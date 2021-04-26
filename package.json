@@ -1,0 +1,49 @@
+{
+  "name": "vue-quasar-s3-albums",
+  "version": "0.0.1",
+  "description": "Quasar S3 photo album app",
+  "productName": "Quasar S3 albums",
+  "author": "Laurence Ho <bluegray.he@aol.com>",
+  "private": true,
+  "scripts": {
+    "dev": "quasar dev",
+    "build": "quasar build",
+    "lint": "eslint --ext .js,.ts,.vue ./",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.10.4",
+    "aws-sdk": "^2.892.0",
+    "core-js": "^3.11.0",
+    "lodash": "^4.17.21",
+    "quasar": "^2.0.0-beta.1"
+  },
+  "devDependencies": {
+    "@quasar/app": "^3.0.0-beta.15",
+    "@types/lodash": "^4.14.168",
+    "@types/node": "^10.17.58",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^7.25.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-vue": "^7.9.0",
+    "prettier": "^2.2.1"
+  },
+  "browserslist": [
+    "last 10 Chrome versions",
+    "last 10 Firefox versions",
+    "last 4 Edge versions",
+    "last 7 Safari versions",
+    "last 8 Android versions",
+    "last 8 ChromeAndroid versions",
+    "last 8 FirefoxAndroid versions",
+    "last 10 iOS versions",
+    "last 5 Opera versions"
+  ],
+  "engines": {
+    "node": ">= 10.18.1",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
+}
