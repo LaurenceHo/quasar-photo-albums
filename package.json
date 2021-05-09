@@ -8,27 +8,38 @@
   "scripts": {
     "dev": "quasar dev",
     "build": "quasar build",
-    "lint": "eslint --ext .js,.ts,.vue ./",
-    "test": "echo \"No test specified\" && exit 0"
+    "lint": "eslint --ext .js,.ts,.vue ./ && prettier --write ./src/**/*.{js,ts,vue}",
+    "test": "echo \"No test specified\" && exit 0",
+    "postinstall": "husky install"
   },
   "dependencies": {
     "@quasar/extras": "^1.10.4",
-    "aws-sdk": "^2.892.0",
-    "core-js": "^3.11.0",
+    "aws-sdk": "^2.903.0",
+    "core-js": "^3.12.1",
     "lodash": "^4.17.21",
-    "quasar": "^2.0.0-beta.1"
+    "quasar": "^2.0.0-beta.15",
+    "util": "^0.12.3"
   },
   "devDependencies": {
-    "@quasar/app": "^3.0.0-beta.15",
+    "@babel/eslint-parser": "^7.13.14",
+    "@quasar/app": "^3.0.0-beta.22",
     "@types/lodash": "^4.14.168",
-    "@types/node": "^10.17.58",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
-    "@typescript-eslint/parser": "^4.22.0",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^7.25.0",
+    "@types/node": "^10.17.59",
+    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/parser": "^4.22.1",
+    "eslint": "^7.26.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-vue": "^7.9.0",
+    "husky": "^6.0.0",
+    "lint-staged": "^11.0.0",
     "prettier": "^2.2.1"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ]
   },
   "browserslist": [
     "last 10 Chrome versions",

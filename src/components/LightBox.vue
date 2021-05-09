@@ -131,15 +131,14 @@ export default defineComponent({
     imageName(value: string) {
       if (value) {
         this.controlsVisible = true;
-        let that = this;
         // Find the index of the image passed to Lightbox
         this.index = this.filteredImages.findIndex((image: LightBoxImage) => {
           return image.name === value;
         });
         window.clearTimeout(this.timer);
         this.timer = window.setTimeout(() => {
-          that.controlsVisible = false;
-        }, that.timeoutDuration);
+          this.controlsVisible = false;
+        }, this.timeoutDuration);
         this.preloadNextImage();
       }
     },
@@ -168,12 +167,11 @@ export default defineComponent({
     },
     keyEventListener(e: any) {
       if (this.visible) {
-        let that = this;
         this.controlsVisible = true;
         window.clearTimeout(this.timer);
         this.timer = window.setTimeout(() => {
-          that.controlsVisible = false;
-        }, that.timeoutDuration);
+          this.controlsVisible = false;
+        }, this.timeoutDuration);
         switch (e.key) {
           case 'ArrowRight':
             this.next();
@@ -194,12 +192,11 @@ export default defineComponent({
     },
     mouseEventListener(e: any) {
       if (this.visible) {
-        let that = this;
         this.controlsVisible = true;
         window.clearTimeout(this.timer);
         this.timer = window.setTimeout(() => {
-          that.controlsVisible = false;
-        }, that.timeoutDuration);
+          this.controlsVisible = false;
+        }, this.timeoutDuration);
       }
     },
     preloadNextImage() {
