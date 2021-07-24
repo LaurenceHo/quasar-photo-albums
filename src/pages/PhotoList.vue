@@ -6,7 +6,12 @@
     </div>
     <div class="q-col-gutter-md row items-start">
       <div v-for="photo in photos" :key="photo.key" class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6">
-        <q-img :ratio="1" :src="photo.url" class="rounded-borders album-thumbnail" @click="showLightBox(photo.url)">
+        <q-img
+          :ratio="1"
+          :src="`${photo.url}?tr=w-250,h-250`"
+          class="rounded-borders album-thumbnail"
+          @click="showLightBox(photo.url)"
+        >
           <div class="absolute-bottom text-center">{{ photo.key }}</div>
         </q-img>
       </div>

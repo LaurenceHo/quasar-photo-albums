@@ -7,23 +7,25 @@
     </q-header>
     <q-page-container>
       <q-linear-progress query color="secondary" v-if="loadingData" />
-      <div class="q-pa-md">
-        <q-breadcrumbs>
-          <q-breadcrumbs-el
-            v-for="breadcrumb in breadcrumbs"
-            :key="breadcrumb.label"
-            :label="breadcrumb.label"
-            :icon="breadcrumb.icon"
-            :to="breadcrumb.to"
-          />
-        </q-breadcrumbs>
-        <template v-if="!loadingData">
-          <router-view v-slot="{ Component }">
-            <keep-alive>
-              <component :is="Component" />
-            </keep-alive>
-          </router-view>
-        </template>
+      <div class="container">
+        <div class="q-pa-md">
+          <q-breadcrumbs>
+            <q-breadcrumbs-el
+              v-for="breadcrumb in breadcrumbs"
+              :key="breadcrumb.label"
+              :label="breadcrumb.label"
+              :icon="breadcrumb.icon"
+              :to="breadcrumb.to"
+            />
+          </q-breadcrumbs>
+          <template v-if="!loadingData">
+            <router-view v-slot="{ Component }">
+              <keep-alive>
+                <component :is="Component" />
+              </keep-alive>
+            </router-view>
+          </template>
+        </div>
       </div>
     </q-page-container>
   </q-layout>

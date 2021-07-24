@@ -76,7 +76,8 @@ module.exports = configure(function (ctx) {
         AWS_REGION: '',
         AWS_S3_BUCKET_NAME: '',
         AWS_IDENTITY_POOL_ID: '',
-        ALBUM_APP_TITLE: 'My photo albums'
+        ALBUM_APP_TITLE: 'My photo albums',
+        IMAGEKIT_CDN_URL: 'https://ik.imagekit.io/YOU_IMAGE_ID/',
       },
     },
 

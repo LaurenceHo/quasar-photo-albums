@@ -13,26 +13,27 @@
     "postinstall": "husky install"
   },
   "dependencies": {
-    "@quasar/extras": "^1.10.4",
-    "aws-sdk": "^2.903.0",
-    "core-js": "^3.12.1",
+    "@quasar/extras": "^1.10.9",
+    "aws-sdk": "^2.953.0",
+    "core-js": "^3.15.2",
     "lodash": "^4.17.21",
-    "quasar": "^2.0.0-beta.15",
-    "util": "^0.12.3"
+    "quasar": "^2.0.3",
+    "util": "^0.12.4",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.13.14",
-    "@quasar/app": "^3.0.0-beta.22",
-    "@types/lodash": "^4.14.168",
-    "@types/node": "^10.17.59",
-    "@typescript-eslint/eslint-plugin": "^4.22.1",
-    "@typescript-eslint/parser": "^4.22.1",
-    "eslint": "^7.26.0",
+    "@babel/eslint-parser": "^7.14.7",
+    "@quasar/app": "^3.0.3",
+    "@types/lodash": "^4.14.171",
+    "@types/node": "^10.17.60",
+    "@typescript-eslint/eslint-plugin": "^4.28.4",
+    "@typescript-eslint/parser": "^4.28.4",
+    "eslint": "^7.31.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-vue": "^7.9.0",
+    "eslint-plugin-vue": "^7.14.0",
     "husky": "^6.0.0",
-    "lint-staged": "^11.0.0",
-    "prettier": "^2.2.1"
+    "lint-staged": "^11.1.0",
+    "prettier": "^2.3.2"
   },
   "lint-staged": {
     "*.{js,ts,vue}": [

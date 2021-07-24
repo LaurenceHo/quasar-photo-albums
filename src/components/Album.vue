@@ -1,6 +1,11 @@
 <template>
   <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6">
-    <q-img :ratio="1" :src="thumbnail[0].url" class="rounded-borders album-thumbnail" @click="goToAlbum">
+    <q-img
+      :ratio="1"
+      :src="`${thumbnail[0].url}?tr=w-250,h-250`"
+      class="rounded-borders album-thumbnail"
+      @click="goToAlbum"
+    >
       <div class="absolute-bottom text-center">{{ albumName }}</div>
     </q-img>
   </div>

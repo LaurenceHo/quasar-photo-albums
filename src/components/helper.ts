@@ -3,6 +3,7 @@ import { Photo } from 'components/models';
 
 export const getPhotos = (albumName: string, maxKeys: number, callback: any) => {
   const bucketName = process.env.AWS_S3_BUCKET_NAME as string;
+  const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
 
   const s3 = new AWS.S3({
     apiVersion: '2006-03-01',
@@ -17,14 +18,13 @@ export const getPhotos = (albumName: string, maxKeys: number, callback: any) => 
       if (err) {
         return;
       }
-      const bucketUrl = `http://${bucketName}/`;
 
       if (data && data.Contents) {
         photos = data.Contents.map((photo) => {
           let url = '';
           let key = '';
           if (photo && photo.Key) {
-            url = bucketUrl + encodeURIComponent(photo.Key);
+            url = cdnURL + encodeURI(photo.Key);
             key = photo.Key;
           }
           return { url, key };
