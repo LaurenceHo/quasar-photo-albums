@@ -45,6 +45,17 @@ export const actions: ActionTree<StoreState, StoreState> & Actions = {
             album.albumName === 'icons' ||
             album.albumName === 'js'
         );
+        allAlbumList.sort((a, b) => {
+          const nameA = a.albumName.toLowerCase();
+          const nameB = b.albumName.toLowerCase();
+          if (nameA < nameB) {
+            return 1;
+          }
+          if (nameA > nameB) {
+            return -1;
+          }
+          return 0;
+        });
         commit(MutationType.setAllAlbumList, allAlbumList);
       }
       commit(MutationType.loadingData, false);

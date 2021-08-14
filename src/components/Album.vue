@@ -14,7 +14,8 @@
 <script lang="ts">
 import { getPhotos } from 'components/helper';
 import { Photo } from 'components/models';
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted, ref, toRefs } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'Album',
@@ -26,25 +27,19 @@ export default defineComponent({
     },
   },
 
-  data() {
-    const thumbnail: Photo[] = [];
-    thumbnail.push({ url: '' });
+  setup(props) {
+    const { albumName } = toRefs(props);
+    const router = useRouter();
+    const thumbnail = ref([] as Photo[]);
+    thumbnail.value.push({ url: '' });
+
+    // Get first photo of album as album cover
+    onMounted(() => getPhotos(albumName.value, 1, (photos: Photo[]) => (thumbnail.value = photos)));
+
     return {
       thumbnail,
+      goToAlbum: () => router.push(`/album/${albumName.value}`),
     };
-  },
-
-  mounted() {
-    // Get first photo of album as album cover
-    getPhotos(this.albumName, 1, (photos: Photo[]) => {
-      this.thumbnail = photos;
-    });
-  },
-
-  methods: {
-    goToAlbum() {
-      this.$router.push(`/album/${this.albumName}`);
-    },
   },
 });
 </script>

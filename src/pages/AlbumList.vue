@@ -29,8 +29,9 @@
 <script lang="ts">
 import Album from 'components/Album.vue';
 import { Album as AlbumName } from 'components/models';
+import isEmpty from 'lodash/isEmpty';
 import { useStore } from 'src/store';
-import { defineComponent } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 
 export default defineComponent({
   name: 'AlbumList',
@@ -39,66 +40,57 @@ export default defineComponent({
     Album,
   },
 
-  data() {
+  setup() {
     const store = useStore();
-    const itemsPerPage = 10;
-    const totalItems = store.state.allAlbumList.length;
-    const chunkAlbumList: AlbumName[] = store.getters.chunkAlbumList(0, itemsPerPage);
+    const itemsPerPage = ref(20);
+    const pageNumber = ref(1);
+    const searchKey = ref('');
+
+    const totalItems = ref(store.state.allAlbumList.length);
+    const chunkAlbumList = ref(store.getters.chunkAlbumList(0, itemsPerPage.value) as AlbumName[]);
+    const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
+    const firstIndex = computed(() => (pageNumber.value - 1) * itemsPerPage.value);
+    const lastIndex = computed(() =>
+      totalPages.value > pageNumber.value ? firstIndex.value + itemsPerPage.value : totalItems.value
+    );
+
+    const getFilteredAlbumList = () => {
+      if (!isEmpty(searchKey.value)) {
+        const filteredAlbumList = store.getters.filteredAlbumList(searchKey.value);
+        totalItems.value = filteredAlbumList.length;
+        if (filteredAlbumList.length) {
+          chunkAlbumList.value = filteredAlbumList.slice(firstIndex.value, lastIndex.value);
+        }
+      } else {
+        totalItems.value = store.state.allAlbumList.length;
+        chunkAlbumList.value = store.getters.chunkAlbumList(firstIndex.value, lastIndex.value);
+      }
+    };
+
+    watch(pageNumber, () => {
+      getFilteredAlbumList();
+    });
+
+    watch(itemsPerPage, () => {
+      pageNumber.value = 1;
+      getFilteredAlbumList();
+    });
+
+    watch(searchKey, () => {
+      pageNumber.value = 1;
+      itemsPerPage.value = 10;
+      getFilteredAlbumList();
+    });
 
     return {
       store,
-      searchKey: '',
-      pageNumber: 1,
+      searchKey,
+      pageNumber,
       totalItems,
+      totalPages,
       itemsPerPage,
       chunkAlbumList,
     };
-  },
-
-  watch: {
-    pageNumber() {
-      this.getFilteredAlbumList();
-    },
-
-    itemsPerPage() {
-      this.pageNumber = 1;
-      this.getFilteredAlbumList();
-    },
-
-    searchKey() {
-      this.pageNumber = 1;
-      this.itemsPerPage = 10;
-      this.getFilteredAlbumList();
-    },
-  },
-
-  computed: {
-    totalPages(): number {
-      return Math.ceil(this.totalItems / this.itemsPerPage);
-    },
-
-    firstIndex(): number {
-      return (this.pageNumber - 1) * this.itemsPerPage;
-    },
-
-    lastIndex(): number {
-      return this.totalPages > this.pageNumber ? this.firstIndex + this.itemsPerPage : this.totalItems;
-    },
-  },
-
-  methods: {
-    getFilteredAlbumList() {
-      if (this.searchKey) {
-        const filteredAlbumList = this.store.getters.filteredAlbumList(this.searchKey);
-        this.totalItems = filteredAlbumList.length;
-        if (filteredAlbumList.length) {
-          this.chunkAlbumList = filteredAlbumList.slice(this.firstIndex, this.lastIndex);
-        }
-      } else {
-        this.totalItems = this.store.state.allAlbumList.length;
-        this.chunkAlbumList = this.store.getters.chunkAlbumList(this.firstIndex, this.lastIndex);
-      }
-    },
   },
 });
 </script>

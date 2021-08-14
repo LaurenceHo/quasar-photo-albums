@@ -28,7 +28,8 @@ If you want to make your S3 albums public so that anyone can see it, you need to
 
 ### S3 static website
 If you want to place this Vue app in the S3 bucket along with your photos, you need to make your S3 bucket as a web server
-to serve your js, css, font... etc files[2].
+to serve your js, css, font... etc files[2]. If you want to configure your S3 bucket as a static website using a custom domain,
+you can check out this [documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/website-hosting-custom-domain-walkthrough.html).
 
 ### S3 CORS policy
 If you don't want anyone can link to your photos from their website, don't forget to put CORS into S3 bucket configuration[3].
