@@ -17,7 +17,11 @@ export const getters: GetterTree<StoreState, StoreState> & Getters = {
     (state: StoreState) =>
     (searchKey: string): Album[] => {
       if (searchKey) {
-        return state.allAlbumList.filter((album) => album.albumName.toLowerCase().includes(searchKey.toLowerCase()));
+        return state.allAlbumList.filter(
+          (album) =>
+            album.albumName.toLowerCase().includes(searchKey.toLowerCase()) ||
+            album.desc.toLowerCase().includes(searchKey.toLowerCase())
+        );
       } else {
         return state.allAlbumList;
       }

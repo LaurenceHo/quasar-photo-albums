@@ -20,6 +20,7 @@ import { createStore, Store as VuexStore, useStore as vuexUseStore } from 'vuex'
 const state: StoreState = {
   loadingData: false,
   allAlbumList: [],
+  searchKey: '',
 };
 
 // provide typings for `this.$store`

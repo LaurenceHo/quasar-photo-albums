@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { getPhotos } from 'components/helper';
+import { getPhotoObjectFromS3 } from 'components/helper';
 import LightBox from 'components/LightBox.vue';
 import { LightBoxImage, Photo } from 'components/models';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
@@ -59,9 +59,9 @@ export default defineComponent({
         })) as LightBoxImage[]
     );
 
-    const getPhotoList = () => {
+    const getPhotoList = async () => {
       photosInAlbum.value = [];
-      getPhotos(albumName.value, 1000, (photoList: Photo[]) => (photosInAlbum.value = photoList));
+      photosInAlbum.value = await getPhotoObjectFromS3(albumName.value, 1000);
     };
 
     onMounted(() => getPhotoList());
