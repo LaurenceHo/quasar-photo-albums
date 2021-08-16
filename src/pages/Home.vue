@@ -46,8 +46,6 @@ export default defineComponent({
     const store = useStore();
     const route = useRoute();
 
-    onMounted(() => store.dispatch(ActionType.getAllAlbumList));
-
     const loadingData = computed(() => store.state.loadingData);
 
     const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => {

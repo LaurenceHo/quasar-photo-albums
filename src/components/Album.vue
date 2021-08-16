@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { getPhotos } from 'components/helper';
+import { getPhotoObjectFromS3 } from 'components/helper';
 import { Photo } from 'components/models';
 import { defineComponent, onMounted, ref, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
@@ -34,7 +34,7 @@ export default defineComponent({
     thumbnail.value.push({ url: '' });
 
     // Get first photo of album as album cover
-    onMounted(() => getPhotos(albumName.value, 1, (photos: Photo[]) => (thumbnail.value = photos)));
+    onMounted(() => getPhotoObjectFromS3(albumName.value, 1, (photos: Photo[]) => (thumbnail.value = photos)));
 
     return {
       thumbnail,

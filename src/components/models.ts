@@ -1,5 +1,7 @@
 export interface Album {
   albumName: string;
+  desc: string;
+  tags: string[];
 }
 
 export interface Photo {
