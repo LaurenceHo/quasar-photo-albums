@@ -2,7 +2,15 @@
   <q-layout view="lHh Lpr lFf">
     <q-header>
       <q-toolbar>
+        <q-avatar>
+          <img src="icons/favicon-128x128.png" />
+        </q-avatar>
         <q-toolbar-title> {{ albumAppName }} </q-toolbar-title>
+        <q-input v-if="routeName === 'Albums'" v-model="searchKey" dense outlined color="secondary">
+          <template v-slot:append>
+            <q-icon name="mdi-magnify" />
+          </template>
+        </q-input>
       </q-toolbar>
     </q-header>
     <q-page-container>
@@ -35,7 +43,7 @@
 import PhotoList from 'pages/PhotoList.vue';
 import { useStore } from 'src/store';
 import { ActionType } from 'src/store/types';
-import { defineComponent, computed, onMounted } from 'vue';
+import { defineComponent, computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import AlbumList from 'pages/AlbumList.vue';
 
@@ -46,8 +54,8 @@ export default defineComponent({
     const store = useStore();
     const route = useRoute();
 
+    const albumAppName = computed(() => process.env.ALBUM_APP_TITLE);
     const loadingData = computed(() => store.state.loadingData);
-
     const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => {
       const routes: { label: string; icon: string; to?: any }[] = [];
       routes.push({ label: 'Home', icon: 'mdi-home' });
@@ -58,8 +66,20 @@ export default defineComponent({
       return routes;
     });
 
-    const albumAppName = computed(() => process.env.ALBUM_APP_TITLE);
-    return { loadingData, breadcrumbs, albumAppName };
+    const searchKey = ref('');
+    watch(searchKey, (newValue) => {
+      if (newValue) {
+        store.dispatch(ActionType.inputSearchKey, newValue);
+      }
+    });
+
+    return {
+      searchKey,
+      loadingData,
+      breadcrumbs,
+      albumAppName,
+      routeName: computed(() => route.name),
+    };
   },
 });
 </script>

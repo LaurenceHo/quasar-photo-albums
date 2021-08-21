@@ -2,7 +2,7 @@
   <q-page class="q-pt-md">
     <div class="q-pb-md row justify-between items-center">
       <div class="col-12 col-xl-3 col-lg-4 col-md-4 flex">
-        <q-btn-group outline class="q-mb-sm">
+        <q-btn-group class="q-mb-sm" outline>
           <q-btn
             :outline="albumListType === 'square'"
             color="primary"
@@ -18,11 +18,6 @@
             @click="setAlbumListType('square')"
           />
         </q-btn-group>
-        <q-input v-model="searchKey" class="full-width" dense outlined>
-          <template v-slot:append>
-            <q-icon name="mdi-magnify" />
-          </template>
-        </q-input>
       </div>
       <div class="col-12 col-xl-4 col-lg-5 col-md-5 flex justify-end items-center q-pt-md">
         <q-pagination
@@ -43,7 +38,7 @@
     </div>
     <div v-else class="justify-center row">
       <div class="col-12 col-xl-6 col-lg-8 col-md-8 column">
-        <q-list bordered separator class="rounded-borders">
+        <q-list v-if="chunkAlbumList.length" bordered class="rounded-borders" separator>
           <Album v-for="album in chunkAlbumList" :key="album.albumName" :albumItem="album" :albumType="albumListType" />
         </q-list>
       </div>
@@ -69,11 +64,12 @@ export default defineComponent({
     const store = useStore();
     const itemsPerPage = ref(20);
     const pageNumber = ref(1);
-    const searchKey = ref('');
     const albumListType = ref('list');
 
     const totalItems = ref(store.state.allAlbumList.length);
     const chunkAlbumList = ref(store.getters.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
+
+    const searchKey = computed(() => store.state.searchKey);
     const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
     const firstIndex = computed(() => (pageNumber.value - 1) * itemsPerPage.value);
     const lastIndex = computed(() =>
