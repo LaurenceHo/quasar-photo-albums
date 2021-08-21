@@ -6,16 +6,17 @@
   "author": "Laurence Ho <bluegray.he@aol.com>",
   "private": true,
   "scripts": {
-    "dev": "quasar dev",
+    "serve": "quasar dev",
     "build": "quasar build",
     "lint": "eslint --ext .js,.ts,.vue ./ && prettier --write ./src/**/*.{js,ts,vue}",
-    "test": "echo \"No test specified\" && exit 0",
     "postinstall": "husky install",
     "firebase-deploy": "npm run build && firebase deploy"
   },
   "dependencies": {
+    "@aws-sdk/client-cognito-identity": "^3.27.0",
+    "@aws-sdk/client-s3": "^3.27.0",
+    "@aws-sdk/credential-provider-cognito-identity": "^3.27.0",
     "@quasar/extras": "^1.10.10",
-    "aws-sdk": "^2.968.0",
     "core-js": "^3.16.1",
     "lodash": "^4.17.21",
     "quasar": "^2.0.3",

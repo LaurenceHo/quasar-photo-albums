@@ -59,9 +59,9 @@ export default defineComponent({
         })) as LightBoxImage[]
     );
 
-    const getPhotoList = () => {
+    const getPhotoList = async () => {
       photosInAlbum.value = [];
-      getPhotoObjectFromS3(albumName.value, 1000, (photoList: Photo[]) => (photosInAlbum.value = photoList));
+      photosInAlbum.value = await getPhotoObjectFromS3(albumName.value, 1000);
     };
 
     onMounted(() => getPhotoList());

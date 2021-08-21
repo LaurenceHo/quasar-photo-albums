@@ -57,9 +57,7 @@ export default defineComponent({
     thumbnail.value.push({ url: '' });
 
     // Get first photo of album as album cover
-    onMounted(() =>
-      getPhotoObjectFromS3(props.albumItem.albumName, 1, (photos: Photo[]) => (thumbnail.value = photos))
-    );
+    onMounted(async () => (thumbnail.value = await getPhotoObjectFromS3(props.albumItem.albumName, 1)));
 
     return {
       thumbnail,
