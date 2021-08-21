@@ -8,4 +8,7 @@ export const mutations: MutationTree<StoreState> & Mutations = {
   [MutationType.setAllAlbumList](state: StoreState, payload): void {
     state.allAlbumList = payload;
   },
+  [MutationType.inputSearchKey](state: StoreState, payload): void {
+    state.searchKey = payload;
+  },
 };

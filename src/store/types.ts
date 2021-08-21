@@ -4,6 +4,7 @@ import { ActionContext, CommitOptions, DispatchOptions, Store as VuexStore } fro
 export interface StoreState {
   loadingData: boolean;
   allAlbumList: Album[];
+  searchKey: string;
 }
 
 export type Getters = {
@@ -14,21 +15,25 @@ export type Getters = {
 export enum ActionType {
   loadingData = 'loadingData',
   getAllAlbumList = 'getAllAlbumList',
+  inputSearchKey = 'inputSearchKey',
 }
 
 export type Actions = {
   [ActionType.loadingData](context: ActionAugments, payload: boolean): void;
   [ActionType.getAllAlbumList](context: ActionAugments): void;
+  [ActionType.inputSearchKey](context: ActionAugments, payload: string): void;
 };
 
 export enum MutationType {
   loadingData = 'loadingData',
   setAllAlbumList = 'setAllAlbumList',
+  inputSearchKey = 'inputSearchKey',
 }
 
 export type Mutations = {
   [MutationType.loadingData](state: StoreState, payload: boolean): void;
   [MutationType.setAllAlbumList](state: StoreState, payload: Album[]): void;
+  [MutationType.inputSearchKey](state: StoreState, payload: string): void;
 };
 
 export type ActionAugments = Omit<ActionContext<StoreState, StoreState>, 'commit'> & {

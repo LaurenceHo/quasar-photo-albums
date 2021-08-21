@@ -28,7 +28,7 @@ module.exports = configure(function (ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli/boot-files
-    boot: [],
+    boot: ['firebase'],
 
     // https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ['app.scss'],
@@ -73,11 +73,11 @@ module.exports = configure(function (ctx) {
       // https://quasar.dev/quasar-cli/handling-process-env
       // Add environment variables here that you can use in your website/app JS code.
       env: {
-        AWS_REGION: '',
-        AWS_S3_BUCKET_NAME: '',
-        AWS_IDENTITY_POOL_ID: '',
-        ALBUM_APP_TITLE: 'My photo albums',
-        IMAGEKIT_CDN_URL: 'https://ik.imagekit.io/YOU_IMAGE_ID/',
+        AWS_REGION: 'AWS_REGION',
+        AWS_S3_BUCKET_NAME: 'AWS_S3_BUCKET_NAME',
+        AWS_IDENTITY_POOL_ID: 'AWS_IDENTITY_POOL_ID',
+        ALBUM_APP_TITLE: 'ALBUM_APP_TITLE',
+        IMAGEKIT_CDN_URL: 'https://ik.imagekit.io/IMAGEKIT_ID/',
       },
     },
 
@@ -103,7 +103,7 @@ module.exports = configure(function (ctx) {
       // directives: [],
 
       // Quasar plugins
-      plugins: [],
+      plugins: ['Notify'],
     },
 
     // animations: 'all', // --- includes all animations
