@@ -6,13 +6,18 @@
   padding-right: 15px;
 }
 
-.album-thumbnail {
-  cursor: pointer;
-}
-
 .carousel-photo-caption {
   text-align: center;
   padding: 12px;
   color: white;
   background: rgba(0, 0, 0, 0.47);
+}
+
+.rounded-borders-lg {
+  border-radius: 8px;
+}
+
+// Quasar css override
+.q-field--standout .q-field__control {
+  background: #fff;
 }

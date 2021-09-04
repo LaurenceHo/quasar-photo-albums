@@ -33,16 +33,26 @@
         ({{ totalItems }} albums)
       </div>
     </div>
-    <div v-if="albumListType === 'square'" class="q-col-gutter-md row">
-      <Album v-for="album in chunkAlbumList" :key="album.albumName" :albumItem="album" :albumType="albumListType" />
-    </div>
-    <div v-else class="justify-center row">
-      <div class="col-12 col-xl-6 col-lg-8 col-md-8 column">
-        <q-list v-if="chunkAlbumList.length" bordered class="rounded-borders" separator>
-          <Album v-for="album in chunkAlbumList" :key="album.albumName" :albumItem="album" :albumType="albumListType" />
-        </q-list>
+    <template v-if="chunkAlbumList.length">
+      <div v-if="albumListType === 'square'" class="q-col-gutter-md row">
+        <Album v-for="album in chunkAlbumList" :key="album.albumName" :albumItem="album" :albumType="albumListType" />
       </div>
-    </div>
+      <div v-else class="justify-center row">
+        <div class="col-12 col-xl-6 col-lg-8 col-md-8 column">
+          <q-list bordered class="rounded-borders" separator>
+            <Album
+              v-for="album in chunkAlbumList"
+              :key="album.albumName"
+              :albumItem="album"
+              :albumType="albumListType"
+            />
+          </q-list>
+        </div>
+      </div>
+    </template>
+    <template v-else>
+      <div class="text-h5 text-weight-medium">No results.</div>
+    </template>
   </q-page>
 </template>
 
@@ -80,9 +90,7 @@ export default defineComponent({
       if (!isEmpty(searchKey.value)) {
         const filteredAlbumList = store.getters.filteredAlbumList(searchKey.value);
         totalItems.value = filteredAlbumList.length;
-        if (filteredAlbumList.length) {
-          chunkAlbumList.value = filteredAlbumList.slice(firstIndex.value, lastIndex.value);
-        }
+        chunkAlbumList.value = filteredAlbumList.slice(firstIndex.value, lastIndex.value);
       } else {
         totalItems.value = store.state.allAlbumList.length;
         chunkAlbumList.value = store.getters.chunkAlbumList(firstIndex.value, lastIndex.value);

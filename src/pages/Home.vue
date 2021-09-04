@@ -5,8 +5,8 @@
         <q-avatar>
           <img src="icons/favicon-128x128.png" />
         </q-avatar>
-        <q-toolbar-title> {{ albumAppName }} </q-toolbar-title>
-        <q-input v-if="routeName === 'Albums'" v-model="searchKey" dense outlined color="secondary">
+        <q-toolbar-title> {{ albumAppName }}</q-toolbar-title>
+        <q-input v-if="routeName === 'Albums'" v-model="searchKey" dense standout="bg-grey">
           <template v-slot:append>
             <q-icon name="mdi-magnify" />
           </template>
@@ -14,15 +14,15 @@
       </q-toolbar>
     </q-header>
     <q-page-container>
-      <q-linear-progress query color="secondary" v-if="loadingData" />
+      <q-linear-progress v-if="loadingData" color="secondary" query />
       <div class="container">
         <div class="q-pa-md">
           <q-breadcrumbs>
             <q-breadcrumbs-el
               v-for="breadcrumb in breadcrumbs"
               :key="breadcrumb.label"
-              :label="breadcrumb.label"
               :icon="breadcrumb.icon"
+              :label="breadcrumb.label"
               :to="breadcrumb.to"
             />
           </q-breadcrumbs>
@@ -40,12 +40,12 @@
 </template>
 
 <script lang="ts">
+import AlbumList from 'pages/AlbumList.vue';
 import PhotoList from 'pages/PhotoList.vue';
 import { useStore } from 'src/store';
 import { ActionType } from 'src/store/types';
-import { defineComponent, computed, ref, watch } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import AlbumList from 'pages/AlbumList.vue';
 
 export default defineComponent({
   name: 'Home',
@@ -68,9 +68,7 @@ export default defineComponent({
 
     const searchKey = ref('');
     watch(searchKey, (newValue) => {
-      if (newValue) {
-        store.dispatch(ActionType.inputSearchKey, newValue);
-      }
+      store.dispatch(ActionType.inputSearchKey, newValue);
     });
 
     return {
