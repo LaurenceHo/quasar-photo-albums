@@ -3,23 +3,23 @@
     <q-img
       :ratio="1"
       :src="`${thumbnail[0].url}?tr=w-250,h-250`"
-      class="rounded-borders album-thumbnail"
+      class="rounded-borders-lg cursor-pointer"
       @click="goToAlbum"
     >
-      <div class="absolute-bottom text-center">{{ albumItem.albumName }}</div>
     </q-img>
+    <div class="q-pt-sm text-h6 text-weight-medium">{{ albumItem.albumName }}</div>
   </div>
   <template v-else>
-    <q-item clickable v-ripple @click="goToAlbum">
+    <q-item v-ripple clickable @click="goToAlbum">
       <q-item-section avatar>
-        <q-avatar rounded size="72px">
-          <q-img class="rounded-borders" :ratio="1" :src="`${thumbnail[0].url}?tr=w-72,h-72`" />
+        <q-avatar rounded size="90px">
+          <q-img :ratio="1" :src="`${thumbnail[0].url}?tr=w-90,h-90`" class="rounded-borders" />
         </q-avatar>
       </q-item-section>
 
       <q-item-section>
-        <q-item-label class="text-weight-medium">{{ albumItem.albumName }}</q-item-label>
-        <q-item-label v-if="albumItem.desc" caption>
+        <q-item-label class="text-h6 text-weight-medium">{{ albumItem.albumName }}</q-item-label>
+        <q-item-label v-if="albumItem.desc" class="text-subtitle1 text-grey-7">
           {{ albumItem.desc }}
         </q-item-label>
         <div class="flex">

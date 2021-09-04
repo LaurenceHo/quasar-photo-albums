@@ -9,10 +9,9 @@
         <q-img
           :ratio="1"
           :src="`${photo.url}?tr=w-250,h-250`"
-          class="rounded-borders album-thumbnail"
+          class="rounded-borders-lg cursor-pointer"
           @click="showLightBox(photo.url)"
         >
-          <div class="absolute-bottom text-center">{{ photo.key }}</div>
         </q-img>
       </div>
     </div>
