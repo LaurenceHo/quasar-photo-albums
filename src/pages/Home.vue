@@ -7,14 +7,17 @@
         </q-avatar>
         <q-toolbar-title> {{ albumAppName }}</q-toolbar-title>
         <q-input v-if="routeName === 'Albums'" v-model="searchKey" dense standout="bg-grey">
-          <template v-slot:append>
+          <template v-slot:prepend>
             <q-icon name="mdi-magnify" />
+          </template>
+          <template v-slot:append>
+            <q-icon class="cursor-pointer" name="mdi-close" @click="searchKey = ''" />
           </template>
         </q-input>
       </q-toolbar>
     </q-header>
     <q-page-container>
-      <q-linear-progress v-if="loadingData" color="secondary" query />
+      <q-linear-progress v-if="loadingAlbum" color="secondary" query />
       <div class="container">
         <div class="q-pa-md">
           <q-breadcrumbs>
@@ -26,7 +29,7 @@
               :to="breadcrumb.to"
             />
           </q-breadcrumbs>
-          <template v-if="!loadingData">
+          <template v-if="!loadingAlbum">
             <router-view v-slot="{ Component }">
               <keep-alive>
                 <component :is="Component" />
@@ -55,7 +58,7 @@ export default defineComponent({
     const route = useRoute();
 
     const albumAppName = computed(() => process.env.ALBUM_APP_TITLE);
-    const loadingData = computed(() => store.state.loadingData);
+    const loadingAlbum = computed(() => store.state.loadingAlbum);
     const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => {
       const routes: { label: string; icon: string; to?: any }[] = [];
       routes.push({ label: 'Home', icon: 'mdi-home' });
@@ -73,7 +76,7 @@ export default defineComponent({
 
     return {
       searchKey,
-      loadingData,
+      loadingAlbum,
       breadcrumbs,
       albumAppName,
       routeName: computed(() => route.name),

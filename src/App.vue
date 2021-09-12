@@ -14,6 +14,7 @@ export default defineComponent({
     const store = useStore();
     // insertDataToFirestore();
     store.dispatch(ActionType.getAllAlbumList);
+    store.dispatch(ActionType.getAlbumTags);
   },
 });
 </script>
