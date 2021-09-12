@@ -11,8 +11,7 @@ export const getAlbumList = async (startIndex?: number, endIndex?: number, filte
   const db = firebase.firestore();
   const queryResult = await db
     .collection('s3-photo-albums')
-    .where('private', '!=', true)
-    .orderBy('private')
+    .where('private', '==', false)
     .orderBy('albumName', 'desc')
     .get()
     .catch((error) => {
@@ -22,6 +21,18 @@ export const getAlbumList = async (startIndex?: number, endIndex?: number, filte
     albumList.push(doc.data() as Album);
   });
   return albumList;
+};
+
+export const getAlbumTags = async () => {
+  const db = firebase.firestore();
+  return await db
+    .collection('album-tags')
+    .doc('album-tags')
+    .get()
+    .then((doc) => doc.data() as { tags: string[] })
+    .catch((error) => {
+      throw error;
+    });
 };
 
 export const getPhotoObjectFromS3 = async (albumName: string, maxKeys: number) => {

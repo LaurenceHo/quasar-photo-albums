@@ -18,8 +18,10 @@ import { createStore, Store as VuexStore, useStore as vuexUseStore } from 'vuex'
  */
 
 const state: StoreState = {
-  loadingData: false,
+  loadingAlbum: false,
+  loadingAlbumTags: false,
   allAlbumList: [],
+  albumTags: [],
   searchKey: '',
 };
 

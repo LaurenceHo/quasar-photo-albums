@@ -2,7 +2,7 @@
 
 This is a simple AWS S3 album app by using Vue3, Quasar and AWS SDK. You can use this web app to display your photos in S3 bucket.
 Since displaying photos from S3 directly only has limited functionality (you can only display folder name as album name), I use Google Cloud Firestore to organise
-my S3 photo folders information as well as deploy my project to Google Cloud Firebase.
+my S3 photo folder information as well as deploy my project to Google Cloud Firebase.
 
 ## Getting started
 ### Create S3 bucket and Cognito Identity Pool
@@ -43,7 +43,7 @@ to serve your js, css, font... etc files[2]. If you want to configure your S3 bu
 you can check out this [documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/website-hosting-custom-domain-walkthrough.html).
 
 ### Deploy to Firebase (recommended)
-Because I don't want to deal with SSL on my project (I am too lazy to configure AWS CDN...etc ¯\_(ツ)_/¯ ), I deploy my project to Google Firebase
+Because I don't want to deal with SSL on my project (I am too lazy to configure AWS CDN...etc `¯\_(ツ)_/¯` ), I deploy my project to Google Firebase
 and Google will do all SSL configuration for me.
 * Visit `https://console.firebase.google.com` to create a new project
 * Check [here](https://firebase.google.com/docs/hosting/quickstart) for further detail about how to deploy your app to Firebase
@@ -76,6 +76,9 @@ is a cloud-based image CDN with real-time image optimization and transformation 
 optimized images across all devices[4]. You can follow this [documentation](https://imagekit.io/blog/image-optimization-resize-aws-s3-imagekit/)
 to create an account in the ImageKit. You will have 20GB bandwidth per month as a free user.
 
+#### Important
+If you change S3 bucket name, don't forget to update the configuration in ImageKit, AWS IAM permission for Cognito and Imagekit.
+
 ### Google Cloud Firestore
 As I mentioned, I use [Google Cloud Firestore](https://firebase.google.com/docs/firestore) to organise my S3 photo folders information. I ran a small script to fetch
 all folders in S3 bucket and inserted folder name along with other information into Google Firestore. The album object structure as below:
@@ -88,7 +91,8 @@ Album
   private: boolean;
 }
 ```
-Yes I know, input this information is quite painful because it has to be manually process.
+Architecture:
+![Architecture](./public/S3_albums_architecture.jpg)
 
 ### Install the dependencies
 ```bash
@@ -98,6 +102,7 @@ npm install
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 ```bash
 quasar dev
+or
 npm run serve
 ```
 
@@ -109,6 +114,7 @@ npm run lint
 ### Build the app for production
 ```bash
 quasar build
+or
 npm run build
 ```
 

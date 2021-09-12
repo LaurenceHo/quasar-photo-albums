@@ -15,15 +15,27 @@ export const getters: GetterTree<StoreState, StoreState> & Getters = {
     },
   filteredAlbumList:
     (state: StoreState) =>
-    (searchKey: string): Album[] => {
-      if (searchKey) {
-        return state.allAlbumList.filter(
-          (album) =>
-            album.albumName.toLowerCase().includes(searchKey.toLowerCase()) ||
-            album.desc.toLowerCase().includes(searchKey.toLowerCase())
-        );
-      } else {
-        return state.allAlbumList;
+    (searchKey: string, selectedTags: string[]): Album[] => {
+      let filteredAlbumList = state.allAlbumList;
+      if (!isEmpty(searchKey) || !isEmpty(selectedTags)) {
+        const filterByTags: Album[] = [];
+        if (!isEmpty(searchKey)) {
+          filteredAlbumList = filteredAlbumList.filter(
+            (album) =>
+              album.albumName.toLowerCase().includes(searchKey.toLowerCase()) ||
+              album.desc.toLowerCase().includes(searchKey.toLowerCase())
+          );
+        }
+        if (!isEmpty(selectedTags)) {
+          filteredAlbumList.forEach((album) => {
+            const result = selectedTags.some((tag) => album.tags.includes(tag));
+            if (result) {
+              filterByTags.push(album);
+            }
+          });
+          filteredAlbumList = filterByTags;
+        }
       }
+      return filteredAlbumList;
     },
 };
