@@ -1,6 +1,5 @@
 import { boot } from 'quasar/wrappers';
 import { initializeApp } from 'firebase/app';
-import { getAnalytics } from 'firebase/analytics';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -17,7 +16,6 @@ const firebaseApp = initializeApp({
   messagingSenderId: process.env.GOOGLE_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.GOOGLE_FIREBASE_APP_ID,
 });
-getAnalytics();
 
 export default boot(({ app }) => {
   app.config.globalProperties.$firebaseApp = firebaseApp;

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="albumType === 'square'" class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6">
+  <div v-if="albumType === 'grid'" class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6">
     <q-img
       :ratio="1"
       :src="`${thumbnail[0].url}?tr=w-250,h-250`"

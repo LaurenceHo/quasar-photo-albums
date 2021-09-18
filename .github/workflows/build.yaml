@@ -1,0 +1,78 @@
+name: Node.js CI
+
+on:
+  pull_request:
+    branches: [ master ]
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Run build manually'
+        required: true
+        default: 'Run build manually'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      ALBUM_APP_TITLE: ${{ secrets.ALBUM_APP_TITLE }}
+      AWS_IDENTITY_POOL_ID: ${{ secrets.AWS_IDENTITY_POOL_ID }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
+      GOOGLE_FIREBASE_API_KEY: ${{ secrets.GOOGLE_FIREBASE_API_KEY }}
+      GOOGLE_FIREBASE_APP_ID: ${{ secrets.GOOGLE_FIREBASE_APP_ID }}
+      GOOGLE_FIREBASE_AUTH_DOMAIN: ${{ secrets.GOOGLE_FIREBASE_AUTH_DOMAIN }}
+      GOOGLE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.GOOGLE_FIREBASE_MESSAGING_SENDER_ID }}
+      GOOGLE_FIREBASE_PROJECT_ID: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
+      GOOGLE_FIREBASE_STORAGE_BUCKET: ${{ secrets.GOOGLE_FIREBASE_STORAGE_BUCKET }}
+      IMAGEKIT_CDN_URL: ${{ secrets.IMAGEKIT_CDN_URL }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Write .env file
+        run: |
+          tee .env <<EOF
+          ALBUM_APP_TITLE=$ALBUM_APP_TITLE
+          AWS_IDENTITY_POOL_ID=$AWS_IDENTITY_POOL_ID
+          AWS_REGION=$AWS_REGION
+          AWS_S3_BUCKET_NAME=$AWS_S3_BUCKET_NAME
+          GOOGLE_FIREBASE_API_KEY=$GOOGLE_FIREBASE_API_KEY
+          GOOGLE_FIREBASE_APP_ID=$GOOGLE_FIREBASE_APP_ID
+          GOOGLE_FIREBASE_AUTH_DOMAIN=$GOOGLE_FIREBASE_AUTH_DOMAIN
+          GOOGLE_FIREBASE_MESSAGING_SENDER_ID=$GOOGLE_FIREBASE_MESSAGING_SENDER_ID
+          GOOGLE_FIREBASE_PROJECT_ID=$GOOGLE_FIREBASE_PROJECT_ID
+          GOOGLE_FIREBASE_STORAGE_BUCKET=$GOOGLE_FIREBASE_STORAGE_BUCKET
+          IMAGEKIT_CDN_URL=$IMAGEKIT_CDN_URL
+          EOF
+      - name: Test and build
+        run: |
+          npm run test:unit
+          npm run build
+          npx firebase-tools --project $GOOGLE_FIREBASE_PROJECT_ID
+
+      - name: Deploy to Firebase preview channel
+        if: ${{ success() && github.event_name == 'pull_request' }}
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BLUEBOTTLE_PHOTO_ALBUMS }}
+          projectId: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
+
+      - name: Deploy to Firebase prod
+        if: ${{ success() && github.head_ref == 'master' && (github.event_name == 'push' || github.event.pull_request.merged == true) }}
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BLUEBOTTLE_PHOTO_ALBUMS }}
+          channelId: live
+          projectId: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
