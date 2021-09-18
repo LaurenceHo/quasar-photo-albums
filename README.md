@@ -7,7 +7,7 @@ my S3 photo folder information as well as deploy my project to Google Cloud Fire
 ## Getting started
 ### Create S3 bucket and Cognito Identity Pool
 Before you start, please create an AWS S3 bucket and an AWS Cognito Identity Pool at first [1]. Once you create them, replace those properties:
-AWS_S3_BUCKET_NAME, AWS_REGION, AWS_IDENTITY_POOL_ID and IMAGEKIT_CDN_URL with your real information in`quasar.conf.js` (under `build -> env` section) then you are good to go.
+AWS_S3_BUCKET_NAME, AWS_REGION, AWS_IDENTITY_POOL_ID and IMAGEKIT_CDN_URL with your real information in`.env.example` and modify file name to `.env` then you are good to go.
 The file structure in the S3 bucket should be like this:
 ```
 /S3 bucket:
@@ -48,6 +48,7 @@ and Google will do all SSL configuration for me.
 * Visit `https://console.firebase.google.com` to create a new project
 * Check [here](https://firebase.google.com/docs/hosting/quickstart) for further detail about how to deploy your app to Firebase
 * You can run this command to deploy your project locally: `npm run firebase-deploy`
+* Place your Google Firebase information in the `.env` too
 
 ### S3 CORS policy
 Don't forget to put CORS into S3 bucket configuration[3] to prevent other people link your photos from their websites directly.
