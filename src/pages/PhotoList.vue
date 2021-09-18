@@ -28,11 +28,11 @@
 </template>
 
 <script lang="ts">
-import { getPhotoObjectFromS3 } from 'components/helper';
 import LightBox from 'components/LightBox.vue';
 import { LightBoxImage, Photo } from 'components/models';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import S3Service from 'src/services/s3-service';
 
 export default defineComponent({
   name: 'PhotoList',
@@ -41,6 +41,7 @@ export default defineComponent({
   },
 
   setup() {
+    const s3Service = new S3Service();
     const router = useRouter();
     const route = useRoute();
 
@@ -60,7 +61,7 @@ export default defineComponent({
 
     const getPhotoList = async () => {
       photosInAlbum.value = [];
-      photosInAlbum.value = await getPhotoObjectFromS3(albumName.value, 1000);
+      photosInAlbum.value = await s3Service.getPhotoObject(albumName.value, 1000);
     };
 
     onMounted(() => getPhotoList());

@@ -3,18 +3,24 @@ import { RouteRecordRaw } from 'vue-router';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    name: 'Home',
-    component: () => import('pages/Home.vue'),
+    component: () => import('layouts/PublicLayout.vue'),
     children: [
       {
-        path: '',
-        name: 'Albums',
-        component: () => import('pages/AlbumList.vue'),
-      },
-      {
-        path: '/album/:albumName',
-        name: 'Photos',
-        component: () => import('pages/PhotoList.vue'),
+        path: '/',
+        component: () => import('pages/Index.vue'),
+        name: 'LandingPage',
+        children: [
+          {
+            path: '',
+            name: 'Albums',
+            component: () => import('pages/AlbumList.vue'),
+          },
+          {
+            path: '/album/:albumName',
+            name: 'Photos',
+            component: () => import('pages/PhotoList.vue'),
+          },
+        ],
       },
     ],
   },

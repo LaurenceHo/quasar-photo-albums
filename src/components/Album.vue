@@ -31,8 +31,8 @@
 </template>
 
 <script lang="ts">
-import { getPhotoObjectFromS3 } from 'components/helper';
 import { Photo } from 'components/models';
+import S3Service from 'src/services/s3-service';
 import { defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -52,12 +52,13 @@ export default defineComponent({
   },
 
   setup(props) {
+    const s3Service = new S3Service();
     const router = useRouter();
     const thumbnail = ref([] as Photo[]);
     thumbnail.value.push({ url: '' });
 
     // Get first photo of album as album cover
-    onMounted(async () => (thumbnail.value = await getPhotoObjectFromS3(props.albumItem.albumName, 1)));
+    onMounted(async () => (thumbnail.value = await s3Service.getPhotoObject(props.albumItem.albumName, 1)));
 
     return {
       thumbnail,
