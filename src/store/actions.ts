@@ -39,7 +39,7 @@ export const actions: ActionTree<StoreState, StoreState> & Actions = {
       .then((albumTags) => {
         commit(
           MutationType.setAlbumTags,
-          albumTags.tags.sort((a, b) => {
+          albumTags.tags.sort((a: string, b: string) => {
             if (a.toLowerCase() > b.toLowerCase()) {
               return 1;
             } else if (a.toLowerCase() < b.toLowerCase()) {

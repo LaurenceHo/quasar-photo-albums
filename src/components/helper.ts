@@ -1,22 +1,19 @@
 import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity';
 import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
-import { firebase } from 'boot/firebase';
+import { firebaseApp } from 'boot/firebase';
 import { Album, Photo } from 'components/models';
+import { collection, doc, getDoc, getDocs, getFirestore, orderBy, query, setDoc, where } from 'firebase/firestore';
 import { Notify } from 'quasar';
 
 export const getAlbumList = async (startIndex?: number, endIndex?: number, filter?: string) => {
-  // TODO: need to apply filter
+  // TODO: May need to apply filter in the feature. It only runs filter in the memory atm.
   const albumList: Album[] = [];
-  const db = firebase.firestore();
-  const queryResult = await db
-    .collection('s3-photo-albums')
-    .where('private', '==', false)
-    .orderBy('albumName', 'desc')
-    .get()
-    .catch((error) => {
-      throw error;
-    });
+  const db = getFirestore(firebaseApp);
+  const q = query(collection(db, 's3-photo-albums'), where('private', '==', false), orderBy('albumName', 'desc'));
+  const queryResult = await getDocs(q).catch((error) => {
+    throw error;
+  });
   queryResult.forEach((doc) => {
     albumList.push(doc.data() as Album);
   });
@@ -24,11 +21,9 @@ export const getAlbumList = async (startIndex?: number, endIndex?: number, filte
 };
 
 export const getAlbumTags = async () => {
-  const db = firebase.firestore();
-  return await db
-    .collection('album-tags')
-    .doc('album-tags')
-    .get()
+  const db = getFirestore(firebaseApp);
+  const docRef = doc(db, 'album-tags', 'album-tags');
+  return await getDoc(docRef)
     .then((doc) => doc.data() as { tags: string[] })
     .catch((error) => {
       throw error;
@@ -83,7 +78,7 @@ export const getPhotoObjectFromS3 = async (albumName: string, maxKeys: number) =
 };
 
 export const insertDataToFirestore = async () => {
-  const db = firebase.firestore();
+  const db = getFirestore(firebaseApp);
 
   const bucketName = process.env.AWS_S3_BUCKET_NAME as string;
 
@@ -109,14 +104,16 @@ export const insertDataToFirestore = async () => {
       });
 
       // Insert data to Google Firebase
-      allAlbumList.forEach((album: { albumName: string }) => {
-        db.collection('s3-photo-albums').doc(album.albumName).set({
+      for (const album of allAlbumList) {
+        await setDoc(doc(db, 's3-photo-albums', album.albumName), {
           albumName: album.albumName,
           desc: '',
           tags: [],
           private: false,
+        }).catch((error) => {
+          throw error;
         });
-      });
+      }
     }
   } catch (error) {
     console.log(error);
