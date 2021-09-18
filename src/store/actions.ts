@@ -1,7 +1,9 @@
-import { getAlbumList, getAlbumTags } from 'components/helper';
 import { Notify } from 'quasar';
+import FirestoreService from 'src/services/firestore-service';
 import { ActionTree } from 'vuex';
 import { Actions, ActionType, MutationType, StoreState } from './types';
+
+const firestoreService = new FirestoreService();
 
 export const actions: ActionTree<StoreState, StoreState> & Actions = {
   [ActionType.loadingAlbum]({ commit }, payload) {
@@ -15,7 +17,8 @@ export const actions: ActionTree<StoreState, StoreState> & Actions = {
   [ActionType.getAllAlbumList]({ commit }) {
     let allAlbumList: any[] = [];
     commit(MutationType.loadingAlbum, true);
-    getAlbumList()
+    firestoreService
+      .getAlbumList()
       .then((albumList) => {
         allAlbumList = albumList;
 
@@ -35,7 +38,8 @@ export const actions: ActionTree<StoreState, StoreState> & Actions = {
 
   [ActionType.getAlbumTags]({ commit }) {
     commit(MutationType.loadingAlbumTags, true);
-    getAlbumTags()
+    firestoreService
+      .getAlbumTags()
       .then((albumTags) => {
         commit(
           MutationType.setAlbumTags,
