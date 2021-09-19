@@ -22,8 +22,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-#      - name: Test
-#        run: npm run test:unit
+      - name: Test
+        run: npm run test:unit
 
       - name: Build
         run: npm run build \

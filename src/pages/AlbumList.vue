@@ -4,7 +4,7 @@
       <div class="col-shrink q-mr-sm">
         <q-btn-group outline>
           <q-btn
-            :outline="albumListType === 'square'"
+            :outline="albumListType === 'grid'"
             color="primary"
             dense
             icon="mdi-format-list-bulleted-square"
@@ -15,7 +15,7 @@
             color="primary"
             dense
             icon="mdi-view-grid"
-            @click="setAlbumListType('square')"
+            @click="setAlbumListType('grid')"
           />
         </q-btn-group>
       </div>
@@ -50,7 +50,7 @@
       </div>
     </div>
     <template v-if="chunkAlbumList.length">
-      <div v-if="albumListType === 'square'" class="q-col-gutter-md row">
+      <div v-if="albumListType === 'grid'" class="q-col-gutter-md row">
         <Album v-for="album in chunkAlbumList" :key="album.albumName" :albumItem="album" :albumType="albumListType" />
       </div>
       <div v-else class="justify-center row">
@@ -141,7 +141,7 @@ export default defineComponent({
       itemsPerPage,
       chunkAlbumList,
       albumListType,
-      setAlbumListType: (type: 'list' | 'square') => (albumListType.value = type),
+      setAlbumListType: (type: 'list' | 'grid') => (albumListType.value = type),
       albumTags,
       selectedTags,
       filterCategory: (val: string, update: any) => {
