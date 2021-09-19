@@ -1,9 +1,9 @@
-name: Node.js CI
+name: Test and build app
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
+    types: [ opened, edited ]
+  push:
     branches: [ master ]
 
 jobs:
@@ -14,10 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Use Node.js
+      - name: Setup Node.js environment
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: 12.x
 
       - name: Install dependencies
         run: npm install
@@ -50,3 +50,19 @@ jobs:
           GOOGLE_FIREBASE_PROJECT_ID: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
           GOOGLE_FIREBASE_STORAGE_BUCKET: ${{ secrets.GOOGLE_FIREBASE_STORAGE_BUCKET }}
           IMAGEKIT_CDN_URL: ${{ secrets.IMAGEKIT_CDN_URL }}
+
+      - name: Trigger Firebase deploy to preview channle
+        if: ${{ success() && github.event_name == 'pull_request' }}
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: ${{ github.repository }}
+          event-type: trigger-firebase-preview-deploy
+
+      - name: Trigger Firebase deploy to prod
+        if: ${{ success() && github.event_name == 'push' }}
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: ${{ github.repository }}
+          event-type: trigger-firebase-prod-deploy

@@ -12,6 +12,7 @@ export default defineComponent({
   name: 'App',
 
   setup() {
+    document.getElementsByTagName('title')[0].innerHTML = process.env.ALBUM_APP_TITLE as string;
     getAnalytics(firebaseApp);
 
     const store = useStore();
