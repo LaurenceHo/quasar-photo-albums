@@ -46,7 +46,7 @@ module.exports = {
   //  in the same folder.
   // This guarantee a great dev experience both for testing and type-checking.
   // See https://github.com/vuejs/vue-jest/issues/188#issuecomment-620750728
-  moduleFileExtensions: ['vue', 'js', 'jsx', 'json', 'ts', 'tsx'],
+  moduleFileExtensions: ['vue', 'js', 'json', 'ts'],
   moduleNameMapper: {
     '^~/(.*)$': '<rootDir>/$1',
     '^src/(.*)$': '<rootDir>/src/$1',

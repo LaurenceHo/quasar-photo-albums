@@ -2,10 +2,12 @@ import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity';
 import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
 import { Photo } from 'components/models';
-import { Notify } from 'quasar';
+import { Notify, LoadingBar } from 'quasar';
 
 export default class S3Service {
   async getPhotoObject(albumName: string, maxKeys: number) {
+    LoadingBar.start();
+
     const bucketName = process.env.AWS_S3_BUCKET_NAME as string;
     const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
 
@@ -40,10 +42,11 @@ export default class S3Service {
           return { url, key };
         });
       }
-    } catch (error) {
+      LoadingBar.stop();
+    } catch (error: any) {
       console.log(error);
       Notify.create({
-        color: 'red-4',
+        color: 'error',
         textColor: 'white',
         icon: 'mdi-alert-circle-outline',
         message: error.toString(),

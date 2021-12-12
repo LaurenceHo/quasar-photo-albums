@@ -1,25 +1,38 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
+import { createTestingPinia } from '@pinia/testing';
 import { installQuasarPlugin, qLayoutInjections } from '@quasar/quasar-app-extension-testing-unit-jest';
-import { mount } from '@vue/test-utils';
-import { mockRouter as router, mockStore as store } from 'app/test/jest/__tests__/mock-data';
+import { flushPromises, mount } from '@vue/test-utils';
+import { mockAlbumList, mockRouter as router } from 'app/test/jest/__tests__/mock-data';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import AlbumList from 'pages/AlbumList';
 import { QBtn } from 'quasar';
-import { storeKey as key } from 'src/store';
+import { albumStore } from 'src/store/album-store';
 
 installQuasarPlugin();
+
+jest.mock('src/services/s3-service', () =>
+  jest.fn().mockImplementation(() => ({
+    getPhotoObject: () => Promise.resolve([{ url: '/test/photo/url', key: 'photoKey' }]),
+  }))
+);
 
 describe('AlbumList.vue', () => {
   it('Check album list', async () => {
     const wrapper = mount(AlbumList, {
       global: {
-        plugins: [router, [store, key]],
+        plugins: [router, createTestingPinia()],
         provide: qLayoutInjections(),
         stubs: ['Album'],
       },
     });
     await router.isReady();
+    await flushPromises();
+
+    const store = albumStore();
+    store.allAlbumList = mockAlbumList;
+    store.albumTags = ['sport', 'food', 'hiking', 'secret'];
+
     const { vm } = wrapper as any;
     expect(wrapper).toBeTruthy();
     expect(vm.totalItems).toEqual(5);

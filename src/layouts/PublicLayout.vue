@@ -23,30 +23,20 @@
   </q-layout>
 </template>
 
-<script lang="ts">
-import { useStore } from 'src/store';
-import { ActionType } from 'src/store/types';
-import { computed, defineComponent, ref, watch } from 'vue';
+<script lang="ts" setup>
+import { albumStore } from 'src/store/album-store';
+import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
-export default defineComponent({
-  name: 'PublicLayout',
+const store = albumStore();
+const route = useRoute();
 
-  setup() {
-    const store = useStore();
-    const route = useRoute();
+const searchKey = ref('');
 
-    const albumAppName = computed(() => process.env.ALBUM_APP_TITLE);
-    const searchKey = ref('');
-    watch(searchKey, (newValue) => {
-      store.dispatch(ActionType.inputSearchKey, newValue);
-    });
+const routeName = computed(() => route.name);
+const albumAppName = computed(() => process.env.ALBUM_APP_TITLE);
 
-    return {
-      searchKey,
-      albumAppName,
-      routeName: computed(() => route.name),
-    };
-  },
+watch(searchKey, (newValue) => {
+  store.setSearchKey(newValue);
 });
 </script>

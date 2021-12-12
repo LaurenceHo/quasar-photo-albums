@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <q-linear-progress v-if="loadingAlbum" color="secondary" query />
+    <q-linear-progress v-if="loadingAlbums" color="secondary" query />
     <div class="container">
       <div class="q-pa-md">
         <q-breadcrumbs>
@@ -12,7 +12,7 @@
             :to="breadcrumb.to"
           />
         </q-breadcrumbs>
-        <template v-if="!loadingAlbum">
+        <template v-if="!loadingAlbums">
           <router-view v-slot="{ Component }">
             <keep-alive>
               <component :is="Component" />
@@ -24,33 +24,22 @@
   </q-page>
 </template>
 
-<script lang="ts">
-import { useStore } from 'src/store';
-import { computed, defineComponent } from 'vue';
+<script lang="ts" setup>
+import { albumStore } from 'src/store/album-store';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
-export default defineComponent({
-  name: 'Index',
+const store = albumStore();
+const route = useRoute();
 
-  setup() {
-    const store = useStore();
-    const route = useRoute();
-
-    const loadingAlbum = computed(() => store.state.loadingAlbum);
-    const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => {
-      const routes: { label: string; icon: string; to?: any }[] = [];
-      routes.push({ label: 'Home', icon: 'mdi-home' });
-      routes.push({ label: 'Albums', icon: 'mdi-apps', to: { name: 'Albums' } });
-      if (route.name === 'Photos') {
-        routes.push({ label: 'Photos', icon: 'mdi-image' });
-      }
-      return routes;
-    });
-
-    return {
-      loadingAlbum,
-      breadcrumbs,
-    };
-  },
+const loadingAlbums = computed(() => store.loadingAlbums);
+const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => {
+  const routes: { label: string; icon: string; to?: any }[] = [];
+  routes.push({ label: 'Home', icon: 'mdi-home' });
+  routes.push({ label: 'Albums', icon: 'mdi-apps', to: { name: 'Albums' } });
+  if (route.name === 'Photos') {
+    routes.push({ label: 'Photos', icon: 'mdi-image' });
+  }
+  return routes;
 });
 </script>
