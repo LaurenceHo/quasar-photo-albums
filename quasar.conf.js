@@ -29,7 +29,7 @@ module.exports = configure(function (ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli/boot-files
-    boot: ['firebase', 'pinia'],
+    boot: ['firebase'],
 
     // https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ['app.scss'],
@@ -75,7 +75,12 @@ module.exports = configure(function (ctx) {
 
     // https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {
-      config: {},
+      config: {
+        loadingBar: {
+          color: 'secondary',
+          size: '4px',
+        },
+      },
 
       iconSet: 'mdi-v5', // Quasar icon set
       // lang: 'en-US', // Quasar language pack

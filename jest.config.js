@@ -17,14 +17,8 @@ module.exports = {
   // watch: true,
   collectCoverage: false,
   coverageDirectory: '<rootDir>/test/jest/coverage',
-  collectCoverageFrom: [
-    '<rootDir>/src/**/*.vue',
-    // '<rootDir>/src/**/*.js',
-    '<rootDir>/src/**/*.ts',
-    // '<rootDir>/src/**/*.jsx',
-    // '<rootDir>/src/**/*.tsx',
-  ],
-  coveragePathIgnorePatterns: ['/node_modules/', '.d.ts$'],
+  collectCoverageFrom: ['<rootDir>/src/**/*.vue', '<rootDir>/src/**/*.ts'],
+  coveragePathIgnorePatterns: ['/node_modules/', '.d.ts$', '/src/boot/*'],
   coverageThreshold: {
     global: {
       //  branches: 50,
