@@ -1,6 +1,5 @@
 <template>
   <q-page>
-    <q-linear-progress v-if="loadingAlbums" color="secondary" query />
     <div class="container">
       <div class="q-pa-md">
         <q-breadcrumbs>

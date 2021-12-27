@@ -1,7 +1,7 @@
 import { Album } from 'components/models';
 import isEmpty from 'lodash/isEmpty';
 import { defineStore } from 'pinia';
-import { Notify } from 'quasar';
+import { LoadingBar, Notify } from 'quasar';
 import FirestoreService from 'src/services/firestore-service';
 
 export interface AlbumState {
@@ -65,6 +65,7 @@ export const albumStore = defineStore('album', {
     },
 
     getAllAlbumList() {
+      LoadingBar.start();
       this.loadingAlbums = true;
 
       firestoreService
@@ -81,6 +82,7 @@ export const albumStore = defineStore('album', {
           });
         })
         .finally(() => {
+          LoadingBar.stop();
           this.loadingAlbums = false;
         });
     },

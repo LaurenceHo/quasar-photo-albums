@@ -30,40 +30,31 @@
   </template>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { Photo } from 'components/models';
 import S3Service from 'src/services/s3-service';
-import { defineComponent, onMounted, ref } from 'vue';
+import { onMounted, ref, defineProps } from 'vue';
 import { useRouter } from 'vue-router';
 
-export default defineComponent({
-  name: 'Album',
-
-  props: {
-    albumType: {
-      type: String,
-      required: true,
-    },
-    albumItem: {
-      type: Object,
-      required: true,
-      default: () => ({ albumName: '', desc: '', tags: [] }),
-    },
+const props = defineProps({
+  albumType: {
+    type: String,
+    required: true,
   },
-
-  setup(props) {
-    const s3Service = new S3Service();
-    const router = useRouter();
-    const thumbnail = ref([] as Photo[]);
-    thumbnail.value.push({ url: '' });
-
-    // Get first photo of album as album cover
-    onMounted(async () => (thumbnail.value = await s3Service.getPhotoObject(props.albumItem.albumName, 1)));
-
-    return {
-      thumbnail,
-      goToAlbum: () => router.push(`/album/${props.albumItem.albumName}`),
-    };
+  albumItem: {
+    type: Object,
+    required: true,
+    default: () => ({ albumName: '', desc: '', tags: [] }),
   },
 });
+
+const s3Service = new S3Service();
+const router = useRouter();
+const thumbnail = ref([] as Photo[]);
+thumbnail.value.push({ url: '' });
+
+// Get first photo of album as album cover
+onMounted(async () => (thumbnail.value = await s3Service.getPhotoObject(props.albumItem.albumName, 1)));
+
+const goToAlbum = () => router.push(`/album/${props.albumItem.albumName}`);
 </script>
