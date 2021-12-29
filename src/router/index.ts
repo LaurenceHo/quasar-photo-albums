@@ -1,7 +1,7 @@
-import { getAuth } from 'firebase/auth';
+import isEmpty from 'lodash/isEmpty';
 import { Notify } from 'quasar';
 import { route } from 'quasar/wrappers';
-import AuthService from 'src/services/auth-service';
+import { userStore } from 'src/store/user-store';
 import { createMemoryHistory, createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 import routes from './routes';
 
@@ -31,42 +31,19 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE),
   });
 
-  const authService = new AuthService();
-  const auth = getAuth();
-
-  Router.beforeEach((to, from, next) => {
+  Router.beforeEach(async (to, from, next) => {
     if (to.matched.some((record) => record.meta.requiresAuth)) {
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        currentUser
-          .getIdToken()
-          .then(async (idToken) => {
-            const userInfo = await authService.verifyIdToken(idToken);
-            if (userInfo) {
-              next();
-            } else {
-              Notify.create({
-                color: 'negative',
-                icon: 'mdi-alert-circle-outline',
-                message: "You don't have permission.",
-              });
-              next('/');
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            Notify.create({
-              color: 'negative',
-              icon: 'mdi-alert-circle-outline',
-              message: 'Unauthorized access. Please login.',
-            });
-            next('/');
-          });
+      const userPermissionStore = userStore();
+      if (isEmpty(userPermissionStore.userPermission)) {
+        await userPermissionStore.checkUserPermission();
+      }
+      if (!isEmpty(userPermissionStore.userPermission)) {
+        next();
       } else {
         Notify.create({
           color: 'negative',
           icon: 'mdi-alert-circle-outline',
-          message: 'Unauthorized access. Please login.',
+          message: "You don't have permission.",
         });
         next('/');
       }

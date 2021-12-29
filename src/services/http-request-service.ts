@@ -5,7 +5,7 @@ export default class HttpRequestService {
   baseUrl = '';
   displayLoadingBar = false;
 
-  public setDisplayingParameters(displayLoadingBar: boolean) {
+  public setDisplayLoadingBar(displayLoadingBar: boolean) {
     this.displayLoadingBar = displayLoadingBar;
   }
 
@@ -33,11 +33,9 @@ export default class HttpRequestService {
     const headers = new Headers({ Accept: '*/*' });
 
     const requestOptions: any = {};
-    /** FIXME: Once we have CORS setup, we need to put these config back **/
     requestOptions.mode = 'cors';
     requestOptions.credentials = 'include';
     requestOptions.cache = 'no-cache';
-    requestOptions.redirect = 'follow';
 
     // Construct request body
     if (!isEmpty(requestJsonBody)) {

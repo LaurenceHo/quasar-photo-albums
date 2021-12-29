@@ -1,20 +1,22 @@
 <template>
   <q-layout view="hHh lpR fFf">
     <q-header>
-      <q-toolbar>
-        <q-avatar>
-          <img src="icons/favicon-128x128.png" />
-        </q-avatar>
-        <q-toolbar-title> {{ albumAppName }}</q-toolbar-title>
-        <q-input v-if="routeName === 'Albums'" v-model="searchKey" dense standout="bg-grey">
-          <template v-slot:prepend>
-            <q-icon name="mdi-magnify" />
-          </template>
-          <template v-slot:append>
-            <q-icon class="cursor-pointer" name="mdi-close" @click="searchKey = ''" />
-          </template>
-        </q-input>
-      </q-toolbar>
+      <div class="q-pa-sm">
+        <q-toolbar>
+          <q-avatar>
+            <img src="icons/favicon-128x128.png" />
+          </q-avatar>
+          <q-toolbar-title> {{ albumAppName }}</q-toolbar-title>
+          <q-input v-if="routeName === 'Albums'" v-model="searchKey" dense standout="bg-grey">
+            <template v-slot:prepend>
+              <q-icon name="mdi-magnify" />
+            </template>
+            <template v-slot:append>
+              <q-icon class="cursor-pointer" name="mdi-close" @click="searchKey = ''" />
+            </template>
+          </q-input>
+        </q-toolbar>
+      </div>
     </q-header>
 
     <q-page-container>

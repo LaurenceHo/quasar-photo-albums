@@ -3,6 +3,7 @@ const { getFirestore } = require('firebase-admin/firestore');
 const functions = require('firebase-functions');
 const bodyParser = require('body-parser');
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const env = require('dotenv').config().parsed;
 
 const serviceAccount = require('./serviceAccountKey.json');
@@ -12,7 +13,9 @@ admin.initializeApp({
 });
 
 const app = express();
-const db = getFirestore();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cookieParser());
 
 const corsHeader = (req, res, next) => {
   const allowedOrigins = ['http://localhost:8080', env.ALBUM_URL];
@@ -32,21 +35,32 @@ const corsHeader = (req, res, next) => {
 };
 app.use(corsHeader);
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.post('/auth/checkUser', async (req, res) => {
+  const sessionCookie = req.cookies.session || '';
+  // Verify the session cookie. In this case an additional check is added to detect
+  // if the user's Firebase session was revoked, user deleted/disabled, etc.
+  try {
+    const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
+    const userPermission = await _queryUserPermission(decodedClaims.uid);
+
+    if (userPermission && userPermission.role === 'admin') {
+      return res.status(200).send(userPermission);
+    } else {
+      return res.status(403).send({ status: 'Unauthorized' });
+    }
+  } catch (error) {
+    return res.status(403).send({ status: 'Unauthorized' });
+  }
+});
 
 app.post('/auth/verifyIdToken', async (req, res) => {
   const token = req.body.token;
+
   try {
     const decodedIdToken = await admin.auth().verifyIdToken(String(token));
-    const usersRef = db.collection('user-permission');
-    const queryResult = await usersRef.where('uid', '==', decodedIdToken.uid).get();
-    let userPermission = null;
-    queryResult.forEach((doc) => {
-      userPermission = doc.data();
-    });
-
+    const userPermission = await _queryUserPermission(decodedIdToken.uid);
     if (userPermission && userPermission.role === 'admin') {
+      await _setCookies(res, token);
       return res.status(200).send(userPermission);
     } else {
       console.log(`User ${decodedIdToken.email} doesn't have permission`);
@@ -62,3 +76,22 @@ app.post('/auth/verifyIdToken', async (req, res) => {
 });
 
 exports.api = functions.https.onRequest(app);
+
+const _queryUserPermission = async (uid) => {
+  const db = getFirestore();
+  const usersRef = db.collection('user-permission');
+  const queryResult = await usersRef.where('uid', '==', uid).limit(1).get();
+  let userPermission = null;
+  queryResult.forEach((doc) => {
+    userPermission = doc.data();
+  });
+
+  return userPermission;
+};
+
+const _setCookies = async (res, token) => {
+  const expiresIn = 60 * 60 * 24 * 5 * 1000;
+  const sessionCookie = await admin.auth().createSessionCookie(String(token), { expiresIn });
+  const options = { maxAge: expiresIn, httpOnly: true, secure: true };
+  res.cookie('session', sessionCookie, options);
+};

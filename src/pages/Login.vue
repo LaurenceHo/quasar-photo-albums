@@ -46,13 +46,13 @@ const handleClickSignIn = async () => {
       auth.currentUser
         ?.getIdToken()
         .then(async (idToken) => {
-          const userInfo = await authService.verifyIdToken(idToken);
-          if (userInfo) {
+          const userPermission = await authService.verifyIdToken(idToken);
+          if (userPermission) {
             await setPersistence(auth, browserSessionPersistence);
             q.notify({
               color: 'positive',
               icon: 'mdi-alert-circle-outline',
-              message: `Welcome, ${userInfo.displayName}`,
+              message: `Welcome, ${userPermission.displayName}`,
               timeout: 2000,
             });
             setTimeout(() => router.push('/management'), 1000);
