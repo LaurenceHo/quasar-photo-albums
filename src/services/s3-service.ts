@@ -46,8 +46,7 @@ export default class S3Service {
     } catch (error: any) {
       console.log(error);
       Notify.create({
-        color: 'error',
-        textColor: 'white',
+        color: 'negative',
         icon: 'mdi-alert-circle-outline',
         message: error.toString(),
       });

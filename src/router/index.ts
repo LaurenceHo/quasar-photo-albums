@@ -1,4 +1,7 @@
+import { getAuth } from 'firebase/auth';
+import { Notify } from 'quasar';
 import { route } from 'quasar/wrappers';
+import AuthService from 'src/services/auth-service';
 import { createMemoryHistory, createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 import routes from './routes';
 
@@ -26,6 +29,50 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE),
+  });
+
+  const authService = new AuthService();
+  const auth = getAuth();
+
+  Router.beforeEach((to, from, next) => {
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        currentUser
+          .getIdToken()
+          .then(async (idToken) => {
+            const userInfo = await authService.verifyIdToken(idToken);
+            if (userInfo) {
+              next();
+            } else {
+              Notify.create({
+                color: 'negative',
+                icon: 'mdi-alert-circle-outline',
+                message: "You don't have permission.",
+              });
+              next('/');
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            Notify.create({
+              color: 'negative',
+              icon: 'mdi-alert-circle-outline',
+              message: 'Unauthorized access. Please login.',
+            });
+            next('/');
+          });
+      } else {
+        Notify.create({
+          color: 'negative',
+          icon: 'mdi-alert-circle-outline',
+          message: 'Unauthorized access. Please login.',
+        });
+        next('/');
+      }
+    } else {
+      next();
+    }
   });
 
   return Router;
