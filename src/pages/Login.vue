@@ -40,18 +40,15 @@ const handleClickSignIn = async () => {
 
   try {
     loading.value = true;
-    await setPersistence(auth, browserSessionPersistence);
     const result = await signInWithPopup(auth, provider);
     const credential = GoogleAuthProvider.credentialFromResult(result);
-    if (credential) {
-      if (auth) {
-        auth.currentUser?.getIdToken().then(async (idToken) => {
+    if (auth && credential) {
+      auth.currentUser
+        ?.getIdToken()
+        .then(async (idToken) => {
           const userInfo = await authService.verifyIdToken(idToken);
           if (userInfo) {
-            const token = credential.accessToken;
-            localStorage.setItem('authToken', String(token));
-            localStorage.setItem('userInfo', JSON.stringify(userInfo));
-
+            await setPersistence(auth, browserSessionPersistence);
             q.notify({
               color: 'positive',
               icon: 'mdi-alert-circle-outline',
@@ -60,8 +57,14 @@ const handleClickSignIn = async () => {
             });
             setTimeout(() => router.push('/management'), 1000);
           }
+        })
+        .catch((error) => {
+          q.notify({
+            color: 'negative',
+            icon: 'mdi-alert-circle-outline',
+            message: error.toString(),
+          });
         });
-      }
     } else {
       q.notify({
         color: 'negative',

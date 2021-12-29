@@ -11,7 +11,6 @@
     "lint": "eslint --ext .js,.ts,.vue ./ && prettier --write ./src/**/*.{js,ts,vue}",
     "postinstall": "husky install",
     "firebase:deploy": "npm run build && firebase deploy",
-    "firbase:deploy-functions": "firebase deploy --only functions",
     "test:unit": "quasar test --unit jest"
   },
   "dependencies": {

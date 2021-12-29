@@ -9,7 +9,7 @@ import { Notify } from 'quasar';
 export default class FirestoreService {
   db = getFirestore(firebaseApp);
 
-  async getAlbumList(startIndex?: number, endIndex?: number, filter?: string) {
+  async getAlbumList(publicAlbumOnly: boolean, startIndex?: number, endIndex?: number, filter?: string) {
     // TODO: May need to apply filter in the feature. It only runs filter in the memory atm.
     const albumList: Album[] = [];
     const q = query(
