@@ -24,7 +24,35 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
-
+  {
+    path: '/',
+    component: () => import('layouts/AdminLayout.vue'),
+    children: [
+      {
+        path: '/login',
+        component: () => import('pages/Login.vue'),
+        name: 'Login',
+      },
+      {
+        path: '/management',
+        component: () => import('pages/Index.vue'),
+        name: 'Management',
+        meta: { requiresAuth: true },
+        children: [
+          {
+            path: '',
+            name: 'Albums',
+            component: () => import('pages/AlbumList.vue'),
+          },
+          {
+            path: '/management/album/:albumName',
+            name: 'Photos',
+            component: () => import('pages/PhotoList.vue'),
+          },
+        ],
+      },
+    ],
+  },
   // Always leave this as last one,
   // but you can also remove it
   {

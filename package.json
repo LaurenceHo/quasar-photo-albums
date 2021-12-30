@@ -10,7 +10,7 @@
     "build": "quasar build",
     "lint": "eslint --ext .js,.ts,.vue ./ && prettier --write ./src/**/*.{js,ts,vue}",
     "postinstall": "husky install",
-    "firebase-deploy": "npm run build && firebase deploy",
+    "firebase:deploy": "npm run build && firebase deploy",
     "test:unit": "quasar test --unit jest"
   },
   "dependencies": {

@@ -4,11 +4,12 @@ import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-id
 import { firebaseApp } from 'boot/firebase';
 import { Album } from 'components/models';
 import { collection, doc, getDoc, getDocs, getFirestore, orderBy, query, setDoc, where } from 'firebase/firestore';
+import { Notify } from 'quasar';
 
 export default class FirestoreService {
   db = getFirestore(firebaseApp);
 
-  async getAlbumList(startIndex?: number, endIndex?: number, filter?: string) {
+  async getAlbumList(publicAlbumOnly: boolean, startIndex?: number, endIndex?: number, filter?: string) {
     // TODO: May need to apply filter in the feature. It only runs filter in the memory atm.
     const albumList: Album[] = [];
     const q = query(
@@ -16,12 +17,19 @@ export default class FirestoreService {
       where('private', '==', false),
       orderBy('albumName', 'desc')
     );
-    const queryResult = await getDocs(q).catch((error) => {
-      throw error;
-    });
-    queryResult.forEach((doc) => {
-      albumList.push(doc.data() as Album);
-    });
+    try {
+      const queryResult = await getDocs(q);
+
+      queryResult.forEach((doc) => {
+        albumList.push(doc.data() as Album);
+      });
+    } catch (error: any) {
+      Notify.create({
+        color: 'negative',
+        icon: 'mdi-alert-circle-outline',
+        message: error.toString(),
+      });
+    }
     return albumList;
   }
 
