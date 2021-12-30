@@ -64,55 +64,26 @@ export const albumStore = defineStore('album', {
       this.searchKey = input;
     },
 
-    getAllAlbumList() {
+    async getAllAlbumList() {
       LoadingBar.start();
       this.loadingAlbums = true;
-
-      firestoreService
-        .getAlbumList()
-        .then((albumList) => {
-          this.allAlbumList = albumList;
-        })
-        .catch((error) => {
-          Notify.create({
-            color: 'error',
-            textColor: 'white',
-            icon: 'mdi-alert-circle-outline',
-            message: error.toString(),
-          });
-        })
-        .finally(() => {
-          LoadingBar.stop();
-          this.loadingAlbums = false;
-        });
+      this.allAlbumList = await firestoreService.getAlbumList(true);
+      LoadingBar.stop();
+      this.loadingAlbums = false;
     },
 
-    getAlbumTags() {
+    async getAlbumTags() {
       this.loadingAlbumTags = true;
-
-      firestoreService
-        .getAlbumTags()
-        .then((albumTags) => {
-          this.albumTags = albumTags.tags.sort((a: string, b: string) => {
-            if (a.toLowerCase() > b.toLowerCase()) {
-              return 1;
-            } else if (a.toLowerCase() < b.toLowerCase()) {
-              return -1;
-            }
-            return 0;
-          });
-        })
-        .catch((error) => {
-          Notify.create({
-            color: 'error',
-            textColor: 'white',
-            icon: 'mdi-alert-circle-outline',
-            message: error.toString(),
-          });
-        })
-        .finally(() => {
-          this.loadingAlbumTags = false;
-        });
+      const albumTags = await firestoreService.getAlbumTags();
+      this.albumTags = albumTags.tags.sort((a: string, b: string) => {
+        if (a.toLowerCase() > b.toLowerCase()) {
+          return 1;
+        } else if (a.toLowerCase() < b.toLowerCase()) {
+          return -1;
+        }
+        return 0;
+      });
+      this.loadingAlbumTags = false;
     },
   },
 });
