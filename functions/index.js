@@ -75,7 +75,9 @@ app.post('/auth/verifyIdToken', async (req, res) => {
   }
 });
 
-exports.api = functions.https.onRequest(app);
+const main = express();
+main.use('/api', app);
+exports.main = functions.https.onRequest(main);
 
 const _queryUserPermission = async (uid) => {
   const db = getFirestore();

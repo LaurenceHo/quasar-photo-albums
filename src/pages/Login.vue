@@ -25,14 +25,17 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
 import AuthService from 'src/services/auth-service';
+import { userStore } from 'src/store/user-store';
 import { ref } from 'vue';
 import { getAuth, signInWithPopup, GoogleAuthProvider, setPersistence, browserSessionPersistence } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const q = useQuasar();
+
 const loading = ref(false);
 const authService = new AuthService();
+const userPermissionStore = userStore();
 
 const handleClickSignIn = async () => {
   const provider = new GoogleAuthProvider();
@@ -48,6 +51,7 @@ const handleClickSignIn = async () => {
         .then(async (idToken) => {
           const userPermission = await authService.verifyIdToken(idToken);
           if (userPermission) {
+            userPermissionStore.setUserPermission(userPermission);
             await setPersistence(auth, browserSessionPersistence);
             q.notify({
               color: 'positive',

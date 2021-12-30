@@ -44,5 +44,8 @@ export const userStore = defineStore('user-permission', {
         Loading.hide();
       }
     },
+    setUserPermission(userPermission: UserPermission) {
+      this.userPermission = userPermission;
+    },
   },
 });

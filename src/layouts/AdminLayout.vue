@@ -22,7 +22,8 @@
 
 <script setup lang="ts">
 import { UserPermission, userStore } from 'src/store/user-store';
+import { computed } from 'vue';
 
 const userPermissionStore = userStore();
-const userPermission: UserPermission = userPermissionStore.userPermission;
+const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 </script>

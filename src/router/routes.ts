@@ -35,21 +35,9 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: '/management',
-        component: () => import('pages/Index.vue'),
+        component: () => import('pages/AlbumList.vue'),
         name: 'Management',
         meta: { requiresAuth: true },
-        children: [
-          {
-            path: '',
-            name: 'Albums',
-            component: () => import('pages/AlbumList.vue'),
-          },
-          {
-            path: '/management/album/:albumName',
-            name: 'Photos',
-            component: () => import('pages/PhotoList.vue'),
-          },
-        ],
       },
     ],
   },
