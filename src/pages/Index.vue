@@ -41,4 +41,7 @@ const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => 
   }
   return routes;
 });
+
+store.getAllAlbumList();
+store.getAlbumTags();
 </script>

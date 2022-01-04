@@ -22,22 +22,10 @@ const routes: RouteRecordRaw[] = [
           },
         ],
       },
-    ],
-  },
-  {
-    path: '/',
-    component: () => import('layouts/AdminLayout.vue'),
-    children: [
       {
         path: '/login',
         component: () => import('pages/Login.vue'),
         name: 'Login',
-      },
-      {
-        path: '/management',
-        component: () => import('pages/AlbumList.vue'),
-        name: 'Management',
-        meta: { requiresAuth: true },
       },
     ],
   },

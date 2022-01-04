@@ -3,7 +3,19 @@ import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
 import { firebaseApp } from 'boot/firebase';
 import { Album } from 'components/models';
-import { collection, doc, getDoc, getDocs, getFirestore, orderBy, query, setDoc, where } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  orderBy,
+  query,
+  setDoc,
+  where,
+  writeBatch,
+} from 'firebase/firestore';
 import { Notify } from 'quasar';
 
 export default class FirestoreService {
@@ -12,11 +24,12 @@ export default class FirestoreService {
   async getAlbumList(publicAlbumOnly: boolean, startIndex?: number, endIndex?: number, filter?: string) {
     // TODO: May need to apply filter in the feature. It only runs filter in the memory atm.
     const albumList: Album[] = [];
-    const q = query(
-      collection(this.db, 's3-photo-albums'),
-      where('private', '==', false),
-      orderBy('albumName', 'desc')
-    );
+    let q;
+    if (publicAlbumOnly) {
+      q = query(collection(this.db, 's3-photo-albums'), where('private', '==', false), orderBy('albumName', 'desc'));
+    } else {
+      q = query(collection(this.db, 's3-photo-albums'), orderBy('albumName', 'desc'));
+    }
     try {
       const queryResult = await getDocs(q);
 
@@ -40,6 +53,22 @@ export default class FirestoreService {
       .catch((error) => {
         throw error;
       });
+  }
+
+  async updateAlbum(album: Album) {
+    console.log('auth', getAuth());
+    const batch = writeBatch(this.db);
+    const albumRef = doc(this.db, 's3-photo-albums', album.albumName);
+    batch.update(albumRef, { albumName: album.albumName, desc: album.desc, private: album.private, tags: album.tags });
+    await batch.commit();
+  }
+
+  async deleteAlbum(albumName: string) {
+    console.log('auth', getAuth());
+    const batch = writeBatch(this.db);
+    const albumRef = doc(this.db, 's3-photo-albums', albumName);
+    batch.delete(albumRef);
+    await batch.commit();
   }
 
   async insertAllAlbumsData() {

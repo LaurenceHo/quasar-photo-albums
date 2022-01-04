@@ -13,8 +13,8 @@ export default class AuthService extends HttpRequestService {
     return this.perform('POST', '/verifyIdToken', { token });
   }
 
-  checkUser(): Promise<any> {
+  getUserInfo(): Promise<any> {
     this.setDisplayLoadingBar(false);
-    return this.perform('POST', '/checkUser');
+    return this.perform('POST', '/getUserInfo');
   }
 }
