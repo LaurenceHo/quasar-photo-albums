@@ -16,32 +16,7 @@
           style="top: 8px; left: 8px"
         />
       </q-img>
-      <q-btn
-        v-if="userPermission.role === 'admin'"
-        class="absolute"
-        color="white"
-        flat
-        icon="mdi-dots-vertical"
-        round
-        style="top: 0px; right: 0px"
-      >
-        <q-menu>
-          <q-list style="min-width: 100px">
-            <q-item v-close-popup clickable @click="updateAlbum">
-              <q-item-section avatar>
-                <q-icon color="primary" name="mdi-pencil" />
-              </q-item-section>
-              <q-item-section>Update album</q-item-section>
-            </q-item>
-            <q-item v-close-popup clickable @click="deleteAlbum">
-              <q-item-section avatar>
-                <q-icon color="primary" name="mdi-delete" />
-              </q-item-section>
-              <q-item-section>Delete album</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-      </q-btn>
+      <EditAlbumButton :album-item="albumItem" :album-style="albumStyle" />
     </div>
     <div class="q-pt-sm text-h6 text-weight-medium">{{ albumItem.albumName }}</div>
   </div>
@@ -49,7 +24,7 @@
     <q-item clickable>
       <q-item-section avatar @click="goToAlbum">
         <q-avatar rounded size="90px">
-          <q-img :ratio="1" :src="`${thumbnail[0].url}?tr=w-90,h-90`" class="rounded-borders">
+          <q-img v-if="thumbnail.length" :ratio="1" :src="`${thumbnail[0].url}?tr=w-90,h-90`" class="rounded-borders">
             <q-icon
               v-if="albumItem.private"
               class="absolute"
@@ -73,30 +48,14 @@
       </q-item-section>
 
       <q-item-section v-if="userPermission.role === 'admin'" side>
-        <q-btn color="dark" flat icon="mdi-dots-vertical" round>
-          <q-menu>
-            <q-list style="min-width: 100px">
-              <q-item v-close-popup clickable @click="updateAlbum">
-                <q-item-section avatar>
-                  <q-icon color="primary" name="mdi-pencil" />
-                </q-item-section>
-                <q-item-section>Update album</q-item-section>
-              </q-item>
-              <q-item v-close-popup clickable @click="deleteAlbum">
-                <q-item-section avatar>
-                  <q-icon color="primary" name="mdi-delete" />
-                </q-item-section>
-                <q-item-section>Delete album</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
+        <EditAlbumButton :album-item="albumItem" :album-style="albumStyle" />
       </q-item-section>
     </q-item>
   </template>
 </template>
 
 <script lang="ts" setup>
+import EditAlbumButton from 'components/EditAlbumButton.vue';
 import { Photo } from 'components/models';
 import S3Service from 'src/services/s3-service';
 import { UserPermission, userStore } from 'src/store/user-store';
@@ -111,7 +70,7 @@ const props = defineProps({
   albumItem: {
     type: Object,
     required: true,
-    default: () => ({ albumName: '', desc: '', tags: [] }),
+    default: () => ({ albumName: '', desc: '', tags: [], private: false }),
   },
 });
 
@@ -127,11 +86,4 @@ const userPermission = computed(() => userPermissionStore.userPermission as User
 onMounted(async () => (thumbnail.value = await s3Service.getPhotoObject(props.albumItem.albumName, 1)));
 
 const goToAlbum = () => router.push(`/album/${props.albumItem.albumName}`);
-
-const updateAlbum = () => {
-  // TODO
-};
-const deleteAlbum = () => {
-  // TODO
-};
 </script>

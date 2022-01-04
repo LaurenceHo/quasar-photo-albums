@@ -1,7 +1,7 @@
 import { Album } from 'components/models';
 import isEmpty from 'lodash/isEmpty';
 import { defineStore } from 'pinia';
-import { LoadingBar } from 'quasar';
+import { LoadingBar, Notify } from 'quasar';
 import FirestoreService from 'src/services/firestore-service';
 import { userStore } from 'src/store/user-store';
 
@@ -11,6 +11,7 @@ export interface AlbumState {
   allAlbumList: Album[];
   albumTags: string[];
   searchKey: string;
+  refreshAlbumList: boolean;
 }
 
 const firestoreService = new FirestoreService();
@@ -23,6 +24,7 @@ export const albumStore = defineStore('album', {
       allAlbumList: [],
       albumTags: [],
       searchKey: '',
+      refreshAlbumList: false,
     } as AlbumState),
   getters: {
     chunkAlbumList:
@@ -34,6 +36,7 @@ export const albumStore = defineStore('album', {
           return [];
         }
       },
+
     filteredAlbumList:
       (state: AlbumState) =>
       (searchKey: string, selectedTags: string[]): Album[] => {
@@ -77,16 +80,41 @@ export const albumStore = defineStore('album', {
 
     async getAlbumTags() {
       this.loadingAlbumTags = true;
-      const albumTags = await firestoreService.getAlbumTags();
-      this.albumTags = albumTags.tags.sort((a: string, b: string) => {
-        if (a.toLowerCase() > b.toLowerCase()) {
-          return 1;
-        } else if (a.toLowerCase() < b.toLowerCase()) {
-          return -1;
+      try {
+        const albumTags = await firestoreService.getAlbumTags();
+        this.albumTags = albumTags.tags.sort((a: string, b: string) => {
+          if (a.toLowerCase() > b.toLowerCase()) {
+            return 1;
+          } else if (a.toLowerCase() < b.toLowerCase()) {
+            return -1;
+          }
+          return 0;
+        });
+      } catch (error: any) {
+        Notify.create({
+          color: 'negative',
+          icon: 'mdi-alert-circle-outline',
+          message: error.toString(),
+        });
+      } finally {
+        this.loadingAlbumTags = false;
+      }
+    },
+
+    updateAlbum(albumToBeUpdated: Album, deleteAlbum: boolean) {
+      const findIndex = this.allAlbumList.findIndex((album) => album.albumName === albumToBeUpdated.albumName);
+      if (findIndex > -1) {
+        if (deleteAlbum) {
+          this.allAlbumList.splice(findIndex, 1);
+        } else {
+          this.allAlbumList.splice(findIndex, 1, albumToBeUpdated);
         }
-        return 0;
-      });
-      this.loadingAlbumTags = false;
+        this.refreshAlbumList = true;
+      }
+    },
+
+    updateRefreshAlbumListFlag() {
+      this.refreshAlbumList = !this.refreshAlbumList;
     },
   },
 });

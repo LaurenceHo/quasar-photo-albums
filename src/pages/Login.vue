@@ -55,7 +55,7 @@ const handleClickSignIn = async () => {
             await setPersistence(auth, browserSessionPersistence);
             q.notify({
               color: 'positive',
-              icon: 'mdi-alert-circle-outline',
+              icon: 'mdi-human-handsup',
               message: `Welcome, ${userPermission.displayName}`,
               timeout: 2000,
             });

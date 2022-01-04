@@ -3,7 +3,18 @@ import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
 import { firebaseApp } from 'boot/firebase';
 import { Album } from 'components/models';
-import { collection, doc, getDoc, getDocs, getFirestore, orderBy, query, setDoc, where } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  orderBy,
+  query,
+  setDoc,
+  where,
+  writeBatch,
+} from 'firebase/firestore';
 import { Notify } from 'quasar';
 
 export default class FirestoreService {
@@ -41,6 +52,20 @@ export default class FirestoreService {
       .catch((error) => {
         throw error;
       });
+  }
+
+  async updateAlbum(album: Album) {
+    const batch = writeBatch(this.db);
+    const albumRef = doc(this.db, 's3-photo-albums', album.albumName);
+    batch.update(albumRef, { albumName: album.albumName, desc: album.desc, private: album.private, tags: album.tags });
+    await batch.commit();
+  }
+
+  async deleteAlbum(albumName: string) {
+    const batch = writeBatch(this.db);
+    const albumRef = doc(this.db, 's3-photo-albums', albumName);
+    batch.delete(albumRef);
+    await batch.commit();
   }
 
   async insertAllAlbumsData() {

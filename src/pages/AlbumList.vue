@@ -86,6 +86,7 @@ const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumI
 const albumTags = ref(store.albumTags);
 const selectedTags = ref([]);
 
+const refreshAlbumList = computed(() => store.refreshAlbumList);
 const searchKey = computed(() => store.searchKey);
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
 const firstIndex = computed(() => (pageNumber.value - 1) * itemsPerPage.value);
@@ -122,6 +123,13 @@ const filterCategory = (val: string, update: any) => {
     albumTags.value = store.albumTags.filter((v) => v.toLowerCase().indexOf(needle) > -1);
   });
 };
+
+watch(refreshAlbumList, (newValue) => {
+  if (newValue) {
+    getFilteredAlbumList();
+    store.updateRefreshAlbumListFlag();
+  }
+});
 
 watch([pageNumber, itemsPerPage, searchKey, selectedTags], ([newPageNumber]) => {
   if (!newPageNumber) {
