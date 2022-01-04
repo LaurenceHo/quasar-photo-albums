@@ -35,7 +35,7 @@ const corsHeader = (req, res, next) => {
 };
 app.use(corsHeader);
 
-app.post('/auth/checkUser', async (req, res) => {
+app.post('/auth/getUserInfo', async (req, res) => {
   const sessionCookie = req.cookies.session || '';
   // Verify the session cookie. In this case an additional check is added to detect
   // if the user's Firebase session was revoked, user deleted/disabled, etc.
@@ -43,11 +43,7 @@ app.post('/auth/checkUser', async (req, res) => {
     const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
     const userPermission = await _queryUserPermission(decodedClaims.uid);
 
-    if (userPermission && userPermission.role === 'admin') {
-      return res.status(200).send(userPermission);
-    } else {
-      return res.status(403).send({ status: 'Unauthorized' });
-    }
+    return res.status(200).send(userPermission);
   } catch (error) {
     return res.status(403).send({ status: 'Unauthorized' });
   }

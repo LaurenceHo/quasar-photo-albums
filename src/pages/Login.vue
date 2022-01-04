@@ -59,7 +59,7 @@ const handleClickSignIn = async () => {
               message: `Welcome, ${userPermission.displayName}`,
               timeout: 2000,
             });
-            setTimeout(() => router.push('/management'), 1000);
+            setTimeout(() => router.push('/'), 1000);
           }
         })
         .catch((error) => {
@@ -68,6 +68,9 @@ const handleClickSignIn = async () => {
             icon: 'mdi-alert-circle-outline',
             message: error.toString(),
           });
+        })
+        .finally(() => {
+          loading.value = false;
         });
     } else {
       q.notify({
@@ -77,14 +80,13 @@ const handleClickSignIn = async () => {
       });
     }
   } catch (error: any) {
+    loading.value = false;
     const errorMessage = error.message;
     q.notify({
       color: 'negative',
       icon: 'mdi-alert-circle-outline',
       message: `Error! ${errorMessage}`,
     });
-  } finally {
-    loading.value = false;
   }
 };
 </script>

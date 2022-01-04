@@ -4,18 +4,18 @@
       <div class="col-shrink q-mr-sm">
         <q-btn-group outline>
           <q-btn
-            :outline="albumListType === 'grid'"
+            :outline="albumStyle === 'grid'"
             color="primary"
             dense
             icon="mdi-format-list-bulleted-square"
-            @click="setAlbumListType('list')"
+            @click="setAlbumStyle('list')"
           />
           <q-btn
-            :outline="albumListType === 'list'"
+            :outline="albumStyle === 'list'"
             color="primary"
             dense
             icon="mdi-view-grid"
-            @click="setAlbumListType('grid')"
+            @click="setAlbumStyle('grid')"
           />
         </q-btn-group>
       </div>
@@ -50,18 +50,13 @@
       </div>
     </div>
     <template v-if="chunkAlbumList.length">
-      <div v-if="albumListType === 'grid'" class="q-col-gutter-md row">
-        <Album v-for="album in chunkAlbumList" :key="album.albumName" :albumItem="album" :albumType="albumListType" />
+      <div v-if="albumStyle === 'grid'" class="q-col-gutter-md row">
+        <Album v-for="album in chunkAlbumList" :key="album.albumName" :albumItem="album" :albumStyle="albumStyle" />
       </div>
       <div v-else class="justify-center row">
         <div class="col-12 col-xl-6 col-lg-8 col-md-8 column">
           <q-list bordered class="rounded-borders" separator>
-            <Album
-              v-for="album in chunkAlbumList"
-              :key="album.albumName"
-              :albumItem="album"
-              :albumType="albumListType"
-            />
+            <Album v-for="album in chunkAlbumList" :key="album.albumName" :albumItem="album" :albumStyle="albumStyle" />
           </q-list>
         </div>
       </div>
@@ -78,11 +73,14 @@ import { Album as AlbumItem } from 'components/models';
 import isEmpty from 'lodash/isEmpty';
 import { albumStore } from 'src/store/album-store';
 import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
+const route = useRoute();
+const router = useRouter();
 const store = albumStore();
 const itemsPerPage = ref(20);
 const pageNumber = ref(1);
-const albumListType = ref('list');
+const albumStyle = ref((route.query.albumStyle as string) || 'list');
 const totalItems = ref(store.allAlbumList.length);
 const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
 const albumTags = ref(store.albumTags);
@@ -106,7 +104,10 @@ const getFilteredAlbumList = () => {
   }
 };
 
-const setAlbumListType = (type: 'list' | 'grid') => (albumListType.value = type);
+const setAlbumStyle = (type: 'list' | 'grid') => {
+  albumStyle.value = type;
+  router.replace({ query: { albumStyle: type } });
+};
 
 const filterCategory = (val: string, update: any) => {
   if (val === '') {

@@ -12,11 +12,12 @@ export default class FirestoreService {
   async getAlbumList(publicAlbumOnly: boolean, startIndex?: number, endIndex?: number, filter?: string) {
     // TODO: May need to apply filter in the feature. It only runs filter in the memory atm.
     const albumList: Album[] = [];
-    const q = query(
-      collection(this.db, 's3-photo-albums'),
-      where('private', '==', false),
-      orderBy('albumName', 'desc')
-    );
+    let q;
+    if (publicAlbumOnly) {
+      q = query(collection(this.db, 's3-photo-albums'), where('private', '==', false), orderBy('albumName', 'desc'));
+    } else {
+      q = query(collection(this.db, 's3-photo-albums'), orderBy('albumName', 'desc'));
+    }
     try {
       const queryResult = await getDocs(q);
 

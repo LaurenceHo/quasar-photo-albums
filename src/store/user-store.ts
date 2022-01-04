@@ -11,6 +11,7 @@ export interface UserPermission {
 
 export interface UserState {
   userPermission: UserPermission;
+  isCheckingUserPermission: boolean;
 }
 
 const authService = new AuthService();
@@ -18,30 +19,28 @@ const authService = new AuthService();
 export const userStore = defineStore('user-permission', {
   state: () =>
     ({
-      userPermission: {},
+      userPermission: {
+        uid: '',
+        email: '',
+        role: '',
+        displayName: '',
+      },
+      isCheckingUserPermission: true,
     } as UserState),
   actions: {
     async checkUserPermission() {
       try {
         Loading.show();
-        const userPermission = await authService.checkUser();
+        this.isCheckingUserPermission = true;
+        const userPermission = await authService.getUserInfo();
         if (userPermission) {
           this.userPermission = userPermission;
-        } else {
-          Notify.create({
-            color: 'negative',
-            icon: 'mdi-alert-circle-outline',
-            message: "You don't have permission.",
-          });
         }
-      } catch (error) {
-        Notify.create({
-          color: 'negative',
-          icon: 'mdi-alert-circle-outline',
-          message: 'Unauthorized access. Please login.',
-        });
+      } catch (error: any) {
+        console.log(error);
       } finally {
         Loading.hide();
+        this.isCheckingUserPermission = false;
       }
     },
     setUserPermission(userPermission: UserPermission) {

@@ -1,8 +1,9 @@
 import { Album } from 'components/models';
 import isEmpty from 'lodash/isEmpty';
 import { defineStore } from 'pinia';
-import { LoadingBar, Notify } from 'quasar';
+import { LoadingBar } from 'quasar';
 import FirestoreService from 'src/services/firestore-service';
+import { userStore } from 'src/store/user-store';
 
 export interface AlbumState {
   loadingAlbums: boolean;
@@ -65,9 +66,11 @@ export const albumStore = defineStore('album', {
     },
 
     async getAllAlbumList() {
+      const userPermissionStore = userStore();
+
       LoadingBar.start();
       this.loadingAlbums = true;
-      this.allAlbumList = await firestoreService.getAlbumList(true);
+      this.allAlbumList = await firestoreService.getAlbumList(userPermissionStore.userPermission.role !== 'admin');
       LoadingBar.stop();
       this.loadingAlbums = false;
     },
