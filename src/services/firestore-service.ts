@@ -3,6 +3,7 @@ import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
 import { firebaseApp } from 'boot/firebase';
 import { Album } from 'components/models';
+import { getAuth } from 'firebase/auth';
 import {
   collection,
   doc,
@@ -55,6 +56,7 @@ export default class FirestoreService {
   }
 
   async updateAlbum(album: Album) {
+    console.log('auth', getAuth());
     const batch = writeBatch(this.db);
     const albumRef = doc(this.db, 's3-photo-albums', album.albumName);
     batch.update(albumRef, { albumName: album.albumName, desc: album.desc, private: album.private, tags: album.tags });
@@ -62,6 +64,7 @@ export default class FirestoreService {
   }
 
   async deleteAlbum(albumName: string) {
+    console.log('auth', getAuth());
     const batch = writeBatch(this.db);
     const albumRef = doc(this.db, 's3-photo-albums', albumName);
     batch.delete(albumRef);
