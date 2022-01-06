@@ -12,12 +12,22 @@ export default class AlbumService extends HttpRequestService {
 
   getAlbums(startIndex?: number, endIndex?: number, filter?: string): Promise<Album[]> {
     // TODO: May need to apply filter in the feature. It only runs filter in the memory atm.
-    this.setDisplayLoadingBar(true);
+    this.setDisplayLoadingBar(false);
     return this.perform('GET', '');
   }
 
   getAlbumTags(): Promise<{ tags: string[] }> {
     this.setDisplayLoadingBar(false);
     return this.perform('GET', '/tags');
+  }
+
+  updateAlbum(album: Album): Promise<any> {
+    this.setDisplayLoadingBar(true);
+    return this.perform('PUT', '/', album);
+  }
+
+  deleteAlbum(albumName: string): Promise<any> {
+    this.setDisplayLoadingBar(true);
+    return this.perform('DELETE', `/${albumName}`);
   }
 }

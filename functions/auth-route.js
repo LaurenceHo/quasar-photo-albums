@@ -11,11 +11,15 @@ router.post('/auth/getUserInfo', async (req, res) => {
   const sessionCookie = req.cookies.session || '';
   try {
     const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
+    if (decodedClaims.exp <= Date.now() / 1000) {
+      res.clearCookie('session');
+      return res.status(200).send({ status: 'Unauthorized', message: 'User is not logged-in' });
+    }
     const userPermission = await helpers.queryUserPermission(decodedClaims.uid);
 
     return res.status(200).send(userPermission);
   } catch (error) {
-    return res.status(200).send({ status: 'User is not logged-in' });
+    return res.status(200).send({ status: 'Unauthorized', message: 'User is not logged-in' });
   }
 });
 

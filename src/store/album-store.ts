@@ -1,7 +1,7 @@
 import { Album } from 'components/models';
 import isEmpty from 'lodash/isEmpty';
 import { defineStore } from 'pinia';
-import { LoadingBar, Notify } from 'quasar';
+import { Loading, Notify } from 'quasar';
 import AlbumService from 'src/services/album-service';
 
 export interface AlbumState {
@@ -68,7 +68,7 @@ export const albumStore = defineStore('album', {
     },
 
     async getAlbums(startIndex?: number, endIndex?: number, filter?: string) {
-      LoadingBar.start();
+      Loading.show();
       this.loadingAlbums = true;
       try {
         this.allAlbumList = await albumService.getAlbums(startIndex, endIndex, filter);
@@ -79,7 +79,7 @@ export const albumStore = defineStore('album', {
           message: error.toString(),
         });
       } finally {
-        LoadingBar.stop();
+        Loading.hide();
         this.loadingAlbums = false;
       }
     },

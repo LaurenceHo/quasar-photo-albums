@@ -5,9 +5,12 @@ const admin = require('firebase-admin');
 const router = express.Router();
 const helpers = require('./helpers');
 
+// Reference:
+// https://firebase.google.com/docs/reference/admin/node/firebase-admin.firestore
+// https://googleapis.dev/nodejs/firestore/latest/Firestore.html
+
 router.get('/albums/tags', async (req, res) => {
-  const db = getFirestore();
-  const docRef = db.collection('album-tags');
+  const docRef = getFirestore().collection('album-tags');
   docRef
     .get()
     .then((querySnapshot) => {
@@ -42,10 +45,49 @@ router.get('/albums', async (req, res) => {
   }
 });
 
+router.put('/albums', helpers.verifyJwtClaim, async (req, res) => {
+  if (req.user.role === 'admin') {
+    const album = req.body;
+    const writeBatch = getFirestore().batch();
+    const albumRef = getFirestore().doc(`s3-photo-albums/${album.albumName}`);
+    writeBatch.update(albumRef, album);
+    writeBatch
+      .commit()
+      .then(() => {
+        return res.status(200).send({ statue: 'Album updated' });
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.status(500).send({ statue: 'Server error' });
+      });
+  } else {
+    return res.status(403).send({ status: 'Unauthorized', message: `User ${req.user.email} doesn't have permission` });
+  }
+});
+
+router.delete('/albums/:albumName', helpers.verifyJwtClaim, async (req, res) => {
+  if (req.user.role === 'admin') {
+    const albumName = req.params.albumName;
+    const writeBatch = getFirestore().batch();
+    const albumRef = getFirestore().doc(`s3-photo-albums/${albumName}`);
+    writeBatch.delete(albumRef);
+    writeBatch
+      .commit()
+      .then(() => {
+        return res.status(200).send({ statue: 'Album deleted' });
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.status(500).send({ statue: 'Server error' });
+      });
+  } else {
+    return res.status(403).send({ status: 'Unauthorized', message: `User ${req.user.email} doesn't have permission` });
+  }
+});
+
 const _queryAlbums = async (isAdmin) => {
   const albumList = [];
-  const db = getFirestore();
-  const albumRef = db.collection('s3-photo-albums');
+  const albumRef = getFirestore().collection('s3-photo-albums');
   let queryResult;
   if (isAdmin) {
     queryResult = await albumRef.orderBy('albumName', 'desc').get();

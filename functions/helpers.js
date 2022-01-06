@@ -2,8 +2,7 @@ const { getFirestore } = require('firebase-admin/firestore');
 const admin = require('firebase-admin');
 
 const queryUserPermission = async (uid) => {
-  const db = getFirestore();
-  const usersRef = db.collection('user-permission');
+  const usersRef = getFirestore().collection('user-permission');
   const queryResult = await usersRef.where('uid', '==', uid).limit(1).get();
   let userPermission = null;
   queryResult.forEach((doc) => {
@@ -17,8 +16,8 @@ const verifyJwtClaim = async (req, res, next) => {
   const _cleanToken = (message) => {
     res.clearCookie('session');
     return res.status(401).send({
-      success: false,
-      error: message,
+      status: 'Unauthorized',
+      message,
     });
   };
 

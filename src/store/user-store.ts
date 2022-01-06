@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { Loading, Notify } from 'quasar';
+import { Loading } from 'quasar';
 import AuthService from 'src/services/auth-service';
 
 export interface UserPermission {
@@ -45,6 +45,14 @@ export const userStore = defineStore('user-permission', {
     },
     setUserPermission(userPermission: UserPermission) {
       this.userPermission = userPermission;
+    },
+    removeUserPermission() {
+      this.userPermission = {
+        uid: '',
+        email: '',
+        role: '',
+        displayName: '',
+      };
     },
   },
 });
