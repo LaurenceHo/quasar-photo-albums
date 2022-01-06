@@ -14,7 +14,8 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
     "firebase-admin": "^10.0.1",
-    "firebase-functions": "^3.16.0"
+    "firebase-functions": "^3.16.0",
+    "lodash": "^4.17.21"
   },
   "engines": {
     "node": "16"

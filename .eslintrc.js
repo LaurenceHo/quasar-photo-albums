@@ -75,6 +75,7 @@ module.exports = {
 
   // add your custom rules here
   rules: {
+    'import/no-unresolved': 0,
     'no-unused-vars': 'off',
     'prefer-promise-reject-errors': 'off',
     // TypeScript

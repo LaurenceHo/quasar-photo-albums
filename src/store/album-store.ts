@@ -2,8 +2,7 @@ import { Album } from 'components/models';
 import isEmpty from 'lodash/isEmpty';
 import { defineStore } from 'pinia';
 import { LoadingBar, Notify } from 'quasar';
-import FirestoreService from 'src/services/firestore-service';
-import { userStore } from 'src/store/user-store';
+import AlbumService from 'src/services/album-service';
 
 export interface AlbumState {
   loadingAlbums: boolean;
@@ -14,7 +13,7 @@ export interface AlbumState {
   refreshAlbumList: boolean;
 }
 
-const firestoreService = new FirestoreService();
+const albumService = new AlbumService();
 
 export const albumStore = defineStore('album', {
   state: () =>
@@ -68,20 +67,27 @@ export const albumStore = defineStore('album', {
       this.searchKey = input;
     },
 
-    async getAllAlbumList() {
-      const userPermissionStore = userStore();
-
+    async getAlbums(startIndex?: number, endIndex?: number, filter?: string) {
       LoadingBar.start();
       this.loadingAlbums = true;
-      this.allAlbumList = await firestoreService.getAlbumList(userPermissionStore.userPermission.role !== 'admin');
-      LoadingBar.stop();
-      this.loadingAlbums = false;
+      try {
+        this.allAlbumList = await albumService.getAlbums(startIndex, endIndex, filter);
+      } catch (error: any) {
+        Notify.create({
+          color: 'negative',
+          icon: 'mdi-alert-circle-outline',
+          message: error.toString(),
+        });
+      } finally {
+        LoadingBar.stop();
+        this.loadingAlbums = false;
+      }
     },
 
     async getAlbumTags() {
       this.loadingAlbumTags = true;
       try {
-        const albumTags = await firestoreService.getAlbumTags();
+        const albumTags = await albumService.getAlbumTags();
         this.albumTags = albumTags.tags.sort((a: string, b: string) => {
           if (a.toLowerCase() > b.toLowerCase()) {
             return 1;
