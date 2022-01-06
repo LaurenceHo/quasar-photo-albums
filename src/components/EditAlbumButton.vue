@@ -69,7 +69,7 @@
 <script lang="ts" setup>
 import { Album } from 'components/models';
 import { useQuasar } from 'quasar';
-import FirestoreService from 'src/services/firestore-service';
+import AlbumService from 'src/services/album-service';
 import { albumStore } from 'src/store/album-store';
 import { UserPermission, userStore } from 'src/store/user-store';
 import { computed, defineProps, ref, toRefs } from 'vue';
@@ -87,7 +87,7 @@ const props = defineProps({
 });
 const { albumItem } = toRefs(props);
 
-const firestoreService = new FirestoreService();
+const albumService = new AlbumService();
 const store = albumStore();
 const userPermissionStore = userStore();
 const q = useQuasar();
@@ -112,7 +112,7 @@ const confirmUpdateAlbum = async () => {
   };
 
   try {
-    await firestoreService.updateAlbum(albumToBeUpdated);
+    await albumService.updateAlbum(albumToBeUpdated);
     store.updateAlbum(albumToBeUpdated, false);
     editAlbum.value = false;
     q.notify({
@@ -136,7 +136,7 @@ const confirmDeleteAlbum = async () => {
   isProcessing.value = true;
 
   try {
-    await firestoreService.deleteAlbum(albumItem?.value.albumName);
+    await albumService.deleteAlbum(albumItem?.value.albumName);
     store.updateAlbum(albumItem?.value as Album, true);
     deleteAlbum.value = false;
     q.notify({
