@@ -2,7 +2,7 @@ const _ = require('lodash');
 const express = require('express');
 const admin = require('firebase-admin');
 const { getFirestore } = require('firebase-admin/firestore');
-const helpers = require('./helpers');
+const helpers = require('../helpers');
 
 // Reference:
 // https://firebase.google.com/docs/reference/admin/node/firebase-admin.firestore
@@ -10,6 +10,7 @@ const helpers = require('./helpers');
 
 const router = express.Router();
 router.get('/tags', async (req, res) => {
+  res.set('Cache-control', 'public, max-age=3600');
   const docRef = getFirestore().collection('album-tags');
   docRef
     .get()
@@ -17,14 +18,14 @@ router.get('/tags', async (req, res) => {
       let i = 0;
       querySnapshot.forEach((doc) => {
         if (i === 0) {
-          res.status(200).send(doc.data());
+          res.send(doc.data());
         }
         i++;
       });
     })
     .catch((error) => {
       console.log(error);
-      return res.status(500).send({ status: 'Server error' });
+      res.status(500).send({ status: 'Server error' });
     });
 });
 
@@ -38,10 +39,11 @@ router.get('', async (req, res) => {
       userPermission = await helpers.queryUserPermission(decodedClaims.uid);
     }
     const albumList = await _queryAlbums(_.get(userPermission, 'role') === 'admin');
-    return res.status(200).send(albumList);
+    res.set('Cache-control', 'public, max-age=3600');
+    res.send(albumList);
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ status: 'Server error' });
+    res.status(500).send({ status: 'Server error' });
   }
 });
 
@@ -54,14 +56,14 @@ router.put('', helpers.verifyJwtClaim, async (req, res) => {
     writeBatch
       .commit()
       .then(() => {
-        return res.status(200).send({ statue: 'Album updated' });
+        res.send({ statue: 'Album updated' });
       })
       .catch((error) => {
         console.log(error);
-        return res.status(500).send({ statue: 'Server error' });
+        res.status(500).send({ statue: 'Server error' });
       });
   } else {
-    return res.status(403).send({ status: 'Unauthorized', message: `User ${req.user.email} doesn't have permission` });
+    res.status(403).send({ status: 'Unauthorized', message: `User ${req.user.email} doesn't have permission` });
   }
 });
 
@@ -74,14 +76,14 @@ router.delete('/:albumName', helpers.verifyJwtClaim, async (req, res) => {
     writeBatch
       .commit()
       .then(() => {
-        return res.status(200).send({ statue: 'Album deleted' });
+        res.send({ statue: 'Album deleted' });
       })
       .catch((error) => {
         console.log(error);
-        return res.status(500).send({ statue: 'Server error' });
+        res.status(500).send({ statue: 'Server error' });
       });
   } else {
-    return res.status(403).send({ status: 'Unauthorized', message: `User ${req.user.email} doesn't have permission` });
+    res.status(403).send({ status: 'Unauthorized', message: `User ${req.user.email} doesn't have permission` });
   }
 });
 
