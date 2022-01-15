@@ -10,7 +10,7 @@ import { QBtn } from 'quasar';
 
 installQuasarPlugin();
 
-describe.skip('AlbumList.vue', () => {
+describe('AlbumList.vue', () => {
   it('Check album list', async () => {
     const wrapper = mount(AlbumList, {
       global: {
@@ -18,8 +18,10 @@ describe.skip('AlbumList.vue', () => {
           router,
           createTestingPinia({
             initialState: {
-              allAlbumList: mockAlbumList,
-              albumTags: ['sport', 'food', 'hiking', 'secret'],
+              album: {
+                allAlbumList: mockAlbumList,
+                albumTags: ['sport', 'food', 'hiking', 'secret'],
+              },
             },
           }),
         ],
@@ -31,15 +33,15 @@ describe.skip('AlbumList.vue', () => {
     await flushPromises();
 
     const { vm } = wrapper as any;
-    expect(wrapper).toBeTruthy();
-    // TODO => Pinia mock store doesn't work in the Vue SFC
-    // expect(vm.totalItems).toEqual(5);
-    // expect(vm.chunkAlbumList).toHaveLength(5);
-    // expect(vm.totalPages).toEqual(1);
-    // expect(vm.albumListType).toEqual('list');
+    expect(vm.totalItems).toEqual(5);
+    expect(vm.chunkAlbumList).toHaveLength(5);
+    expect(vm.totalPages).toEqual(1);
+    expect(vm.albumStyle).toEqual('list');
 
     await wrapper.findAllComponents(QBtn)[1].trigger('click');
     await vm.$nextTick();
+    await router.isReady();
+    await flushPromises();
     expect(vm.albumStyle).toEqual('grid');
   });
 });

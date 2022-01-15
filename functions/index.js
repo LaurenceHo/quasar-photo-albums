@@ -6,8 +6,8 @@ const admin = require('firebase-admin');
 const functions = require('firebase-functions');
 const helmet = require('helmet');
 
-const authRoute = require('./auth-route');
-const albumRoute = require('./album-route');
+const authRoute = require('./route/auth-route');
+const albumRoute = require('./route/album-route');
 const serviceAccount = require('./serviceAccountKey.json');
 
 admin.initializeApp({
