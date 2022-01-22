@@ -31,7 +31,7 @@
           outlined
           use-chips
           use-input
-          @filter="filterCategory"
+          @filter="filterTags"
         />
       </div>
       <q-space />
@@ -71,6 +71,7 @@
 import Album from 'components/Album.vue';
 import { Album as AlbumItem } from 'components/models';
 import isEmpty from 'lodash/isEmpty';
+import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import { albumStore } from 'src/store/album-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -78,12 +79,14 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 const store = albumStore();
+
+const { albumTags, filterTags } = AlbumTagsFilterComposable();
+
 const itemsPerPage = ref(20);
 const pageNumber = ref(1);
 const albumStyle = ref((route.query.albumStyle as string) || 'list');
 const totalItems = ref(store.allAlbumList.length);
 const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
-const albumTags = ref(store.albumTags);
 const selectedTags = ref([]);
 
 const refreshAlbumList = computed(() => store.refreshAlbumList);
@@ -108,20 +111,6 @@ const getFilteredAlbumList = () => {
 const setAlbumStyle = (type: 'list' | 'grid') => {
   albumStyle.value = type;
   router.replace({ query: { albumStyle: type } });
-};
-
-const filterCategory = (val: string, update: any) => {
-  if (val === '') {
-    update(() => {
-      albumTags.value = store.albumTags;
-    });
-    return;
-  }
-
-  update(() => {
-    const needle = val.toLowerCase();
-    albumTags.value = store.albumTags.filter((v) => v.toLowerCase().indexOf(needle) > -1);
-  });
 };
 
 watch(refreshAlbumList, (newValue) => {

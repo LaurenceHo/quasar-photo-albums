@@ -11,17 +11,16 @@ const helpers = require('../helpers');
 const router = express.Router();
 router.get('/tags', async (req, res) => {
   res.set('Cache-control', 'public, max-age=3600');
+  const albumTags = [];
   const docRef = getFirestore().collection('album-tags');
   docRef
+    .orderBy('tag', 'asc')
     .get()
     .then((querySnapshot) => {
-      let i = 0;
       querySnapshot.forEach((doc) => {
-        if (i === 0) {
-          res.send(doc.data());
-        }
-        i++;
+        albumTags.push(doc.data());
       });
+      res.send(albumTags);
     })
     .catch((error) => {
       console.log(error);
@@ -38,8 +37,11 @@ router.get('', async (req, res) => {
       decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
       userPermission = await helpers.queryUserPermission(decodedClaims.uid);
     }
-    const albumList = await _queryAlbums(_.get(userPermission, 'role') === 'admin');
-    res.set('Cache-control', 'public, max-age=3600');
+    const isAdmin = _.get(userPermission, 'role') === 'admin';
+    const albumList = await _queryAlbums(isAdmin);
+    if (!isAdmin) {
+      res.set('Cache-control', 'public, max-age=3600');
+    }
     res.send(albumList);
   } catch (error) {
     console.log(error);
@@ -51,7 +53,7 @@ router.put('', helpers.verifyJwtClaim, async (req, res) => {
   if (req.user.role === 'admin') {
     const album = req.body;
     const writeBatch = getFirestore().batch();
-    const albumRef = getFirestore().doc(`s3-photo-albums/${album.albumName}`);
+    const albumRef = getFirestore().doc(`s3-photo-albums/${album.id}`);
     writeBatch.update(albumRef, album);
     writeBatch
       .commit()
@@ -67,11 +69,11 @@ router.put('', helpers.verifyJwtClaim, async (req, res) => {
   }
 });
 
-router.delete('/:albumName', helpers.verifyJwtClaim, async (req, res) => {
+router.delete('/:albumId', helpers.verifyJwtClaim, async (req, res) => {
   if (req.user.role === 'admin') {
-    const albumName = req.params.albumName;
+    const albumId = req.params['albumId'];
     const writeBatch = getFirestore().batch();
-    const albumRef = getFirestore().doc(`s3-photo-albums/${albumName}`);
+    const albumRef = getFirestore().doc(`s3-photo-albums/${albumId}`);
     writeBatch.delete(albumRef);
     writeBatch
       .commit()
@@ -97,7 +99,7 @@ const _queryAlbums = async (isAdmin) => {
     queryResult = await albumRef.where('private', '==', false).orderBy('albumName', 'desc').get();
   }
   queryResult.forEach((doc) => {
-    albumList.push(doc.data());
+    albumList.push({ ...doc.data(), id: doc.id });
   });
   return albumList;
 };

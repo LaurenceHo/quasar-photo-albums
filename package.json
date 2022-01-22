@@ -7,18 +7,17 @@
   "scripts": {
     "serve": "quasar dev",
     "build": "quasar build",
-    "lint": "eslint --ext .js,.ts,.vue ./ && prettier --write ./src/**/*.{js,ts,vue}",
+    "lint": "eslint --ext .js,.ts,.vue ./ && prettier --write ./src/**/*.{js,ts,vue,scss}",
     "postinstall": "husky install",
     "firebase:deploy": "npm run build && firebase deploy",
-    "test:unit": "quasar test --unit jest"
+    "test:unit": "jest --coverage"
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity": "^3.47.0",
-    "@aws-sdk/client-s3": "^3.47.0",
-    "@aws-sdk/credential-provider-cognito-identity": "^3.47.0",
-    "@quasar/extras": "^1.12.3",
-    "core-js": "^3.20.1",
-    "firebase": "^9.6.3",
+    "@aws-sdk/client-cognito-identity": "^3.48.0",
+    "@aws-sdk/client-s3": "^3.48.0",
+    "@aws-sdk/credential-provider-cognito-identity": "^3.48.0",
+    "core-js": "^3.20.3",
+    "firebase": "^9.6.4",
     "lodash": "^4.17.21",
     "pinia": "^2.0.9",
     "quasar": "^2.4.10"
@@ -26,23 +25,23 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.16.5",
     "@pinia/testing": "^0.0.9",
-    "@quasar/app": "^3.2.6",
-    "@quasar/quasar-app-extension-testing": "^2.0.1",
-    "@quasar/quasar-app-extension-testing-unit-jest": "^3.0.0-alpha.6",
+    "@quasar/app": "^3.2.9",
+    "@quasar/extras": "^1.12.4",
+    "@quasar/quasar-app-extension-testing-unit-jest": "^3.0.0-alpha.8",
     "@types/lodash": "^4.14.178",
-    "@types/node": "^17.0.8",
-    "@typescript-eslint/eslint-plugin": "^5.9.1",
-    "@typescript-eslint/parser": "^5.9.1",
-    "dotenv": "^12.0.3",
-    "eslint": "^8.6.0",
+    "@types/node": "^17.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/parser": "^5.10.0",
+    "dotenv": "^14.2.0",
+    "eslint": "^8.7.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-jest": "^25.3.4",
+    "eslint-plugin-jest": "^25.7.0",
     "eslint-plugin-vue": "^8.3.0",
-    "firebase-tools": "^10.1.0",
+    "firebase-tools": "^10.1.2",
     "husky": "^7.0.4",
-    "lint-staged": "^12.1.7",
+    "lint-staged": "^12.2.2",
     "prettier": "^2.5.1",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.5"
   },
   "lint-staged": {
     "*.{js,ts,vue}": [

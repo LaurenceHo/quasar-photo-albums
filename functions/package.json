@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "serve": "firebase emulators:start --only functions",
-    "start": "firebase functions:shell",
-    "deploy": "firebase deploy --only functions",
+    "serve:functions": "firebase emulators:start --only functions",
+    "start:functions": "firebase functions:shell",
+    "deploy:functions": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
   "dependencies": {

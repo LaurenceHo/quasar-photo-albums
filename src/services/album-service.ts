@@ -1,4 +1,4 @@
-import { Album } from 'components/models';
+import { Album, AlbumTag } from 'components/models';
 import HttpRequestService from 'src/services/http-request-service';
 
 export default class AlbumService extends HttpRequestService {
@@ -16,7 +16,7 @@ export default class AlbumService extends HttpRequestService {
     return this.perform('GET', '');
   }
 
-  getAlbumTags(): Promise<{ tags: string[] }> {
+  getAlbumTags(): Promise<AlbumTag[]> {
     this.setDisplayLoadingBar(false);
     return this.perform('GET', '/tags');
   }
@@ -26,8 +26,8 @@ export default class AlbumService extends HttpRequestService {
     return this.perform('PUT', '', album);
   }
 
-  deleteAlbum(albumName: string): Promise<any> {
+  deleteAlbum(albumId: string): Promise<any> {
     this.setDisplayLoadingBar(true);
-    return this.perform('DELETE', `/${albumName}`);
+    return this.perform('DELETE', `/${albumId}`);
   }
 }

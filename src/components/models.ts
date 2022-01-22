@@ -1,4 +1,5 @@
 export interface Album {
+  id: string;
   albumName: string;
   desc: string;
   tags: string[];
@@ -8,6 +9,10 @@ export interface Album {
 export interface Photo {
   url: string;
   key?: string;
+}
+
+export interface AlbumTag {
+  tag: string;
 }
 
 export interface LightBoxImage {

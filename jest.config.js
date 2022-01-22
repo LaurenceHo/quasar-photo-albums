@@ -1,4 +1,4 @@
-const esModules = ['quasar/lang', 'lodash-es'].join('|');
+const esModules = ['quasar', 'quasar/lang', 'lodash-es'].join('|');
 
 /* eslint-env node */
 module.exports = {
@@ -8,6 +8,11 @@ module.exports = {
     // See https://github.com/vuejs/vue-jest/issues/175
     'vue-jest': {
       pug: { doctype: 'html' },
+    },
+    // Remove if using `const enums`
+    // See https://huafu.github.io/ts-jest/user/config/isolatedModules#example
+    'ts-jest': {
+      isolatedModules: true,
     },
   },
   // noStackTrace: true,
@@ -40,8 +45,9 @@ module.exports = {
   //  in the same folder.
   // This guarantee a great dev experience both for testing and type-checking.
   // See https://github.com/vuejs/vue-jest/issues/188#issuecomment-620750728
-  moduleFileExtensions: ['vue', 'js', 'json', 'ts'],
+  moduleFileExtensions: ['vue', 'js', 'json', 'ts', 'scss'],
   moduleNameMapper: {
+    '^quasar$': 'quasar/dist/quasar.esm.prod.js',
     '^~/(.*)$': '<rootDir>/$1',
     '^src/(.*)$': '<rootDir>/src/$1',
     '^app/(.*)$': '<rootDir>/$1',
@@ -50,7 +56,7 @@ module.exports = {
     '^pages/(.*)$': '<rootDir>/src/pages/$1',
     '^assets/(.*)$': '<rootDir>/src/assets/$1',
     '^boot/(.*)$': '<rootDir>/src/boot/$1',
-    '.*css$': '@quasar/quasar-app-extension-testing-unit-jest/stub.css',
+    '\\.(s?css|less)$': 'identity-obj-proxy',
   },
   transform: {
     // See https://jestjs.io/docs/en/configuration.html#transformignorepatterns-array-string

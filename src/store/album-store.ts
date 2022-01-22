@@ -88,14 +88,7 @@ export const albumStore = defineStore('album', {
       this.loadingAlbumTags = true;
       try {
         const albumTags = await albumService.getAlbumTags();
-        this.albumTags = albumTags.tags.sort((a: string, b: string) => {
-          if (a.toLowerCase() > b.toLowerCase()) {
-            return 1;
-          } else if (a.toLowerCase() < b.toLowerCase()) {
-            return -1;
-          }
-          return 0;
-        });
+        this.albumTags = albumTags.map((t) => t.tag);
       } catch (error: any) {
         Notify.create({
           color: 'negative',
@@ -108,7 +101,7 @@ export const albumStore = defineStore('album', {
     },
 
     updateAlbum(albumToBeUpdated: Album, deleteAlbum: boolean) {
-      const findIndex = this.allAlbumList.findIndex((album) => album.albumName === albumToBeUpdated.albumName);
+      const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
       if (findIndex > -1) {
         if (deleteAlbum) {
           this.allAlbumList.splice(findIndex, 1);
