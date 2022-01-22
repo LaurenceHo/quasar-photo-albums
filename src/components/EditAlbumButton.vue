@@ -31,8 +31,28 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input v-model="albumName" autofocus class="q-pb-md" disable label="Album name" outlined stack-label />
-        <q-input v-model="albumDesc" :disable="isProcessing" autofocus label="Album description" outlined stack-label />
+        <q-input v-model="albumName" autofocus class="q-pb-md" label="Album name" outlined stack-label />
+        <q-input
+          v-model="albumDesc"
+          :disable="isProcessing"
+          autofocus
+          label="Album description"
+          outlined
+          stack-label
+          class="q-pb-md"
+        />
+        <q-select
+          v-model="selectedAlbumTags"
+          :options="albumTags"
+          clearable
+          input-debounce="0"
+          label="Category"
+          multiple
+          outlined
+          use-chips
+          use-input
+          @filter="filterTags"
+        />
         <q-toggle
           v-model="privateAlbum"
           :disable="isProcessing"
@@ -69,6 +89,7 @@
 <script lang="ts" setup>
 import { Album } from 'components/models';
 import { useQuasar } from 'quasar';
+import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import AlbumService from 'src/services/album-service';
 import { albumStore } from 'src/store/album-store';
 import { UserPermission, userStore } from 'src/store/user-store';
@@ -92,6 +113,8 @@ const store = albumStore();
 const userPermissionStore = userStore();
 const q = useQuasar();
 
+const { albumTags, filterTags } = AlbumTagsFilterComposable();
+
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 
 const editAlbum = ref(false);
@@ -99,16 +122,17 @@ const deleteAlbum = ref(false);
 const albumName = ref(albumItem?.value?.albumName);
 const albumDesc = ref(albumItem?.value?.desc);
 const privateAlbum = ref(albumItem?.value?.private);
-const albumTags = ref(albumItem?.value?.tags);
+const selectedAlbumTags = ref(albumItem?.value?.tags);
 const isProcessing = ref(false);
 
 const confirmUpdateAlbum = async () => {
   isProcessing.value = true;
   const albumToBeUpdated = {
+    id: albumItem.value.id,
     albumName: albumName.value,
     desc: albumDesc.value,
     private: privateAlbum.value,
-    tags: albumTags.value,
+    tags: selectedAlbumTags.value,
   };
 
   try {
@@ -136,7 +160,7 @@ const confirmDeleteAlbum = async () => {
   isProcessing.value = true;
 
   try {
-    await albumService.deleteAlbum(albumItem?.value.albumName);
+    await albumService.deleteAlbum(albumItem?.value.id);
     store.updateAlbum(albumItem?.value as Album, true);
     deleteAlbum.value = false;
     q.notify({
@@ -160,7 +184,7 @@ const resetAlbum = () => {
   albumName.value = albumItem?.value?.albumName;
   albumDesc.value = albumItem?.value?.desc;
   privateAlbum.value = albumItem?.value?.private;
-  albumTags.value = albumItem?.value?.tags;
+  selectedAlbumTags.value = albumItem?.value?.tags;
   editAlbum.value = false;
 };
 </script>
