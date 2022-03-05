@@ -1,7 +1,7 @@
 <template>
   <q-btn
     v-if="userPermission.role === 'admin'"
-    :class="{ 'grid-album-edit-button': albumStyle === 'grid' }"
+    :class="{ 'absolute-top-right': albumStyle === 'grid' }"
     :color="albumStyle === 'grid' ? 'white' : 'dark'"
     flat
     icon="mdi-dots-vertical"
@@ -102,10 +102,3 @@ const confirmDeleteAlbum = async () => {
   }
 };
 </script>
-<style lang="scss">
-.grid-album-edit-button {
-  top: 0;
-  right: 0;
-  position: absolute;
-}
-</style>
