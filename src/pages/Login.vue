@@ -23,11 +23,11 @@
 </template>
 
 <script setup lang="ts">
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useQuasar } from 'quasar';
 import AuthService from 'src/services/auth-service';
 import { userStore } from 'src/store/user-store';
 import { ref } from 'vue';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -54,7 +54,7 @@ const handleClickSignIn = async () => {
             userPermissionStore.setUserPermission(userPermission);
             q.notify({
               color: 'positive',
-              icon: 'mdi-human-handsup',
+              icon: 'mdi-hand-wave-outline',
               message: `Welcome, ${userPermission.displayName}`,
               timeout: 2000,
             });

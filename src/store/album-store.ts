@@ -102,14 +102,17 @@ export const albumStore = defineStore('album', {
 
     updateAlbum(albumToBeUpdated: Album, deleteAlbum: boolean) {
       const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
-      if (findIndex > -1) {
+      if (findIndex === -1) {
+        this.allAlbumList.push(albumToBeUpdated);
+        this.allAlbumList = this.allAlbumList.sort((a, b) => b.albumName.localeCompare(a.albumName));
+      } else {
         if (deleteAlbum) {
           this.allAlbumList.splice(findIndex, 1);
         } else {
           this.allAlbumList.splice(findIndex, 1, albumToBeUpdated);
         }
-        this.refreshAlbumList = true;
       }
+      this.refreshAlbumList = true;
     },
 
     updateRefreshAlbumListFlag() {

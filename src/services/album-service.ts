@@ -21,6 +21,11 @@ export default class AlbumService extends HttpRequestService {
     return this.perform('GET', '/tags');
   }
 
+  createAlbum(album: Album): Promise<any> {
+    this.setDisplayLoadingBar(true);
+    return this.perform('POST', '', album);
+  }
+
   updateAlbum(album: Album): Promise<any> {
     this.setDisplayLoadingBar(true);
     return this.perform('PUT', '', album);

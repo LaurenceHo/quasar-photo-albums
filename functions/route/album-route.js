@@ -49,17 +49,32 @@ router.get('', async (req, res) => {
   }
 });
 
+router.post('', helpers.verifyJwtClaim, async (req, res) => {
+  if (req.user.role === 'admin') {
+    const album = req.body;
+    const albumRef = getFirestore().collection('s3-photo-albums').doc(album.id);
+
+    delete album.id;
+
+    albumRef
+      .set(album)
+      .then(() => res.send({ statue: 'Album created' }))
+      .catch((error) => {
+        console.log(`Failed to create document: ${error}`);
+        res.status(500).send({ statue: 'Server error' });
+      });
+  } else {
+    res.status(403).send({ status: 'Unauthorized', message: `User ${req.user.email} doesn't have permission` });
+  }
+});
+
 router.put('', helpers.verifyJwtClaim, async (req, res) => {
   if (req.user.role === 'admin') {
     const album = req.body;
-    const writeBatch = getFirestore().batch();
     const albumRef = getFirestore().doc(`s3-photo-albums/${album.id}`);
-    writeBatch.update(albumRef, album);
-    writeBatch
-      .commit()
-      .then(() => {
-        res.send({ statue: 'Album updated' });
-      })
+    albumRef
+      .update(album)
+      .then(() => res.send({ statue: 'Album updated' }))
       .catch((error) => {
         console.log(error);
         res.status(500).send({ statue: 'Server error' });
@@ -72,14 +87,10 @@ router.put('', helpers.verifyJwtClaim, async (req, res) => {
 router.delete('/:albumId', helpers.verifyJwtClaim, async (req, res) => {
   if (req.user.role === 'admin') {
     const albumId = req.params['albumId'];
-    const writeBatch = getFirestore().batch();
     const albumRef = getFirestore().doc(`s3-photo-albums/${albumId}`);
-    writeBatch.delete(albumRef);
-    writeBatch
-      .commit()
-      .then(() => {
-        res.send({ statue: 'Album deleted' });
-      })
+    albumRef
+      .delete()
+      .then(() => res.send({ statue: 'Album deleted' }))
       .catch((error) => {
         console.log(error);
         res.status(500).send({ statue: 'Server error' });
