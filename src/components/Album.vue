@@ -83,7 +83,7 @@ thumbnail.value.push({ url: '' });
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 
 // Get first photo of album as album cover
-onMounted(async () => (thumbnail.value = await s3Service.getPhotoObject(props.albumItem.albumName, 1)));
+onMounted(async () => (thumbnail.value = await s3Service.getPhotoObject(props.albumItem.id, 1)));
 
-const goToAlbum = () => router.push(`/album/${props.albumItem.albumName}`);
+const goToAlbum = () => router.push(`/album/${props.albumItem.id}`);
 </script>

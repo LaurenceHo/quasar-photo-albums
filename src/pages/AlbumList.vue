@@ -51,12 +51,12 @@
     </div>
     <template v-if="chunkAlbumList.length">
       <div v-if="albumStyle === 'grid'" class="q-col-gutter-md row">
-        <Album v-for="album in chunkAlbumList" :key="album.albumName" :albumItem="album" :albumStyle="albumStyle" />
+        <Album v-for="album in chunkAlbumList" :key="album.id" :albumItem="album" :albumStyle="albumStyle" />
       </div>
       <div v-else class="justify-center row">
         <div class="col-12 col-xl-6 col-lg-8 col-md-8 column">
           <q-list bordered class="rounded-borders" separator>
-            <Album v-for="album in chunkAlbumList" :key="album.albumName" :albumItem="album" :albumStyle="albumStyle" />
+            <Album v-for="album in chunkAlbumList" :key="album.id" :albumItem="album" :albumStyle="albumStyle" />
           </q-list>
         </div>
       </div>

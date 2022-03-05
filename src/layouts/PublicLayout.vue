@@ -18,9 +18,15 @@
           <q-btn v-if="userPermission.uid" class="q-ml-sm" color="secondary" icon="mdi-account-circle" round unelevated>
             <q-menu>
               <q-list style="min-width: 100px">
+                <q-item v-close-popup clickable @click="updateAlbumDialogState = true">
+                  <q-item-section avatar>
+                    <q-icon color="primary" name="mdi-folder-plus-outline" />
+                  </q-item-section>
+                  <q-item-section>New album</q-item-section>
+                </q-item>
                 <q-item v-close-popup clickable @click="manageTags">
                   <q-item-section avatar>
-                    <q-icon color="primary" name="mdi-bookmark-multiple" />
+                    <q-icon color="primary" name="mdi-tag-multiple-outline" />
                   </q-item-section>
                   <q-item-section>Manage album tags</q-item-section>
                 </q-item>
@@ -37,9 +43,12 @@
       </template>
     </q-page-container>
   </q-layout>
+  <EditOrCreateAlbumDialog />
 </template>
 
 <script lang="ts" setup>
+import EditOrCreateAlbumDialog from 'components/EditOrCreateAlbumDialog.vue';
+import DialogStateComposable from 'src/composables/dialog-state-composable';
 import { albumStore } from 'src/store/album-store';
 import { UserPermission, userStore } from 'src/store/user-store';
 import { computed, ref, watch } from 'vue';
@@ -48,6 +57,7 @@ import { useRoute } from 'vue-router';
 const userPermissionStore = userStore();
 const store = albumStore();
 const route = useRoute();
+const { updateAlbumDialogState } = DialogStateComposable();
 
 const searchKey = ref('');
 

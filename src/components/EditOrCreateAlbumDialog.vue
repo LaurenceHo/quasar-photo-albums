@@ -1,0 +1,128 @@
+﻿<template>
+  <q-dialog v-model="updateAlbumDialogState">
+    <q-card style="min-width: 500px">
+      <q-card-section>
+        <div class="text-h6">{{ getAlbumToBeUpdate.id ? 'Edit' : 'New' }} Album</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none">
+        <q-input v-model="albumName" autofocus class="q-pb-md" label="Album name" outlined stack-label />
+        <q-input
+          v-model="albumDesc"
+          :disable="isProcessing"
+          autofocus
+          class="q-pb-md"
+          label="Album description"
+          outlined
+          stack-label
+        />
+        <q-select
+          v-model="selectedAlbumTags"
+          :options="albumTags"
+          clearable
+          input-debounce="0"
+          label="Category"
+          multiple
+          outlined
+          use-chips
+          use-input
+          @filter="filterTags"
+        />
+        <q-toggle
+          v-model="privateAlbum"
+          :disable="isProcessing"
+          checked-icon="mdi-lock"
+          color="primary"
+          icon="mdi-lock-open"
+          label="Private album?"
+          left-label
+        />
+      </q-card-section>
+
+      <q-card-actions align="right" class="text-primary">
+        <q-btn :disable="isProcessing" flat label="Cancel" no-caps @click="resetAlbum" />
+        <q-btn
+          :loading="isProcessing"
+          flat
+          :label="getAlbumToBeUpdate.id ? 'Update' : 'Create'"
+          no-caps
+          @click="confirmUpdateAlbum"
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+</template>
+
+<script lang="ts" setup>
+import { useQuasar } from 'quasar';
+import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
+import DialogStateComposable from 'src/composables/dialog-state-composable';
+import AlbumService from 'src/services/album-service';
+import { albumStore } from 'src/store/album-store';
+import { ref, watch } from 'vue';
+
+const albumService = new AlbumService();
+const store = albumStore();
+
+const q = useQuasar();
+
+const { updateAlbumDialogState, getAlbumToBeUpdate, setAlbumToBeUpdated } = DialogStateComposable();
+const { albumTags, filterTags } = AlbumTagsFilterComposable();
+
+const albumName = ref('');
+const albumDesc = ref('');
+const privateAlbum = ref(false);
+const selectedAlbumTags = ref([] as string[]);
+const isProcessing = ref(false);
+
+const confirmUpdateAlbum = async () => {
+  isProcessing.value = true;
+
+  const albumToBeSubmitted = {
+    id: getAlbumToBeUpdate.value.id || albumName.value,
+    albumName: albumName.value,
+    desc: albumDesc.value,
+    private: privateAlbum.value,
+    tags: selectedAlbumTags.value,
+  };
+
+  try {
+    if (getAlbumToBeUpdate.value.id) {
+      await albumService.updateAlbum(albumToBeSubmitted);
+    } else {
+      await albumService.createAlbum(albumToBeSubmitted);
+    }
+    store.updateAlbum(albumToBeSubmitted, false);
+    updateAlbumDialogState.value = false;
+    q.notify({
+      color: 'positive',
+      icon: 'mdi-cloud-check-outline',
+      message: `Album ${getAlbumToBeUpdate.value.id ? 'updated' : 'created'}`,
+      timeout: 3000,
+    });
+  } catch (error: any) {
+    q.notify({
+      color: 'negative',
+      icon: 'mdi-alert-circle-outline',
+      message: error.toString(),
+    });
+  } finally {
+    isProcessing.value = false;
+  }
+};
+const resetAlbum = () => {
+  setAlbumToBeUpdated({ id: '', albumName: '', desc: '', tags: [], private: false });
+  updateAlbumDialogState.value = false;
+};
+
+watch(
+  getAlbumToBeUpdate,
+  (newValue) => {
+    albumName.value = newValue.albumName;
+    albumDesc.value = newValue.desc;
+    privateAlbum.value = newValue.private;
+    selectedAlbumTags.value = newValue.tags;
+  },
+  { deep: true, immediate: true }
+);
+</script>

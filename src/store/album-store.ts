@@ -26,6 +26,8 @@ export const albumStore = defineStore('album', {
       refreshAlbumList: false,
     } as AlbumState),
   getters: {
+    getAlbumById: (state: AlbumState) => (id: string) => state.allAlbumList.find((album) => album.id === id),
+
     chunkAlbumList:
       (state: AlbumState) =>
       (firstIndex: number, lastIndex: number): Album[] => {
@@ -68,48 +70,55 @@ export const albumStore = defineStore('album', {
     },
 
     async getAlbums(startIndex?: number, endIndex?: number, filter?: string) {
-      Loading.show();
-      this.loadingAlbums = true;
-      try {
-        this.allAlbumList = await albumService.getAlbums(startIndex, endIndex, filter);
-      } catch (error: any) {
-        Notify.create({
-          color: 'negative',
-          icon: 'mdi-alert-circle-outline',
-          message: error.toString(),
-        });
-      } finally {
-        Loading.hide();
-        this.loadingAlbums = false;
+      if (this.allAlbumList.length === 0) {
+        Loading.show();
+        this.loadingAlbums = true;
+        try {
+          this.allAlbumList = await albumService.getAlbums(startIndex, endIndex, filter);
+        } catch (error: any) {
+          Notify.create({
+            color: 'negative',
+            icon: 'mdi-alert-circle-outline',
+            message: error.toString(),
+          });
+        } finally {
+          Loading.hide();
+          this.loadingAlbums = false;
+        }
       }
     },
 
     async getAlbumTags() {
-      this.loadingAlbumTags = true;
-      try {
-        const albumTags = await albumService.getAlbumTags();
-        this.albumTags = albumTags.map((t) => t.tag);
-      } catch (error: any) {
-        Notify.create({
-          color: 'negative',
-          icon: 'mdi-alert-circle-outline',
-          message: error.toString(),
-        });
-      } finally {
-        this.loadingAlbumTags = false;
+      if (this.albumTags.length === 0) {
+        this.loadingAlbumTags = true;
+        try {
+          const albumTags = await albumService.getAlbumTags();
+          this.albumTags = albumTags.map((t) => t.tag);
+        } catch (error: any) {
+          Notify.create({
+            color: 'negative',
+            icon: 'mdi-alert-circle-outline',
+            message: error.toString(),
+          });
+        } finally {
+          this.loadingAlbumTags = false;
+        }
       }
     },
 
     updateAlbum(albumToBeUpdated: Album, deleteAlbum: boolean) {
       const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
-      if (findIndex > -1) {
+      if (findIndex === -1) {
+        this.allAlbumList.push(albumToBeUpdated);
+        this.allAlbumList = this.allAlbumList.sort((a, b) => b.albumName.localeCompare(a.albumName));
+      } else {
         if (deleteAlbum) {
           this.allAlbumList.splice(findIndex, 1);
         } else {
           this.allAlbumList.splice(findIndex, 1, albumToBeUpdated);
         }
-        this.refreshAlbumList = true;
       }
+      this.refreshAlbumList = true;
     },
 
     updateRefreshAlbumListFlag() {

@@ -1,7 +1,7 @@
 <template>
   <q-btn
     v-if="userPermission.role === 'admin'"
-    :class="{ 'grid-album-edit-button': albumStyle === 'grid' }"
+    :class="{ 'absolute-top-right': albumStyle === 'grid' }"
     :color="albumStyle === 'grid' ? 'white' : 'dark'"
     flat
     icon="mdi-dots-vertical"
@@ -9,68 +9,21 @@
   >
     <q-menu>
       <q-list style="min-width: 100px">
-        <q-item v-close-popup clickable @click="editAlbum = true">
+        <q-item v-close-popup clickable @click="setAlbum">
           <q-item-section avatar>
-            <q-icon color="primary" name="mdi-pencil" />
+            <q-icon color="primary" name="mdi-pencil-outline" />
           </q-item-section>
-          <q-item-section>Update album</q-item-section>
+          <q-item-section>Edit album</q-item-section>
         </q-item>
         <q-item v-close-popup clickable @click="deleteAlbum = true">
           <q-item-section avatar>
-            <q-icon color="primary" name="mdi-delete" />
+            <q-icon color="primary" name="mdi-delete-outline" />
           </q-item-section>
           <q-item-section>Delete album</q-item-section>
         </q-item>
       </q-list>
     </q-menu>
   </q-btn>
-  <q-dialog v-model="editAlbum" persistent>
-    <q-card style="min-width: 500px">
-      <q-card-section>
-        <div class="text-h6">Edit Album</div>
-      </q-card-section>
-
-      <q-card-section class="q-pt-none">
-        <q-input v-model="albumName" autofocus class="q-pb-md" label="Album name" outlined stack-label />
-        <q-input
-          v-model="albumDesc"
-          :disable="isProcessing"
-          autofocus
-          label="Album description"
-          outlined
-          stack-label
-          class="q-pb-md"
-        />
-        <q-select
-          v-model="selectedAlbumTags"
-          :options="albumTags"
-          clearable
-          input-debounce="0"
-          label="Category"
-          multiple
-          outlined
-          use-chips
-          use-input
-          @filter="filterTags"
-        />
-        <q-toggle
-          v-model="privateAlbum"
-          :disable="isProcessing"
-          checked-icon="mdi-lock"
-          color="primary"
-          icon="mdi-lock-open"
-          label="Private album?"
-          left-label
-        />
-      </q-card-section>
-
-      <q-card-actions align="right" class="text-primary">
-        <q-btn :disable="isProcessing" flat label="Cancel" no-caps @click="resetAlbum" />
-        <q-btn :loading="isProcessing" flat label="Update" no-caps @click="confirmUpdateAlbum" />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
-
   <q-dialog v-model="deleteAlbum" persistent>
     <q-card>
       <q-card-section class="row items-center">
@@ -89,7 +42,7 @@
 <script lang="ts" setup>
 import { Album } from 'components/models';
 import { useQuasar } from 'quasar';
-import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
+import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
 import { albumStore } from 'src/store/album-store';
 import { UserPermission, userStore } from 'src/store/user-store';
@@ -103,7 +56,7 @@ const props = defineProps({
   albumItem: {
     type: Object,
     required: true,
-    default: () => ({ albumName: '', desc: '', tags: [], private: false }),
+    default: () => ({ id: '', albumName: '', desc: '', tags: [], private: false } as Album),
   },
 });
 const { albumItem } = toRefs(props);
@@ -112,48 +65,17 @@ const albumService = new AlbumService();
 const store = albumStore();
 const userPermissionStore = userStore();
 const q = useQuasar();
-
-const { albumTags, filterTags } = AlbumTagsFilterComposable();
+const { updateAlbumDialogState, setAlbumToBeUpdated } = DialogStateComposable();
 
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 
-const editAlbum = ref(false);
 const deleteAlbum = ref(false);
 const albumName = ref(albumItem?.value?.albumName);
-const albumDesc = ref(albumItem?.value?.desc);
-const privateAlbum = ref(albumItem?.value?.private);
-const selectedAlbumTags = ref(albumItem?.value?.tags);
 const isProcessing = ref(false);
 
-const confirmUpdateAlbum = async () => {
-  isProcessing.value = true;
-  const albumToBeUpdated = {
-    id: albumItem.value.id,
-    albumName: albumName.value,
-    desc: albumDesc.value,
-    private: privateAlbum.value,
-    tags: selectedAlbumTags.value,
-  };
-
-  try {
-    await albumService.updateAlbum(albumToBeUpdated);
-    store.updateAlbum(albumToBeUpdated, false);
-    editAlbum.value = false;
-    q.notify({
-      color: 'positive',
-      icon: 'mdi-cloud-check-outline',
-      message: 'Album updated',
-      timeout: 3000,
-    });
-  } catch (error: any) {
-    q.notify({
-      color: 'negative',
-      icon: 'mdi-alert-circle-outline',
-      message: error.toString(),
-    });
-  } finally {
-    isProcessing.value = false;
-  }
+const setAlbum = () => {
+  setAlbumToBeUpdated(albumItem.value as Album);
+  updateAlbumDialogState.value = true;
 };
 
 const confirmDeleteAlbum = async () => {
@@ -179,19 +101,4 @@ const confirmDeleteAlbum = async () => {
     isProcessing.value = false;
   }
 };
-
-const resetAlbum = () => {
-  albumName.value = albumItem?.value?.albumName;
-  albumDesc.value = albumItem?.value?.desc;
-  privateAlbum.value = albumItem?.value?.private;
-  selectedAlbumTags.value = albumItem?.value?.tags;
-  editAlbum.value = false;
-};
 </script>
-<style lang="scss">
-.grid-album-edit-button {
-  top: 0;
-  right: 0;
-  position: absolute;
-}
-</style>
