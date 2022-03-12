@@ -17,6 +17,7 @@
     "@aws-sdk/client-s3": "^3.48.0",
     "@aws-sdk/credential-provider-cognito-identity": "^3.48.0",
     "core-js": "^3.20.3",
+    "exifreader": "^4.3.1",
     "firebase": "^9.6.4",
     "lodash": "^4.17.21",
     "pinia": "^2.0.9",
