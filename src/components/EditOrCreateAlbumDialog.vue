@@ -116,12 +116,14 @@ const resetAlbum = () => {
 };
 
 watch(
-  getAlbumToBeUpdate,
+  updateAlbumDialogState,
   (newValue) => {
-    albumName.value = newValue.albumName;
-    albumDesc.value = newValue.desc;
-    privateAlbum.value = newValue.private;
-    selectedAlbumTags.value = newValue.tags;
+    if (newValue) {
+      albumName.value = getAlbumToBeUpdate.value.albumName;
+      albumDesc.value = getAlbumToBeUpdate.value.desc;
+      privateAlbum.value = getAlbumToBeUpdate.value.private;
+      selectedAlbumTags.value = getAlbumToBeUpdate.value.tags;
+    }
   },
   { deep: true, immediate: true }
 );

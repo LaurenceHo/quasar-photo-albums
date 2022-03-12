@@ -8,7 +8,7 @@ export interface Album {
 
 export interface Photo {
   url: string;
-  key?: string;
+  key: string;
 }
 
 export interface AlbumTag {
