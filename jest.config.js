@@ -45,7 +45,7 @@ module.exports = {
   //  in the same folder.
   // This guarantee a great dev experience both for testing and type-checking.
   // See https://github.com/vuejs/vue-jest/issues/188#issuecomment-620750728
-  moduleFileExtensions: ['vue', 'js', 'json', 'ts', 'scss'],
+  moduleFileExtensions: ['vue', 'js', 'json', 'ts'],
   moduleNameMapper: {
     '^quasar$': 'quasar/dist/quasar.esm.prod.js',
     '^~/(.*)$': '<rootDir>/$1',
@@ -56,7 +56,8 @@ module.exports = {
     '^pages/(.*)$': '<rootDir>/src/pages/$1',
     '^assets/(.*)$': '<rootDir>/src/assets/$1',
     '^boot/(.*)$': '<rootDir>/src/boot/$1',
-    '\\.(s?css|less)$': 'identity-obj-proxy',
+    '^stores/(.*)$': '<rootDir>/src/stores/$1',
+    '.*css$': '@quasar/quasar-app-extension-testing-unit-jest/stub.css',
   },
   transform: {
     // See https://jestjs.io/docs/en/configuration.html#transformignorepatterns-array-string

@@ -44,8 +44,8 @@ import { Album } from 'components/models';
 import { useQuasar } from 'quasar';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
-import { albumStore } from 'src/store/album-store';
-import { UserPermission, userStore } from 'src/store/user-store';
+import { albumStore } from 'stores/album-store';
+import { UserPermission, userStore } from 'stores/user-store';
 import { computed, defineProps, ref, toRefs } from 'vue';
 
 const props = defineProps({

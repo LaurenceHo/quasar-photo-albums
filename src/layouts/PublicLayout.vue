@@ -4,7 +4,7 @@
       <div class="q-pa-sm">
         <q-toolbar>
           <q-avatar>
-            <img src="icons/favicon-128x128.png" />
+            <img src="/icons/favicon-128x128.png" />
           </q-avatar>
           <q-toolbar-title v-if="$q.screen.gt.xs"> {{ albumAppName }}</q-toolbar-title>
           <q-input v-if="routeName === 'Albums'" v-model="searchKey" dense standout="bg-grey">
@@ -49,8 +49,8 @@
 <script lang="ts" setup>
 import EditOrCreateAlbumDialog from 'components/EditOrCreateAlbumDialog.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import { albumStore } from 'src/store/album-store';
-import { UserPermission, userStore } from 'src/store/user-store';
+import { albumStore } from 'stores/album-store';
+import { UserPermission, userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 

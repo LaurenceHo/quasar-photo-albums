@@ -26,7 +26,7 @@
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useQuasar } from 'quasar';
 import AuthService from 'src/services/auth-service';
-import { userStore } from 'src/store/user-store';
+import { userStore } from 'stores/user-store';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 

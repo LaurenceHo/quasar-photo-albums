@@ -17,7 +17,7 @@ admin.initializeApp({
 const app = express();
 const corsHeader = (req, res, next) => {
   console.log('Request API:', req.url);
-  const allowedOrigins = ['http://localhost:8080', env.ALBUM_URL];
+  const allowedOrigins = ['http://localhost:9000', env.ALBUM_URL];
   const origin = req.headers.origin;
   if (allowedOrigins.indexOf(origin) > -1) {
     res.setHeader('Access-Control-Allow-Origin', origin);

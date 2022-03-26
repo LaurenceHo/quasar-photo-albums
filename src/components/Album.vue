@@ -58,7 +58,7 @@
 import EditAlbumButton from 'components/EditAlbumButton.vue';
 import { Photo } from 'components/models';
 import S3Service from 'src/services/s3-service';
-import { UserPermission, userStore } from 'src/store/user-store';
+import { UserPermission, userStore } from 'stores/user-store';
 import { computed, defineProps, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 

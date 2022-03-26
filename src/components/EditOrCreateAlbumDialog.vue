@@ -58,7 +58,7 @@ import { useQuasar } from 'quasar';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
-import { albumStore } from 'src/store/album-store';
+import { albumStore } from 'stores/album-store';
 import { ref, watch } from 'vue';
 
 const albumService = new AlbumService();
