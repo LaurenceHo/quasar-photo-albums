@@ -1,7 +1,7 @@
 import isEmpty from 'lodash/isEmpty';
 import { Notify } from 'quasar';
 import { route } from 'quasar/wrappers';
-import { userStore } from 'src/store/user-store';
+import { userStore } from 'stores/user-store';
 import { createMemoryHistory, createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 import routes from './routes';
 

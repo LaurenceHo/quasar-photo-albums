@@ -44,16 +44,6 @@
             <div class="col-12 col-xl-9 col-lg-9 col-md-9 column items-center">
               <div class="text-subtitle1 text-grey-7 q-pb-md">{{ selectedImage.key }}</div>
               <div class="relative-position">
-                <q-btn
-                  round
-                  icon="mdi-chevron-left"
-                  class="absolute-left"
-                  color="secondary"
-                  unelevated
-                  size="sm"
-                  style="height: 30px"
-                  @click="nextPhoto(-1)"
-                />
                 <img :src="selectedImage.url" class="rounded-borders-lg responsive-image" />
                 <q-btn
                   round
@@ -64,6 +54,16 @@
                   size="sm"
                   style="height: 30px"
                   @click="nextPhoto(1)"
+                />
+                <q-btn
+                  round
+                  icon="mdi-chevron-left"
+                  class="absolute-left"
+                  color="secondary"
+                  unelevated
+                  size="sm"
+                  style="height: 30px"
+                  @click="nextPhoto(-1)"
                 />
               </div>
             </div>
@@ -89,7 +89,7 @@
                 <q-item v-if="exifTags.Model">
                   <q-item-section>
                     <q-item-label>Device</q-item-label>
-                    <q-item-label caption>{{ exifTags.Model.value[0] }}</q-item-label>
+                    <q-item-label caption>{{ exifTags.Make?.description }}, {{ exifTags.Model.value[0] }}</q-item-label>
                   </q-item-section>
                 </q-item>
 
@@ -182,8 +182,8 @@
 import { Album, Photo } from 'components/models';
 import { copyToClipboard, Notify, useQuasar } from 'quasar';
 import S3Service from 'src/services/s3-service';
-import { albumStore } from 'src/store/album-store';
-import { UserPermission, userStore } from 'src/store/user-store';
+import { albumStore } from 'stores/album-store';
+import { UserPermission, userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ExifReader from 'exifreader';
@@ -270,12 +270,16 @@ watch(
   selectedImage,
   async (newValue) => {
     if (newValue) {
-      // Need to load photo from the original source instead of CDN
-      exifTags.value = await ExifReader.load(getS3Url(newValue.key) as any);
-
-      delete exifTags.value.MakerNote;
-      q.loading.hide();
-      selectedImageIndex.value = photosInAlbum.value.findIndex((photo) => photo.key === newValue.key);
+      try {
+        // Need to load photo from the original source instead of CDN
+        exifTags.value = await ExifReader.load(getS3Url(newValue.key) as any);
+        delete exifTags.value.MakerNote;
+        selectedImageIndex.value = photosInAlbum.value.findIndex((photo) => photo.key === newValue.key);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        q.loading.hide();
+      }
     }
   },
   { deep: true, immediate: true }

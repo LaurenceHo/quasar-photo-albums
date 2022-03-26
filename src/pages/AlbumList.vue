@@ -72,7 +72,7 @@ import Album from 'components/Album.vue';
 import { Album as AlbumItem } from 'components/models';
 import isEmpty from 'lodash/isEmpty';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
-import { albumStore } from 'src/store/album-store';
+import { albumStore } from 'stores/album-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
