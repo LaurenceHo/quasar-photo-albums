@@ -1,18 +1,21 @@
-import { describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 import { createTestingPinia } from '@pinia/testing';
 import { installQuasarPlugin, qLayoutInjections } from '@quasar/quasar-app-extension-testing-unit-jest';
 import { flushPromises, mount } from '@vue/test-utils';
-import { mockAlbumList, mockRouter as router } from 'app/test/jest/__tests__/mock-data';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import AlbumList from 'pages/AlbumList';
 import { QBtn } from 'quasar';
+import { albumStore } from 'src/stores/album-store';
+import { mockAlbumList, mockRouter as router } from '../mock-data';
 
 installQuasarPlugin();
 
 describe('AlbumList.vue', () => {
-  it('Check album list', async () => {
-    const wrapper = mount(AlbumList, {
+  let wrapper: any;
+
+  beforeEach(() => {
+    wrapper = mount(AlbumList, {
       global: {
         plugins: [
           router,
@@ -29,6 +32,9 @@ describe('AlbumList.vue', () => {
         stubs: ['Album'],
       },
     });
+  });
+
+  it('Check album list', async () => {
     await router.isReady();
     await flushPromises();
 
@@ -43,5 +49,13 @@ describe('AlbumList.vue', () => {
     await router.isReady();
     await flushPromises();
     expect(vm.albumStyle).toEqual('grid');
+  });
+
+  it('Search album list', async () => {
+    const store = albumStore();
+    store.searchKey = 'Apple';
+
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.totalItems).toEqual(0);
   });
 });

@@ -1,4 +1,4 @@
-﻿import { albumStore } from 'stores/album-store';
+﻿import { albumStore } from 'src/stores/album-store';
 import { ref } from 'vue';
 
 export default function AlbumTagsFilterComposable() {

@@ -42,7 +42,7 @@ export default route(function (/* { store, ssrContext } */) {
       } else {
         Notify.create({
           color: 'negative',
-          icon: 'mdi-alert-circle-outline',
+          icon: 'mdi-alert-circle',
           message: "You don't have permission.",
         });
         next('/');

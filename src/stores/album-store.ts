@@ -1,7 +1,7 @@
-import { Album } from 'components/models';
 import isEmpty from 'lodash/isEmpty';
 import { defineStore } from 'pinia';
 import { Loading, Notify } from 'quasar';
+import { Album } from 'src/components/models';
 import AlbumService from 'src/services/album-service';
 
 export interface AlbumState {
@@ -78,7 +78,7 @@ export const albumStore = defineStore('album', {
         } catch (error: any) {
           Notify.create({
             color: 'negative',
-            icon: 'mdi-alert-circle-outline',
+            icon: 'mdi-alert-circle',
             message: error.toString(),
           });
         } finally {
@@ -97,7 +97,7 @@ export const albumStore = defineStore('album', {
         } catch (error: any) {
           Notify.create({
             color: 'negative',
-            icon: 'mdi-alert-circle-outline',
+            icon: 'mdi-alert-circle',
             message: error.toString(),
           });
         } finally {

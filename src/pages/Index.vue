@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { albumStore } from 'stores/album-store';
+import { albumStore } from 'src/stores/album-store';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 

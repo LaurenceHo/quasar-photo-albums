@@ -1,5 +1,5 @@
 ﻿<template>
-  <q-dialog v-model="updateAlbumDialogState">
+  <q-dialog v-model="getUpdateAlbumDialogState" persistent>
     <q-card style="min-width: 500px">
       <q-card-section>
         <div class="text-h6">{{ getAlbumToBeUpdate.id ? 'Edit' : 'New' }} Album</div>
@@ -43,9 +43,10 @@
         <q-btn :disable="isProcessing" flat label="Cancel" no-caps @click="resetAlbum" />
         <q-btn
           :loading="isProcessing"
-          flat
           :label="getAlbumToBeUpdate.id ? 'Update' : 'Create'"
           no-caps
+          unelevated
+          color="primary"
           @click="confirmUpdateAlbum"
         />
       </q-card-actions>
@@ -58,7 +59,7 @@ import { useQuasar } from 'quasar';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
-import { albumStore } from 'stores/album-store';
+import { albumStore } from 'src/stores/album-store';
 import { ref, watch } from 'vue';
 
 const albumService = new AlbumService();
@@ -66,7 +67,8 @@ const store = albumStore();
 
 const q = useQuasar();
 
-const { updateAlbumDialogState, getAlbumToBeUpdate, setAlbumToBeUpdated } = DialogStateComposable();
+const { getUpdateAlbumDialogState, setUpdateAlbumDialogState, getAlbumToBeUpdate, setAlbumToBeUpdated } =
+  DialogStateComposable();
 const { albumTags, filterTags } = AlbumTagsFilterComposable();
 
 const albumName = ref('');
@@ -93,17 +95,17 @@ const confirmUpdateAlbum = async () => {
       await albumService.createAlbum(albumToBeSubmitted);
     }
     store.updateAlbum(albumToBeSubmitted, false);
-    updateAlbumDialogState.value = false;
+    setUpdateAlbumDialogState(false);
     q.notify({
       color: 'positive',
-      icon: 'mdi-cloud-check-outline',
+      icon: 'mdi-cloud-check',
       message: `Album ${getAlbumToBeUpdate.value.id ? 'updated' : 'created'}`,
       timeout: 3000,
     });
   } catch (error: any) {
     q.notify({
       color: 'negative',
-      icon: 'mdi-alert-circle-outline',
+      icon: 'mdi-alert-circle',
       message: error.toString(),
     });
   } finally {
@@ -112,11 +114,11 @@ const confirmUpdateAlbum = async () => {
 };
 const resetAlbum = () => {
   setAlbumToBeUpdated({ id: '', albumName: '', desc: '', tags: [], private: false });
-  updateAlbumDialogState.value = false;
+  setUpdateAlbumDialogState(false);
 };
 
 watch(
-  updateAlbumDialogState,
+  getUpdateAlbumDialogState,
   (newValue) => {
     if (newValue) {
       albumName.value = getAlbumToBeUpdate.value.albumName;
