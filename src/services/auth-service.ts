@@ -1,5 +1,5 @@
 import HttpRequestService from 'src/services/http-request-service';
-import { UserPermission } from 'stores/user-store';
+import { UserPermission } from 'src/stores/user-store';
 
 export default class AuthService extends HttpRequestService {
   constructor() {

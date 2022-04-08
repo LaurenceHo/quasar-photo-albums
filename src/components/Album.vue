@@ -55,10 +55,10 @@
 </template>
 
 <script lang="ts" setup>
-import EditAlbumButton from 'components/EditAlbumButton.vue';
-import { Photo } from 'components/models';
+import EditAlbumButton from 'src/components/EditAlbumButton.vue';
+import { Photo } from 'src/components/models';
 import S3Service from 'src/services/s3-service';
-import { UserPermission, userStore } from 'stores/user-store';
+import { UserPermission, userStore } from 'src/stores/user-store';
 import { computed, defineProps, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -78,7 +78,7 @@ const userPermissionStore = userStore();
 const s3Service = new S3Service();
 const router = useRouter();
 const thumbnail = ref([] as Photo[]);
-thumbnail.value.push({ url: '' });
+thumbnail.value.push({ url: '', key: '' });
 
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 

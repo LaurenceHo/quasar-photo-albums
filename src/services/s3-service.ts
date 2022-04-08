@@ -1,8 +1,8 @@
 import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity';
 import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
-import { Photo } from 'components/models';
-import { Notify, LoadingBar } from 'quasar';
+import { LoadingBar, Notify } from 'quasar';
+import { Photo } from 'src/components/models';
 
 export default class S3Service {
   async getPhotoObject(albumName: string, maxKeys: number) {
@@ -47,7 +47,7 @@ export default class S3Service {
       console.log(error);
       Notify.create({
         color: 'negative',
-        icon: 'mdi-alert-circle-outline',
+        icon: 'mdi-alert-circle',
         message: error.toString(),
       });
     }

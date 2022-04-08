@@ -18,15 +18,15 @@
           <q-btn v-if="userPermission.uid" class="q-ml-sm" color="secondary" icon="mdi-account-circle" round unelevated>
             <q-menu>
               <q-list style="min-width: 100px">
-                <q-item v-close-popup clickable @click="updateAlbumDialogState = true">
+                <q-item v-close-popup clickable @click="setUpdateAlbumDialogState(true)">
                   <q-item-section avatar>
-                    <q-icon color="primary" name="mdi-folder-plus-outline" />
+                    <q-icon color="primary" name="mdi-folder-plus" />
                   </q-item-section>
                   <q-item-section>New album</q-item-section>
                 </q-item>
-                <q-item v-close-popup clickable @click="manageTags">
+                <q-item v-close-popup clickable @click="setUpdateAlbumTagsDialogState(true)">
                   <q-item-section avatar>
-                    <q-icon color="primary" name="mdi-tag-multiple-outline" />
+                    <q-icon color="primary" name="mdi-tag-multiple" />
                   </q-item-section>
                   <q-item-section>Manage album tags</q-item-section>
                 </q-item>
@@ -44,20 +44,22 @@
     </q-page-container>
   </q-layout>
   <EditOrCreateAlbumDialog />
+  <EditAlbumTagsDialog />
 </template>
 
 <script lang="ts" setup>
-import EditOrCreateAlbumDialog from 'components/EditOrCreateAlbumDialog.vue';
+import EditAlbumTagsDialog from 'components/EditAlbumTagsDialog.vue';
+import EditOrCreateAlbumDialog from 'src/components/EditOrCreateAlbumDialog.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import { albumStore } from 'stores/album-store';
-import { UserPermission, userStore } from 'stores/user-store';
+import { albumStore } from 'src/stores/album-store';
+import { UserPermission, userStore } from 'src/stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const userPermissionStore = userStore();
 const store = albumStore();
 const route = useRoute();
-const { updateAlbumDialogState } = DialogStateComposable();
+const { setUpdateAlbumDialogState, setUpdateAlbumTagsDialogState } = DialogStateComposable();
 
 const searchKey = ref('');
 
@@ -65,10 +67,6 @@ const routeName = computed(() => route.name);
 const albumAppName = computed(() => process.env.ALBUM_APP_TITLE);
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 const isCheckingUserPermission = computed(() => userPermissionStore.isCheckingUserPermission);
-
-const manageTags = async () => {
-  // TODO
-};
 
 userPermissionStore.checkUserPermission();
 

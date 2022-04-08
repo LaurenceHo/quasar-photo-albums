@@ -1,8 +1,8 @@
 import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity';
 import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
-import { firebaseApp } from 'boot/firebase';
-import { Album } from 'components/models';
+import { firebaseApp } from 'src/boot/firebase';
+import { Album } from 'src/components/models';
 import { getAuth } from 'firebase/auth';
 import {
   collection,
@@ -18,6 +18,9 @@ import {
 } from 'firebase/firestore';
 import { Notify } from 'quasar';
 
+/**
+ * Deprecated - Don't call firestore directly anymore
+ */
 export default class FirestoreService {
   db = getFirestore(firebaseApp);
 
@@ -39,7 +42,7 @@ export default class FirestoreService {
     } catch (error: any) {
       Notify.create({
         color: 'negative',
-        icon: 'mdi-alert-circle-outline',
+        icon: 'mdi-alert-circle',
         message: error.toString(),
       });
     }

@@ -2,7 +2,7 @@
   <q-page>
     <div class="container">
       <div class="center-screen">
-        <q-card flat bordered class="rounded-borders-lg" style="width: 300px">
+        <q-card flat bordered style="width: 300px">
           <q-card-section>
             <div class="text-h4 text-center q-pb-md">Login</div>
             <q-btn
@@ -26,7 +26,7 @@
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useQuasar } from 'quasar';
 import AuthService from 'src/services/auth-service';
-import { userStore } from 'stores/user-store';
+import { userStore } from 'src/stores/user-store';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -54,7 +54,7 @@ const handleClickSignIn = async () => {
             userPermissionStore.setUserPermission(userPermission);
             q.notify({
               color: 'positive',
-              icon: 'mdi-hand-wave-outline',
+              icon: 'mdi-hand-wave',
               message: `Welcome, ${userPermission.displayName}`,
               timeout: 2000,
             });
@@ -64,7 +64,7 @@ const handleClickSignIn = async () => {
         .catch((error) => {
           q.notify({
             color: 'negative',
-            icon: 'mdi-alert-circle-outline',
+            icon: 'mdi-alert-circle',
             message: error.toString(),
           });
         })
@@ -74,7 +74,7 @@ const handleClickSignIn = async () => {
     } else {
       q.notify({
         color: 'negative',
-        icon: 'mdi-alert-circle-outline',
+        icon: 'mdi-alert-circle',
         message: 'Error!',
       });
     }
@@ -83,7 +83,7 @@ const handleClickSignIn = async () => {
     const errorMessage = error.message;
     q.notify({
       color: 'negative',
-      icon: 'mdi-alert-circle-outline',
+      icon: 'mdi-alert-circle',
       message: `Error! ${errorMessage}`,
     });
   }

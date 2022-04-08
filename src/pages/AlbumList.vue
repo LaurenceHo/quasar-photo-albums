@@ -9,6 +9,7 @@
             dense
             icon="mdi-format-list-bulleted-square"
             @click="setAlbumStyle('list')"
+            padding="sm"
           />
           <q-btn
             :outline="albumStyle === 'list'"
@@ -16,6 +17,7 @@
             dense
             icon="mdi-view-grid"
             @click="setAlbumStyle('grid')"
+            padding="sm"
           />
         </q-btn-group>
       </div>
@@ -60,6 +62,19 @@
           </q-list>
         </div>
       </div>
+      <div class="col-12 col-xl-4 col-lg-5 col-md-5 flex justify-end items-center q-pt-md">
+        <q-pagination
+          v-model="pageNumber"
+          :max="totalPages"
+          :max-pages="5"
+          boundary-links
+          boundary-numbers
+          direction-links
+          outline
+        />
+        <q-select v-model="itemsPerPage" :options="[10, 20, 50]" dense outlined />
+        ({{ totalItems }} albums)
+      </div>
     </template>
     <template v-else>
       <div class="text-h5 text-weight-medium">No results.</div>
@@ -69,10 +84,10 @@
 
 <script lang="ts" setup>
 import Album from 'components/Album.vue';
-import { Album as AlbumItem } from 'components/models';
-import isEmpty from 'lodash/isEmpty';
+import * as _ from 'lodash';
+import { Album as AlbumItem } from 'src/components/models';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
-import { albumStore } from 'stores/album-store';
+import { albumStore } from 'src/stores/album-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -98,7 +113,7 @@ const lastIndex = computed(() =>
 );
 
 const getFilteredAlbumList = () => {
-  if (!isEmpty(searchKey.value) || !isEmpty(selectedTags.value)) {
+  if (!_.isEmpty(searchKey.value) || !_.isEmpty(selectedTags.value)) {
     const filteredAlbumList = store.filteredAlbumList(searchKey.value, selectedTags.value);
     totalItems.value = filteredAlbumList.length;
     chunkAlbumList.value = filteredAlbumList.slice(firstIndex.value, lastIndex.value);

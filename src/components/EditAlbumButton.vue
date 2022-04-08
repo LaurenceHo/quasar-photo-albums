@@ -11,13 +11,13 @@
       <q-list style="min-width: 100px">
         <q-item v-close-popup clickable @click="setAlbum">
           <q-item-section avatar>
-            <q-icon color="primary" name="mdi-pencil-outline" />
+            <q-icon color="primary" name="mdi-pencil" />
           </q-item-section>
           <q-item-section>Edit album</q-item-section>
         </q-item>
         <q-item v-close-popup clickable @click="deleteAlbum = true">
           <q-item-section avatar>
-            <q-icon color="primary" name="mdi-delete-outline" />
+            <q-icon color="primary" name="mdi-delete" />
           </q-item-section>
           <q-item-section>Delete album</q-item-section>
         </q-item>
@@ -40,12 +40,12 @@
 </template>
 
 <script lang="ts" setup>
-import { Album } from 'components/models';
 import { useQuasar } from 'quasar';
+import { Album } from 'src/components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
-import { albumStore } from 'stores/album-store';
-import { UserPermission, userStore } from 'stores/user-store';
+import { albumStore } from 'src/stores/album-store';
+import { UserPermission, userStore } from 'src/stores/user-store';
 import { computed, defineProps, ref, toRefs } from 'vue';
 
 const props = defineProps({
@@ -65,7 +65,7 @@ const albumService = new AlbumService();
 const store = albumStore();
 const userPermissionStore = userStore();
 const q = useQuasar();
-const { updateAlbumDialogState, setAlbumToBeUpdated } = DialogStateComposable();
+const { setUpdateAlbumDialogState, setAlbumToBeUpdated } = DialogStateComposable();
 
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 
@@ -75,7 +75,7 @@ const isProcessing = ref(false);
 
 const setAlbum = () => {
   setAlbumToBeUpdated(albumItem.value as Album);
-  updateAlbumDialogState.value = true;
+  setUpdateAlbumDialogState(true);
 };
 
 const confirmDeleteAlbum = async () => {
@@ -87,14 +87,14 @@ const confirmDeleteAlbum = async () => {
     deleteAlbum.value = false;
     q.notify({
       color: 'positive',
-      icon: 'mdi-cloud-check-outline',
+      icon: 'mdi-cloud-check',
       message: 'Album deleted',
       timeout: 3000,
     });
   } catch (error: any) {
     q.notify({
       color: 'negative',
-      icon: 'mdi-alert-circle-outline',
+      icon: 'mdi-alert-circle',
       message: error.toString(),
     });
   } finally {

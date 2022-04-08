@@ -54,9 +54,12 @@
 </template>
 
 <script lang="ts">
+import { LightBoxImage } from 'src/components/models';
 import { defineComponent } from 'vue';
-import { LightBoxImage } from 'components/models';
 
+/**
+ * Deprecated
+ */
 export default defineComponent({
   name: 'LightBox',
 
@@ -236,6 +239,7 @@ export default defineComponent({
   z-index: 2001;
   color: rgba(255, 255, 255, 0.8);
 }
+
 .lightbox-close {
   position: fixed;
   z-index: 2010;
@@ -248,6 +252,7 @@ export default defineComponent({
   height: 4rem;
   color: white;
 }
+
 .lightbox-main {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -256,6 +261,7 @@ export default defineComponent({
   width: 80%;
   height: 80%;
 }
+
 .lightbox-arrow {
   padding: 0 2rem;
   cursor: pointer;
@@ -270,12 +276,15 @@ export default defineComponent({
   width: 2rem;
   z-index: 100;
 }
+
 .lightbox-arrow-right {
   right: 0;
 }
+
 .lightbox-arrow-left {
   left: 0;
 }
+
 .lightbox-image-container {
   -webkit-box-flex: 1;
   width: 20%;
@@ -283,6 +292,7 @@ export default defineComponent({
   -ms-flex: 1;
   flex: 1;
 }
+
 .lightbox-image {
   width: 100%;
   height: 100%;
@@ -290,6 +300,7 @@ export default defineComponent({
   background-repeat: no-repeat;
   background-position: 50% 50%;
 }
+
 .lightbox-caption {
   position: absolute;
   bottom: 15px;
@@ -298,6 +309,7 @@ export default defineComponent({
   text-align: center;
   text-shadow: 1px 1px 3px rgb(26, 26, 26);
 }
+
 .lightbox-caption span {
   border-radius: 12px;
   background-color: rgba(0, 0, 0, 0.6);
@@ -307,46 +319,54 @@ export default defineComponent({
   -ms-user-select: none;
   user-select: none;
 }
+
 .lightbox-total {
   position: absolute;
   top: 5%;
   width: 100%;
   text-align: center;
 }
+
 .lightbox-slide-next-enter-active,
 .lightbox-slide-next-leave-active,
 .lightbox-slide-prev-enter-active,
 .lightbox-slide-prev-leave-active {
   transition: all 0.4s ease;
 }
+
 .lightbox-slide-next-enter {
   -webkit-transform: translateX(100px);
   -ms-transform: translateX(100px);
   transform: translateX(100px);
   opacity: 0;
 }
+
 .lightbox-slide-next-leave-to {
   -webkit-transform: translateX(-100px);
   -ms-transform: translateX(-100px);
   transform: translateX(-100px);
   opacity: 0;
 }
+
 .lightbox-slide-prev-enter {
   -webkit-transform: translateX(-100px);
   -ms-transform: translateX(-100px);
   transform: translateX(-100px);
   opacity: 0;
 }
+
 .lightbox-slide-prev-leave-to {
   -webkit-transform: translateX(100px);
   -ms-transform: translateX(100px);
   transform: translateX(100px);
   opacity: 0;
 }
+
 .lightbox-fade-enter-active,
 .lightbox-fade-leave-active {
   transition: all 0.4s ease;
 }
+
 .lightbox-fade-enter,
 .lightbox-fade-leave-to {
   opacity: 0;
