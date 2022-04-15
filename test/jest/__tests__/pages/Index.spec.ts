@@ -5,7 +5,7 @@ import { mount } from '@vue/test-utils';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import Index from 'pages/Index';
-import { mockRouter as router } from '../mock-data';
+import { mockRouter as router } from '../mock-router';
 
 installQuasarPlugin();
 

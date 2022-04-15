@@ -53,7 +53,7 @@ export const albumStore = defineStore('album', {
           }
           if (!isEmpty(selectedTags)) {
             filteredAlbumList.forEach((album) => {
-              const result = selectedTags.some((tag) => album.tags.includes(tag));
+              const result = selectedTags.some((tag) => album.tags?.includes(tag));
               if (result) {
                 filterByTags.push(album);
               }

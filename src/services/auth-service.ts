@@ -19,4 +19,9 @@ export default class AuthService extends HttpRequestService {
     this.setDisplayLoadingBar(false);
     return this.perform('GET', '/userInfo');
   }
+
+  logout(): Promise<void> {
+    this.setDisplayLoadingBar(true);
+    return this.perform('POST', '/logout');
+  }
 }
