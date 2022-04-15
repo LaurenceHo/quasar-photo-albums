@@ -30,6 +30,12 @@
                   </q-item-section>
                   <q-item-section>Manage album tags</q-item-section>
                 </q-item>
+                <q-item v-close-popup clickable @click="logout">
+                  <q-item-section avatar>
+                    <q-icon color="primary" name="mdi-logout-variant" />
+                  </q-item-section>
+                  <q-item-section>Logout</q-item-section>
+                </q-item>
               </q-list>
             </q-menu>
           </q-btn>
@@ -51,11 +57,13 @@
 import EditAlbumTagsDialog from 'components/EditAlbumTagsDialog.vue';
 import EditOrCreateAlbumDialog from 'src/components/EditOrCreateAlbumDialog.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
+import AuthService from 'src/services/auth-service';
 import { albumStore } from 'src/stores/album-store';
 import { UserPermission, userStore } from 'src/stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
+const authService = new AuthService();
 const userPermissionStore = userStore();
 const store = albumStore();
 const route = useRoute();
@@ -69,6 +77,10 @@ const userPermission = computed(() => userPermissionStore.userPermission as User
 const isCheckingUserPermission = computed(() => userPermissionStore.isCheckingUserPermission);
 
 userPermissionStore.checkUserPermission();
+
+const logout = () => {
+  authService.logout().then(() => location.reload());
+};
 
 watch(searchKey, (newValue) => {
   store.setSearchKey(newValue);

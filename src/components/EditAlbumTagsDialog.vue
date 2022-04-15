@@ -10,10 +10,7 @@
           <q-item v-for="tag in albumTags" :key="tag">
             <q-item-section>{{ tag }}</q-item-section>
             <q-item-section side>
-              <q-btn-group outline>
-                <q-btn icon="mdi-delete" color="primary" dense outline />
-                <q-btn icon="mdi-pencil" color="primary" dense outline />
-              </q-btn-group>
+              <q-btn icon="mdi-delete" color="primary" dense flat />
             </q-item-section>
           </q-item>
         </q-list>

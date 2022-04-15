@@ -209,7 +209,6 @@ watch(
 watch(
   selectedImage,
   async (newValue) => {
-    console.log('####### selectedImage', newValue);
     if (newValue && newValue.key) {
       try {
         // Need to load photo from the original source instead of CDN

@@ -43,6 +43,22 @@ router.post('/verifyIdToken', async (req, res) => {
   }
 });
 
+router.post('/logout', async (req, res) => {
+  const sessionCookie = req.cookies['__session'] || '';
+  res.clearCookie('__session');
+  try {
+    const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie);
+    admin
+      .auth()
+      .revokeRefreshTokens(decodedClaims.sub)
+      .then(() => {
+        res.send(200);
+      });
+  } catch (error) {
+    res.send(500);
+  }
+});
+
 const _setCookies = async (res, token) => {
   const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
   const sessionCookie = await admin.auth().createSessionCookie(String(token), { expiresIn });

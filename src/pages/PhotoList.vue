@@ -1,17 +1,23 @@
 <template>
   <q-page class="q-pt-md">
     <div class="row items-center">
-      <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated @click="goBack" />
-      <div class="text-h4 q-py-md q-pl-sm">
+      <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated to="/" />
+      <div class="text-h4 q-py-md q-pl-sm" data-test-id="album-name">
         {{ albumItem?.albumName }} {{ albumItem?.private ? '(private album)' : '' }}
       </div>
     </div>
-    <div class="text-h6 text-grey q-pb-lg">{{ albumItem?.desc }}</div>
+    <div class="text-h6 text-grey q-pb-md" data-test-id="album-desc">{{ albumItem?.desc }}</div>
+    <div v-if="albumItem?.tags?.length > 0" class="flex q-pb-md">
+      <q-chip v-for="(tag, i) in albumItem.tags" :key="i" data-test-id="album-tag">
+        {{ tag }}
+      </q-chip>
+    </div>
     <div class="q-col-gutter-md row items-start">
       <div
         v-for="(photo, index) in photosInAlbum"
         :key="photo.key"
         class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6"
+        data-test-id="photo-item"
       >
         <div class="relative-position">
           <q-img
@@ -50,11 +56,10 @@ import S3Service from 'src/services/s3-service';
 import { albumStore } from 'src/stores/album-store';
 import { UserPermission, userStore } from 'src/stores/user-store';
 import { computed, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 const q = useQuasar();
 const s3Service = new S3Service();
-const router = useRouter();
 const route = useRoute();
 
 const store = albumStore();
@@ -67,7 +72,6 @@ const photosInAlbum = ref([] as Photo[]);
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 const albumId = computed(() => route.params.albumId as string);
 const albumItem = computed(() => store.getAlbumById(albumId.value) as Album);
-
 const getPhotoList = async () => {
   photosInAlbum.value = [];
   if (albumItem.value?.id) {
@@ -76,8 +80,6 @@ const getPhotoList = async () => {
 };
 
 getPhotoList();
-
-const goBack = () => router.back();
 
 const showLightBox = (imageIndex: number) => {
   setPhotoDetailDialogState(true);

@@ -7,7 +7,8 @@ import { flushPromises, mount } from '@vue/test-utils';
 import AlbumList from 'pages/AlbumList';
 import { QBtn } from 'quasar';
 import { albumStore } from 'src/stores/album-store';
-import { mockAlbumList, mockRouter as router } from '../mock-data';
+import { mockAlbumList } from '../mock-data';
+import { mockRouter as router } from '../mock-router';
 
 installQuasarPlugin();
 
@@ -57,5 +58,13 @@ describe('AlbumList.vue', () => {
 
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.totalItems).toEqual(0);
+  });
+
+  it('Search album list by category', async () => {
+    const { vm } = wrapper as any;
+    vm.selectedTags = ['sport'];
+    await vm.$nextTick();
+    expect(vm.totalItems).toEqual(1);
+    expect(vm.chunkAlbumList[0]).toHaveProperty('albumName', 'Sport');
   });
 });
