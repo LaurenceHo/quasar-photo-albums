@@ -19,6 +19,9 @@
         <q-select
           v-model="selectedAlbumTags"
           :options="albumTags"
+          option-value="id"
+          option-label="tag"
+          emit-value
           clearable
           input-debounce="0"
           label="Category"

@@ -155,7 +155,7 @@ import * as ExifReader from 'exifreader';
 import { Photo } from 'src/components/models';
 import { useQuasar } from 'quasar';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import { defineProps, ref, toRefs, watch } from 'vue';
+import { ref, toRefs, watch } from 'vue';
 import { getS3Url } from 'src/components/helper';
 
 const props = defineProps({

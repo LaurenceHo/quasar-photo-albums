@@ -59,7 +59,7 @@ import EditAlbumButton from 'src/components/EditAlbumButton.vue';
 import { Photo } from 'src/components/models';
 import S3Service from 'src/services/s3-service';
 import { UserPermission, userStore } from 'src/stores/user-store';
-import { computed, defineProps, onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const props = defineProps({
@@ -83,6 +83,7 @@ thumbnail.value.push({ url: '', key: '' });
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 
 // Get first photo of album as album cover
+// TODO, need to get rid of it and read photo url from Firestore in the near future
 onMounted(async () => (thumbnail.value = await s3Service.getPhotoObject(props.albumItem.id, 1)));
 
 const goToAlbum = () => router.push(`/album/${props.albumItem.id}`);

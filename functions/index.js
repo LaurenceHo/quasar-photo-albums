@@ -8,6 +8,7 @@ const helmet = require('helmet');
 
 const authRoute = require('./route/auth-route');
 const albumRoute = require('./route/album-route');
+const albumTagsRoute = require('./route/album-tag-route');
 const serviceAccount = require('./serviceAccountKey.json');
 
 admin.initializeApp({
@@ -40,5 +41,6 @@ app.use(helmet());
 
 app.use('/api/auth', authRoute);
 app.use('/api/albums', albumRoute);
+app.use('/api/albumTags', albumTagsRoute);
 
 exports.main = functions.https.onRequest(app);
