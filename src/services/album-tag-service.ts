@@ -20,7 +20,7 @@ export default class AlbumTagService extends HttpRequestService {
     return this.perform('POST', '', tag);
   }
 
-  deleteAlbum(tagId: string): Promise<any> {
+  deleteAlbumTag(tagId: string): Promise<any> {
     this.setDisplayLoadingBar(true);
     return this.perform('DELETE', `/${tagId}`);
   }

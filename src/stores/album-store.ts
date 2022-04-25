@@ -125,5 +125,15 @@ export const albumStore = defineStore('album', {
     updateRefreshAlbumListFlag() {
       this.refreshAlbumList = !this.refreshAlbumList;
     },
+
+    updateAlbumTags(albumTag: AlbumTag, deleteTag: boolean) {
+      if (deleteTag) {
+        const findIndex = this.albumTags.findIndex((tag) => tag.id === albumTag.id);
+        this.albumTags.splice(findIndex, 1);
+      } else {
+        this.albumTags.push(albumTag);
+      }
+      this.albumTags = this.albumTags.sort((a, b) => a.tag.localeCompare(b.tag));
+    },
   },
 });
