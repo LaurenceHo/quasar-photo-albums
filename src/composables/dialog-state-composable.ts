@@ -31,6 +31,7 @@ export default function DialogStateComposable() {
     setUpdateAlbumDialogState,
     getUpdateAlbumTagsDialogState: computed(() => updateAlbumTagsDialogState.value),
     setUpdateAlbumTagsDialogState,
+    updateAlbumTagsDialogState,
     getPhotoDetailDialogState: computed(() => photoDetailDialogState.value),
     setPhotoDetailDialogState,
   };

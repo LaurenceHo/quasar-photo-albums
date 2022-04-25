@@ -19,7 +19,7 @@ import {
 import { Notify } from 'quasar';
 
 /**
- * Deprecated - Don't call firestore directly anymore
+ * Deprecated - Don't call firestore from UI directly anymore
  */
 export default class FirestoreService {
   db = getFirestore(firebaseApp);

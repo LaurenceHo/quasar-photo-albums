@@ -15,7 +15,7 @@ export default function AlbumTagsFilterComposable() {
 
     update(() => {
       const needle = val.toLowerCase();
-      albumTags.value = store.albumTags.filter((v) => v.toLowerCase().indexOf(needle) > -1);
+      albumTags.value = store.albumTags.filter((v) => v.tag.toLowerCase().indexOf(needle) > -1);
     });
   };
 

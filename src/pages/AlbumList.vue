@@ -25,6 +25,9 @@
         <q-select
           v-model="selectedTags"
           :options="albumTags"
+          option-value="id"
+          option-label="tag"
+          emit-value
           clearable
           dense
           input-debounce="0"

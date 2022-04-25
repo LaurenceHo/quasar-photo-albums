@@ -1,5 +1,6 @@
 const { getFirestore } = require('firebase-admin/firestore');
 const admin = require('firebase-admin');
+const _ = require('lodash');
 
 const queryUserPermission = async (uid) => {
   const usersRef = getFirestore().collection('user-permission');
@@ -40,5 +41,31 @@ const verifyJwtClaim = async (req, res, next) => {
   }
 };
 
+const isAdmin = async (sessionCookie) => {
+  let decodedClaims = '';
+  let userPermission = null;
+  if (sessionCookie) {
+    decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
+    userPermission = await queryUserPermission(decodedClaims.uid);
+  }
+  return _.get(userPermission, 'role') === 'admin';
+};
+
+const setCacheControlHeader = async (req, res, next) => {
+  const sessionCookie = req.cookies['__session'] || '';
+  try {
+    const isUserAdmin = await isAdmin(sessionCookie);
+    if (!isUserAdmin) {
+      res.set('Cache-control', 'public, max-age=3600');
+    }
+    next();
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ status: 'Server error' });
+  }
+};
+
 exports.queryUserPermission = queryUserPermission;
 exports.verifyJwtClaim = verifyJwtClaim;
+exports.isAdmin = isAdmin;
+exports.setCacheControlHeader = setCacheControlHeader;

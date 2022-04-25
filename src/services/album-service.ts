@@ -1,4 +1,4 @@
-import { Album, AlbumTag } from 'src/components/models';
+import { Album } from 'src/components/models';
 import HttpRequestService from 'src/services/http-request-service';
 
 export default class AlbumService extends HttpRequestService {
@@ -14,11 +14,6 @@ export default class AlbumService extends HttpRequestService {
     // TODO: May need to apply filter in the feature. It only runs filter in the memory atm.
     this.setDisplayLoadingBar(false);
     return this.perform('GET', '');
-  }
-
-  getAlbumTags(): Promise<AlbumTag[]> {
-    this.setDisplayLoadingBar(false);
-    return this.perform('GET', '/tags');
   }
 
   createAlbum(album: Album): Promise<any> {
