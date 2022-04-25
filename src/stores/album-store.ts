@@ -1,19 +1,21 @@
 import isEmpty from 'lodash/isEmpty';
 import { defineStore } from 'pinia';
 import { Loading, Notify } from 'quasar';
-import { Album } from 'src/components/models';
+import { Album, AlbumTag } from 'src/components/models';
 import AlbumService from 'src/services/album-service';
+import AlbumTagService from 'src/services/album-tag-service';
 
 export interface AlbumState {
   loadingAlbums: boolean;
   loadingAlbumTags: boolean;
   allAlbumList: Album[];
-  albumTags: string[];
+  albumTags: AlbumTag[];
   searchKey: string;
   refreshAlbumList: boolean;
 }
 
 const albumService = new AlbumService();
+const albumTagService = new AlbumTagService();
 
 export const albumStore = defineStore('album', {
   state: () =>
@@ -92,8 +94,7 @@ export const albumStore = defineStore('album', {
       if (this.albumTags.length === 0) {
         this.loadingAlbumTags = true;
         try {
-          const albumTags = await albumService.getAlbumTags();
-          this.albumTags = albumTags.map((t) => t.tag);
+          this.albumTags = await albumTagService.getAlbumTags();
         } catch (error: any) {
           Notify.create({
             color: 'negative',

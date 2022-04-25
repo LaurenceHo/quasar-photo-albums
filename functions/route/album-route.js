@@ -9,24 +9,6 @@ const helpers = require('../helpers');
 // https://googleapis.dev/nodejs/firestore/latest/Firestore.html
 
 const router = express.Router();
-router.get('/tags', async (req, res) => {
-  res.set('Cache-control', 'public, max-age=3600');
-  const albumTags = [];
-  const docRef = getFirestore().collection('album-tags');
-  docRef
-    .orderBy('tag', 'asc')
-    .get()
-    .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        albumTags.push(doc.data());
-      });
-      res.send(albumTags);
-    })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).send({ status: 'Server error' });
-    });
-});
 
 router.get('', async (req, res) => {
   const sessionCookie = req.cookies['__session'] || '';
@@ -38,10 +20,10 @@ router.get('', async (req, res) => {
       userPermission = await helpers.queryUserPermission(decodedClaims.uid);
     }
     const isAdmin = _.get(userPermission, 'role') === 'admin';
-    const albumList = await _queryAlbums(isAdmin);
     if (!isAdmin) {
       res.set('Cache-control', 'public, max-age=3600');
     }
+    const albumList = await _queryAlbums(isAdmin);
     res.send(albumList);
   } catch (error) {
     console.log(error);
@@ -52,6 +34,8 @@ router.get('', async (req, res) => {
 router.post('', helpers.verifyJwtClaim, async (req, res) => {
   if (req.user.role === 'admin') {
     const album = req.body;
+    // Because we don't want to use auto generated id, we need to use "set" to create document
+    // https://googleapis.dev/nodejs/firestore/latest/DocumentReference.html#set
     const albumRef = getFirestore().collection('s3-photo-albums').doc(album.id);
 
     delete album.id;

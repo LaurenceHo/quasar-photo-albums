@@ -33,7 +33,7 @@
 
       <q-card-actions align="right">
         <q-btn v-close-popup :disable="isProcessing" color="primary" flat label="Cancel" no-caps />
-        <q-btn :loading="isProcessing" color="primary" flat label="Confirm" no-caps @click="confirmDeleteAlbum" />
+        <q-btn :loading="isProcessing" color="primary" unelevated label="Confirm" no-caps @click="confirmDeleteAlbum" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -46,7 +46,7 @@ import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
 import { albumStore } from 'src/stores/album-store';
 import { UserPermission, userStore } from 'src/stores/user-store';
-import { computed, defineProps, ref, toRefs } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 
 const props = defineProps({
   albumStyle: {

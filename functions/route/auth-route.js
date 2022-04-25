@@ -11,13 +11,14 @@ router.get('/userInfo', async (req, res) => {
   try {
     const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
     if (decodedClaims.exp <= Date.now() / 1000) {
-      res.clearCookie('session');
+      res.clearCookie('__session');
       res.send({ status: 'Unauthorized', message: 'User is not logged-in' });
     }
     const userPermission = await helpers.queryUserPermission(decodedClaims.uid);
 
     res.send(userPermission);
   } catch (error) {
+    res.clearCookie('__session');
     res.send({ status: 'Unauthorized', message: 'User is not logged-in' });
   }
 });
