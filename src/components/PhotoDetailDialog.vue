@@ -15,32 +15,40 @@
       <q-card-section>
         <div class="row">
           <div class="col-12 col-xl-9 col-lg-9 col-md-9 column items-center">
-            <div class="text-subtitle1 text-grey-7 q-pb-md">{{ selectedImage.key }}</div>
-            <div class="relative-position">
-              <img :src="selectedImage.url" class="rounded-borders-lg responsive-image" />
+            <div class="text-subtitle1 text-grey-7">{{ selectedImage.key }}</div>
+            <div class="text-subtitle1 text-grey-7 q-pb-md">({{ imageIndex + 1 }}/{{ photosInAlbum.length }})</div>
+            <div class="relative-position full-width image-container">
+              <div class="flex justify-center items-center full-height">
+                <q-spinner v-show="loadImage" color="accent" size="4rem" />
+                <img
+                  v-show="!loadImage"
+                  :src="selectedImage.url"
+                  class="rounded-borders-lg responsive-image"
+                  style="margin: auto; display: block"
+                  @load="loadImage = false"
+                />
+              </div>
               <q-btn
                 round
                 icon="mdi-chevron-right"
                 class="absolute-right"
-                color="secondary"
+                color="accent"
                 unelevated
-                size="sm"
-                style="height: 30px"
+                style="height: 42px"
                 @click="nextPhoto(1)"
               />
               <q-btn
                 round
                 icon="mdi-chevron-left"
                 class="absolute-left"
-                color="secondary"
+                color="accent"
                 unelevated
-                size="sm"
-                style="height: 30px"
+                style="height: 42px"
                 @click="nextPhoto(-1)"
               />
             </div>
           </div>
-          <div class="col-12 col-xl-3 col-lg-3 col-md-3">
+          <div class="col-12 col-xl-3 col-lg-3 col-md-3 q-pt-md q-pt-xl-none q-pt-lg-none q-pt-md-none">
             <q-list separator>
               <q-item>
                 <q-item-section class="text-h5"> Details</q-item-section>
@@ -178,9 +186,12 @@ const q = useQuasar();
 const imageIndex = ref(0);
 const selectedImage = ref({ url: '', key: '' } as Photo);
 const exifTags = ref({});
+const loadImage = ref(false);
 
 const nextPhoto = (dir: number) => {
-  q.loading.show();
+  q.loadingBar.start();
+  exifTags.value = {};
+
   const slideLength = photosInAlbum.value.length;
   imageIndex.value = (imageIndex.value + (dir % slideLength) + slideLength) % slideLength;
   const nextPhoto = photosInAlbum.value[imageIndex.value] as Photo;
@@ -209,14 +220,15 @@ watch(
 watch(
   selectedImage,
   async (newValue) => {
-    if (newValue && newValue.key) {
+    if (newValue?.key) {
+      loadImage.value = true;
       try {
         // Need to load photo from the original source instead of CDN
         exifTags.value = await ExifReader.load(getS3Url(newValue.key) as any);
       } catch (error) {
         console.error(error);
       } finally {
-        q.loading.hide();
+        q.loadingBar.stop();
       }
     }
   },
@@ -224,6 +236,18 @@ watch(
 );
 </script>
 <style lang="scss" scoped>
+@media only screen and (max-width: 768px) {
+  .image-container {
+    height: inherit;
+  }
+}
+
+@media only screen and (min-width: 769px) {
+  .image-container {
+    height: 80vh;
+  }
+}
+
 .absolute-left {
   top: 50% !important;
 }

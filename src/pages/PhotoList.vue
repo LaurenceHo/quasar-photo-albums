@@ -66,7 +66,7 @@ const store = albumStore();
 const userPermissionStore = userStore();
 const { getPhotoDetailDialogState, setPhotoDetailDialogState } = DialogStateComposable();
 
-const selectedImageIndex = ref(0);
+const selectedImageIndex = ref(-1);
 const photosInAlbum = ref([] as Photo[]);
 
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
