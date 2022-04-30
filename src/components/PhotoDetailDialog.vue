@@ -15,7 +15,7 @@
       <q-card-section>
         <div class="row">
           <div class="col-12 col-xl-9 col-lg-9 col-md-9 column items-center">
-            <div class="text-subtitle1 text-grey-7">{{ selectedImage.key }}</div>
+            <div class="text-subtitle1 text-grey-7">{{ photoFileName }}</div>
             <div class="text-subtitle1 text-grey-7 q-pb-md">({{ imageIndex + 1 }}/{{ photosInAlbum.length }})</div>
             <div class="relative-position full-width image-container">
               <div class="flex justify-center items-center full-height">
@@ -183,8 +183,10 @@ const { selectedImageIndex, photosInAlbum } = toRefs(props);
 const { getPhotoDetailDialogState, setPhotoDetailDialogState } = DialogStateComposable();
 
 const q = useQuasar();
+
 const imageIndex = ref(0);
 const selectedImage = ref({ url: '', key: '' } as Photo);
+const photoFileName = ref('');
 const exifTags = ref({});
 const loadImage = ref(false);
 
@@ -221,6 +223,7 @@ watch(
   selectedImage,
   async (newValue) => {
     if (newValue?.key) {
+      photoFileName.value = selectedImage.value.key.split('/')[1];
       loadImage.value = true;
       try {
         // Need to load photo from the original source instead of CDN

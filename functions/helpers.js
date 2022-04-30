@@ -1,6 +1,9 @@
 const { getFirestore } = require('firebase-admin/firestore');
 const admin = require('firebase-admin');
 const _ = require('lodash');
+const { S3Client, ListObjectsV2Command } = require('@aws-sdk/client-s3');
+const { fromCognitoIdentityPool } = require('@aws-sdk/credential-provider-cognito-identity');
+const { CognitoIdentityClient } = require('@aws-sdk/client-cognito-identity');
 
 const queryUserPermission = async (uid) => {
   const usersRef = getFirestore().collection('user-permission');
@@ -51,21 +54,45 @@ const isAdmin = async (sessionCookie) => {
   return _.get(userPermission, 'role') === 'admin';
 };
 
-const setCacheControlHeader = async (req, res, next) => {
-  const sessionCookie = req.cookies['__session'] || '';
+const fetchObjectFromS3 = async (albumName, maxKeys) => {
+  const albumPhotosKey = encodeURIComponent(albumName) + '/';
+  const s3Client = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: fromCognitoIdentityPool({
+      client: new CognitoIdentityClient({ region: process.env.AWS_REGION }),
+      identityPoolId: process.env.AWS_IDENTITY_POOL_ID,
+    }),
+  });
+
+  const command = new ListObjectsV2Command({
+    Prefix: albumPhotosKey,
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    MaxKeys: maxKeys,
+    StartAfter: albumPhotosKey,
+  });
+
   try {
-    const isUserAdmin = await isAdmin(sessionCookie);
-    if (!isUserAdmin) {
-      res.set('Cache-control', 'public, max-age=3600');
-    }
-    next();
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({ status: 'Server error' });
+    const result = await s3Client.send(command);
+    return result.Contents;
+  } catch (err) {
+    console.log('Error', err);
   }
 };
 
+const setupDefaultAlbumCover = async (albumList) => {
+  for (const album of albumList) {
+    if (!album.albumCover) {
+      const s3ObjectContents = await fetchObjectFromS3(album.id, 1);
+      console.log('Photo key:', s3ObjectContents[0].Key);
+
+      const albumRef = getFirestore().collection('s3-photo-albums').doc(album.id);
+      albumRef.update({ ...album, albumCover: s3ObjectContents[0].Key }).then((res) => {
+        console.log(`Document updated at ${res.writeTime}`);
+      });
+    }
+  }
+};
 exports.queryUserPermission = queryUserPermission;
 exports.verifyJwtClaim = verifyJwtClaim;
 exports.isAdmin = isAdmin;
-exports.setCacheControlHeader = setCacheControlHeader;
+exports.setupDefaultAlbumCover = setupDefaultAlbumCover;
