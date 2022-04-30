@@ -87,7 +87,9 @@ all folders in S3 bucket and inserted folder name along with other information i
 ```
 Album
 {
+  id: string;
   albumName: string;
+  albumCover: string;
   desc: string;
   tags: string[];
   private: boolean;

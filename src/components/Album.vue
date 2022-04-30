@@ -3,7 +3,7 @@
     <div class="relative-position">
       <q-img
         :ratio="1"
-        :src="`${thumbnail[0].url}?tr=w-250,h-250`"
+        :src="`${thumbnail}?tr=w-250,h-250`"
         class="rounded-borders-lg cursor-pointer"
         @click="goToAlbum"
       >
@@ -24,7 +24,7 @@
     <q-item clickable>
       <q-item-section avatar @click="goToAlbum">
         <q-avatar rounded size="90px">
-          <q-img v-if="thumbnail.length" :ratio="1" :src="`${thumbnail[0].url}?tr=w-90,h-90`" class="rounded-borders">
+          <q-img :ratio="1" :src="`${thumbnail}?tr=w-90,h-90`" class="rounded-borders">
             <q-icon
               v-if="albumItem.private"
               class="absolute"
@@ -56,11 +56,11 @@
 
 <script lang="ts" setup>
 import EditAlbumButton from 'src/components/EditAlbumButton.vue';
-import { Photo } from 'src/components/models';
-import S3Service from 'src/services/s3-service';
 import { UserPermission, userStore } from 'src/stores/user-store';
-import { computed, onMounted, ref } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+
+const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
 
 const props = defineProps({
   albumStyle: {
@@ -70,21 +70,14 @@ const props = defineProps({
   albumItem: {
     type: Object,
     required: true,
-    default: () => ({ albumName: '', desc: '', tags: [], private: false }),
+    default: () => ({ albumName: '', desc: '', tags: [], private: false, albumCover: '' }),
   },
 });
 
 const userPermissionStore = userStore();
-const s3Service = new S3Service();
 const router = useRouter();
-const thumbnail = ref([] as Photo[]);
-thumbnail.value.push({ url: '', key: '' });
-
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
-
-// Get first photo of album as album cover
-// TODO, need to get rid of it and read photo url from Firestore in the near future
-onMounted(async () => (thumbnail.value = await s3Service.getPhotoObject(props.albumItem.id, 1)));
+const thumbnail = computed(() => cdnURL + encodeURI(props.albumItem?.albumCover));
 
 const goToAlbum = () => router.push(`/album/${props.albumItem.id}`);
 </script>
