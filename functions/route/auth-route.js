@@ -61,7 +61,7 @@ router.post('/logout', async (req, res) => {
 });
 
 const _setCookies = async (res, token) => {
-  const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
+  const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days
   const sessionCookie = await admin.auth().createSessionCookie(String(token), { expiresIn });
   const options = { maxAge: expiresIn, httpOnly: true, secure: process.env.NODE_ENV === 'production' };
   // It must be "__session" or Google Cloud Functions would not retain it.

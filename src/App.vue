@@ -2,6 +2,7 @@
   <router-view />
 </template>
 <script lang="ts" setup>
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { getAnalytics } from 'firebase/analytics';
 import { firebaseApp } from 'src/boot/firebase';
 
