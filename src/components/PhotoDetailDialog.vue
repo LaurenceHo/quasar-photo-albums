@@ -70,7 +70,7 @@
               <q-item v-if="exifTags.Model">
                 <q-item-section>
                   <q-item-label>Device</q-item-label>
-                  <q-item-label caption>{{ exifTags.Make?.description }}, {{ exifTags.Model.value[0] }} </q-item-label>
+                  <q-item-label caption>{{ exifTags.Make?.description }}, {{ exifTags.Model.value[0] }}</q-item-label>
                 </q-item-section>
               </q-item>
 
@@ -123,31 +123,17 @@
                 </q-item-section>
               </q-item>
 
-              <q-item v-if="exifTags.GPSLatitudeRef">
+              <q-item
+                v-if="exifTags.GPSLatitudeRef && exifTags.GPSLongitudeRef && longitude > -1000 && latitude > -1000"
+              >
                 <q-item-section>
-                  <q-item-label>GPS Latitude Ref</q-item-label>
-                  <q-item-label caption>{{ exifTags.GPSLatitudeRef.description }}</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item v-if="exifTags.GPSLatitude">
-                <q-item-section>
-                  <q-item-label>GPS Latitude</q-item-label>
-                  <q-item-label caption>{{ exifTags.GPSLatitude.description }}</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item v-if="exifTags.GPSLongitudeRef">
-                <q-item-section>
-                  <q-item-label>GPS Longitude Ref</q-item-label>
-                  <q-item-label caption>{{ exifTags.GPSLongitudeRef.description }}</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item v-if="exifTags.GPSLongitude">
-                <q-item-section>
-                  <q-item-label>GPS Longitude</q-item-label>
-                  <q-item-label caption>{{ exifTags.GPSLongitude.description }}</q-item-label>
+                  <q-item-label class="q-pb-sm">Location</q-item-label>
+                  <PhotoLocationMap
+                    :latitude="latitude"
+                    :longitude="longitude"
+                    :latitude-ref="exifTags.GPSLatitudeRef.value[0]"
+                    :longitude-ref="exifTags.GPSLongitudeRef.value[0]"
+                  />
                 </q-item-section>
               </q-item>
             </q-list>
@@ -159,12 +145,14 @@
 </template>
 
 <script setup lang="ts">
+import PhotoLocationMap from 'components/PhotoLocationMap.vue';
+import { Tags } from 'exifreader';
 import * as ExifReader from 'exifreader';
-import { Photo } from 'src/components/models';
 import { useQuasar } from 'quasar';
+import { getS3Url } from 'src/components/helper';
+import { Photo } from 'src/components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import { ref, toRefs, watch } from 'vue';
-import { getS3Url } from 'src/components/helper';
 
 const props = defineProps({
   photosInAlbum: {
@@ -187,8 +175,10 @@ const q = useQuasar();
 const imageIndex = ref(0);
 const selectedImage = ref({ url: '', key: '' } as Photo);
 const photoFileName = ref('');
-const exifTags = ref({});
+const exifTags = ref({} as Tags);
 const loadImage = ref(false);
+const latitude = ref(-1000);
+const longitude = ref(-1000);
 
 const nextPhoto = (dir: number) => {
   q.loadingBar.start();
@@ -228,6 +218,12 @@ watch(
       try {
         // Need to load photo from the original source instead of CDN
         exifTags.value = await ExifReader.load(getS3Url(newValue.key) as any);
+        if (exifTags.value?.GPSLatitude?.description) {
+          latitude.value = Number(exifTags.value.GPSLatitude.description);
+        }
+        if (exifTags.value?.GPSLongitude?.description) {
+          longitude.value = Number(exifTags.value.GPSLongitude.description);
+        }
       } catch (error) {
         console.error(error);
       } finally {
