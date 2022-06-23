@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pt-md">
+  <div class="q-pt-md">
     <div class="row items-center">
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated to="/" />
       <div class="text-h4 q-py-md q-pl-sm" data-test-id="album-name">
@@ -12,7 +12,7 @@
         {{ tag }}
       </q-chip>
     </div>
-    <div class="q-col-gutter-md row items-start">
+    <div v-if="photosInAlbum.length > 0" class="q-col-gutter-md row items-start">
       <div
         v-for="(photo, index) in photosInAlbum"
         :key="photo.key"
@@ -38,7 +38,24 @@
         </div>
       </div>
     </div>
-  </q-page>
+    <template v-else-if="photosInAlbum.length === 0 && !isLoadingPhotos">
+      <div class="flex justify-center items-center" style="height: 50vh">
+        <div>
+          <q-uploader
+            v-if="userPermission.role === 'admin'"
+            url="http://localhost:4444/upload"
+            label="Upload photos"
+            multiple
+            accept=".jpg, image/*"
+            @rejected="onRejected"
+            flat
+            bordered
+          />
+          <h6 v-else>No photo in this album</h6>
+        </div>
+      </div>
+    </template>
+  </div>
   <PhotoDetailDialog
     v-if="getPhotoDetailDialogState"
     :photos-in-album="photosInAlbum"
@@ -68,15 +85,18 @@ const { getPhotoDetailDialogState, setPhotoDetailDialogState } = DialogStateComp
 
 const selectedImageIndex = ref(-1);
 const photosInAlbum = ref([] as Photo[]);
+const isLoadingPhotos = ref(false);
 
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 const albumId = computed(() => route.params.albumId as string);
 const albumItem = computed(() => store.getAlbumById(albumId.value) as Album);
 const getPhotoList = async () => {
+  isLoadingPhotos.value = true;
   photosInAlbum.value = [];
   if (albumItem.value?.id) {
     photosInAlbum.value = await s3Service.getPhotoObject(albumItem.value.id, 1000);
   }
+  isLoadingPhotos.value = false;
 };
 
 getPhotoList();
@@ -89,7 +109,7 @@ const showLightBox = (imageIndex: number) => {
 const copyPhotoLink = (photoKey: string) => {
   const photoLink = getS3Url(photoKey);
   copyToClipboard(photoLink).then(() => {
-    Notify.create({
+    q.notify({
       color: 'white',
       textColor: 'dark',
       message: `<strong>Photo link copied!</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${photoLink}`,
@@ -97,6 +117,13 @@ const copyPhotoLink = (photoKey: string) => {
       html: true,
       timeout: 3000,
     });
+  });
+};
+
+const onRejected = (rejectedEntries: any) => {
+  q.notify({
+    type: 'negative',
+    message: `${rejectedEntries.length} file(s) did not pass validation constraints`,
   });
 };
 
