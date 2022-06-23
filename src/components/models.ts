@@ -1,7 +1,7 @@
 export interface Album {
   id: string;
   albumName: string;
-  albumCover: string;
+  albumCover?: string;
   desc: string;
   tags: string[];
   private: boolean;

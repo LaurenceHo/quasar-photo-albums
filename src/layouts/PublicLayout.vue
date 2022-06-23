@@ -64,8 +64,8 @@
 </template>
 
 <script lang="ts" setup>
-import EditAlbumTagsDialog from 'components/EditAlbumTagsDialog.vue';
-import EditOrCreateAlbumDialog from 'src/components/EditOrCreateAlbumDialog.vue';
+import EditAlbumTagsDialog from 'components/dialog/EditAlbumTagsDialog.vue';
+import EditOrCreateAlbumDialog from 'components/dialog/EditOrCreateAlbumDialog.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AuthService from 'src/services/auth-service';
 import { albumStore } from 'src/stores/album-store';
