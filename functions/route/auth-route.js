@@ -36,7 +36,9 @@ router.post('/verifyIdToken', async (req, res) => {
     } else {
       console.log(`User ${decodedIdToken.email} doesn't have permission`);
       await admin.auth().revokeRefreshTokens(decodedIdToken.uid);
-      res.status(403).send({ status: 'Unauthorized', message: `User ${decodedIdToken.email} doesn't have permission` });
+      res
+        .status(403)
+        .send({ status: 'Unauthorized', message: `User ${decodedIdToken.email} doesn't have login permission` });
     }
   } catch (error) {
     console.error('Error while getting Firebase User record:', error);

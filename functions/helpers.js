@@ -44,6 +44,14 @@ const verifyJwtClaim = async (req, res, next) => {
   }
 };
 
+const verifyUserPermission = async (req, res, next) => {
+  if (req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(403).send({ status: 'Unauthorized', message: 'Unauthorized action' });
+  }
+};
+
 const isAdmin = async (sessionCookie) => {
   let decodedClaims = '';
   let userPermission = null;
@@ -83,16 +91,19 @@ const setupDefaultAlbumCover = async (albumList) => {
   for (const album of albumList) {
     if (!album.albumCover) {
       const s3ObjectContents = await fetchObjectFromS3(album.id, 1);
-      console.log('Photo key:', s3ObjectContents[0].Key);
+      if (s3ObjectContents) {
+        console.log('Photo key:', s3ObjectContents[0].Key);
 
-      const albumRef = getFirestore().collection('s3-photo-albums').doc(album.id);
-      albumRef.update({ ...album, albumCover: s3ObjectContents[0].Key }).then((res) => {
-        console.log(`Document updated at ${res.writeTime}`);
-      });
+        const albumRef = getFirestore().collection('s3-photo-albums').doc(album.id);
+        albumRef.update({ ...album, albumCover: s3ObjectContents[0].Key }).then((res) => {
+          console.log(`Document updated at ${res.writeTime}`);
+        });
+      }
     }
   }
 };
 exports.queryUserPermission = queryUserPermission;
 exports.verifyJwtClaim = verifyJwtClaim;
+exports.verifyUserPermission = verifyUserPermission;
 exports.isAdmin = isAdmin;
 exports.setupDefaultAlbumCover = setupDefaultAlbumCover;

@@ -32,57 +32,45 @@ router.get('', async (req, res) => {
   }
 });
 
-router.post('', helpers.verifyJwtClaim, async (req, res) => {
-  if (req.user.role === 'admin') {
-    const album = req.body;
-    // Because we don't want to use auto generated id, we need to use "set" to create document
-    // https://googleapis.dev/nodejs/firestore/latest/DocumentReference.html#set
-    const albumRef = getFirestore().collection('s3-photo-albums').doc(album.id);
+router.post('', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
+  const album = req.body;
+  // Because we don't want to use auto generated id, we need to use "set" to create document
+  // https://googleapis.dev/nodejs/firestore/latest/DocumentReference.html#set
+  const albumRef = getFirestore().collection('s3-photo-albums').doc(album.id);
 
-    delete album.id;
+  delete album.id;
 
-    albumRef
-      .set(album)
-      .then(() => res.send({ statue: 'Album created' }))
-      .catch((error) => {
-        console.log(`Failed to create document: ${error}`);
-        res.status(500).send({ statue: 'Server error' });
-      });
-  } else {
-    res.status(403).send({ status: 'Unauthorized', message: `User ${req.user.email} doesn't have permission` });
-  }
+  albumRef
+    .set(album)
+    .then(() => res.send({ statue: 'Album created' }))
+    .catch((error) => {
+      console.log(`Failed to create document: ${error}`);
+      res.status(500).send({ statue: 'Server error' });
+    });
 });
 
-router.put('', helpers.verifyJwtClaim, async (req, res) => {
-  if (req.user.role === 'admin') {
-    const album = req.body;
-    const albumRef = getFirestore().doc(`s3-photo-albums/${album.id}`);
-    albumRef
-      .update(album)
-      .then(() => res.send({ statue: 'Album updated' }))
-      .catch((error) => {
-        console.log(error);
-        res.status(500).send({ statue: 'Server error' });
-      });
-  } else {
-    res.status(403).send({ status: 'Unauthorized', message: `User ${req.user.email} doesn't have permission` });
-  }
+router.put('', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
+  const album = req.body;
+  const albumRef = getFirestore().doc(`s3-photo-albums/${album.id}`);
+  albumRef
+    .update(album)
+    .then(() => res.send({ statue: 'Album updated' }))
+    .catch((error) => {
+      console.log(error);
+      res.status(500).send({ statue: 'Server error' });
+    });
 });
 
-router.delete('/:albumId', helpers.verifyJwtClaim, async (req, res) => {
-  if (req.user.role === 'admin') {
-    const albumId = req.params['albumId'];
-    const albumRef = getFirestore().doc(`s3-photo-albums/${albumId}`);
-    albumRef
-      .delete()
-      .then(() => res.send({ statue: 'Album deleted' }))
-      .catch((error) => {
-        console.log(error);
-        res.status(500).send({ statue: 'Server error' });
-      });
-  } else {
-    res.status(403).send({ status: 'Unauthorized', message: `User ${req.user.email} doesn't have permission` });
-  }
+router.delete('/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
+  const albumId = req.params['albumId'];
+  const albumRef = getFirestore().doc(`s3-photo-albums/${albumId}`);
+  albumRef
+    .delete()
+    .then(() => res.send({ statue: 'Album deleted' }))
+    .catch((error) => {
+      console.log(error);
+      res.status(500).send({ statue: 'Server error' });
+    });
 });
 
 const _queryAlbums = async (isAdmin) => {
