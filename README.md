@@ -3,7 +3,7 @@
 This is a simple AWS S3 album app by using Vue3, Quasar, Google Firebase (including Firebase, Firestore and Cloud Functions)
 and AWS SDK. You can use this web app to display your photos in S3 bucket. Since displaying photos from S3 directly only
 has limited functionality (you can only display folder name as album name), I use Google Cloud Firestore to organise
-my S3 photo folder information as well as deploy my project to Google Cloud Firebase.
+my S3 photo folder information. In addition, this project is running on Google Cloud Firebase.
 
 ## Getting started
 ### Create S3 bucket and Cognito Identity Pool
@@ -59,6 +59,9 @@ For example:
 ]
 ```
 
+### Architecture
+![Architecture](./public/S3_albums_architecture.jpg)
+
 ### Integrate with ImageKit
 In order to reduce the traffic with S3 buckets (to save money!), this project integrate with ImageKit CDN. ImageKit.io
 is a cloud-based image CDN with real-time image optimization and transformation features that help you deliver perfectly
@@ -74,16 +77,16 @@ to serve your js, css, font... etc files[2]. If you want to configure your S3 bu
 you can check out this [documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/website-hosting-custom-domain-walkthrough.html).
 
 ### Deploy to Firebase
-Because I don't want to deal with SSL on my project (I am too lazy to configure AWS CDN...etc `¯\_(ツ)_/¯` ), I deploy my project to Google Firebase
-and Google will do all SSL configuration for me.
+Because I don't want to deal with SSL on my project, I deploy my project to Google Firebase and Google will do all SSL configuration for me.
 * Visit `https://console.firebase.google.com` to create a new project
 * Check [here](https://firebase.google.com/docs/hosting/quickstart) for further detail about how to deploy your app to Firebase
 * You can run this command to deploy your project locally: `npm run firebase-deploy`
 * Place your Google Firebase information in the `.env` too
 
 ### Google Cloud Firestore
-As I mentioned, I use [Google Cloud Firestore](https://firebase.google.com/docs/firestore) to organise my S3 photo folders information. I ran a small script to fetch
-all folders in S3 bucket and inserted folder name along with other information into Google Firestore. The album object structure as below:
+As I mentioned, I use [Google Cloud Firestore](https://firebase.google.com/docs/firestore) to organise my S3 photo
+folders information. I ran a small script to fetch all folders in S3 bucket and inserted folder name along with other
+information into Google Firestore. The album object structure as below:
 ```
 Album
 {
@@ -99,11 +102,8 @@ Apart from adding or managing any data in the Firestore, it's very important to 
 [document](https://firebase.google.com/docs/firestore/security/rules-structure) to apply security rules to your Firestore.
 
 ### Google Cloud Functions
-I use Google Cloud Functions to handle authentication process so that I can manage user's cookies, which I can use to
-against admin actions such as update album, delete album when writing data to Firestore .
-
-### Architecture
-![Architecture](./public/S3_albums_architecture.jpg)
+I use Google Cloud Functions to handle all APIs (as BFF, backend for frontend) and authentication process so that I can
+manage user's cookies, which I can use to against admin actions such as update album, delete album when writing data to Firestore.
 
 ### Install the dependencies
 ```bash
@@ -132,6 +132,18 @@ npm run build
 ### Deploy to Google Firebase
 ```
 npm run firebase:deploy
+```
+
+### Deploy to Google Cloud function
+```
+cd functions
+npm run deploy:functions
+```
+
+### Simulate Google Cloud function
+```
+cd functions
+npm run serve:functions
 ```
 
 ### Customize the Quasar configuration
