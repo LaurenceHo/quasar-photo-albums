@@ -12,6 +12,9 @@
 </template>
 
 <script lang="ts" setup>
+/**
+ * https://www.smashingmagazine.com/2022/03/drag-drop-file-uploader-vuejs-3/
+ */
 import { ref, onMounted, onUnmounted } from 'vue';
 const emit = defineEmits(['files-dropped']);
 

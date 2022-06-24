@@ -135,8 +135,7 @@ if (!albumItem.value) {
   setTimeout(() => router.push('/#activities'), 5000);
 }
 
-const uploadUrl = `http://localhost:5001/${process.env.GOOGLE_FIREBASE_PROJECT_ID}/us-central1/main/api/photos/upload/${albumId.value}`;
-const { uploadFiles } = createUploader(uploadUrl);
+const { uploadFiles } = createUploader(albumId.value);
 
 const showLightBox = (imageIndex: number) => {
   setPhotoDetailDialogState(true);

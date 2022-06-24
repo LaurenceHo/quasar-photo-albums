@@ -42,10 +42,10 @@ router.post('', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req
 
   albumRef
     .set(album)
-    .then(() => res.send({ statue: 'Album created' }))
+    .then(() => res.send({ status: 'Album created' }))
     .catch((error) => {
       console.log(`Failed to create document: ${error}`);
-      res.status(500).send({ statue: 'Server error' });
+      res.status(500).send({ status: 'Server error' });
     });
 });
 
@@ -54,10 +54,10 @@ router.put('', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req,
   const albumRef = getFirestore().doc(`s3-photo-albums/${album.id}`);
   albumRef
     .update(album)
-    .then(() => res.send({ statue: 'Album updated' }))
+    .then(() => res.send({ status: 'Album updated' }))
     .catch((error) => {
       console.log(error);
-      res.status(500).send({ statue: 'Server error' });
+      res.status(500).send({ status: 'Server error' });
     });
 });
 
@@ -66,10 +66,10 @@ router.delete('/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermission,
   const albumRef = getFirestore().doc(`s3-photo-albums/${albumId}`);
   albumRef
     .delete()
-    .then(() => res.send({ statue: 'Album deleted' }))
+    .then(() => res.send({ status: 'Album deleted' }))
     .catch((error) => {
       console.log(error);
-      res.status(500).send({ statue: 'Server error' });
+      res.status(500).send({ status: 'Server error' });
     });
 });
 

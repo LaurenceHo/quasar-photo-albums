@@ -50,8 +50,6 @@ export default class HttpRequestService {
       }
       requestOptions.body = urlSearchParams;
     } else if (!isEmpty(formParams)) {
-      // Multi-part form submit
-      headers.append('Content-Type', 'multipart/form-data');
       const formData = new FormData();
       for (const formParam of Object.keys(formParams)) {
         formData.append(formParam, formParams[formParam]);
