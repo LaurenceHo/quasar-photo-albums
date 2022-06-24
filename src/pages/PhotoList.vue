@@ -86,18 +86,18 @@ import PhotoDetailDialog from 'components/dialog/PhotoDetailDialog.vue';
 import DropZone from 'components/file-uploader/DropZone.vue';
 import FilePreview from 'components/file-uploader/FilePreview.vue';
 import { copyToClipboard, useQuasar } from 'quasar';
-import { getS3Url, createUploader } from 'src/components/helper';
+import { createUploader, getS3Url } from 'src/components/helper';
 import { Album, Photo } from 'src/components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import useFileList from 'src/composables/file-list-composable';
-import S3Service from 'src/services/s3-service';
+import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'src/stores/album-store';
 import { UserPermission, userStore } from 'src/stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+const photoService = new PhotoService();
 const q = useQuasar();
-const s3Service = new S3Service();
 const route = useRoute();
 const router = useRouter();
 const { files, addFiles, removeFile } = useFileList();
@@ -117,7 +117,7 @@ const getPhotoList = async () => {
   isLoadingPhotos.value = true;
   photosInAlbum.value = [];
   if (albumItem.value?.id) {
-    photosInAlbum.value = await s3Service.getPhotoObject(albumItem.value.id, 1000);
+    photosInAlbum.value = await photoService.getPhotosByAlbumId(albumItem.value.id);
   }
   isLoadingPhotos.value = false;
 };
@@ -166,6 +166,7 @@ const clearFiles = () => (files.value = []);
 watch(albumId, (newValue) => {
   if (newValue) {
     getPhotoList();
+    clearFiles();
   }
 });
 </script>
@@ -189,6 +190,7 @@ watch(albumId, (newValue) => {
   border-radius: 8px;
   border: 1px solid #ef6692;
   transition: 0.2s ease;
+
   &[data-active='true'] {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     background: #ffffffcc;
@@ -199,9 +201,11 @@ label {
   font-size: 36px;
   cursor: pointer;
   display: block;
+
   span {
     display: block;
   }
+
   input[type='file']:not(:focus-visible) {
     position: absolute !important;
     width: 1px !important;
@@ -213,6 +217,7 @@ label {
     white-space: nowrap !important;
     border: 0 !important;
   }
+
   .smaller {
     font-size: 16px;
   }

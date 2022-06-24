@@ -81,7 +81,7 @@ const fetchObjectFromS3 = async (albumName, maxKeys) => {
 
   try {
     const result = await s3Client.send(command);
-    return result.Contents;
+    return result?.Contents;
   } catch (err) {
     console.log('Error', err);
   }
@@ -107,3 +107,4 @@ exports.verifyJwtClaim = verifyJwtClaim;
 exports.verifyUserPermission = verifyUserPermission;
 exports.isAdmin = isAdmin;
 exports.setupDefaultAlbumCover = setupDefaultAlbumCover;
+exports.fetchObjectFromS3 = fetchObjectFromS3;

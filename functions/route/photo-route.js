@@ -6,6 +6,25 @@ const router = express.Router();
 const Busboy = require('busboy');
 const os = require('os');
 
+router.get('/:albumId', async (req, res) => {
+  const albumId = req.params['albumId'];
+  const cdnURL = process.env.IMAGEKIT_CDN_URL;
+  const s3ObjectContents = await helpers.fetchObjectFromS3(albumId, 1000);
+  let photos = [];
+  if (s3ObjectContents) {
+    photos = s3ObjectContents.map((photo) => {
+      let url = '';
+      let key = '';
+      if (photo && photo.Key) {
+        url = cdnURL + encodeURI(photo.Key);
+        key = photo.Key;
+      }
+      return { url, key };
+    });
+  }
+  res.send(photos);
+});
+
 /**
  * https://cloud.google.com/functions/docs/writing/http#multipart_data
  */

@@ -24,7 +24,6 @@ router.get('', async (req, res) => {
       res.set('Cache-control', 'public, max-age=3600');
     }
     const albumList = await _queryAlbums(isAdmin);
-    helpers.setupDefaultAlbumCover(albumList); // Do it in the background
     res.send(albumList);
   } catch (error) {
     console.log(error);
