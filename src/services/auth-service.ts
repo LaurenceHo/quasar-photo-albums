@@ -11,17 +11,17 @@ export default class AuthService extends HttpRequestService {
   }
 
   verifyIdToken(token: string): Promise<UserPermission> {
-    this.setDisplayLoadingBar(true);
+    this.setDisplayingParameters(true);
     return this.perform('POST', '/verifyIdToken', { token });
   }
 
   getUserInfo(): Promise<any> {
-    this.setDisplayLoadingBar(false);
+    this.setDisplayingParameters(false);
     return this.perform('GET', '/userInfo');
   }
 
   logout(): Promise<void> {
-    this.setDisplayLoadingBar(true);
+    this.setDisplayingParameters(true);
     return this.perform('POST', '/logout');
   }
 }

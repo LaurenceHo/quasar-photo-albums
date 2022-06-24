@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Build and deploy to Google Firebase
 
 on:
   pull_request:
@@ -7,10 +7,10 @@ on:
     branches: [ master ]
   workflow_dispatch:
     inputs:
-      name:
+      buildManually:
         description: 'Run build manually'
         required: true
-        default: 'Run build manually'
+        default: 'Run'
 
 jobs:
   build-and-deploy:
@@ -69,7 +69,7 @@ jobs:
           projectId: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
 
       - name: Deploy to Firebase prod
-        if: ${{ success() && (github.event_name == 'push' || github.event.pull_request.merged == true) }}
+        if: ${{ success() && (github.event_name == 'push' || github.event.pull_request.merged == true || github.event.inputs.buildManually == 'Run') }}
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}

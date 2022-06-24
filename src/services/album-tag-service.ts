@@ -11,17 +11,17 @@ export default class AlbumTagService extends HttpRequestService {
   }
 
   getAlbumTags(): Promise<AlbumTag[]> {
-    this.setDisplayLoadingBar(false);
+    this.setDisplayingParameters(false);
     return this.perform('GET', '');
   }
 
   createAlbumTag(tag: AlbumTag): Promise<any> {
-    this.setDisplayLoadingBar(true);
+    this.setDisplayingParameters(true, `Tag "${tag.tag}" created`);
     return this.perform('POST', '', tag);
   }
 
   deleteAlbumTag(tagId: string): Promise<any> {
-    this.setDisplayLoadingBar(true);
+    this.setDisplayingParameters(true, 'Tag deleted');
     return this.perform('DELETE', `/${tagId}`);
   }
 }

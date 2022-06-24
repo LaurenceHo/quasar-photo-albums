@@ -11,12 +11,12 @@ export default class PhotoService extends HttpRequestService {
   }
 
   getPhotosByAlbumId(albumId: string): Promise<Photo[]> {
-    this.setDisplayLoadingBar(true);
+    this.setDisplayingParameters(true);
     return this.perform('GET', `/${albumId}`);
   }
 
   uploadPhotos(file: any, albumId: string): Promise<any> {
-    this.setDisplayLoadingBar(true);
+    this.setDisplayingParameters(true);
     return this.perform('POST', `/upload/${albumId}`, null, null, { file });
   }
 }

@@ -29,10 +29,10 @@ router.post('', helpers.verifyJwtClaim, helpers.verifyUserPermission, (req, res)
 
   tagRef
     .set(tag)
-    .then(() => res.send({ statue: 'Album tag created' }))
+    .then(() => res.send({ status: 'Album tag created' }))
     .catch((error) => {
       console.log(`Failed to create document: ${error}`);
-      res.status(500).send({ statue: 'Server error' });
+      res.status(500).send({ status: 'Server error' });
     });
 });
 
@@ -41,10 +41,10 @@ router.delete('/:tagId', helpers.verifyJwtClaim, helpers.verifyUserPermission, a
   const tagRef = getFirestore().doc(`album-tags/${tagId}`);
   tagRef
     .delete()
-    .then(() => res.send({ statue: 'Tag deleted' }))
+    .then(() => res.send({ status: 'Tag deleted' }))
     .catch((error) => {
       console.log(error);
-      res.status(500).send({ statue: 'Server error' });
+      res.status(500).send({ status: 'Server error' });
     });
 });
 
