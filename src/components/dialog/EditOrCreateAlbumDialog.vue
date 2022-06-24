@@ -58,17 +58,14 @@
 </template>
 
 <script lang="ts" setup>
-import { useQuasar } from 'quasar';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
-import { albumStore } from 'src/stores/album-store';
+import { albumStore } from 'stores/album-store';
 import { ref, watch } from 'vue';
 
 const albumService = new AlbumService();
 const store = albumStore();
-
-const q = useQuasar();
 
 const { getUpdateAlbumDialogState, setUpdateAlbumDialogState, getAlbumToBeUpdate, setAlbumToBeUpdated } =
   DialogStateComposable();
@@ -91,30 +88,16 @@ const confirmUpdateAlbum = async () => {
     tags: selectedAlbumTags.value,
   };
 
-  try {
-    if (getAlbumToBeUpdate.value.id) {
-      await albumService.updateAlbum(albumToBeSubmitted);
-    } else {
-      await albumService.createAlbum(albumToBeSubmitted);
-    }
-    store.updateAlbum(albumToBeSubmitted, false);
-    setUpdateAlbumDialogState(false);
-    q.notify({
-      color: 'positive',
-      icon: 'mdi-cloud-check',
-      message: `Album ${getAlbumToBeUpdate.value.id ? 'updated' : 'created'}`,
-      timeout: 3000,
-    });
-  } catch (error: any) {
-    q.notify({
-      color: 'negative',
-      icon: 'mdi-alert-circle',
-      message: error.toString(),
-    });
-  } finally {
-    isProcessing.value = false;
+  if (getAlbumToBeUpdate.value.id) {
+    await albumService.updateAlbum(albumToBeSubmitted);
+  } else {
+    await albumService.createAlbum(albumToBeSubmitted);
   }
+  store.updateAlbum(albumToBeSubmitted, false);
+  setUpdateAlbumDialogState(false);
+  isProcessing.value = false;
 };
+
 const resetAlbum = () => {
   setAlbumToBeUpdated({ id: '', albumName: '', desc: '', tags: [], private: false });
   setUpdateAlbumDialogState(false);

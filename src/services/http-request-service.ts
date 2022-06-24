@@ -1,12 +1,25 @@
 import isEmpty from 'lodash/isEmpty';
-import { LoadingBar } from 'quasar';
+import { LoadingBar, Notify } from 'quasar';
 
 export default class HttpRequestService {
   baseUrl = '';
   displayLoadingBar = false;
+  customSuccessMessage: string | null = null;
+  displayErrorNotification = true;
 
-  public setDisplayLoadingBar(displayLoadingBar: boolean) {
+  /**
+   * @param displayLoadingBar
+   * @param customSuccessMessage
+   * @param displayErrorNotification
+   */
+  public setDisplayingParameters(
+    displayLoadingBar: boolean,
+    customSuccessMessage: string | null = null,
+    displayErrorNotification = true
+  ) {
     this.displayLoadingBar = displayLoadingBar;
+    this.customSuccessMessage = customSuccessMessage;
+    this.displayErrorNotification = displayErrorNotification;
   }
 
   /**
@@ -50,8 +63,6 @@ export default class HttpRequestService {
       }
       requestOptions.body = urlSearchParams;
     } else if (!isEmpty(formParams)) {
-      // Multi-part form submit
-      headers.append('Content-Type', 'multipart/form-data');
       const formData = new FormData();
       for (const formParam of Object.keys(formParams)) {
         formData.append(formParam, formParams[formParam]);
@@ -66,6 +77,10 @@ export default class HttpRequestService {
     const response = await fetch(urlPath, requestOptions);
 
     if (response.status >= 200 && response.status < 300) {
+      if (this.customSuccessMessage) {
+        this.notifyMessage(false, this.customSuccessMessage);
+      }
+
       const contentLength = response.headers.get('content-length');
       let contentLengthInt = 0;
       if (contentLength) {
@@ -82,18 +97,32 @@ export default class HttpRequestService {
     return data;
   }
 
+  notifyMessage = (error: boolean, message: string) => {
+    Notify.create({
+      color: error ? 'negative' : 'positive',
+      textColor: 'white',
+      icon: error ? 'mdi-alert-circle-outline' : 'mdi-check-circle-outline',
+      message: message,
+    });
+  };
+
   private errorHandling = async (response: Response) => {
-    // For 403, 404 or 500...etc error
+    // Catch error and handle it here. Don't throw it to UI.
     let errorJson: { status: string; message: string } = { status: '', message: '' };
     try {
       errorJson = await response.json();
+      // If we can parse error response to JSON, display error message from JSON
+      if (this.displayErrorNotification) {
+        this.notifyMessage(true, errorJson.message || errorJson.status || response.statusText);
+      }
     } catch (error) {
-      throw new Error(response.statusText);
-    }
-    if (errorJson.message) {
-      throw new Error(errorJson.message);
-    } else {
-      throw new Error(errorJson.status || response.statusText);
+      // If we cannot parse error response to JSON (exception will occur),
+      // display original response status text as warning message
+      if (this.displayErrorNotification) {
+        this.notifyMessage(true, `Error: ${response.statusText}`);
+      }
+    } finally {
+      LoadingBar.stop();
     }
   };
 

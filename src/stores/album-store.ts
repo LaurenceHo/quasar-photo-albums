@@ -1,6 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 import { defineStore } from 'pinia';
-import { Loading, Notify } from 'quasar';
+import { Loading } from 'quasar';
 import { Album, AlbumTag } from 'src/components/models';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
@@ -75,35 +75,17 @@ export const albumStore = defineStore('album', {
       if (this.allAlbumList.length === 0) {
         Loading.show();
         this.loadingAlbums = true;
-        try {
-          this.allAlbumList = await albumService.getAlbums(startIndex, endIndex, filter);
-        } catch (error: any) {
-          Notify.create({
-            color: 'negative',
-            icon: 'mdi-alert-circle',
-            message: error.toString(),
-          });
-        } finally {
-          Loading.hide();
-          this.loadingAlbums = false;
-        }
+        this.allAlbumList = await albumService.getAlbums(startIndex, endIndex, filter);
+        Loading.hide();
+        this.loadingAlbums = false;
       }
     },
 
     async getAlbumTags() {
       if (this.albumTags.length === 0) {
         this.loadingAlbumTags = true;
-        try {
-          this.albumTags = await albumTagService.getAlbumTags();
-        } catch (error: any) {
-          Notify.create({
-            color: 'negative',
-            icon: 'mdi-alert-circle',
-            message: error.toString(),
-          });
-        } finally {
-          this.loadingAlbumTags = false;
-        }
+        this.albumTags = await albumTagService.getAlbumTags();
+        this.loadingAlbumTags = false;
       }
     },
 

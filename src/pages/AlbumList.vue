@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pt-md">
+  <div class="q-pt-md">
     <div class="q-pb-md row justify-between items-center content-center">
       <div class="col-shrink q-mr-sm">
         <q-btn-group outline>
@@ -82,7 +82,7 @@
     <template v-else>
       <div class="text-h5 text-weight-medium">No results.</div>
     </template>
-  </q-page>
+  </div>
 </template>
 
 <script lang="ts" setup>

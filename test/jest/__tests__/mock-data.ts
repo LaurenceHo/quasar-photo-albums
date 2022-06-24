@@ -1,3 +1,17 @@
+import { jest } from '@jest/globals';
+
+export const mockFetch = () => {
+  const mockFetchPromise = Promise.resolve({
+    status: 200,
+    json: () => Promise.resolve(),
+    headers: {
+      get: jest.fn(),
+    },
+  });
+  const globalRef: any = global;
+  globalRef.fetch = jest.fn().mockImplementation(() => mockFetchPromise);
+};
+
 export const mockAlbumList = [
   { id: 'Sport', albumName: 'Sport', desc: 'Sport', tags: ['sport'], private: false },
   { id: 'Food', albumName: 'Food title', desc: 'Food desc', tags: ['food', 'test'], private: false },
@@ -11,3 +25,12 @@ export const mockAlbumList = [
     private: true,
   },
 ];
+
+export const mockAlbum = {
+  id: 'Sport',
+  albumName: 'Sport',
+  desc: 'Sport',
+  tags: ['sport'],
+  private: false,
+  albumCover: 'thisIsAlbumCover',
+};

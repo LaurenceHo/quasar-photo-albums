@@ -18,13 +18,23 @@
           <q-btn v-if="userPermission.uid" class="q-ml-sm" color="secondary" icon="mdi-account-circle" round unelevated>
             <q-menu>
               <q-list style="min-width: 100px">
-                <q-item v-close-popup clickable @click="setUpdateAlbumDialogState(true)">
+                <q-item
+                  v-if="userPermission.role === 'admin'"
+                  v-close-popup
+                  clickable
+                  @click="setUpdateAlbumDialogState(true)"
+                >
                   <q-item-section avatar>
                     <q-icon color="primary" name="mdi-folder-plus" />
                   </q-item-section>
                   <q-item-section>New album</q-item-section>
                 </q-item>
-                <q-item v-close-popup clickable @click="setUpdateAlbumTagsDialogState(true)">
+                <q-item
+                  v-if="userPermission.role === 'admin'"
+                  v-close-popup
+                  clickable
+                  @click="setUpdateAlbumTagsDialogState(true)"
+                >
                   <q-item-section avatar>
                     <q-icon color="primary" name="mdi-tag-multiple" />
                   </q-item-section>
@@ -54,8 +64,8 @@
 </template>
 
 <script lang="ts" setup>
-import EditAlbumTagsDialog from 'components/EditAlbumTagsDialog.vue';
-import EditOrCreateAlbumDialog from 'src/components/EditOrCreateAlbumDialog.vue';
+import EditAlbumTagsDialog from 'components/dialog/EditAlbumTagsDialog.vue';
+import EditOrCreateAlbumDialog from 'components/dialog/EditOrCreateAlbumDialog.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AuthService from 'src/services/auth-service';
 import { albumStore } from 'src/stores/album-store';

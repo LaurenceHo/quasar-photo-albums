@@ -29,6 +29,7 @@ import AuthService from 'src/services/auth-service';
 import { userStore } from 'src/stores/user-store';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import isEmpty from 'lodash/isEmpty';
 
 const router = useRouter();
 const q = useQuasar();
@@ -46,31 +47,21 @@ const handleClickSignIn = async () => {
     const result = await signInWithPopup(auth, provider);
     const credential = GoogleAuthProvider.credentialFromResult(result);
     if (auth && credential) {
-      auth.currentUser
-        ?.getIdToken()
-        .then(async (idToken) => {
-          const userPermission = await authService.verifyIdToken(idToken);
-          if (userPermission) {
-            userPermissionStore.setUserPermission(userPermission);
-            q.notify({
-              color: 'positive',
-              icon: 'mdi-hand-wave',
-              message: `Welcome, ${userPermission.displayName}`,
-              timeout: 2000,
-            });
-            setTimeout(() => router.push('/'), 1000);
-          }
-        })
-        .catch((error) => {
+      auth.currentUser?.getIdToken().then(async (idToken) => {
+        const userPermission = await authService.verifyIdToken(idToken);
+
+        if (!isEmpty(userPermission)) {
+          userPermissionStore.setUserPermission(userPermission);
           q.notify({
-            color: 'negative',
-            icon: 'mdi-alert-circle',
-            message: error.toString(),
+            color: 'positive',
+            icon: 'mdi-hand-wave',
+            message: `Welcome, ${userPermission.displayName}`,
+            timeout: 2000,
           });
-        })
-        .finally(() => {
-          loading.value = false;
-        });
+          setTimeout(() => router.push('/'), 1000);
+        }
+        loading.value = false;
+      });
     } else {
       q.notify({
         color: 'negative',

@@ -1,24 +1,23 @@
-name: Node.js CI
+name: Build and deploy to Google Firebase
 
 on:
   pull_request:
     branches: [ master ]
   push:
     branches: [ master ]
+    paths: ["src/**"]
   workflow_dispatch:
     inputs:
-      name:
+      buildManually:
         description: 'Run build manually'
         required: true
-        default: 'Run build manually'
+        default: 'Run'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     env:
       ALBUM_APP_TITLE: ${{ secrets.ALBUM_APP_TITLE }}
-      AWS_IDENTITY_POOL_ID: ${{ secrets.AWS_IDENTITY_POOL_ID }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
       GOOGLE_CLOUD_FUNCTION_URL: ${{ secrets.GOOGLE_CLOUD_FUNCTION_URL }}
       GOOGLE_FIREBASE_API_KEY: ${{ secrets.GOOGLE_FIREBASE_API_KEY }}
@@ -28,6 +27,7 @@ jobs:
       GOOGLE_FIREBASE_PROJECT_ID: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
       GOOGLE_FIREBASE_STORAGE_BUCKET: ${{ secrets.GOOGLE_FIREBASE_STORAGE_BUCKET }}
       IMAGEKIT_CDN_URL: ${{ secrets.IMAGEKIT_CDN_URL }}
+      MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
 
     steps:
       - uses: actions/checkout@v2
@@ -44,8 +44,6 @@ jobs:
         run: |
           tee .env <<EOF
           ALBUM_APP_TITLE=$ALBUM_APP_TITLE
-          AWS_IDENTITY_POOL_ID=$AWS_IDENTITY_POOL_ID
-          AWS_REGION=$AWS_REGION
           AWS_S3_BUCKET_NAME=$AWS_S3_BUCKET_NAME
           GOOGLE_CLOUD_FUNCTION_URL=$GOOGLE_CLOUD_FUNCTION_URL
           GOOGLE_FIREBASE_API_KEY=$GOOGLE_FIREBASE_API_KEY
@@ -55,6 +53,7 @@ jobs:
           GOOGLE_FIREBASE_PROJECT_ID=$GOOGLE_FIREBASE_PROJECT_ID
           GOOGLE_FIREBASE_STORAGE_BUCKET=$GOOGLE_FIREBASE_STORAGE_BUCKET
           IMAGEKIT_CDN_URL=$IMAGEKIT_CDN_URL
+          MAPBOX_API_KEY=$MAPBOX_API_KEY
           EOF
       - name: Test and build
         run: |
@@ -71,7 +70,7 @@ jobs:
           projectId: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
 
       - name: Deploy to Firebase prod
-        if: ${{ success() && (github.event_name == 'push' || github.event.pull_request.merged == true) }}
+        if: ${{ success() && (github.event_name == 'push' || github.event.pull_request.merged == true || github.event.inputs.buildManually == 'Run') }}
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}

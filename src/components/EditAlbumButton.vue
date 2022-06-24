@@ -40,7 +40,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useQuasar } from 'quasar';
 import { Album } from 'src/components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
@@ -64,7 +63,6 @@ const { albumItem } = toRefs(props);
 const albumService = new AlbumService();
 const store = albumStore();
 const userPermissionStore = userStore();
-const q = useQuasar();
 const { setUpdateAlbumDialogState, setAlbumToBeUpdated } = DialogStateComposable();
 
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
@@ -80,25 +78,9 @@ const setAlbum = () => {
 
 const confirmDeleteAlbum = async () => {
   isProcessing.value = true;
-
-  try {
-    await albumService.deleteAlbum(albumItem?.value.id);
-    store.updateAlbum(albumItem?.value as Album, true);
-    deleteAlbum.value = false;
-    q.notify({
-      color: 'positive',
-      icon: 'mdi-cloud-check',
-      message: 'Album deleted',
-      timeout: 3000,
-    });
-  } catch (error: any) {
-    q.notify({
-      color: 'negative',
-      icon: 'mdi-alert-circle',
-      message: error.toString(),
-    });
-  } finally {
-    isProcessing.value = false;
-  }
+  await albumService.deleteAlbum(albumItem?.value.id);
+  store.updateAlbum(albumItem?.value as Album, true);
+  deleteAlbum.value = false;
+  isProcessing.value = false;
 };
 </script>

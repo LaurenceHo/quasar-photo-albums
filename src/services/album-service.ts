@@ -10,24 +10,24 @@ export default class AlbumService extends HttpRequestService {
         : `http://localhost:5001/${process.env.GOOGLE_FIREBASE_PROJECT_ID}/us-central1/main/api/albums`;
   }
 
-  getAlbums(startIndex?: number, endIndex?: number, filter?: string): Promise<Album[]> {
+  public getAlbums(startIndex?: number, endIndex?: number, filter?: string): Promise<Album[]> {
     // TODO: May need to apply filter in the feature. It only runs filter in the memory atm.
-    this.setDisplayLoadingBar(false);
+    this.setDisplayingParameters(false);
     return this.perform('GET', '');
   }
 
-  createAlbum(album: Album): Promise<any> {
-    this.setDisplayLoadingBar(true);
+  public createAlbum(album: Album): Promise<any> {
+    this.setDisplayingParameters(true, `Album "${album.albumName}" created`);
     return this.perform('POST', '', album);
   }
 
-  updateAlbum(album: Album): Promise<any> {
-    this.setDisplayLoadingBar(true);
+  public updateAlbum(album: Album): Promise<any> {
+    this.setDisplayingParameters(true, `Album "${album.albumName}" updated`);
     return this.perform('PUT', '', album);
   }
 
-  deleteAlbum(albumId: string): Promise<any> {
-    this.setDisplayLoadingBar(true);
+  public deleteAlbum(albumId: string): Promise<any> {
+    this.setDisplayingParameters(true, 'Album deleted');
     return this.perform('DELETE', `/${albumId}`);
   }
 }

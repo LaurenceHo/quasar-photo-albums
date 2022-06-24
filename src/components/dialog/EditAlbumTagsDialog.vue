@@ -69,13 +69,11 @@
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumTagService from 'src/services/album-tag-service';
-import { albumStore } from 'src/stores/album-store';
+import { albumStore } from 'stores/album-store';
 import { computed, ref } from 'vue';
 
-const q = useQuasar();
 const albumTagService = new AlbumTagService();
 const store = albumStore();
 const { updateAlbumTagsDialogState } = DialogStateComposable();
@@ -99,12 +97,6 @@ const confirmCreateTag = async () => {
   createTagDialog.value = false;
   isProcessing.value = false;
   tagName.value = '';
-  q.notify({
-    color: 'positive',
-    icon: 'mdi-cloud-check',
-    message: `Tag "${tag.tag}" created`,
-    timeout: 3000,
-  });
 };
 
 const confirmDeleteAlbum = async () => {
@@ -120,12 +112,6 @@ const confirmDeleteAlbum = async () => {
   deleteTagDialog.value = false;
   isProcessing.value = false;
   tagName.value = '';
-  q.notify({
-    color: 'positive',
-    icon: 'mdi-cloud-check',
-    message: 'Tag deleted',
-    timeout: 3000,
-  });
 };
 const openDeleteDialog = (tag: string) => {
   deleteTagDialog.value = true;
