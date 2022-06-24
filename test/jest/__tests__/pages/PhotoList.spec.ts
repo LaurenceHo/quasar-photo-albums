@@ -10,9 +10,9 @@ import { mockRouter as router } from '../mock-router';
 
 installQuasarPlugin();
 
-jest.mock('src/services/s3-service', () =>
+jest.mock('src/services/photo-service', () =>
   jest.fn().mockImplementation(() => ({
-    getPhotoObject: () =>
+    getPhotosByAlbumId: () =>
       Promise.resolve([
         {
           url: 'https://ik.imagekit.io/oeqc5vsr3tf/2020-02-15/batch_2019-08-24%2010.32.31.jpg',

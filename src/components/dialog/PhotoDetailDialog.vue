@@ -149,8 +149,8 @@ import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import { Tags } from 'exifreader';
 import * as ExifReader from 'exifreader';
 import { useQuasar } from 'quasar';
-import { getS3Url } from 'src/components/helper';
-import { Photo } from 'src/components/models';
+import { getS3Url } from 'components/helper';
+import { Photo } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import { ref, toRefs, watch } from 'vue';
 

@@ -72,7 +72,7 @@
 import { useQuasar } from 'quasar';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumTagService from 'src/services/album-tag-service';
-import { albumStore } from 'src/stores/album-store';
+import { albumStore } from 'stores/album-store';
 import { computed, ref } from 'vue';
 
 const q = useQuasar();

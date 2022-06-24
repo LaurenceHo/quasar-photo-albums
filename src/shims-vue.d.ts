@@ -11,6 +11,4 @@ declare module '*.vue' {
   export default component;
 }
 
-declare module '@aws-sdk/client-cognito-identity';
-declare module '@aws-sdk/credential-provider-cognito-identity';
 declare module 'mapbox-gl';
