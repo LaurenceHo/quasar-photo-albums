@@ -61,11 +61,11 @@
             </ul>
           </DropZone>
           <div class="flex q-pt-lg justify-center">
-            <q-btn outline rounded color="accent" size="lg" padding="sm xl" @click="clearFiles" class="q-mr-md">
+            <q-btn outline rounded color="primary" size="lg" padding="sm xl" @click="clearFiles" class="q-mr-md">
               Clear all
             </q-btn>
 
-            <q-btn unelevated rounded color="accent" size="lg" padding="sm xl" @click.prevent="uploadFiles(files)">
+            <q-btn unelevated rounded color="primary" size="lg" padding="sm xl" @click.prevent="uploadFiles(files)">
               Upload
             </q-btn>
           </div>
@@ -132,7 +132,7 @@ if (!albumItem.value) {
     icon: 'mdi-alert-circle-outline',
     message: "Album doesn't exist. You will be redirected to the home page in 5 seconds",
   });
-  setTimeout(() => router.push('/#activities'), 5000);
+  setTimeout(() => router.push('/'), 5000);
 }
 
 const { uploadFiles } = createUploader(albumId.value);
@@ -188,7 +188,7 @@ watch(albumId, (newValue) => {
   padding: 50px;
   background: #ffffff55;
   border-radius: 8px;
-  border: 1px solid #ef6692;
+  border: 1px solid #3f82c3;
   transition: 0.2s ease;
 
   &[data-active='true'] {

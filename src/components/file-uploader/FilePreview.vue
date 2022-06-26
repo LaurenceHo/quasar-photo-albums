@@ -50,7 +50,7 @@ defineEmits(['remove']);
   .close-icon {
     width: var(--size);
     font-size: var(--size);
-    background: #933;
+    background: #c10015;
     color: #fff;
     top: 0.25rem;
     cursor: pointer;
@@ -68,12 +68,12 @@ defineEmits(['remove']);
   }
 
   .success-indicator {
-    background: #6c6;
+    background: #21ba45;
     color: #040;
   }
 
   .failure-indicator {
-    background: #933;
+    background: #c10015;
     color: #fff;
   }
 }

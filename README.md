@@ -8,7 +8,7 @@ my S3 photo folder information. In addition, this project is running on Google C
 ## Getting started
 ### Create S3 bucket and Cognito Identity Pool
 Before you start, please create an AWS S3 bucket and an AWS Cognito Identity Pool at first [1]. Once you create them, replace those properties:
-AWS_S3_BUCKET_NAME, AWS_REGION, AWS_IDENTITY_POOL_ID and IMAGEKIT_CDN_URL with your real information in`.env.example` and modify file name to `.env` then you are good to go.
+AWS_S3_BUCKET_NAME, AWS_REGION, AWS_PUBLIC_IDENTITY_POOL_ID and IMAGEKIT_CDN_URL with your real information in`.env.example` and modify file name to `.env` then you are good to go.
 The file structure in the S3 bucket should be like this:
 ```
 /S3 bucket:
