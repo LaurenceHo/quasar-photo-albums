@@ -108,7 +108,8 @@ manage user's cookies, which I can use to against admin actions such as update a
 ### Upload photos to AWS S3 bucket
 I use AWS Cognito identity pool to provide temporary credentials to access AWS S3 bucket for anonymous guest users or for users who have signed in.
 Before uploading photos to AWS S3 bucket via Google Cloud Function, we need to set up AWS Cognito identity pool and IAM properly.
-Make sure attaching correct permissions to the IAM role which is used by AWS Cognito identity pool and use the [credential](https://docs.aws.amazon.com/cognito/latest/developerguide/getting-credentials.html)
+Make sure attaching correct permissions to the [IAM role](https://docs.aws.amazon.com/cognito/latest/developerguide/security_iam_service-with-iam.html)
+which is used by AWS Cognito identity pool and use the [credential](https://docs.aws.amazon.com/cognito/latest/developerguide/getting-credentials.html)
 to access AWS S3 client. Since this project is using Google IDP, we need to enable Google login in the AWS Cognito.
 Please check this [document](https://docs.aws.amazon.com/cognito/latest/developerguide/google.html).
 
