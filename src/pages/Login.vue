@@ -48,7 +48,7 @@ const handleClickSignIn = async () => {
     const credential = GoogleAuthProvider.credentialFromResult(result);
     if (auth && credential) {
       auth.currentUser?.getIdToken().then(async (idToken) => {
-        const userPermission = await authService.verifyIdToken(idToken);
+        const userPermission = await authService.verifyIdToken(credential.idToken, idToken);
 
         if (!isEmpty(userPermission)) {
           userPermissionStore.setUserPermission(userPermission);
