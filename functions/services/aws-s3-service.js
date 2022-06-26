@@ -1,4 +1,4 @@
-const { S3Client, ListObjectsV2Command, UploadPartCommand } = require('@aws-sdk/client-s3');
+const { S3Client, ListObjectsV2Command, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { fromCognitoIdentityPool } = require('@aws-sdk/credential-provider-cognito-identity');
 const {
   CognitoIdentityClient,
@@ -52,19 +52,20 @@ const _getCredentials = async (identityId, idToken) => {
   return response.Credentials;
 };
 
-const uploadObject = async (idToken, filePath, file) => {
-  console.log('##### file', file);
+//FIXME permission error
+//https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-photo-album-full.html
+const uploadObject = async (idToken, filePath, object) => {
+  console.log('##### S3 FilePath:', filePath);
   const identityId = await _getIdFromCognito(idToken);
   const credentials = await _getCredentials(identityId, idToken);
 
-  // FIXME
   const s3Client = new S3Client({
     region: process.env.AWS_REGION,
     credentials,
   });
 
-  const command = new UploadPartCommand({
-    Body: file,
+  const command = new PutObjectCommand({
+    Body: object,
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     Key: filePath,
   });

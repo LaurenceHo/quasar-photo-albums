@@ -1,8 +1,5 @@
 const Busboy = require('busboy');
 const express = require('express');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
 
 const helpers = require('../helpers');
 const awsS3Service = require('../services/aws-s3-service');
@@ -41,65 +38,49 @@ router.post('/upload/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermis
   const albumId = req.params['albumId'];
 
   const busboy = Busboy({ headers: req.headers });
-  const tmpdir = os.tmpdir();
-
-  const fields = {};
-  const uploads = {};
   const fileWrites = [];
+
+  busboy.on('file', async (fieldName, file, info) => {
+    const { filename, encoding, mimeType } = info;
+    console.log(`##### File [${fieldName}]: filename: ${filename}, encoding: ${encoding}, mimeType: ${mimeType}`);
+
+    const promise = new Promise((resolve, reject) => {
+      awsS3Service
+        .uploadObject(idTokenCookies, `${albumId}/${filename}`, file)
+        .then((result) => {
+          console.log('##### upload result', result);
+          resolve(result);
+        })
+        .catch((error) => reject(error));
+    });
+    fileWrites.push(promise);
+
+    file
+      .on('data', (buffer) => {
+        console.log(`##### File [${filename}] got ${buffer.length} bytes`);
+      })
+      .on('close', () => {
+        console.log(`File [${filename}] done`);
+      });
+  });
 
   busboy.on('field', (fieldName, val) => {
     console.log(`##### Processed field ${fieldName}: ${val}.`);
-    fields[fieldName] = val;
   });
 
-  busboy.on('file', (fieldName, file, { filename }) => {
-    // Note: os.tmpdir() points to an in-memory file system on GCF
-    // Thus, any files in it must fit in the instance's memory.
-    console.log(`##### Processed file ${filename}`);
-    const filepath = path.join(tmpdir, filename);
-    uploads[fieldName] = filepath;
-
-    const writeStream = fs.createWriteStream(filepath);
-    file.pipe(writeStream);
-
-    // File was processed by Busboy; wait for it to be written.
-    // Note: GCF may not persist saved files across invocations.
-    // Persistent files must be kept in other locations
-    // (such as Cloud Storage buckets).
-    const promise = new Promise((resolve, reject) => {
-      file.on('end', () => {
-        writeStream.end();
-      });
-      writeStream.on('finish', resolve);
-      writeStream.on('error', reject);
-    });
-    fileWrites.push(promise);
-  });
-
-  // Triggered once all uploaded files are processed by Busboy.
-  // We still need to wait for the disk writes (saves) to complete.
   busboy.on('finish', async () => {
-    await Promise.all(fileWrites);
-
-    /**
-     * TODO(developer): Process saved files here, upload to S3 bucket
-     */
-    for (const name in uploads) {
-      const file = uploads[name];
-
-      try {
-        const result = await awsS3Service.uploadObject(idTokenCookies, `${albumId}/${name}`, file);
-        console.log('####### upload result', result);
-        fs.unlinkSync(file);
-        res.send({ status: 'Success' });
-      } catch (err) {
-        console.log(err);
-        res.sendStatus(500);
-      }
+    try {
+      await Promise.all(fileWrites);
+      res.send({ status: 'Success' });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+        status: 'Server error',
+        message: error.toString(),
+      });
     }
   });
 
   busboy.end(req.rawBody);
 });
-
 module.exports = router;
