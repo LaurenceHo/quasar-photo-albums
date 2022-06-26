@@ -8,7 +8,7 @@ my S3 photo folder information. In addition, this project is running on Google C
 ## Getting started
 ### Create S3 bucket and Cognito Identity Pool
 Before you start, please create an AWS S3 bucket and an AWS Cognito Identity Pool at first [1]. Once you create them, replace those properties:
-AWS_S3_BUCKET_NAME, AWS_REGION, AWS_PUBLIC_IDENTITY_POOL_ID and IMAGEKIT_CDN_URL with your real information in`.env.example` and modify file name to `.env` then you are good to go.
+AWS_S3_BUCKET_NAME, AWS_REGION, AWS_IDENTITY_POOL_ID and IMAGEKIT_CDN_URL with your real information in`.env.example` and modify file name to `.env` then you are good to go.
 The file structure in the S3 bucket should be like this:
 ```
 /S3 bucket:
@@ -103,7 +103,14 @@ Apart from adding or managing any data in the Firestore, it's very important to 
 
 ### Google Cloud Functions
 I use Google Cloud Functions to handle all APIs (as BFF, backend for frontend) and authentication process so that I can
-manage user's cookies, which I can use to against admin actions such as update album, delete album when writing data to Firestore.
+manage user's cookies, which I can use to against admin actions such as update album, delete album from Firestore as well as uploading photos to AWS S3 bucket.
+
+### Upload photos to AWS S3 bucket
+I use AWS Cognito identity pool to provide temporary credentials to access AWS S3 bucket for anonymous guest users or for users who have signed in.
+Before uploading photos to AWS S3 bucket via Google Cloud Function, we need to set up AWS Cognito identity pool and IAM properly.
+Make sure attaching correct permissions to the IAM role which is used by AWS Cognito identity pool and use the [credential](https://docs.aws.amazon.com/cognito/latest/developerguide/getting-credentials.html)
+to access AWS S3 client. Since this project is using Google IDP, we need to enable Google login in the AWS Cognito.
+Please check this [document](https://docs.aws.amazon.com/cognito/latest/developerguide/google.html).
 
 ### Install the dependencies
 ```bash

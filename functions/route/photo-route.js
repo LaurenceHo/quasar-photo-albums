@@ -44,20 +44,19 @@ router.post('/upload/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermis
     const { filename, encoding, mimeType } = info;
     console.log(`##### File [${fieldName}]: filename: ${filename}, encoding: ${encoding}, mimeType: ${mimeType}`);
 
-    const promise = new Promise((resolve, reject) => {
-      awsS3Service
-        .uploadObject(idTokenCookies, `${albumId}/${filename}`, file)
-        .then((result) => {
-          console.log('##### upload result', result);
-          resolve(result);
-        })
-        .catch((error) => reject(error));
-    });
-    fileWrites.push(promise);
-
     file
       .on('data', (buffer) => {
         console.log(`##### File [${filename}] got ${buffer.length} bytes`);
+        const promise = new Promise((resolve, reject) => {
+          awsS3Service
+            .uploadObject(idTokenCookies, `${filename}`, buffer)
+            .then((result) => {
+              console.log('##### upload result', JSON.stringify(result));
+              resolve(result);
+            })
+            .catch((error) => reject(error));
+        });
+        fileWrites.push(promise);
       })
       .on('close', () => {
         console.log(`File [${filename}] done`);

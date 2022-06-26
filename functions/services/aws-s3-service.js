@@ -52,16 +52,20 @@ const _getCredentials = async (identityId, idToken) => {
   return response.Credentials;
 };
 
-//FIXME permission error
 //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-photo-album-full.html
 const uploadObject = async (idToken, filePath, object) => {
   console.log('##### S3 FilePath:', filePath);
+  // Get credentials from Cognito: https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html
   const identityId = await _getIdFromCognito(idToken);
   const credentials = await _getCredentials(identityId, idToken);
 
   const s3Client = new S3Client({
     region: process.env.AWS_REGION,
-    credentials,
+    credentials: {
+      accessKeyId: credentials.AccessKeyId,
+      secretAccessKey: credentials.SecretKey,
+      sessionToken: credentials.SessionToken,
+    },
   });
 
   const command = new PutObjectCommand({

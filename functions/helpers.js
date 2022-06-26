@@ -15,7 +15,7 @@ const getTokenFromCookies = (req, tokenType = 'firebase') => {
   let token = '';
   if (sessionCookie) {
     const tokens = sessionCookie.split('#');
-    token = tokenType === 'firebase' ? tokens[0] : token[1];
+    token = tokenType === 'firebase' ? tokens[0] : tokens[1];
   }
   return token;
 };
