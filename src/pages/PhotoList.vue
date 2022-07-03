@@ -39,6 +39,7 @@
               :photo-key="photo.key"
               :album-item="albumItem"
               :is-album-cover="photo.key === albumItem.albumCover"
+              @refreshPhotoList="getPhotoList"
             />
           </div>
         </div>

@@ -30,6 +30,23 @@ router.get('/:albumId', async (req, res) => {
   }
 });
 
+router.delete('/photo/:photoKey', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
+  const idTokenCookies = helpers.getTokenFromCookies(req, 'google');
+  const photoKey = req.params['photoKey'];
+
+  try {
+    if (photoKey) {
+      const response = await awsS3Service.deleteObject(idTokenCookies, decodeURIComponent(photoKey));
+      res.send(response);
+    } else {
+      res.sendStatus(400);
+    }
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
 /**
  * https://cloud.google.com/functions/docs/writing/http#multipart_data
  */

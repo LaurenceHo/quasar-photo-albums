@@ -43,9 +43,11 @@ import { getS3Url } from 'components/helper';
 import { Album } from 'components/models';
 import { copyToClipboard, useQuasar } from 'quasar';
 import AlbumService from 'src/services/album-service';
+import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';
 import { ref, toRefs } from 'vue';
 
+const emits = defineEmits(['refreshPhotoList']);
 const props = defineProps({
   albumItem: {
     type: Object,
@@ -65,6 +67,7 @@ const props = defineProps({
 const { photoKey, albumItem } = toRefs(props);
 
 const albumService = new AlbumService();
+const photoService = new PhotoService();
 const store = albumStore();
 const q = useQuasar();
 
@@ -77,8 +80,10 @@ const makeCoverPhoto = async () => {
   store.updateAlbumCover(albumToBeSubmitted);
 };
 
-const confirmDeletePhoto = () => {
-  // TODO
+const confirmDeletePhoto = async () => {
+  deletePhotoDialog.value = false;
+  await photoService.deletePhoto(encodeURIComponent(photoKey.value));
+  emits('refreshPhotoList');
 };
 
 const copyPhotoLink = () => {

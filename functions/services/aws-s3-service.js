@@ -1,4 +1,4 @@
-const { S3Client, ListObjectsV2Command, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, ListObjectsV2Command, DeleteObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { fromCognitoIdentityPool } = require('@aws-sdk/credential-provider-cognito-identity');
 const {
   CognitoIdentityClient,
@@ -77,5 +77,27 @@ const uploadObject = async (idToken, filePath, object) => {
   return s3Client.send(command);
 };
 
+const deleteObject = async (idToken, objectKey) => {
+  const identityId = await _getIdFromCognito(idToken);
+  const credentials = await _getCredentials(identityId, idToken);
+
+  const s3Client = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: credentials.AccessKeyId,
+      secretAccessKey: credentials.SecretKey,
+      sessionToken: credentials.SessionToken,
+    },
+  });
+
+  const command = new DeleteObjectCommand({
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: objectKey,
+  });
+
+  return s3Client.send(command);
+};
+
 exports.fetchObjectFromS3 = fetchObjectFromS3;
 exports.uploadObject = uploadObject;
+exports.deleteObject = deleteObject;
