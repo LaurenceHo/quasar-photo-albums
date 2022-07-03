@@ -49,7 +49,7 @@ router.post('/upload/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermis
         console.log(`##### File [${filename}] got ${buffer.length} bytes`);
         const promise = new Promise((resolve, reject) => {
           awsS3Service
-            .uploadObject(idTokenCookies, `${filename}`, buffer)
+            .uploadObject(idTokenCookies, `${albumId}/${filename}`, buffer)
             .then((result) => {
               console.log('##### upload result', JSON.stringify(result));
               resolve(result);
