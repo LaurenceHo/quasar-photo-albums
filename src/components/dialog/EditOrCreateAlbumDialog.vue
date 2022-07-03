@@ -58,6 +58,7 @@
 </template>
 
 <script lang="ts" setup>
+import { Album } from 'components/models';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
@@ -86,7 +87,8 @@ const confirmUpdateAlbum = async () => {
     desc: albumDesc.value,
     private: privateAlbum.value,
     tags: selectedAlbumTags.value,
-  };
+    albumCover: getAlbumToBeUpdate.value.albumCover,
+  } as Album;
 
   if (getAlbumToBeUpdate.value.id) {
     await albumService.updateAlbum(albumToBeSubmitted);

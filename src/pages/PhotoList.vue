@@ -34,7 +34,12 @@
               class="rounded-borders-lg cursor-pointer"
               @click="showLightBox(index)"
             />
-            <EditPhotoButton v-if="isAdminUser" :photo-key="photo.key" />
+            <EditPhotoButton
+              v-if="isAdminUser"
+              :photo-key="photo.key"
+              :album-item="albumItem"
+              :is-album-cover="photo.key === albumItem.albumCover"
+            />
           </div>
         </div>
       </template>

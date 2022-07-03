@@ -89,6 +89,11 @@ export const albumStore = defineStore('album', {
       }
     },
 
+    updateAlbumCover(albumToBeUpdated: Album) {
+      const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
+      this.allAlbumList.splice(findIndex, 1, albumToBeUpdated);
+    },
+
     updateAlbum(albumToBeUpdated: Album, deleteAlbum: boolean) {
       const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
       if (findIndex === -1) {
