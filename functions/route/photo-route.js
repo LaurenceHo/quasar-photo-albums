@@ -30,6 +30,23 @@ router.get('/:albumId', async (req, res) => {
   }
 });
 
+router.delete('/photo/:photoKey', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
+  const idTokenCookies = helpers.getTokenFromCookies(req, 'google'); // TODO => Need to refresh token
+  const photoKey = req.params['photoKey'].toString();
+
+  try {
+    if (photoKey) {
+      const response = await awsS3Service.deleteObject(idTokenCookies, decodeURIComponent(photoKey));
+      res.send(response);
+    } else {
+      res.sendStatus(400);
+    }
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
 /**
  * https://cloud.google.com/functions/docs/writing/http#multipart_data
  */
@@ -49,7 +66,7 @@ router.post('/upload/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermis
         console.log(`##### File [${filename}] got ${buffer.length} bytes`);
         const promise = new Promise((resolve, reject) => {
           awsS3Service
-            .uploadObject(idTokenCookies, `${filename}`, buffer)
+            .uploadObject(idTokenCookies, `${albumId}/${filename}`, buffer)
             .then((result) => {
               console.log('##### upload result', JSON.stringify(result));
               resolve(result);

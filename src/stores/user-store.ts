@@ -27,6 +27,9 @@ export const userStore = defineStore('user-permission', {
       },
       isCheckingUserPermission: true,
     } as UserState),
+  getters: {
+    isAdminUser: (state: UserState) => state.userPermission.role === 'admin',
+  },
   actions: {
     async checkUserPermission() {
       try {

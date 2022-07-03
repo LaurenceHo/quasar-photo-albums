@@ -19,7 +19,7 @@
         size="sm"
         style="top: 8px; left: 8px"
       />
-      <EditAlbumButton :album-item="albumItem" :album-style="albumStyle" />
+      <EditAlbumButton v-if="isAdminUser" :album-item="albumItem" :album-style="albumStyle" />
     </div>
     <div class="q-pt-sm text-h6 text-weight-medium">{{ albumItem.albumName }}</div>
   </div>
@@ -50,7 +50,7 @@
         </div>
       </q-item-section>
 
-      <q-item-section v-if="userPermission.role === 'admin'" side>
+      <q-item-section v-if="isAdminUser" side>
         <EditAlbumButton :album-item="albumItem" :album-style="albumStyle" />
       </q-item-section>
     </q-item>
@@ -58,8 +58,8 @@
 </template>
 
 <script lang="ts" setup>
-import EditAlbumButton from 'src/components/EditAlbumButton.vue';
-import { UserPermission, userStore } from 'src/stores/user-store';
+import EditAlbumButton from 'components/button/EditAlbumButton.vue';
+import { userStore } from 'src/stores/user-store';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -79,18 +79,8 @@ const props = defineProps({
 
 const userPermissionStore = userStore();
 const router = useRouter();
-const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
+const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const thumbnail = computed(() => cdnURL + encodeURI(props.albumItem?.albumCover));
 
 const goToAlbum = () => router.push(`/album/${props.albumItem.id}`);
 </script>
-<style lang="scss">
-.no-album-cover-square {
-  border: gray dashed 1px;
-  &:after {
-    content: '';
-    display: block;
-    padding-bottom: 100%;
-  }
-}
-</style>
