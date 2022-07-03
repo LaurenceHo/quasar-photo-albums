@@ -31,8 +31,8 @@ router.get('/:albumId', async (req, res) => {
 });
 
 router.delete('/photo/:photoKey', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
-  const idTokenCookies = helpers.getTokenFromCookies(req, 'google');
-  const photoKey = req.params['photoKey'];
+  const idTokenCookies = helpers.getTokenFromCookies(req, 'google'); // TODO => Need to refresh token
+  const photoKey = req.params['photoKey'].toString();
 
   try {
     if (photoKey) {
