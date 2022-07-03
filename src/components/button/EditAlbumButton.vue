@@ -1,6 +1,5 @@
 <template>
   <q-btn
-    v-if="userPermission.role === 'admin'"
     :class="{ 'absolute-top-right': albumStyle === 'grid' }"
     :color="albumStyle === 'grid' ? 'white' : 'dark'"
     flat
@@ -13,13 +12,13 @@
           <q-item-section avatar>
             <q-icon color="primary" name="mdi-pencil" />
           </q-item-section>
-          <q-item-section>Edit album</q-item-section>
+          <q-item-section>Edit Album</q-item-section>
         </q-item>
         <q-item v-close-popup clickable @click="deleteAlbum = true">
           <q-item-section avatar>
             <q-icon color="primary" name="mdi-delete" />
           </q-item-section>
-          <q-item-section>Delete album</q-item-section>
+          <q-item-section>Delete Album</q-item-section>
         </q-item>
       </q-list>
     </q-menu>
@@ -40,12 +39,11 @@
 </template>
 
 <script lang="ts" setup>
-import { Album } from 'src/components/models';
+import { Album } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
-import { albumStore } from 'src/stores/album-store';
-import { UserPermission, userStore } from 'src/stores/user-store';
-import { computed, ref, toRefs } from 'vue';
+import { albumStore } from 'stores/album-store';
+import { ref, toRefs } from 'vue';
 
 const props = defineProps({
   albumStyle: {
@@ -62,10 +60,7 @@ const { albumItem } = toRefs(props);
 
 const albumService = new AlbumService();
 const store = albumStore();
-const userPermissionStore = userStore();
 const { setUpdateAlbumDialogState, setAlbumToBeUpdated } = DialogStateComposable();
-
-const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 
 const deleteAlbum = ref(false);
 const albumName = ref(albumItem?.value?.albumName);

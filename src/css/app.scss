@@ -15,6 +15,16 @@
   display: block;
 }
 
+.no-album-cover-square {
+  border: gray dashed 1px;
+
+  &:after {
+    content: '';
+    display: block;
+    padding-bottom: 100%;
+  }
+}
+
 // Quasar css override
 .q-field--standout .q-field__control {
   background: #fff;
