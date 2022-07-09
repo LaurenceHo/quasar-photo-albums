@@ -52,7 +52,7 @@ const props = defineProps({
   albumItem: {
     type: Object,
     required: true,
-    default: () => ({ albumName: '', desc: '', tags: [], private: false, albumCover: '' }),
+    default: () => ({ id: '', albumName: '', desc: '', tags: [], private: false, albumCover: '' } as Album),
   },
   photoKey: {
     type: String,
@@ -82,7 +82,9 @@ const makeCoverPhoto = async () => {
 
 const confirmDeletePhoto = async () => {
   deletePhotoDialog.value = false;
-  await photoService.deletePhoto(encodeURIComponent(photoKey.value));
+  const photoKeyArray = photoKey.value?.split('/');
+  const photoKeyString = photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
+  await photoService.deletePhoto(albumItem.value.id, photoKeyString);
   emits('refreshPhotoList');
 };
 
