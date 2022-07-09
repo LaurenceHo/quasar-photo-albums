@@ -51,7 +51,7 @@
     :photos-in-album="photosInAlbum"
     :selected-image-index="selectedImageIndex"
   />
-  <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem.id" />
+  <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem.id" @refreshPhotoList="getPhotoList" />
 </template>
 
 <script lang="ts" setup>

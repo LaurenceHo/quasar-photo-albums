@@ -9,10 +9,13 @@
     <q-card>
       <q-card-section class="row items-center q-pb-none">
         <q-space />
-        <q-btn dense flat icon="mdi-close" round @click="setUploadPhotoDialogState(false)" />
+        <q-btn dense flat icon="mdi-close" round @click="setUploadPhotoDialogState(false)" :disable="isUploading" />
       </q-card-section>
 
       <q-card-section>
+        <div class="flex justify-center q-pb-md">
+          <q-spinner-ios v-if="isUploading" color="secondary" size="3em" />
+        </div>
         <div class="full-width" style="height: 80vh">
           <div id="file-upload-container">
             <DropZone class="drop-area" @files-dropped="addFiles" #default="{ dropZoneActive }">
@@ -35,11 +38,28 @@
               </ul>
             </DropZone>
             <div class="flex q-pt-lg justify-center">
-              <q-btn outline rounded color="primary" size="lg" padding="sm xl" @click="clearFiles" class="q-mr-md">
+              <q-btn
+                outline
+                rounded
+                color="primary"
+                size="lg"
+                padding="sm xl"
+                @click="clearFiles"
+                class="q-mr-md"
+                :disable="isUploading"
+              >
                 Clear all
               </q-btn>
 
-              <q-btn unelevated rounded color="primary" size="lg" padding="sm xl" @click.prevent="uploadFiles(files)">
+              <q-btn
+                unelevated
+                rounded
+                color="primary"
+                size="lg"
+                padding="sm xl"
+                @click.prevent="uploadFiles(files)"
+                :disable="isUploading"
+              >
                 Upload
               </q-btn>
             </div>
@@ -51,12 +71,14 @@
 </template>
 
 <script setup lang="ts">
-import { createUploader } from 'components/helper';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import DropZone from 'components/file-uploader/DropZone.vue';
 import FilePreview from 'components/file-uploader/FilePreview.vue';
 import useFileList from 'src/composables/file-list-composable';
+import fileUploader from 'src/composables/file-uploader-composable';
 import { toRefs, watch } from 'vue';
+
+const emits = defineEmits(['refreshPhotoList']);
 
 const props = defineProps({
   albumId: {
@@ -68,7 +90,7 @@ const props = defineProps({
 const { albumId } = toRefs(props);
 const { getUploadPhotoDialogState, setUploadPhotoDialogState } = DialogStateComposable();
 const { files, addFiles, removeFile } = useFileList();
-
+const { createUploader, isUploading, isCompleteUploading } = fileUploader();
 const { uploadFiles } = createUploader(albumId.value);
 
 const onInputChange = (e: any) => {
@@ -81,6 +103,13 @@ const clearFiles = () => (files.value = []);
 watch(albumId, (newValue) => {
   if (newValue) {
     clearFiles();
+  }
+});
+
+watch(isCompleteUploading, (newValue) => {
+  if (newValue) {
+    emits('refreshPhotoList');
+    isCompleteUploading.value = false;
   }
 });
 </script>

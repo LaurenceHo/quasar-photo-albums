@@ -30,13 +30,14 @@ router.get('/:albumId', async (req, res) => {
   }
 });
 
-router.delete('/photo/:photoKey', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
+router.delete('/photo', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
   const idTokenCookies = helpers.getTokenFromCookies(req, 'google'); // TODO => Need to refresh token
-  const photoKey = req.params['photoKey'].toString();
+  const photo = req.body;
 
   try {
-    if (photoKey) {
-      const response = await awsS3Service.deleteObject(idTokenCookies, decodeURIComponent(photoKey));
+    if (photo) {
+      console.log('###### Delete photo:', photo);
+      const response = await awsS3Service.deleteObject(idTokenCookies, `${photo.albumId}/${photo.objectKey}`);
       res.send(response);
     } else {
       res.sendStatus(400);
