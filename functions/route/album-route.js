@@ -4,6 +4,7 @@ const admin = require('firebase-admin');
 
 const helpers = require('../helpers');
 const firestoreService = require('../services/firestore-service');
+const awsS3Service = require('../services/aws-s3-service');
 
 // Reference:
 // https://firebase.google.com/docs/reference/admin/node/firebase-admin.firestore
@@ -58,15 +59,23 @@ router.put('', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req,
 });
 
 router.delete('/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
+  const idTokenCookies = helpers.getTokenFromCookies(req, 'google'); // TODO => Need to refresh token
   const albumId = req.params['albumId'];
 
-  firestoreService
-    .deletePhotoAlbum(albumId)
-    .then(() => res.send({ status: 'Album deleted' }))
-    .catch((error) => {
-      console.log(error);
+  try {
+    console.log('###### Delete album:', albumId);
+    const result = await awsS3Service.deleteFolders(idTokenCookies, `${albumId}`);
+    console.log('###### Delete result:', result);
+    if (result.$metadata.httpStatusCode === 200) {
+      await firestoreService.deletePhotoAlbum(albumId);
+      res.send({ status: 'Album deleted' });
+    } else {
       res.status(500).send({ status: 'Server error' });
-    });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ status: 'Server error' });
+  }
 });
 
 module.exports = router;
