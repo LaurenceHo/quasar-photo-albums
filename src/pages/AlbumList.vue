@@ -41,17 +41,7 @@
       </div>
       <q-space />
       <div class="col-12 col-xl-4 col-lg-5 col-md-5 flex justify-end items-center">
-        <q-pagination
-          v-model="pageNumber"
-          :max="totalPages"
-          :max-pages="5"
-          boundary-links
-          boundary-numbers
-          direction-links
-          outline
-        />
-        <q-select v-model="itemsPerPage" :options="[10, 20, 50]" dense outlined />
-        ({{ totalItems }} albums)
+        <Pagination :page-number-props="pageNumber" :items-per-page-props="itemsPerPage" :total-pages="totalPages" :total-items='totalItems' @setPageParams='setPageParams' />
       </div>
     </div>
     <template v-if="chunkAlbumList.length">
@@ -66,17 +56,7 @@
         </div>
       </div>
       <div class="col-12 col-xl-4 col-lg-5 col-md-5 flex justify-end items-center q-pt-md">
-        <q-pagination
-          v-model="pageNumber"
-          :max="totalPages"
-          :max-pages="5"
-          boundary-links
-          boundary-numbers
-          direction-links
-          outline
-        />
-        <q-select v-model="itemsPerPage" :options="[10, 20, 50]" dense outlined />
-        ({{ totalItems }} albums)
+        <Pagination :page-number-props="pageNumber" :items-per-page-props="itemsPerPage" :total-pages="totalPages" :total-items='totalItems' @setPageParams='setPageParams' />
       </div>
     </template>
     <template v-else>
@@ -87,6 +67,7 @@
 
 <script lang="ts" setup>
 import Album from 'components/Album.vue';
+import Pagination from 'components/Pagination.vue';
 import * as _ from 'lodash';
 import { Album as AlbumItem } from 'src/components/models';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
@@ -100,8 +81,8 @@ const store = albumStore();
 
 const { albumTags, filterTags } = AlbumTagsFilterComposable();
 
-const itemsPerPage = ref(20);
 const pageNumber = ref(1);
+const itemsPerPage = ref(20);
 const albumStyle = ref((route.query.albumStyle as string) || 'list');
 const totalItems = ref(store.allAlbumList.length);
 const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
@@ -131,6 +112,11 @@ const setAlbumStyle = (type: 'list' | 'grid') => {
   router.replace({ query: { albumStyle: type } });
 };
 
+const setPageParams = (params: {pageNumber: number, itemsPerPage:  number}) => {
+  pageNumber.value = params.pageNumber;
+  itemsPerPage.value = params.itemsPerPage;
+}
+
 watch(refreshAlbumList, (newValue) => {
   if (newValue) {
     getFilteredAlbumList();
@@ -138,10 +124,7 @@ watch(refreshAlbumList, (newValue) => {
   }
 });
 
-watch([pageNumber, itemsPerPage, searchKey, selectedTags], ([newPageNumber]) => {
-  if (!newPageNumber) {
-    pageNumber.value = 1;
-  }
+watch([pageNumber, itemsPerPage,searchKey, selectedTags], () => {
   getFilteredAlbumList();
 });
 </script>
