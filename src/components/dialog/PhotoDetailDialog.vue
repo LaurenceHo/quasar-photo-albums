@@ -19,7 +19,7 @@
             <div class="text-subtitle1 text-grey-7 q-pb-md">({{ imageIndex + 1 }}/{{ photosInAlbum.length }})</div>
             <div class="relative-position full-width image-container">
               <div class="flex justify-center items-center full-height">
-                <q-spinner v-show="loadImage" color="accent" size="4rem" />
+                <q-spinner v-show="loadImage" color="primary" size="4rem" />
                 <img
                   v-show="!loadImage"
                   :src="selectedImage.url"
@@ -32,7 +32,7 @@
                 round
                 icon="mdi-chevron-right"
                 class="absolute-right"
-                color="accent"
+                color="primary"
                 unelevated
                 style="height: 42px"
                 @click="nextPhoto(1)"
@@ -41,7 +41,7 @@
                 round
                 icon="mdi-chevron-left"
                 class="absolute-left"
-                color="accent"
+                color="primary"
                 unelevated
                 style="height: 42px"
                 @click="nextPhoto(-1)"
@@ -52,6 +52,14 @@
             <q-list separator>
               <q-item>
                 <q-item-section class="text-h5"> Details</q-item-section>
+                <EditPhotoButton
+                  v-if="isAdminUser"
+                  :photo-key="selectedImage.key"
+                  :album-item="albumItem"
+                  :is-album-cover="selectedImage.key === albumItem.albumCover"
+                  @refreshPhotoList="$emit('refreshPhotoList')"
+                  @closePhotoDetailDialog="setPhotoDetailDialogState(false)"
+                />
               </q-item>
               <q-item v-if="exifTags['Image Height']">
                 <q-item-section>
@@ -145,6 +153,7 @@
 </template>
 
 <script setup lang="ts">
+import EditPhotoButton from 'components/button/EditPhotoButton.vue';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import { Tags } from 'exifreader';
 import * as ExifReader from 'exifreader';
@@ -152,7 +161,8 @@ import { useQuasar } from 'quasar';
 import { getS3Url } from 'components/helper';
 import { Photo } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import { ref, toRefs, watch } from 'vue';
+import { userStore } from 'stores/user-store';
+import { computed, ref, toRefs, watch } from 'vue';
 
 const props = defineProps({
   photosInAlbum: {
@@ -165,12 +175,18 @@ const props = defineProps({
     required: true,
     default: () => -1,
   },
+  albumItem: {
+    type: Object,
+    required: true,
+  },
 });
 
 const { selectedImageIndex, photosInAlbum } = toRefs(props);
 const { getPhotoDetailDialogState, setPhotoDetailDialogState } = DialogStateComposable();
-
+const userPermissionStore = userStore();
 const q = useQuasar();
+
+const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 
 const imageIndex = ref(0);
 const selectedImage = ref({ url: '', key: '' } as Photo);

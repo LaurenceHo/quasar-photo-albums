@@ -8,7 +8,7 @@
     </div>
     <div class="text-h6 text-grey q-pb-md" data-test-id="album-desc">{{ albumItem?.desc }}</div>
     <div v-if="albumItem?.tags?.length > 0" class="flex q-pb-md">
-      <q-chip v-for="(tag, i) in albumItem.tags" :key="i" data-test-id="album-tag">
+      <q-chip v-for="(tag, i) in albumItem.tags" :key="i" data-test-id="album-tag" color="secondary">
         {{ tag }}
       </q-chip>
     </div>
@@ -40,6 +40,7 @@
               :album-item="albumItem"
               :is-album-cover="photo.key === albumItem.albumCover"
               @refreshPhotoList="getPhotoList"
+              color="white"
             />
           </div>
         </div>
@@ -50,6 +51,8 @@
     v-if="getPhotoDetailDialogState"
     :photos-in-album="photosInAlbum"
     :selected-image-index="selectedImageIndex"
+    :album-item="albumItem"
+    @refreshPhotoList="getPhotoList"
   />
   <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem.id" @refreshPhotoList="getPhotoList" />
 </template>

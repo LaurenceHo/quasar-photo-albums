@@ -46,7 +46,7 @@
                 padding="sm xl"
                 @click="clearFiles"
                 class="q-mr-md"
-                :disable="isUploading"
+                :disable="isUploading || files.length === 0"
               >
                 Clear all
               </q-btn>
@@ -58,7 +58,7 @@
                 size="lg"
                 padding="sm xl"
                 @click.prevent="uploadFiles(files)"
-                :disable="isUploading"
+                :disable="isUploading || files.length === 0"
               >
                 Upload
               </q-btn>

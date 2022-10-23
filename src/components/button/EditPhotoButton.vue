@@ -1,5 +1,5 @@
 <template>
-  <q-btn class="absolute-top-right" color="white" flat icon="mdi-dots-vertical" round>
+  <q-btn class="absolute-top-right" :color="color" flat icon="mdi-dots-vertical" round>
     <q-menu>
       <q-list style="min-width: 100px">
         <q-item v-if="!isAlbumCover" v-close-popup clickable @click="makeCoverPhoto">
@@ -47,8 +47,12 @@ import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';
 import { ref, toRefs } from 'vue';
 
-const emits = defineEmits(['refreshPhotoList']);
+const emits = defineEmits(['refreshPhotoList', 'closePhotoDetailDialog']);
 const props = defineProps({
+  color: {
+    type: String,
+    default: () => 'black',
+  },
   albumItem: {
     type: Object,
     required: true,
@@ -86,6 +90,7 @@ const confirmDeletePhoto = async () => {
   const photoKeyString = photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
   await photoService.deletePhoto(albumItem.value.id, photoKeyString);
   emits('refreshPhotoList');
+  emits('closePhotoDetailDialog');
 };
 
 const copyPhotoLink = () => {

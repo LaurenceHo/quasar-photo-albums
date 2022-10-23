@@ -28,7 +28,10 @@
       <q-card-section class="row items-center">
         <q-icon color="primary" name="mdi-alert-circle" size="md" />
         <span class="q-ml-sm text-h6">Do you want to delete album "{{ albumItem.albumName }}"?</span>
-        <span class="q-ma-sm text-subtitle2">All photos in this album will be deleted, and any new photos added while the delete action is in progress might also be deleted.</span>
+        <span class="q-ma-sm text-subtitle2">
+          All photos in this album will be deleted, and any new photos added while the delete action is in progress
+          might also be deleted.</span
+        >
       </q-card-section>
 
       <q-card-actions align="right">
