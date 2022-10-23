@@ -41,7 +41,13 @@
       </div>
       <q-space />
       <div class="col-12 col-xl-4 col-lg-5 col-md-5 flex justify-end items-center">
-        <Pagination :page-number-props="pageNumber" :items-per-page-props="itemsPerPage" :total-pages="totalPages" :total-items='totalItems' @setPageParams='setPageParams' />
+        <Pagination
+          :page-number-props="pageNumber"
+          :items-per-page-props="itemsPerPage"
+          :total-pages="totalPages"
+          :total-items="totalItems"
+          @setPageParams="setPageParams"
+        />
       </div>
     </div>
     <template v-if="chunkAlbumList.length">
@@ -56,7 +62,13 @@
         </div>
       </div>
       <div class="col-12 col-xl-4 col-lg-5 col-md-5 flex justify-end items-center q-pt-md">
-        <Pagination :page-number-props="pageNumber" :items-per-page-props="itemsPerPage" :total-pages="totalPages" :total-items='totalItems' @setPageParams='setPageParams' />
+        <Pagination
+          :page-number-props="pageNumber"
+          :items-per-page-props="itemsPerPage"
+          :total-pages="totalPages"
+          :total-items="totalItems"
+          @setPageParams="setPageParams"
+        />
       </div>
     </template>
     <template v-else>
@@ -112,10 +124,10 @@ const setAlbumStyle = (type: 'list' | 'grid') => {
   router.replace({ query: { albumStyle: type } });
 };
 
-const setPageParams = (params: {pageNumber: number, itemsPerPage:  number}) => {
+const setPageParams = (params: { pageNumber: number; itemsPerPage: number }) => {
   pageNumber.value = params.pageNumber;
   itemsPerPage.value = params.itemsPerPage;
-}
+};
 
 watch(refreshAlbumList, (newValue) => {
   if (newValue) {
@@ -124,7 +136,7 @@ watch(refreshAlbumList, (newValue) => {
   }
 });
 
-watch([pageNumber, itemsPerPage,searchKey, selectedTags], () => {
+watch([pageNumber, itemsPerPage, searchKey, selectedTags], () => {
   getFilteredAlbumList();
 });
 </script>

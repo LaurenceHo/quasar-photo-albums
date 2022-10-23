@@ -6,13 +6,13 @@
     boundary-links
     boundary-numbers
     direction-links
-    active-design='outline'
+    active-design="outline"
   />
   <q-select v-model="itemsPerPage" :options="[10, 20, 50]" dense outlined />
   ({{ totalItems }} albums)
 </template>
 
-<script lang='ts' setup>
+<script lang="ts" setup>
 import { ref, toRefs, watch } from 'vue';
 
 const emits = defineEmits(['setPageParams']);
@@ -43,13 +43,11 @@ const itemsPerPage = ref(itemsPerPageProps.value);
 watch([pageNumberProps, itemsPerPageProps], ([newValue1, newValue2]) => {
   pageNumber.value = newValue1;
   itemsPerPage.value = newValue2;
-})
+});
 
 watch([pageNumber, itemsPerPage], ([newValue1, newValue2]) => {
-  emits('setPageParams', {pageNumber: newValue1, itemsPerPage: newValue2});
+  emits('setPageParams', { pageNumber: newValue1, itemsPerPage: newValue2 });
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
