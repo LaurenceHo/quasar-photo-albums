@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const admin = require('firebase-admin');
 const firestoreService = require('./services/firestore-service');
 
@@ -9,21 +10,10 @@ const _cleanCookie = (res, message) => {
   });
 };
 
-const getTokenFromCookies = (req, tokenType = 'firebase') => {
-  const sessionCookie = req.cookies['__session'] || '';
-
-  let token = '';
-  if (sessionCookie) {
-    const tokens = sessionCookie.split('#');
-    token = tokenType === 'firebase' ? tokens[0] : tokens[1];
-  }
-  return token;
-};
-
 const verifyJwtClaim = async (req, res, next) => {
   if (req.cookies && req.cookies['__session']) {
     try {
-      const firebaseToken = getTokenFromCookies(req);
+      const firebaseToken = _.get(req, 'cookies.__session', '');
       const decodedClaims = await admin.auth().verifySessionCookie(firebaseToken, true);
       if (decodedClaims.exp <= Date.now() / 1000) {
         _cleanCookie(res, 'User is not logged-in');
@@ -52,6 +42,5 @@ const verifyUserPermission = async (req, res, next) => {
   }
 };
 
-exports.getTokenFromCookies = getTokenFromCookies;
 exports.verifyJwtClaim = verifyJwtClaim;
 exports.verifyUserPermission = verifyUserPermission;
