@@ -9,8 +9,8 @@ const { fromCognitoIdentityPool } = require('@aws-sdk/credential-provider-cognit
 const { CognitoIdentityClient } = require('@aws-sdk/client-cognito-identity');
 
 const fetchObjectFromS3 = async (folderName, maxKeys) => {
-  const folderNameKey = encodeURIComponent(folderName) + '/';
-  // Use unauth identity
+  const folderNameKey = decodeURIComponent(folderName) + '/';
+  // Use unauthenticated identity
   const s3Client = new S3Client({
     region: process.env.AWS_REGION,
     credentials: fromCognitoIdentityPool({
@@ -51,7 +51,7 @@ const uploadObject = async (filePath, object) => {
   return s3Client.send(command);
 };
 
-const deleteObject = async (idToken, objectKey) => {
+const deleteObject = async (objectKey) => {
   const s3Client = new S3Client({
     region: process.env.AWS_REGION,
     credentials: {

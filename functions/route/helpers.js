@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const admin = require('firebase-admin');
-const firestoreService = require('./services/firestore-service');
+const firestoreService = require('../services/firestore-service');
 
 const _cleanCookie = (res, message) => {
   res.clearCookie('__session');

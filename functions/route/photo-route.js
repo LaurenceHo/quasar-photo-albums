@@ -1,7 +1,7 @@
 const Busboy = require('busboy');
 const express = require('express');
 
-const helpers = require('../helpers');
+const helpers = require('./helpers');
 const awsS3Service = require('../services/aws-s3-service');
 
 const router = express.Router();

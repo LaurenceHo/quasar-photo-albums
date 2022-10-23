@@ -2,7 +2,7 @@ const _ = require('lodash');
 const express = require('express');
 const admin = require('firebase-admin');
 
-const helpers = require('../helpers');
+const helpers = require('./helpers');
 const firestoreService = require('../services/firestore-service');
 const awsS3Service = require('../services/aws-s3-service');
 

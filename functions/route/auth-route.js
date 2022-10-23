@@ -3,7 +3,6 @@ const express = require('express');
 const admin = require('firebase-admin');
 
 const firestoreService = require('../services/firestore-service');
-const helpers = require('../helpers');
 
 // Reference:
 // https://firebase.google.com/docs/auth/admin/manage-cookies
