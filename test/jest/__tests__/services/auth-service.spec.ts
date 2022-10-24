@@ -16,10 +16,9 @@ describe('auth-service.ts', () => {
   it('Call verifyIdToken API with correct parameters', () => {
     const authService = new AuthService();
 
-    authService.verifyIdToken('googleIdTokenXXX', 'testTokenXXX');
+    authService.verifyIdToken('testTokenXXX');
     expect(mockSetDisplayingParameters).toHaveBeenCalledWith(true);
     expect(mockPerform).toHaveBeenCalledWith('POST', '/verifyIdToken', {
-      googleIdToken: 'googleIdTokenXXX',
       token: 'testTokenXXX',
     });
   });

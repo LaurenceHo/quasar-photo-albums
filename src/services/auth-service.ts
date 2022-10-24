@@ -10,9 +10,9 @@ export default class AuthService extends HttpRequestService {
         : `http://localhost:5001/${process.env.GOOGLE_FIREBASE_PROJECT_ID}/us-central1/main/api/auth`;
   }
 
-  verifyIdToken(googleIdToken: string | undefined, token: string): Promise<UserPermission> {
+  verifyIdToken(token: string): Promise<UserPermission> {
     this.setDisplayingParameters(true);
-    return this.perform('POST', '/verifyIdToken', { googleIdToken, token });
+    return this.perform('POST', '/verifyIdToken', { token });
   }
 
   getUserInfo(): Promise<any> {

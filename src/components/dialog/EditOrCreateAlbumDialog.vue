@@ -96,8 +96,8 @@ const confirmUpdateAlbum = async () => {
     await albumService.createAlbum(albumToBeSubmitted);
   }
   store.updateAlbum(albumToBeSubmitted, false);
-  setUpdateAlbumDialogState(false);
   isProcessing.value = false;
+  resetAlbum();
 };
 
 const resetAlbum = () => {

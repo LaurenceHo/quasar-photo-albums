@@ -1,6 +1,6 @@
 const express = require('express');
 
-const helpers = require('../helpers');
+const helpers = require('./helpers');
 const firestoreService = require('../services/firestore-service');
 
 const router = express.Router();
