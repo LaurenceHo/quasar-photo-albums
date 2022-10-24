@@ -15,7 +15,7 @@
               <q-icon class="cursor-pointer" name="mdi-close" @click="searchKey = ''" />
             </template>
           </q-input>
-          <q-btn v-if="userPermission.uid" class="q-ml-sm" color="secondary" icon="mdi-account-circle" round unelevated>
+          <q-btn v-if="userPermission.uid" class="q-ml-sm" color="accent" icon="mdi-account-circle" round unelevated>
             <q-menu>
               <q-list style="min-width: 100px">
                 <q-item v-if="isAdminUser" v-close-popup clickable @click="setUpdateAlbumDialogState(true)">

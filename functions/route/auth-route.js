@@ -1,8 +1,8 @@
+const _ = require('lodash');
 const express = require('express');
 const admin = require('firebase-admin');
 
 const firestoreService = require('../services/firestore-service');
-const helpers = require('../helpers');
 
 // Reference:
 // https://firebase.google.com/docs/auth/admin/manage-cookies
@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get('/userInfo', async (req, res) => {
   try {
-    const firebaseToken = helpers.getTokenFromCookies(req);
+    const firebaseToken = _.get(req, 'cookies.__session', '');
     const decodedClaims = await admin.auth().verifySessionCookie(firebaseToken, true);
     if (decodedClaims?.exp <= Date.now() / 1000) {
       res.clearCookie('__session');
@@ -28,8 +28,7 @@ router.get('/userInfo', async (req, res) => {
 });
 
 router.post('/verifyIdToken', async (req, res) => {
-  const googleIdToken = req.body.googleIdToken; // googleIdToken
-  const token = req.body.token; // idToken
+  const token = req.body.token; // Firebase ID Token
 
   try {
     const decodedIdToken = await admin.auth().verifyIdToken(String(token));
@@ -37,7 +36,7 @@ router.post('/verifyIdToken', async (req, res) => {
     // Only process if the authorised user just signed-in in the last 5 minutes.
     if (userPermission && new Date().getTime() / 1000 - decodedIdToken.auth_time < 5 * 60) {
       // Set idToken as cookies
-      await _setCookies(res, token, googleIdToken);
+      await _setCookies(res, token);
       res.send(userPermission);
     } else {
       console.log(`User ${decodedIdToken.email} doesn't have permission`);
@@ -53,7 +52,7 @@ router.post('/verifyIdToken', async (req, res) => {
 });
 
 router.post('/logout', async (req, res) => {
-  const firebaseToken = helpers.getTokenFromCookies(req);
+  const firebaseToken = _.get(req, 'cookies.__session', '');
   res.clearCookie('__session');
   try {
     const decodedClaims = await admin.auth().verifySessionCookie(firebaseToken);
@@ -66,14 +65,13 @@ router.post('/logout', async (req, res) => {
   }
 });
 
-const _setCookies = async (res, token, googleIdToken) => {
+const _setCookies = async (res, token) => {
   const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days
   const sessionCookie = await admin.auth().createSessionCookie(String(token), { expiresIn });
   const options = { maxAge: expiresIn, httpOnly: true, secure: process.env.NODE_ENV === 'production' };
   // It must be "__session" or Google Cloud Functions would not retain it.
   // https://stackoverflow.com/questions/59489994/unable-to-read-cookies-from-the-get-header-in-node-js-express-on-firebase-cloud
-  // __session cookies contains 2 tokens: firebase id token#google id token
-  res.cookie('__session', `${sessionCookie}#${googleIdToken}`, options);
+  res.cookie('__session', sessionCookie, options);
   res.setHeader('Cache-Control', 'private');
 };
 

@@ -2,7 +2,7 @@ const _ = require('lodash');
 const express = require('express');
 const admin = require('firebase-admin');
 
-const helpers = require('../helpers');
+const helpers = require('./helpers');
 const firestoreService = require('../services/firestore-service');
 const awsS3Service = require('../services/aws-s3-service');
 
@@ -14,7 +14,7 @@ const router = express.Router();
 
 router.get('', async (req, res) => {
   try {
-    const firebaseToken = helpers.getTokenFromCookies(req);
+    const firebaseToken = _.get(req, 'cookies.__session', '');
     let decodedClaims = null;
     let userPermission = null;
     if (firebaseToken) {
@@ -59,12 +59,11 @@ router.put('', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req,
 });
 
 router.delete('/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
-  const idTokenCookies = helpers.getTokenFromCookies(req, 'google'); // TODO => Need to refresh token
   const albumId = req.params['albumId'];
 
   try {
     console.log('###### Delete album:', albumId);
-    const result = await awsS3Service.deleteFolders(idTokenCookies, `${albumId}`);
+    const result = await awsS3Service.emptyS3Folder(albumId);
     console.log('###### Delete result:', result);
     if (result.$metadata.httpStatusCode === 200) {
       await firestoreService.deletePhotoAlbum(albumId);

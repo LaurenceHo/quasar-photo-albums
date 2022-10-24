@@ -1,7 +1,7 @@
 const Busboy = require('busboy');
 const express = require('express');
 
-const helpers = require('../helpers');
+const helpers = require('./helpers');
 const awsS3Service = require('../services/aws-s3-service');
 
 const router = express.Router();
@@ -31,13 +31,12 @@ router.get('/:albumId', async (req, res) => {
 });
 
 router.delete('/photo', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
-  const idTokenCookies = helpers.getTokenFromCookies(req, 'google'); // TODO => Need to refresh token
   const photo = req.body;
 
   try {
     if (photo) {
       console.log('###### Delete photo:', photo);
-      const response = await awsS3Service.deleteObject(idTokenCookies, `${photo.albumId}/${photo.objectKey}`);
+      const response = await awsS3Service.deleteObject(`${photo.albumId}/${photo.objectKey}`);
       res.send(response);
     } else {
       res.sendStatus(400);
@@ -52,9 +51,7 @@ router.delete('/photo', helpers.verifyJwtClaim, helpers.verifyUserPermission, as
  * https://cloud.google.com/functions/docs/writing/http#multipart_data
  */
 router.post('/upload/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
-  const idTokenCookies = helpers.getTokenFromCookies(req, 'google');
   const albumId = req.params['albumId'];
-
   const busboy = Busboy({ headers: req.headers });
   const fileWrites = [];
 
@@ -67,7 +64,7 @@ router.post('/upload/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermis
         console.log(`##### File [${filename}] got ${buffer.length} bytes`);
         const promise = new Promise((resolve, reject) => {
           awsS3Service
-            .uploadObject(idTokenCookies, `${albumId}/${filename}`, buffer)
+            .uploadObject(`${albumId}/${filename}`, buffer)
             .then((result) => {
               console.log('##### upload result', JSON.stringify(result));
               resolve(result);
