@@ -1,17 +1,16 @@
-const Busboy = require('busboy');
-const express = require('express');
+import Busboy from 'busboy';
+import express from 'express';
+import { deleteObject, fetchObjectFromS3, uploadObject } from '../services/aws-s3-service';
+import { verifyJwtClaim, verifyUserPermission } from './helpers';
 
-const helpers = require('./helpers');
-const awsS3Service = require('../services/aws-s3-service');
-
-const router = express.Router();
+export const router = express.Router();
 
 router.get('/:albumId', async (req, res) => {
   const albumId = req.params['albumId'];
   const cdnURL = process.env.IMAGEKIT_CDN_URL;
   try {
-    const s3ObjectContents = await awsS3Service.fetchObjectFromS3(albumId, 1000);
-    let photos = [];
+    const s3ObjectContents = await fetchObjectFromS3(albumId, 1000);
+    let photos: any[] = [];
     if (s3ObjectContents) {
       photos = s3ObjectContents.map((photo) => {
         let url = '';
@@ -30,13 +29,13 @@ router.get('/:albumId', async (req, res) => {
   }
 });
 
-router.delete('/photo', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
+router.delete('/photo', verifyJwtClaim, verifyUserPermission, async (req, res) => {
   const photo = req.body;
 
   try {
     if (photo) {
       console.log('###### Delete photo:', photo);
-      const response = await awsS3Service.deleteObject(`${photo.albumId}/${photo.objectKey}`);
+      const response = await deleteObject(`${photo.albumId}/${photo.objectKey}`);
       res.send(response);
     } else {
       res.sendStatus(400);
@@ -50,10 +49,10 @@ router.delete('/photo', helpers.verifyJwtClaim, helpers.verifyUserPermission, as
 /**
  * https://cloud.google.com/functions/docs/writing/http#multipart_data
  */
-router.post('/upload/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
+router.post('/upload/:albumId', verifyJwtClaim, verifyUserPermission, async (req, res) => {
   const albumId = req.params['albumId'];
   const busboy = Busboy({ headers: req.headers });
-  const fileWrites = [];
+  const fileWrites: any[] = [];
 
   busboy.on('file', async (fieldName, file, info) => {
     const { filename, encoding, mimeType } = info;
@@ -63,8 +62,7 @@ router.post('/upload/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermis
       .on('data', (buffer) => {
         console.log(`##### File [${filename}] got ${buffer.length} bytes`);
         const promise = new Promise((resolve, reject) => {
-          awsS3Service
-            .uploadObject(`${albumId}/${filename}`, buffer)
+          uploadObject(`${albumId}/${filename}`, buffer)
             .then((result) => {
               console.log('##### upload result', JSON.stringify(result));
               resolve(result);
@@ -86,7 +84,7 @@ router.post('/upload/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermis
     try {
       await Promise.all(fileWrites);
       res.send({ status: 'Success' });
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       res.status(500).send({
         status: 'Server error',
@@ -95,6 +93,6 @@ router.post('/upload/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermis
     }
   });
 
+  //@ts-ignore
   busboy.end(req.rawBody);
 });
-module.exports = router;

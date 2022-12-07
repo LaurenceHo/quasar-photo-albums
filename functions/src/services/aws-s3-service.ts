@@ -1,21 +1,21 @@
-const {
-  S3Client,
-  ListObjectsV2Command,
+import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity';
+import {
   DeleteObjectCommand,
   DeleteObjectsCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
-} = require('@aws-sdk/client-s3');
-const { fromCognitoIdentityPool } = require('@aws-sdk/credential-provider-cognito-identity');
-const { CognitoIdentityClient } = require('@aws-sdk/client-cognito-identity');
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
 
-const fetchObjectFromS3 = async (folderName, maxKeys) => {
+export const fetchObjectFromS3 = async (folderName: string, maxKeys: number) => {
   const folderNameKey = decodeURIComponent(folderName) + '/';
   // Use unauthenticated identity
   const s3Client = new S3Client({
     region: process.env.AWS_REGION,
     credentials: fromCognitoIdentityPool({
       client: new CognitoIdentityClient({ region: process.env.AWS_REGION }),
-      identityPoolId: process.env.AWS_IDENTITY_POOL_ID,
+      identityPoolId: process.env.AWS_IDENTITY_POOL_ID as string,
     }),
   });
 
@@ -31,14 +31,14 @@ const fetchObjectFromS3 = async (folderName, maxKeys) => {
 };
 
 //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-photo-album-full.html
-const uploadObject = async (filePath, object) => {
+export const uploadObject = async (filePath: string, object: any) => {
   console.log('##### S3 FilePath:', filePath);
 
   const s3Client = new S3Client({
     region: process.env.AWS_REGION,
     credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
     },
   });
 
@@ -51,12 +51,12 @@ const uploadObject = async (filePath, object) => {
   return s3Client.send(command);
 };
 
-const deleteObject = async (objectKey) => {
+export const deleteObject = async (objectKey: string) => {
   const s3Client = new S3Client({
     region: process.env.AWS_REGION,
     credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
     },
   });
 
@@ -68,12 +68,12 @@ const deleteObject = async (objectKey) => {
   return s3Client.send(command);
 };
 
-const emptyS3Folder = async (folderName) => {
+export const emptyS3Folder = async (folderName: string) => {
   const s3Client = new S3Client({
     region: process.env.AWS_REGION,
     credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
     },
   });
 
@@ -82,7 +82,7 @@ const emptyS3Folder = async (folderName) => {
     Prefix: folderName,
   });
 
-  const listedObjects = await s3Client.send(listObjectsV2Command);
+  const listedObjects = (await s3Client.send(listObjectsV2Command)) as any;
 
   if (listedObjects.Contents.length === 0) return;
 
@@ -95,7 +95,8 @@ const emptyS3Folder = async (folderName) => {
     Delete: { Objects: [] },
   };
 
-  listedObjects.Contents.forEach(({ Key }) => {
+  listedObjects.Contents.forEach(({ Key }: any) => {
+    // @ts-ignore
     deleteParams.Delete.Objects.push({ Key });
   });
 
@@ -103,8 +104,3 @@ const emptyS3Folder = async (folderName) => {
 
   return s3Client.send(deleteObjectsCommand);
 };
-
-exports.fetchObjectFromS3 = fetchObjectFromS3;
-exports.uploadObject = uploadObject;
-exports.deleteObject = deleteObject;
-exports.emptyS3Folder = emptyS3Folder;

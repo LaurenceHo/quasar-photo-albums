@@ -1,16 +1,21 @@
-const _ = require('lodash');
-const express = require('express');
-const admin = require('firebase-admin');
-
-const helpers = require('./helpers');
-const firestoreService = require('../services/firestore-service');
-const awsS3Service = require('../services/aws-s3-service');
+import express from 'express';
+import admin from 'firebase-admin';
+import _ from 'lodash';
+import { emptyS3Folder } from '../services/aws-s3-service';
+import {
+  createPhotoAlbum,
+  deletePhotoAlbum,
+  queryPhotoAlbums,
+  queryUserPermission,
+  updatePhotoAlbum,
+} from '../services/firestore-service';
+import { verifyJwtClaim, verifyUserPermission } from './helpers';
 
 // Reference:
 // https://firebase.google.com/docs/reference/admin/node/firebase-admin.firestore
 // https://googleapis.dev/nodejs/firestore/latest/Firestore.html
 
-const router = express.Router();
+export const router = express.Router();
 
 router.get('', async (req, res) => {
   try {
@@ -19,14 +24,14 @@ router.get('', async (req, res) => {
     let userPermission = null;
     if (firebaseToken) {
       decodedClaims = await admin.auth().verifySessionCookie(firebaseToken, true);
-      userPermission = await firestoreService.queryUserPermission(decodedClaims?.uid);
+      userPermission = await queryUserPermission(decodedClaims?.uid);
     }
 
     const isAdmin = _.get(userPermission, 'role') === 'admin';
     if (!isAdmin) {
       res.set('Cache-control', 'public, max-age=3600');
     }
-    const albumList = await firestoreService.queryPhotoAlbums(isAdmin);
+    const albumList = await queryPhotoAlbums(isAdmin);
     res.send(albumList);
   } catch (error) {
     console.log(error);
@@ -34,39 +39,38 @@ router.get('', async (req, res) => {
   }
 });
 
-router.post('', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
+router.post('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
   const album = req.body;
 
-  firestoreService
-    .createPhotoAlbum(album)
+  createPhotoAlbum(album)
     .then(() => res.send({ status: 'Album created' }))
-    .catch((error) => {
+    .catch((error: Error) => {
       console.log(`Failed to create document: ${error}`);
       res.status(500).send({ status: 'Server error' });
     });
 });
 
-router.put('', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
+router.put('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
   const album = req.body;
 
-  firestoreService
-    .updatePhotoAlbum(album)
+  updatePhotoAlbum(album)
     .then(() => res.send({ status: 'Album updated' }))
-    .catch((error) => {
+    .catch((error: Error) => {
       console.log(error);
       res.status(500).send({ status: 'Server error' });
     });
 });
 
-router.delete('/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
-  const albumId = req.params['albumId'];
+router.delete('/:albumId', verifyJwtClaim, verifyUserPermission, async (req, res) => {
+  const albumId = req.params.albumId;
 
   try {
     console.log('###### Delete album:', albumId);
-    const result = await awsS3Service.emptyS3Folder(albumId);
+    const result = await emptyS3Folder(albumId);
     console.log('###### Delete result:', result);
+    // @ts-ignore
     if (result.$metadata.httpStatusCode === 200) {
-      await firestoreService.deletePhotoAlbum(albumId);
+      await deletePhotoAlbum(albumId);
       res.send({ status: 'Album deleted' });
     } else {
       res.status(500).send({ status: 'Server error' });
@@ -76,5 +80,3 @@ router.delete('/:albumId', helpers.verifyJwtClaim, helpers.verifyUserPermission,
     res.status(500).send({ status: 'Server error' });
   }
 });
-
-module.exports = router;
