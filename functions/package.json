@@ -1,13 +1,16 @@
 {
   "name": "functions",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
+    "lint": "eslint --ext .js,.ts .",
+    "build:functions": "tsc",
+    "build:watch": "tsc --watch",
     "serve:functions": "firebase emulators:start --only functions",
     "start:functions": "firebase functions:shell",
     "deploy:functions": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
+  "main": "lib/src/index.js",
   "dependencies": {
     "@aws-sdk/client-cognito-identity": "^3.81.0",
     "@aws-sdk/client-s3": "^3.81.0",
@@ -22,6 +25,17 @@
     "firebase-functions": "^4.0.1",
     "helmet": "^6.0.0",
     "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/busboy": "^1.5.0",
+    "@types/cookie-parser": "^1.4.3",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^0.2.0",
+    "typescript": "^4.5.4"
   },
   "engines": {
     "node": "16"

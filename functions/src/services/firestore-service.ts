@@ -1,11 +1,11 @@
-const { getFirestore } = require('firebase-admin/firestore');
-const awsS3Service = require('./aws-s3-service');
+import { getFirestore } from 'firebase-admin/firestore';
+import { fetchObjectFromS3 } from './aws-s3-service';
 
 // Reference:
 // https://firebase.google.com/docs/reference/admin/node/firebase-admin.firestore
 // https://googleapis.dev/nodejs/firestore/latest/Firestore.html
 
-const queryUserPermission = async (uid) => {
+export const queryUserPermission = async (uid: string) => {
   const usersRef = getFirestore().collection('user-permission');
   const queryResult = await usersRef.where('uid', '==', uid).limit(1).get();
   let userPermission = null;
@@ -16,8 +16,8 @@ const queryUserPermission = async (uid) => {
   return userPermission;
 };
 
-const queryPhotoAlbums = async (isAdmin) => {
-  const albumList = [];
+export const queryPhotoAlbums = async (isAdmin: boolean) => {
+  const albumList: any[] = [];
   const albumRef = getFirestore().collection('s3-photo-albums');
   let queryResult;
   if (isAdmin) {
@@ -31,7 +31,7 @@ const queryPhotoAlbums = async (isAdmin) => {
   return albumList;
 };
 
-const createPhotoAlbum = (album) => {
+export const createPhotoAlbum = (album: any) => {
   // Because we don't want to use auto generated id, we need to use "set" to create document
   // https://googleapis.dev/nodejs/firestore/latest/DocumentReference.html#set
   const albumRef = getFirestore().collection('s3-photo-albums').doc(album.id);
@@ -41,23 +41,22 @@ const createPhotoAlbum = (album) => {
   return albumRef.set(album);
 };
 
-const updatePhotoAlbum = (album) => {
+export const updatePhotoAlbum = (album: any) => {
   const albumRef = getFirestore().doc(`s3-photo-albums/${album.id}`);
 
   return albumRef.update(album);
 };
 
-const deletePhotoAlbum = (albumId) => {
+export const deletePhotoAlbum = (albumId: string) => {
   const albumRef = getFirestore().doc(`s3-photo-albums/${albumId}`);
   return albumRef.delete();
 };
 
-const queryAlbumTags = async () => {
-  const albumTags = [];
-  let querySnapshot;
+export const queryAlbumTags = async () => {
+  const albumTags: any[] = [];
 
   const docRef = getFirestore().collection('album-tags');
-  querySnapshot = await docRef.orderBy('tag', 'asc').get();
+  const querySnapshot = await docRef.orderBy('tag', 'asc').get();
 
   querySnapshot.forEach((doc) => {
     albumTags.push({ ...doc.data(), id: doc.id });
@@ -65,7 +64,7 @@ const queryAlbumTags = async () => {
   return albumTags;
 };
 
-const createPhotoAlbumTag = (tag) => {
+export const createPhotoAlbumTag = (tag: any) => {
   const tagRef = getFirestore().collection('album-tags').doc(tag.id);
 
   delete tag.id;
@@ -73,15 +72,15 @@ const createPhotoAlbumTag = (tag) => {
   return tagRef.set(tag);
 };
 
-const deletePhotoAlbumTag = (tagId) => {
+export const deletePhotoAlbumTag = (tagId: string) => {
   const tagRef = getFirestore().doc(`album-tags/${tagId}`);
   return tagRef.delete();
 };
 
-const setupDefaultAlbumCover = async (albumList) => {
+export const setupDefaultAlbumCover = async (albumList: any[]) => {
   for (const album of albumList) {
     if (!album.albumCover) {
-      const s3ObjectContents = await awsS3Service.fetchObjectFromS3(album.id, 1);
+      const s3ObjectContents = await fetchObjectFromS3(album.id, 1);
       if (s3ObjectContents) {
         console.log('Photo key:', s3ObjectContents[0].Key);
 
@@ -93,16 +92,3 @@ const setupDefaultAlbumCover = async (albumList) => {
     }
   }
 };
-
-exports.queryUserPermission = queryUserPermission;
-
-exports.queryPhotoAlbums = queryPhotoAlbums;
-exports.createPhotoAlbum = createPhotoAlbum;
-exports.updatePhotoAlbum = updatePhotoAlbum;
-exports.deletePhotoAlbum = deletePhotoAlbum;
-
-exports.queryAlbumTags = queryAlbumTags;
-exports.createPhotoAlbumTag = createPhotoAlbumTag;
-exports.deletePhotoAlbumTag = deletePhotoAlbumTag;
-
-exports.setupDefaultAlbumCover = setupDefaultAlbumCover;

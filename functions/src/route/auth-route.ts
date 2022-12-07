@@ -1,14 +1,13 @@
-const _ = require('lodash');
-const express = require('express');
-const admin = require('firebase-admin');
-
-const firestoreService = require('../services/firestore-service');
+import express, { Response } from 'express';
+import admin from 'firebase-admin';
+import _ from 'lodash';
+import { queryUserPermission } from '../services/firestore-service';
 
 // Reference:
 // https://firebase.google.com/docs/auth/admin/manage-cookies
 // https://firebase.google.com/docs/auth/admin/verify-id-tokens
 
-const router = express.Router();
+export const router = express.Router();
 
 router.get('/userInfo', async (req, res) => {
   try {
@@ -18,7 +17,7 @@ router.get('/userInfo', async (req, res) => {
       res.clearCookie('__session');
       res.send({ status: 'Unauthorized', message: 'User is not logged-in' });
     }
-    const userPermission = await firestoreService.queryUserPermission(decodedClaims?.uid);
+    const userPermission = await queryUserPermission(decodedClaims?.uid);
 
     res.send(userPermission);
   } catch (error) {
@@ -32,7 +31,7 @@ router.post('/verifyIdToken', async (req, res) => {
 
   try {
     const decodedIdToken = await admin.auth().verifyIdToken(String(token));
-    const userPermission = await firestoreService.queryUserPermission(decodedIdToken.uid);
+    const userPermission = await queryUserPermission(decodedIdToken.uid);
     // Only process if the authorised user just signed-in in the last 5 minutes.
     if (userPermission && new Date().getTime() / 1000 - decodedIdToken.auth_time < 5 * 60) {
       // Set idToken as cookies
@@ -65,7 +64,7 @@ router.post('/logout', async (req, res) => {
   }
 });
 
-const _setCookies = async (res, token) => {
+const _setCookies = async (res: Response, token: any) => {
   const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days
   const sessionCookie = await admin.auth().createSessionCookie(String(token), { expiresIn });
   const options = { maxAge: expiresIn, httpOnly: true, secure: process.env.NODE_ENV === 'production' };
@@ -74,5 +73,3 @@ const _setCookies = async (res, token) => {
   res.cookie('__session', sessionCookie, options);
   res.setHeader('Cache-Control', 'private');
 };
-
-module.exports = router;

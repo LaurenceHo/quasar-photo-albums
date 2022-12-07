@@ -1,13 +1,11 @@
-const express = require('express');
+import express from 'express';
+import { createPhotoAlbumTag, deletePhotoAlbumTag, queryAlbumTags } from '../services/firestore-service';
+import { verifyJwtClaim, verifyUserPermission } from './helpers';
 
-const helpers = require('./helpers');
-const firestoreService = require('../services/firestore-service');
-
-const router = express.Router();
+export const router = express.Router();
 
 router.get('', async (req, res) => {
-  firestoreService
-    .queryAlbumTags()
+  queryAlbumTags()
     .then((albumTags) => res.send(albumTags))
     .catch((error) => {
       console.log(error);
@@ -15,28 +13,24 @@ router.get('', async (req, res) => {
     });
 });
 
-router.post('', helpers.verifyJwtClaim, helpers.verifyUserPermission, (req, res) => {
+router.post('', verifyJwtClaim, verifyUserPermission, (req, res) => {
   const tag = req.body;
 
-  firestoreService
-    .createPhotoAlbumTag(tag)
+  createPhotoAlbumTag(tag)
     .then(() => res.send({ status: 'Album tag created' }))
-    .catch((error) => {
+    .catch((error: Error) => {
       console.log(`Failed to create document: ${error}`);
       res.status(500).send({ status: 'Server error' });
     });
 });
 
-router.delete('/:tagId', helpers.verifyJwtClaim, helpers.verifyUserPermission, async (req, res) => {
+router.delete('/:tagId', verifyJwtClaim, verifyUserPermission, async (req, res) => {
   const tagId = req.params['tagId'];
 
-  firestoreService
-    .deletePhotoAlbumTag(tagId)
+  deletePhotoAlbumTag(tagId)
     .then(() => res.send({ status: 'Tag deleted' }))
-    .catch((error) => {
+    .catch((error: Error) => {
       console.log(error);
       res.status(500).send({ status: 'Server error' });
     });
 });
-
-module.exports = router;

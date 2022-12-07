@@ -1,8 +1,9 @@
-const _ = require('lodash');
-const admin = require('firebase-admin');
-const firestoreService = require('../services/firestore-service');
+import { Request, Response } from 'express';
+import admin from 'firebase-admin';
+import _ from 'lodash';
+import { queryUserPermission } from '../services/firestore-service';
 
-const _cleanCookie = (res, message) => {
+const _cleanCookie = (res: Response, message: string) => {
   res.clearCookie('__session');
   return res.status(401).send({
     status: 'Unauthorized',
@@ -10,7 +11,7 @@ const _cleanCookie = (res, message) => {
   });
 };
 
-const verifyJwtClaim = async (req, res, next) => {
+export const verifyJwtClaim = async (req: Request, res: Response, next: any) => {
   if (req.cookies && req.cookies['__session']) {
     try {
       const firebaseToken = _.get(req, 'cookies.__session', '');
@@ -19,9 +20,10 @@ const verifyJwtClaim = async (req, res, next) => {
         _cleanCookie(res, 'User is not logged-in');
       }
 
-      const user = await firestoreService.queryUserPermission(decodedClaims?.uid);
+      const user = await queryUserPermission(decodedClaims?.uid);
       if (user) {
-        req['user'] = user;
+        // @ts-ignore
+        req.user = user;
       } else {
         _cleanCookie(res, 'Authentication failed. Please login.');
       }
@@ -34,13 +36,11 @@ const verifyJwtClaim = async (req, res, next) => {
   }
 };
 
-const verifyUserPermission = async (req, res, next) => {
+export const verifyUserPermission = async (req: Request, res: Response, next: any) => {
+  // @ts-ignore
   if (req.user.role === 'admin') {
     next();
   } else {
     res.status(403).send({ status: 'Unauthorized', message: 'Unauthorized action' });
   }
 };
-
-exports.verifyJwtClaim = verifyJwtClaim;
-exports.verifyUserPermission = verifyUserPermission;
