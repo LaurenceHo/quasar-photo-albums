@@ -5,9 +5,9 @@
     "lint": "eslint --ext .js,.ts .",
     "build:functions": "tsc",
     "build:watch": "tsc --watch",
-    "serve:functions": "firebase emulators:start --only functions",
+    "serve:functions": "npm run build:functions && firebase emulators:start --only functions",
     "start:functions": "firebase functions:shell",
-    "deploy:functions": "firebase deploy --only functions",
+    "deploy:functions": "npm run build:functions && firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
   "main": "lib/src/index.js",

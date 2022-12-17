@@ -8,6 +8,14 @@ import {
 } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
 
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+  },
+});
+
 export const fetchObjectFromS3 = async (folderName: string, maxKeys: number) => {
   const folderNameKey = decodeURIComponent(folderName) + '/';
   // Use unauthenticated identity
@@ -33,15 +41,6 @@ export const fetchObjectFromS3 = async (folderName: string, maxKeys: number) => 
 //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-photo-album-full.html
 export const uploadObject = async (filePath: string, object: any) => {
   console.log('##### S3 FilePath:', filePath);
-
-  const s3Client = new S3Client({
-    region: process.env.AWS_REGION,
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
-    },
-  });
-
   const command = new PutObjectCommand({
     Body: object,
     Bucket: process.env.AWS_S3_BUCKET_NAME,
@@ -52,14 +51,6 @@ export const uploadObject = async (filePath: string, object: any) => {
 };
 
 export const deleteObject = async (objectKey: string) => {
-  const s3Client = new S3Client({
-    region: process.env.AWS_REGION,
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
-    },
-  });
-
   const command = new DeleteObjectCommand({
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     Key: objectKey,
@@ -69,14 +60,6 @@ export const deleteObject = async (objectKey: string) => {
 };
 
 export const emptyS3Folder = async (folderName: string) => {
-  const s3Client = new S3Client({
-    region: process.env.AWS_REGION,
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
-    },
-  });
-
   const listObjectsV2Command = new ListObjectsV2Command({
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     Prefix: folderName,
