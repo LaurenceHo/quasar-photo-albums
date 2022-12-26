@@ -1,15 +1,15 @@
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
 
 export const mockFetch = () => {
   const mockFetchPromise = Promise.resolve({
     status: 200,
     json: () => Promise.resolve(),
     headers: {
-      get: jest.fn(),
+      get: vi.fn(),
     },
   });
   const globalRef: any = global;
-  globalRef.fetch = jest.fn().mockImplementation(() => mockFetchPromise);
+  globalRef.fetch = vi.fn().mockImplementation(() => mockFetchPromise);
 };
 
 export const mockAlbumList = [
