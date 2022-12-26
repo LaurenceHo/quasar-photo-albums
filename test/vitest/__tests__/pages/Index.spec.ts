@@ -1,20 +1,17 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
 import { createTestingPinia } from '@pinia/testing';
-import { installQuasarPlugin, qLayoutInjections } from '@quasar/quasar-app-extension-testing-unit-jest';
+import { installQuasar } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { mount } from '@vue/test-utils';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Index from 'pages/Index';
+import Index from '../../../../src/pages/Index.vue';
 import { mockRouter as router } from '../mock-router';
 
-installQuasarPlugin();
+installQuasar();
 
 describe('Index.vue', () => {
   it('Check content', async () => {
     const wrapper = mount(Index, {
       global: {
         plugins: [router, createTestingPinia()],
-        provide: qLayoutInjections(),
         stubs: ['router-view'],
       },
     });

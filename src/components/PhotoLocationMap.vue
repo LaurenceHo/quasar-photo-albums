@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 import mapboxgl from 'mapbox-gl';
-import { computed, onMounted, ref, toRefs } from 'vue';
+import { computed, onMounted, toRefs } from 'vue';
 
 const props = defineProps({
   latitude: {

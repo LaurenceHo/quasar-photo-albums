@@ -1,17 +1,15 @@
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, vi } from 'vitest';
 import { createTestingPinia } from '@pinia/testing';
-import { installQuasarPlugin, qLayoutInjections } from '@quasar/quasar-app-extension-testing-unit-jest';
+import { installQuasar } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { flushPromises, mount } from '@vue/test-utils';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import PhotoList from 'pages/PhotoList';
+import PhotoList from '../../../../src/pages/PhotoList.vue';
 import { mockAlbumList } from '../mock-data';
 import { mockRouter as router } from '../mock-router';
 
-installQuasarPlugin();
+installQuasar();
 
-jest.mock('src/services/photo-service', () =>
-  jest.fn().mockImplementation(() => ({
+vi.mock('../../../../src/services/photo-service', () => ({
+  default: vi.fn().mockImplementation(() => ({
     getPhotosByAlbumId: () =>
       Promise.resolve([
         {
@@ -27,14 +25,15 @@ jest.mock('src/services/photo-service', () =>
           key: '2020-02-15/batch_2019-08-24 10.39.21.jpg',
         },
       ]),
-  }))
-);
+  })),
+}));
 describe('PhotoList.vue', () => {
   it('Check photo list', async () => {
     await router.push('/album/Food');
     await router.isReady();
 
     const wrapper = mount(PhotoList, {
+      shallow: true,
       global: {
         plugins: [
           router,
@@ -48,7 +47,6 @@ describe('PhotoList.vue', () => {
             stubActions: false,
           }),
         ],
-        provide: qLayoutInjections(),
         stubs: ['PhotoDetailDialog'],
       },
     });

@@ -57,6 +57,7 @@ jobs:
           EOF
       - name: Test and build
         run: |
+          npm run test:unit:ci
           npm run build
           npx firebase-tools --project $GOOGLE_FIREBASE_PROJECT_ID
 
