@@ -10,7 +10,7 @@ export default class AlbumService extends HttpRequestService {
         : `http://localhost:5001/${process.env.GOOGLE_FIREBASE_PROJECT_ID}/us-central1/main/api/albums`;
   }
 
-  public getAlbums(startIndex?: number, endIndex?: number, filter?: string): Promise<Album[]> {
+  public getAlbums(sort?: string, startIndex?: number, endIndex?: number, filter?: string): Promise<Album[]> {
     // TODO: May need to apply filter in the feature. It only runs filter in the memory atm.
     this.setDisplayingParameters(false);
     return this.perform('GET', '');

@@ -1,7 +1,8 @@
 import express from 'express';
 import admin from 'firebase-admin';
 import _ from 'lodash';
-import { emptyS3Folder } from '../services/aws-s3-service';
+import { Album } from '../models';
+import { emptyS3Folder, uploadObject } from '../services/aws-s3-service';
 import {
   createPhotoAlbum,
   deletePhotoAlbum,
@@ -40,18 +41,19 @@ router.get('', async (req, res) => {
 });
 
 router.post('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
-  const album = req.body;
-
-  createPhotoAlbum(album)
-    .then(() => res.send({ status: 'Album created' }))
-    .catch((error: Error) => {
-      console.log(`Failed to create document: ${error}`);
-      res.status(500).send({ status: 'Server error' });
-    });
+  const album = req.body as Album;
+  try {
+    await uploadObject(album.id + '/', null);
+    await createPhotoAlbum(album);
+    res.send({ status: 'Album created' });
+  } catch (error) {
+    console.log(`Failed to create album folder: ${error}`);
+    res.status(500).send({ status: 'Server error' });
+  }
 });
 
 router.put('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
-  const album = req.body;
+  const album = req.body as Album;
 
   updatePhotoAlbum(album)
     .then(() => res.send({ status: 'Album updated' }))

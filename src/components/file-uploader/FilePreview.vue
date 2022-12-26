@@ -1,8 +1,17 @@
 <template>
   <component :is="tag" class="file-preview">
-    <button @click="$emit('remove', file)" class="close-icon">&times;</button>
-    <img :src="file.url" :alt="file.file.name" :title="file.file.name" />
-
+    <button
+      v-if="file.status !== true"
+      @click="$emit('remove', file)"
+      class="close-icon"
+      :disabled="file.status === 'loading'"
+    >
+      &times;
+    </button>
+    <img v-if="isImageFile" :src="file.url" :alt="file.file.name" :title="file.file.name" />
+    <div v-else>
+      This file is not allowed: <strong>{{ file.file.name }}</strong>
+    </div>
     <span class="status-indicator loading-indicator" v-show="file.status === 'loading'">In Progress</span>
     <span class="status-indicator success-indicator" v-show="file.status === true">Uploaded</span>
     <span class="status-indicator failure-indicator" v-show="file.status === false">Error</span>
@@ -10,12 +19,16 @@
 </template>
 
 <script lang="ts" setup>
-defineProps({
+import { computed, toRefs } from 'vue';
+
+defineEmits(['remove']);
+const props = defineProps({
   file: { type: Object, required: true },
   tag: { type: String, default: 'li' },
 });
+const { file } = toRefs(props);
 
-defineEmits(['remove']);
+const isImageFile = computed(() => file.value.id.includes('image'));
 </script>
 
 <style scoped lang="scss">

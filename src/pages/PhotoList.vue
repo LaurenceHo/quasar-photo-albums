@@ -87,6 +87,8 @@ const isLoadingPhotos = ref(false);
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumId = computed(() => route.params.albumId as string);
 const albumItem = computed(() => store.getAlbumById(albumId.value) as Album);
+const photoId = computed(() => route.query.photo as string);
+
 const getPhotoList = async () => {
   isLoadingPhotos.value = true;
   photosInAlbum.value = [];
@@ -109,9 +111,32 @@ if (!albumItem.value) {
   setTimeout(() => router.push('/'), 5000);
 }
 
+// User open URL with photo query parameter directly (Not from album page)
+if (photoId.value) {
+  if (photosInAlbum.value.length === 0) {
+    getPhotoList().then(() => {
+      // Find photo index first
+      const photoIndex = photosInAlbum.value.findIndex((photo) => photo.key === `${albumId.value}/${photoId.value}`);
+      if (photoIndex > -1) {
+        selectedImageIndex.value = photoIndex;
+        setPhotoDetailDialogState(true);
+      } else {
+        q.notify({
+          color: 'negative',
+          icon: 'mdi-alert-circle-outline',
+          message: "Photo doesn't exist",
+        });
+        router.replace({ query: undefined });
+      }
+    });
+  }
+}
+
 const showLightBox = (imageIndex: number) => {
   setPhotoDetailDialogState(true);
   selectedImageIndex.value = imageIndex;
+  const photoKeyForUrl = photosInAlbum.value[imageIndex].key.split('/')[1];
+  router.replace({ query: { photo: photoKeyForUrl } });
 };
 
 watch(albumId, (newValue) => {
