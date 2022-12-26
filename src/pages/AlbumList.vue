@@ -8,31 +8,34 @@
             color="primary"
             dense
             icon="mdi-format-list-bulleted-square"
-            @click="setAlbumStyle('list')"
             padding="sm"
+            @click="setAlbumStyle('list')"
           />
           <q-btn
             :outline="albumStyle === 'list'"
             color="primary"
             dense
             icon="mdi-view-grid"
-            @click="setAlbumStyle('grid')"
             padding="sm"
+            @click="setAlbumStyle('grid')"
           />
         </q-btn-group>
+      </div>
+      <div class="col-shrink q-mr-sm">
+        <q-btn :icon="sortIcon" color="primary" dense outline padding="sm" @click="updateSortOrder" />
       </div>
       <div class="col-12 col-xl-3 col-lg-3 col-md-4">
         <q-select
           v-model="selectedTags"
           :options="albumTags"
-          option-value="id"
-          option-label="tag"
-          emit-value
           clearable
           dense
+          emit-value
           input-debounce="0"
           label="Category"
           multiple
+          option-label="tag"
+          option-value="id"
           outlined
           use-chips
           use-input
@@ -42,10 +45,10 @@
       <q-space />
       <div class="col-12 col-xl-4 col-lg-5 col-md-5 flex justify-end items-center">
         <Pagination
-          :page-number-props="pageNumber"
           :items-per-page-props="itemsPerPage"
-          :total-pages="totalPages"
+          :page-number-props="pageNumber"
           :total-items="totalItems"
+          :total-pages="totalPages"
           @setPageParams="setPageParams"
         />
       </div>
@@ -63,10 +66,10 @@
       </div>
       <div class="col-12 col-xl-4 col-lg-5 col-md-5 flex justify-end items-center q-pt-md">
         <Pagination
-          :page-number-props="pageNumber"
           :items-per-page-props="itemsPerPage"
-          :total-pages="totalPages"
+          :page-number-props="pageNumber"
           :total-items="totalItems"
+          :total-pages="totalPages"
           @setPageParams="setPageParams"
         />
       </div>
@@ -80,11 +83,12 @@
 <script lang="ts" setup>
 import Album from 'components/Album.vue';
 import Pagination from 'components/Pagination.vue';
-import * as _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import orderBy from 'lodash/orderBy';
 import { Album as AlbumItem } from 'src/components/models';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import { albumStore } from 'src/stores/album-store';
-import { computed, ref, watch } from 'vue';
+import { computed, DebuggerEvent, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
@@ -100,6 +104,7 @@ const totalItems = ref(store.allAlbumList.length);
 const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
 const selectedTags = ref([]);
 
+const sortOrder = computed(() => store.sortOrder);
 const refreshAlbumList = computed(() => store.refreshAlbumList);
 const searchKey = computed(() => store.searchKey);
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
@@ -107,9 +112,12 @@ const firstIndex = computed(() => (pageNumber.value - 1) * itemsPerPage.value);
 const lastIndex = computed(() =>
   totalPages.value > pageNumber.value ? firstIndex.value + itemsPerPage.value : totalItems.value
 );
+const sortIcon = computed(() =>
+  sortOrder.value === 'desc' ? 'mdi-sort-alphabetical-descending' : 'mdi-sort-alphabetical-ascending'
+);
 
 const getFilteredAlbumList = () => {
-  if (!_.isEmpty(searchKey.value) || !_.isEmpty(selectedTags.value)) {
+  if (!isEmpty(searchKey.value) || !isEmpty(selectedTags.value)) {
     const filteredAlbumList = store.filteredAlbumList(searchKey.value, selectedTags.value);
     totalItems.value = filteredAlbumList.length;
     chunkAlbumList.value = filteredAlbumList.slice(firstIndex.value, lastIndex.value);
@@ -128,6 +136,14 @@ const setPageParams = (params: { pageNumber: number; itemsPerPage: number }) => 
   pageNumber.value = params.pageNumber;
   itemsPerPage.value = params.itemsPerPage;
 };
+
+const updateSortOrder = () => store.setSortOrder(store.sortOrder === 'desc' ? 'asc' : 'desc');
+
+// Only update the order of album list when user click sort button in order to prevent sorting multiple times
+watch(sortOrder, (newValue) => {
+  store.$patch({ allAlbumList: orderBy(store.allAlbumList, 'albumName', newValue) });
+  getFilteredAlbumList();
+});
 
 watch(refreshAlbumList, (newValue) => {
   if (newValue) {

@@ -30,8 +30,7 @@
                     or <strong><em>click here</em></strong> to select files
                   </span>
                 </span>
-
-                <input type="file" id="file-input" multiple @change="onInputChange" />
+                <input id="file-input" type="file" accept="image/png, image/jpeg" multiple @change="onInputChange" />
               </label>
               <ul class="image-list" v-show="files.length">
                 <FilePreview v-for="file of files" :key="file.id" :file="file" tag="li" @remove="removeFile" />

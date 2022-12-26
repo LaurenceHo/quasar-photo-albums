@@ -30,10 +30,10 @@ jobs:
       MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 16.x
 
@@ -57,7 +57,6 @@ jobs:
           EOF
       - name: Test and build
         run: |
-          npm run test:unit
           npm run build
           npx firebase-tools --project $GOOGLE_FIREBASE_PROJECT_ID
 

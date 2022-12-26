@@ -120,7 +120,7 @@
               <q-item v-if="exifTags.ExposureBiasValue">
                 <q-item-section>
                   <q-item-label>Exposure Bias</q-item-label>
-                  <q-item-label caption>{{ exifTags.ExposureBiasValue.description }}</q-item-label>
+                  <q-item-label caption>{{ exposureBias }}</q-item-label>
                 </q-item-section>
               </q-item>
 
@@ -163,6 +163,7 @@ import { Photo } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import { userStore } from 'stores/user-store';
 import { computed, ref, toRefs, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 const props = defineProps({
   photosInAlbum: {
@@ -185,6 +186,7 @@ const { selectedImageIndex, photosInAlbum } = toRefs(props);
 const { getPhotoDetailDialogState, setPhotoDetailDialogState } = DialogStateComposable();
 const userPermissionStore = userStore();
 const q = useQuasar();
+const router = useRouter();
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 
@@ -195,6 +197,11 @@ const exifTags = ref({} as Tags);
 const loadImage = ref(false);
 const latitude = ref(-1000);
 const longitude = ref(-1000);
+const exposureBias = computed(() =>
+  exifTags.value.ExposureBiasValue?.description
+    ? parseFloat(exifTags.value.ExposureBiasValue.description).toFixed(2)
+    : '1'
+);
 
 const nextPhoto = (dir: number) => {
   q.loadingBar.start();
@@ -205,12 +212,15 @@ const nextPhoto = (dir: number) => {
   const nextPhoto = photosInAlbum.value[imageIndex.value] as Photo;
   if (nextPhoto) {
     selectedImage.value = nextPhoto;
+    const photoKeyForUrl = selectedImage.value.key.split('/')[1];
+    router.replace({ query: { photo: photoKeyForUrl } });
   }
 };
 
 const hideLightBox = () => {
   selectedImage.value = { url: '', key: '' };
   exifTags.value = {};
+  router.replace({ query: undefined });
   setPhotoDetailDialogState(false);
 };
 

@@ -2,23 +2,23 @@
   <q-btn class="absolute-top-right" :color="color" flat icon="mdi-dots-vertical" round>
     <q-menu>
       <q-list style="min-width: 100px">
-        <q-item v-if="!isAlbumCover" v-close-popup clickable @click="makeCoverPhoto">
-          <q-item-section avatar>
-            <q-icon color="primary" name="mdi-image-area" />
-          </q-item-section>
-          <q-item-section>Make Cover Photo</q-item-section>
-        </q-item>
         <q-item v-close-popup clickable @click="copyPhotoLink">
           <q-item-section avatar>
             <q-icon color="primary" name="mdi-link-variant" />
           </q-item-section>
-          <q-item-section>Copy Photo Link</q-item-section>
+          <q-item-section>Copy Image Link</q-item-section>
         </q-item>
         <q-item v-close-popup clickable @click="deletePhotoDialog = true">
           <q-item-section avatar>
             <q-icon color="primary" name="mdi-file-image-remove" />
           </q-item-section>
-          <q-item-section>Delete photo</q-item-section>
+          <q-item-section>Delete Photo</q-item-section>
+        </q-item>
+        <q-item v-if="!isAlbumCover" v-close-popup clickable @click="makeCoverPhoto">
+          <q-item-section avatar>
+            <q-icon color="primary" name="mdi-image-area" />
+          </q-item-section>
+          <q-item-section>Make Cover Photo</q-item-section>
         </q-item>
       </q-list>
     </q-menu>
