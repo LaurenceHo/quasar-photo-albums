@@ -140,10 +140,9 @@ const setPageParams = (params: { pageNumber: number; itemsPerPage: number }) => 
 const updateSortOrder = () => store.setSortOrder(store.sortOrder === 'desc' ? 'asc' : 'desc');
 
 // Only update the order of album list when user click sort button in order to prevent sorting multiple times
-store.$subscribe((mutation, state) => {
-  if (mutation.storeId === 'album' && (mutation.events as DebuggerEvent).key === 'sortOrder') {
-    state.allAlbumList = orderBy(store.allAlbumList, 'albumName', sortOrder.value);
-  }
+watch(sortOrder, (newValue) => {
+  store.$patch({ allAlbumList: orderBy(store.allAlbumList, 'albumName', newValue) });
+  getFilteredAlbumList();
 });
 
 watch(refreshAlbumList, (newValue) => {
@@ -153,7 +152,7 @@ watch(refreshAlbumList, (newValue) => {
   }
 });
 
-watch([pageNumber, itemsPerPage, searchKey, selectedTags, sortOrder], () => {
+watch([pageNumber, itemsPerPage, searchKey, selectedTags], () => {
   getFilteredAlbumList();
 });
 </script>
