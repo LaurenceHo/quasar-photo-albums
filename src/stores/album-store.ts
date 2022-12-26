@@ -1,4 +1,5 @@
 import isEmpty from 'lodash/isEmpty';
+import orderBy from 'lodash/orderBy';
 import { defineStore } from 'pinia';
 import { Loading } from 'quasar';
 import { Album, AlbumTag } from 'src/components/models';
@@ -11,6 +12,7 @@ export interface AlbumState {
   allAlbumList: Album[];
   albumTags: AlbumTag[];
   searchKey: string;
+  sortOrder: 'asc' | 'desc';
   refreshAlbumList: boolean;
 }
 
@@ -25,6 +27,7 @@ export const albumStore = defineStore('album', {
       allAlbumList: [],
       albumTags: [],
       searchKey: '',
+      sortOrder: 'desc',
       refreshAlbumList: false,
     } as AlbumState),
   getters: {
@@ -67,15 +70,20 @@ export const albumStore = defineStore('album', {
       },
   },
   actions: {
+    setSortOrder(sort: 'asc' | 'desc') {
+      this.sortOrder = sort;
+    },
+
     setSearchKey(input: string) {
       this.searchKey = input;
     },
 
-    async getAlbums(startIndex?: number, endIndex?: number, filter?: string) {
+    async getAlbums() {
       if (this.allAlbumList.length === 0) {
         Loading.show();
         this.loadingAlbums = true;
-        this.allAlbumList = await albumService.getAlbums(startIndex, endIndex, filter);
+        const tempList = await albumService.getAlbums();
+        this.allAlbumList = orderBy(tempList, 'albumName', this.sortOrder);
         Loading.hide();
         this.loadingAlbums = false;
       }
@@ -98,7 +106,7 @@ export const albumStore = defineStore('album', {
       const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
       if (findIndex === -1) {
         this.allAlbumList.push(albumToBeUpdated);
-        this.allAlbumList = this.allAlbumList.sort((a, b) => b.albumName.localeCompare(a.albumName));
+        this.allAlbumList = orderBy(this.allAlbumList, 'albumName', this.sortOrder);
       } else {
         if (deleteAlbum) {
           this.allAlbumList.splice(findIndex, 1);

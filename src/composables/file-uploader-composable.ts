@@ -9,9 +9,13 @@ export default function () {
   const uploadFile = async (file: any, albumId: string) => {
     const photoService = new PhotoService();
     file.status = 'loading';
-    const response = await photoService.uploadPhotos(file.file, albumId);
-
-    file.status = response.status === 'Success';
+    let response;
+    if (file.id.includes('image')) {
+      response = await photoService.uploadPhotos(file.file, albumId);
+      file.status = response.status === 'Success';
+    } else {
+      file.status = false;
+    }
     return response;
   };
 

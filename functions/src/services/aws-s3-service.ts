@@ -67,7 +67,7 @@ export const emptyS3Folder = async (folderName: string) => {
 
   const listedObjects = (await s3Client.send(listObjectsV2Command)) as any;
 
-  if (listedObjects.Contents.length === 0) return;
+  if (!listedObjects.Contents || listedObjects.Contents?.length === 0) return;
 
   if (listedObjects.IsTruncated) {
     await emptyS3Folder(folderName);
