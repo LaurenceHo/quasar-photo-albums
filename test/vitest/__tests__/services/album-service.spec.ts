@@ -1,12 +1,12 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import AlbumService from 'src/services/album-service';
-import HttpRequestService from 'src/services/http-request-service';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import AlbumService from '../../../../src/services/album-service';
+import HttpRequestService from '../../../../src/services/http-request-service';
 import { mockAlbum } from '../mock-data';
 
-const mockPerform = jest.spyOn(HttpRequestService.prototype, 'perform').mockImplementation(() => Promise.resolve());
-const mockSetDisplayingParameters = jest
+const mockPerform = vi.spyOn(HttpRequestService.prototype, 'perform').mockImplementation(() => Promise.resolve());
+const mockSetDisplayingParameters = vi
   .spyOn(HttpRequestService.prototype, 'setDisplayingParameters')
-  .mockImplementation(() => jest.fn());
+  .mockImplementation(() => vi.fn());
 
 beforeEach(() => {
   mockSetDisplayingParameters.mockClear();

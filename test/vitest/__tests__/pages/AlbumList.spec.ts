@@ -1,16 +1,14 @@
-import { beforeEach, describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { createTestingPinia } from '@pinia/testing';
-import { installQuasarPlugin, qLayoutInjections } from '@quasar/quasar-app-extension-testing-unit-jest';
+import { installQuasar } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { flushPromises, mount } from '@vue/test-utils';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import AlbumList from 'pages/AlbumList';
-import { QBtn } from 'quasar';
-import { albumStore } from 'src/stores/album-store';
+import AlbumList from '../../../../src/pages/AlbumList.vue';
+import { Loading, LoadingBar, Notify, QBtn } from 'quasar';
+import { albumStore } from '../../../../src/stores/album-store';
 import { mockAlbumList } from '../mock-data';
 import { mockRouter as router } from '../mock-router';
 
-installQuasarPlugin();
+installQuasar({ plugins: { Loading, LoadingBar, Notify } });
 
 describe('AlbumList.vue', () => {
   let wrapper: any;
@@ -29,7 +27,6 @@ describe('AlbumList.vue', () => {
             },
           }),
         ],
-        provide: qLayoutInjections(),
         stubs: ['Album'],
       },
     });

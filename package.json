@@ -10,7 +10,8 @@
     "lint": "eslint --ext .js,.ts,.vue ./ && prettier --write ./src/**/*.{js,ts,vue,scss}",
     "postinstall": "husky install",
     "firebase:deploy": "npm run build && firebase deploy",
-    "test:unit": "jest --coverage"
+    "test:unit": "vitest",
+    "test:unit:ci": "vitest run --coverage"
   },
   "dependencies": {
     "exifreader": "^4.3.1",
@@ -26,12 +27,14 @@
     "@pinia/testing": "^0.0.14",
     "@quasar/app-vite": "^1.0.0",
     "@quasar/extras": "^1.14.0",
-    "@quasar/quasar-app-extension-testing-unit-jest": "^3.0.0-alpha.8",
+    "@quasar/quasar-app-extension-testing-unit-vitest": "^0.1.2",
     "@types/lodash": "^4.14.178",
     "@types/mapbox-gl": "^2.7.3",
     "@types/node": "^18.7.16",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
+    "@vitest/coverage-c8": "^0.26.2",
+    "@vue/test-utils": "^2.0.0",
     "autoprefixer": "^10.4.7",
     "dotenv": "^16.0.1",
     "eslint": "^8.15.0",
@@ -40,9 +43,11 @@
     "eslint-plugin-vue": "^9.0.1",
     "firebase-tools": "^11.0.1",
     "husky": "^8.0.1",
+    "jsdom": "^20.0.3",
     "lint-staged": "^13.0.0",
     "prettier": "^2.5.1",
-    "typescript": "^4.6.4"
+    "typescript": "^4.6.4",
+    "vitest": "^0.26.2"
   },
   "lint-staged": {
     "*.{js,ts,vue}": [
@@ -73,5 +78,8 @@
     "singleQuote": true,
     "trailingComma": "es5",
     "useTabs": false
+  },
+  "resolutions": {
+    "vitest": "^0.26.2"
   }
 }
