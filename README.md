@@ -60,7 +60,7 @@ For example:
 ```
 
 ### Architecture
-![Architecture](./public/GCP-AWS-Architecture.png)
+![Architecture](GCP-AWS-Architecture.png)
 
 ### Integrate with ImageKit
 In order to reduce the traffic with S3 buckets (to save money!), this project integrate with ImageKit CDN. ImageKit.io
