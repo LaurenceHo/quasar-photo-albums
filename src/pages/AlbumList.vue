@@ -4,6 +4,7 @@
       <div class="col-shrink q-mr-sm">
         <q-btn-group outline>
           <q-btn
+            data-test-id="album-list-style-button"
             :outline="albumStyle === 'grid'"
             color="primary"
             dense
@@ -12,6 +13,7 @@
             @click="setAlbumStyle('list')"
           />
           <q-btn
+            data-test-id="album-grid-style-button"
             :outline="albumStyle === 'list'"
             color="primary"
             dense
@@ -22,7 +24,15 @@
         </q-btn-group>
       </div>
       <div class="col-shrink q-mr-sm">
-        <q-btn :icon="sortIcon" color="primary" dense outline padding="sm" @click="updateSortOrder" />
+        <q-btn
+          data-test-id="album-sort-order-button"
+          :icon="sortIcon"
+          color="primary"
+          dense
+          outline
+          padding="sm"
+          @click="updateSortOrder"
+        />
       </div>
       <div class="col-12 col-xl-3 col-lg-3 col-md-4">
         <q-select
@@ -137,7 +147,7 @@ const setPageParams = (params: { pageNumber: number; itemsPerPage: number }) => 
   itemsPerPage.value = params.itemsPerPage;
 };
 
-const updateSortOrder = () => store.setSortOrder(store.sortOrder === 'desc' ? 'asc' : 'desc');
+const updateSortOrder = () => store.$patch({ sortOrder: sortOrder.value === 'desc' ? 'asc' : 'desc' });
 
 // Only update the order of album list when user click sort button in order to prevent sorting multiple times
 watch(sortOrder, (newValue) => {

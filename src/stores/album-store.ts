@@ -70,14 +70,6 @@ export const albumStore = defineStore('albums', {
       },
   },
   actions: {
-    setSortOrder(sort: 'asc' | 'desc') {
-      this.sortOrder = sort;
-    },
-
-    setSearchKey(input: string) {
-      this.searchKey = input;
-    },
-
     async getAlbums() {
       if (this.allAlbumList.length === 0) {
         Loading.show();

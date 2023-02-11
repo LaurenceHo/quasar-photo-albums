@@ -3,7 +3,7 @@ import { createTestingPinia } from '@pinia/testing';
 import { installQuasar } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import AlbumList from '../../../../src/pages/AlbumList.vue';
-import { Loading, LoadingBar, Notify, QBtn } from 'quasar';
+import { Loading, LoadingBar, Notify } from 'quasar';
 import { albumStore } from '../../../../src/stores/album-store';
 import { mockAlbumList } from '../mock-data';
 import { mockRouter as router } from '../mock-router';
@@ -20,7 +20,7 @@ describe('AlbumList.vue', () => {
           router,
           createTestingPinia({
             initialState: {
-              album: {
+              albums: {
                 allAlbumList: mockAlbumList,
                 albumTags: ['sport', 'food', 'hiking', 'secret'],
               },
@@ -42,7 +42,7 @@ describe('AlbumList.vue', () => {
     expect(vm.totalPages).toEqual(1);
     expect(vm.albumStyle).toEqual('list');
 
-    await wrapper.findAllComponents(QBtn)[1].trigger('click');
+    await wrapper.findComponent('[data-test-id="album-grid-style-button"]').trigger('click');
     await vm.$nextTick();
     await router.isReady();
     await flushPromises();
@@ -52,9 +52,16 @@ describe('AlbumList.vue', () => {
   it('Search album list', async () => {
     const store = albumStore();
     store.searchKey = 'Apple';
-
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.totalItems).toEqual(0);
+
+    store.searchKey = 'Shoes';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.totalItems).toEqual(1);
+
+    store.searchKey = '';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.totalItems).toEqual(5);
   });
 
   it('Search album list by category', async () => {
@@ -63,5 +70,20 @@ describe('AlbumList.vue', () => {
     await vm.$nextTick();
     expect(vm.totalItems).toEqual(1);
     expect(vm.chunkAlbumList[0]).toHaveProperty('albumName', 'Sport');
+  });
+
+  it('Test sort order', async () => {
+    const { vm } = wrapper as any;
+    expect(vm.sortOrder).toEqual('desc');
+    await wrapper.findComponent('[data-test-id="album-sort-order-button"]').trigger('click');
+    expect(vm.sortOrder).toEqual('asc');
+  });
+
+  it('Refresh album list', async () => {
+    const { vm } = wrapper as any;
+    const store = albumStore();
+    store.refreshAlbumList = true;
+    await vm.$nextTick();
+    expect(store.updateRefreshAlbumListFlag).toHaveBeenCalledOnce();
   });
 });
