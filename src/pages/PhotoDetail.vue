@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-12 col-xl-9 col-lg-9 col-md-9 column items-center">
         <div class="text-subtitle1 text-grey-7">{{ photoFileName }}</div>
-        <div class="text-subtitle1 text-grey-7 q-pb-md">({{ imageIndex + 1 }}/{{ photoList.length }})</div>
+        <div class="text-subtitle1 text-grey-7 q-pb-md">({{ selectedImageIndex + 1 }}/{{ photoList.length }})</div>
         <div class="relative-position full-width image-container">
           <div class="flex justify-center items-center full-height">
             <q-spinner v-show="loadImage" color="primary" size="4rem" />
@@ -146,18 +146,21 @@ import { useQuasar } from 'quasar';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
 const q = useQuasar();
 const router = useRouter();
+const route = useRoute();
+
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const selectedImageIndex = computed(() => usePhotoStore.selectedImageIndex);
 const photoList = computed(() => usePhotoStore.photoList);
 const albumItem = computed(() => usePhotoStore.selectedAlbumItem);
+const albumId = computed(() => route.params.albumId as string);
+const photoId = computed(() => route.query.photo as string);
 
-const imageIndex = ref(0);
 const selectedImage = ref({ url: '', key: '' } as Photo);
 const photoFileName = ref('');
 const exifTags = ref({} as Tags);
@@ -171,13 +174,20 @@ const exposureBias = computed(() =>
     : '1'
 );
 
+// When opening photo detail URL directly (Not from album page)
+if (photoId.value && photoList.value.length === 0) {
+  usePhotoStore.getPhotos(albumId.value);
+}
+
 const nextPhoto = (dir: number) => {
   q.loadingBar.start();
   exifTags.value = {};
 
   const slideLength = photoList.value.length;
-  imageIndex.value = (imageIndex.value + (dir % slideLength) + slideLength) % slideLength;
-  const nextPhoto = photoList.value[imageIndex.value] as Photo;
+  usePhotoStore.$patch({
+    selectedImageIndex: (selectedImageIndex.value + (dir % slideLength) + slideLength) % slideLength,
+  });
+  const nextPhoto = photoList.value[selectedImageIndex.value] as Photo;
   if (nextPhoto) {
     selectedImage.value = nextPhoto;
     const photoKeyForUrl = selectedImage.value.key.split('/')[1];
@@ -185,11 +195,29 @@ const nextPhoto = (dir: number) => {
   }
 };
 
+watch(photoList, (newValue) => {
+  if (newValue.length > 0) {
+    // Find selected photo index
+    const photoIndex = usePhotoStore.findPhotoIndex(photoId.value);
+    if (photoIndex > -1) {
+      usePhotoStore.$patch({ selectedImageIndex: photoIndex });
+    } else {
+      q.notify({
+        timeout: 2000,
+        progress: true,
+        color: 'negative',
+        icon: 'mdi-alert-circle-outline',
+        message: "Photo doesn't exist",
+      });
+      setTimeout(() => router.push(`/album/${albumId.value}`), 3000);
+    }
+  }
+});
+
 watch(
   selectedImageIndex,
   (newValue) => {
     if (newValue > -1) {
-      imageIndex.value = newValue;
       selectedImage.value = photoList.value[newValue] as Photo;
     }
   },

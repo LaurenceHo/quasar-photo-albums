@@ -1,5 +1,8 @@
 <template>
-  <div class="q-pt-md">
+  <template v-if="photoId">
+    <PhotoDetail />
+  </template>
+  <div v-else class="q-pt-md">
     <div class="row items-center">
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated to="/" />
       <div class="text-h4 q-py-md q-pl-sm" data-test-id="album-name">
@@ -53,6 +56,7 @@
 <script lang="ts" setup>
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
+import PhotoDetail from 'pages/PhotoDetail.vue';
 import { useQuasar } from 'quasar';
 import { Album, Photo } from 'src/components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
@@ -75,6 +79,7 @@ const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumId = computed(() => route.params.albumId as string);
 const albumItem = computed(() => useAlbumStore.getAlbumById(albumId.value) as Album);
 const photosInAlbum = computed(() => usePhotoStore.photoList as Photo[]);
+const photoId = computed(() => route.query.photo as string);
 
 const getPhotoList = async () => usePhotoStore.getPhotos(albumId.value);
 
@@ -83,7 +88,7 @@ usePhotoStore.getPhotos(albumId.value);
 const goToPhotoDetail = (imageIndex: number) => {
   usePhotoStore.$patch({ selectedImageIndex: imageIndex });
   const photoKeyForUrl = photosInAlbum.value[imageIndex].key.split('/')[1];
-  router.push(`${albumId.value}/${photoKeyForUrl}`);
+  router.replace({ query: { photo: photoKeyForUrl } });
 };
 
 watch(albumId, (newValue) => {

@@ -1,6 +1,6 @@
 import { Album, Photo } from 'components/models';
 import { defineStore } from 'pinia';
-import { Loading, Notify } from 'quasar';
+import { Notify } from 'quasar';
 import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';
 import { useRouter } from 'vue-router';
@@ -28,6 +28,11 @@ export const photoStore = defineStore('photos', {
       selectedImageIndex: -1,
     } as PhotoStoreState),
 
+  getters: {
+    findPhotoIndex: (state: PhotoStoreState) => (photoId: string) =>
+      state.photoList.findIndex((photo) => photo.key === `${state.selectedAlbumItem.id}/${photoId}`),
+  },
+
   actions: {
     async getPhotos(albumId: string) {
       const store = albumStore();
@@ -36,21 +41,19 @@ export const photoStore = defineStore('photos', {
       if (albumItem?.id) {
         // Only fetch photos when album id is updated
         if (albumId !== this.selectedAlbumItem.id) {
-          Loading.show();
           this.selectedAlbumItem = albumItem;
           this.photoList = [];
           this.photoList = await photoService.getPhotosByAlbumId(albumId);
-          Loading.hide();
         }
       } else {
         Notify.create({
-          timeout: 4000,
+          timeout: 2000,
           progress: true,
           color: 'negative',
           icon: 'mdi-alert-circle-outline',
-          message: "Album doesn't exist. You will be redirected to the home page in 5 seconds",
+          message: "Album doesn't exist. You will be redirected to the home page in 3 seconds",
         });
-        setTimeout(() => router.push('/'), 5000);
+        setTimeout(() => router.push('/'), 3000);
       }
     },
   },
