@@ -19,7 +19,7 @@ export interface AlbumState {
 const albumService = new AlbumService();
 const albumTagService = new AlbumTagService();
 
-export const albumStore = defineStore('album', {
+export const albumStore = defineStore('albums', {
   state: () =>
     ({
       loadingAlbums: false,
