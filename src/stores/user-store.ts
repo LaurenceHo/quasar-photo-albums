@@ -49,13 +49,5 @@ export const userStore = defineStore('user-permission', {
     setUserPermission(userPermission: UserPermission) {
       this.userPermission = userPermission;
     },
-    removeUserPermission() {
-      this.userPermission = {
-        uid: '',
-        email: '',
-        role: '',
-        displayName: '',
-      };
-    },
   },
 });

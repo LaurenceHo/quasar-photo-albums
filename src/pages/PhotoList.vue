@@ -32,13 +32,13 @@
               :ratio="1"
               :src="`${photo.url}?tr=w-250,h-250`"
               class="rounded-borders-lg cursor-pointer"
-              @click="showLightBox(index)"
+              @click="goToPhotoDetail(index)"
             />
             <EditPhotoButton
               v-if="isAdminUser"
               :photo-key="photo.key"
               :album-item="albumItem"
-              :is-album-cover="photo.key === albumItem.albumCover"
+              :is-album-cover="photo.key === albumItem?.albumCover"
               @refreshPhotoList="getPhotoList"
               color="white"
             />
@@ -47,101 +47,48 @@
       </template>
     </div>
   </div>
-  <PhotoDetailDialog
-    v-if="getPhotoDetailDialogState"
-    :photos-in-album="photosInAlbum"
-    :selected-image-index="selectedImageIndex"
-    :album-item="albumItem"
-    @refreshPhotoList="getPhotoList"
-  />
-  <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem.id" @refreshPhotoList="getPhotoList" />
+  <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem?.id" @refreshPhotoList="getPhotoList" />
 </template>
 
 <script lang="ts" setup>
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
-import PhotoDetailDialog from 'components/dialog/PhotoDetailDialog.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
 import { useQuasar } from 'quasar';
 import { Album, Photo } from 'src/components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'src/stores/album-store';
 import { userStore } from 'src/stores/user-store';
-import { computed, ref, watch } from 'vue';
+import { photoStore } from 'stores/photo-store';
+import { computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-const photoService = new PhotoService();
 const q = useQuasar();
 const route = useRoute();
 const router = useRouter();
 
-const store = albumStore();
+const useAlbumStore = albumStore();
 const userPermissionStore = userStore();
-const { getUploadPhotoDialogState, setUploadPhotoDialogState, getPhotoDetailDialogState, setPhotoDetailDialogState } =
-  DialogStateComposable();
-
-const selectedImageIndex = ref(-1);
-const photosInAlbum = ref([] as Photo[]);
-const isLoadingPhotos = ref(false);
+const usePhotoStore = photoStore();
+const { getUploadPhotoDialogState, setUploadPhotoDialogState } = DialogStateComposable();
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumId = computed(() => route.params.albumId as string);
-const albumItem = computed(() => store.getAlbumById(albumId.value) as Album);
-const photoId = computed(() => route.query.photo as string);
+const albumItem = computed(() => useAlbumStore.getAlbumById(albumId.value) as Album);
+const photosInAlbum = computed(() => usePhotoStore.photoList as Photo[]);
 
-const getPhotoList = async () => {
-  isLoadingPhotos.value = true;
-  photosInAlbum.value = [];
-  if (albumItem.value?.id) {
-    photosInAlbum.value = await photoService.getPhotosByAlbumId(albumItem.value.id);
-  }
-  isLoadingPhotos.value = false;
-};
+const getPhotoList = async () => usePhotoStore.getPhotos(albumId.value);
 
-getPhotoList();
+usePhotoStore.getPhotos(albumId.value);
 
-if (!albumItem.value) {
-  q.notify({
-    timeout: 4000,
-    progress: true,
-    color: 'negative',
-    icon: 'mdi-alert-circle-outline',
-    message: "Album doesn't exist. You will be redirected to the home page in 5 seconds",
-  });
-  setTimeout(() => router.push('/'), 5000);
-}
-
-// User open URL with photo query parameter directly (Not from album page)
-if (photoId.value) {
-  if (photosInAlbum.value.length === 0) {
-    getPhotoList().then(() => {
-      // Find photo index first
-      const photoIndex = photosInAlbum.value.findIndex((photo) => photo.key === `${albumId.value}/${photoId.value}`);
-      if (photoIndex > -1) {
-        selectedImageIndex.value = photoIndex;
-        setPhotoDetailDialogState(true);
-      } else {
-        q.notify({
-          color: 'negative',
-          icon: 'mdi-alert-circle-outline',
-          message: "Photo doesn't exist",
-        });
-        router.replace({ query: undefined });
-      }
-    });
-  }
-}
-
-const showLightBox = (imageIndex: number) => {
-  setPhotoDetailDialogState(true);
-  selectedImageIndex.value = imageIndex;
+const goToPhotoDetail = (imageIndex: number) => {
+  usePhotoStore.$patch({ selectedImageIndex: imageIndex });
   const photoKeyForUrl = photosInAlbum.value[imageIndex].key.split('/')[1];
-  router.replace({ query: { photo: photoKeyForUrl } });
+  router.push(`${albumId.value}/${photoKeyForUrl}`);
 };
 
 watch(albumId, (newValue) => {
   if (newValue) {
-    getPhotoList();
+    usePhotoStore.getPhotos(newValue);
   }
 });
 </script>

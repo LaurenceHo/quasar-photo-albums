@@ -47,7 +47,7 @@ import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';
 import { ref, toRefs } from 'vue';
 
-const emits = defineEmits(['refreshPhotoList', 'closePhotoDetailDialog']);
+const emits = defineEmits(['refreshPhotoList']);
 const props = defineProps({
   color: {
     type: String,
@@ -90,7 +90,6 @@ const confirmDeletePhoto = async () => {
   const photoKeyString = photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
   await photoService.deletePhoto(albumItem.value.id, photoKeyString);
   emits('refreshPhotoList');
-  emits('closePhotoDetailDialog');
 };
 
 const copyPhotoLink = () => {
