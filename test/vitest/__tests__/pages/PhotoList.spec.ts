@@ -1,3 +1,4 @@
+import { Loading, LoadingBar, Notify } from 'quasar';
 import { describe, expect, it, vi } from 'vitest';
 import { createTestingPinia } from '@pinia/testing';
 import { installQuasar } from '@quasar/quasar-app-extension-testing-unit-vitest';
@@ -6,7 +7,7 @@ import PhotoList from '../../../../src/pages/PhotoList.vue';
 import { mockAlbumList } from '../mock-data';
 import { mockRouter as router } from '../mock-router';
 
-installQuasar();
+installQuasar({ plugins: { Loading, LoadingBar, Notify } });
 
 vi.mock('../../../../src/services/photo-service', () => ({
   default: vi.fn().mockImplementation(() => ({
@@ -39,7 +40,7 @@ describe('PhotoList.vue', () => {
           router,
           createTestingPinia({
             initialState: {
-              album: {
+              albums: {
                 allAlbumList: mockAlbumList,
                 albumTags: ['sport', 'food', 'hiking', 'secret'],
               },

@@ -19,7 +19,7 @@ export interface AlbumState {
 const albumService = new AlbumService();
 const albumTagService = new AlbumTagService();
 
-export const albumStore = defineStore('album', {
+export const albumStore = defineStore('albums', {
   state: () =>
     ({
       loadingAlbums: false,
@@ -70,14 +70,6 @@ export const albumStore = defineStore('album', {
       },
   },
   actions: {
-    setSortOrder(sort: 'asc' | 'desc') {
-      this.sortOrder = sort;
-    },
-
-    setSearchKey(input: string) {
-      this.searchKey = input;
-    },
-
     async getAlbums() {
       if (this.allAlbumList.length === 0) {
         Loading.show();
