@@ -16,6 +16,7 @@ myproject
       +- tsconfig.json
       |
       +- .eslintrc.js # Optional file if you enabled ESLint
+      |
       +- tsconfig.dev.json # Optional file that references .eslintrc.js
       |
       +- src/     # Directory containing TypeScript source
