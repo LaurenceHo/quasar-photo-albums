@@ -24,16 +24,16 @@
     "vue-router": "^4.0.15"
   },
   "devDependencies": {
-    "@pinia/testing": "^0.0.14",
+    "@pinia/testing": "^0.0.15",
     "@quasar/app-vite": "^1.0.0",
     "@quasar/extras": "^1.14.0",
-    "@quasar/quasar-app-extension-testing-unit-vitest": "^0.1.2",
+    "@quasar/quasar-app-extension-testing-unit-vitest": "^0.2.1",
     "@types/lodash": "^4.14.178",
     "@types/mapbox-gl": "^2.7.3",
     "@types/node": "^18.7.16",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
-    "@vitest/coverage-c8": "^0.26.2",
+    "@vitest/coverage-c8": "^0.29.3",
     "@vue/test-utils": "^2.0.0",
     "autoprefixer": "^10.4.7",
     "dotenv": "^16.0.1",
@@ -46,8 +46,8 @@
     "jsdom": "^21.0.0",
     "lint-staged": "^13.0.0",
     "prettier": "^2.5.1",
-    "typescript": "^4.6.4",
-    "vitest": "^0.26.2"
+    "typescript": "^4.9.5",
+    "vitest": "^0.29.3"
   },
   "lint-staged": {
     "*.{js,ts,vue}": [
@@ -78,8 +78,5 @@
     "singleQuote": true,
     "trailingComma": "es5",
     "useTabs": false
-  },
-  "overrides": {
-    "vitest": "^0.26.2"
   }
 }

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createTestingPinia } from '@pinia/testing';
-import { installQuasar } from '@quasar/quasar-app-extension-testing-unit-vitest';
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import AlbumList from '../../../../src/pages/AlbumList.vue';
 import { Loading, LoadingBar, Notify } from 'quasar';
@@ -8,7 +8,7 @@ import { albumStore } from '../../../../src/stores/album-store';
 import { mockAlbumList } from '../mock-data';
 import { mockRouter as router } from '../mock-router';
 
-installQuasar({ plugins: { Loading, LoadingBar, Notify } });
+installQuasarPlugin({ plugins: { Loading, LoadingBar, Notify } });
 
 describe('AlbumList.vue', () => {
   let wrapper: any;

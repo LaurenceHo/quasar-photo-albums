@@ -11,13 +11,17 @@ Before you start, please create an AWS S3 bucket and an AWS Cognito Identity Poo
 AWS_S3_BUCKET_NAME, AWS_REGION, AWS_IDENTITY_POOL_ID and IMAGEKIT_CDN_URL with your real information in`.env.example` and modify file name to `.env` then you are good to go.
 The file structure in the S3 bucket should be like this:
 ```
-/S3 bucket:
-  | => album folder A/
-         | => photo file A
-         | => photo file B
-  | => album folder B/
-         | => photo file A
-         | => photo file B
+my-photo-S3-bucket/
+ +- photo-alubm-a/     # Directory containing your photos
+      |
+      +- photo-a-1.jpg
+      |
+      +- photo-a-2.jpg
+ +- photo-alubm-b/     # Directory containing your photos
+      |
+      +- photo-b-1.jpg
+      |
+      +- photo-b-2.jpg
 ```
 
 ### S3 bucket policy

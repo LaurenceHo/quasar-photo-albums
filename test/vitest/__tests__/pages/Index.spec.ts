@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { createTestingPinia } from '@pinia/testing';
-import { installQuasar } from '@quasar/quasar-app-extension-testing-unit-vitest';
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { mount } from '@vue/test-utils';
 import Index from '../../../../src/pages/Index.vue';
 import { mockRouter as router } from '../mock-router';
 
-installQuasar();
+installQuasarPlugin();
 
 describe('Index.vue', () => {
   it('Check content', async () => {
