@@ -34,7 +34,6 @@ describe('PhotoList.vue', () => {
     await router.isReady();
 
     const wrapper = mount(PhotoList, {
-      shallow: true,
       global: {
         plugins: [
           router,

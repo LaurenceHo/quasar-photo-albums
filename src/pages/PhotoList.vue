@@ -42,7 +42,7 @@
               :photo-key="photo.key"
               :album-item="albumItem"
               :is-album-cover="photo.key === albumItem?.albumCover"
-              @refreshPhotoList="getPhotoList"
+              @refreshPhotoList="refreshPhotoList"
               color="white"
             />
           </div>
@@ -50,7 +50,7 @@
       </template>
     </div>
   </div>
-  <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem?.id" @refreshPhotoList="getPhotoList" />
+  <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem?.id" @refreshPhotoList="refreshPhotoList" />
 </template>
 
 <script lang="ts" setup>
@@ -81,7 +81,7 @@ const albumItem = computed(() => useAlbumStore.getAlbumById(albumId.value) as Al
 const photosInAlbum = computed(() => usePhotoStore.photoList as Photo[]);
 const photoId = computed(() => route.query.photo as string);
 
-const getPhotoList = async () => usePhotoStore.getPhotos(albumId.value);
+const refreshPhotoList = async () => usePhotoStore.getPhotos(albumId.value, true);
 
 usePhotoStore.getPhotos(albumId.value);
 

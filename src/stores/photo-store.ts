@@ -34,15 +34,17 @@ export const photoStore = defineStore('photos', {
   },
 
   actions: {
-    async getPhotos(albumId: string) {
+    async getPhotos(albumId: string, refreshPhotosList?: boolean) {
       const store = albumStore();
       const router = useRouter();
       const albumItem = store.getAlbumById(albumId) as Album;
       if (albumItem?.id) {
         // Only fetch photos when album id is updated
-        if (albumId !== this.selectedAlbumItem.id) {
+        if (albumId !== this.selectedAlbumItem.id || refreshPhotosList) {
           this.selectedAlbumItem = albumItem;
-          this.photoList = [];
+          if (!refreshPhotosList) {
+            this.photoList = [];
+          }
           this.photoList = await photoService.getPhotosByAlbumId(albumId);
         }
       } else {

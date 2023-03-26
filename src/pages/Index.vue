@@ -46,7 +46,7 @@ const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => 
       routes.push({ label: 'Photos', icon: 'mdi-image-multiple' });
     } else {
       routes.push({
-        label: 'Photos',
+        label: selectedAlbumItem.value.albumName || 'Photos',
         icon: 'mdi-image-multiple',
         to: { path: `/album/${selectedAlbumItem.value.id}` },
       });
