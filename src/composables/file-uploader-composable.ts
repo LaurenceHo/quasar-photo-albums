@@ -6,6 +6,10 @@ const isUploading = ref(false);
 const isCompleteUploading = ref(false);
 
 export default function () {
+  const setIsCompleteUploading = (state: boolean) => {
+    isCompleteUploading.value = state;
+  };
+
   const uploadFile = async (file: any, albumId: string) => {
     const photoService = new PhotoService();
     file.status = 'loading';
@@ -21,6 +25,7 @@ export default function () {
 
   const uploadFiles = (files: any, albumId: string) => {
     isUploading.value = true;
+    isCompleteUploading.value = false;
     return Promise.all(files.map((file: any) => uploadFile(file, albumId))).then(() => {
       isUploading.value = false;
       isCompleteUploading.value = true;
@@ -38,5 +43,5 @@ export default function () {
     uploadFiles: (files: any) => uploadFiles(files, albumId),
   });
 
-  return { createUploader, isUploading, isCompleteUploading };
+  return { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading };
 }

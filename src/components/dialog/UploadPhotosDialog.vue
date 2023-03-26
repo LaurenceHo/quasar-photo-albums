@@ -9,7 +9,7 @@
     <q-card>
       <q-card-section class="row items-center q-pb-none">
         <q-space />
-        <q-btn dense flat icon="mdi-close" round @click="setUploadPhotoDialogState(false)" :disable="isUploading" />
+        <q-btn dense flat icon="mdi-close" round @click="closeDialog" :disable="isUploading" />
       </q-card-section>
 
       <q-card-section>
@@ -19,7 +19,7 @@
         <div class="full-width" style="height: 80vh">
           <div id="file-upload-container">
             <DropZone class="drop-area" @files-dropped="addFiles" #default="{ dropZoneActive }">
-              <label for="file-input">
+              <label for="file-input" v-if="!isCompleteUploading">
                 <span v-if="dropZoneActive">
                   <span>Drop Them Here</span>
                   <span class="smaller">to add them</span>
@@ -38,6 +38,8 @@
             </DropZone>
             <div class="flex q-pt-lg justify-center">
               <q-btn
+                data-test-id="clear-button"
+                v-if="!isCompleteUploading"
                 outline
                 rounded
                 color="primary"
@@ -51,6 +53,8 @@
               </q-btn>
 
               <q-btn
+                data-test-id="upload-button"
+                v-if="!isCompleteUploading"
                 unelevated
                 rounded
                 color="primary"
@@ -60,6 +64,19 @@
                 :disable="isUploading || files.length === 0"
               >
                 Upload
+              </q-btn>
+
+              <q-btn
+                data-test-id="finish-button"
+                v-if="isCompleteUploading"
+                unelevated
+                rounded
+                color="primary"
+                size="lg"
+                padding="sm xl"
+                @click="closeDialog"
+              >
+                Done
               </q-btn>
             </div>
           </div>
@@ -89,7 +106,7 @@ const props = defineProps({
 const { albumId } = toRefs(props);
 const { getUploadPhotoDialogState, setUploadPhotoDialogState } = DialogStateComposable();
 const { files, addFiles, removeFile } = useFileList();
-const { createUploader, isUploading, isCompleteUploading } = fileUploader();
+const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading } = fileUploader();
 const { uploadFiles } = createUploader(albumId.value);
 
 const onInputChange = (e: any) => {
@@ -98,6 +115,12 @@ const onInputChange = (e: any) => {
 };
 
 const clearFiles = () => (files.value = []);
+
+const closeDialog = () => {
+  clearFiles();
+  setIsCompleteUploading(false);
+  setUploadPhotoDialogState(false);
+};
 
 watch(albumId, (newValue) => {
   if (newValue) {
@@ -108,7 +131,6 @@ watch(albumId, (newValue) => {
 watch(isCompleteUploading, (newValue) => {
   if (newValue) {
     emits('refreshPhotoList');
-    isCompleteUploading.value = false;
   }
 });
 </script>
