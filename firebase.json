@@ -24,9 +24,14 @@
       "codebase": "default",
       "ignore": [
         "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log"
+        ".env.example",
+        ".eslintrc.js",
+        ".gitignore",
+        "package.lock.json",
+        "README.md",
+        "tsconfig.*",
+        "firebase-debug.*",
+        "ui-debug.*"
       ],
       "predeploy": [
         "npm --prefix \"$RESOURCE_DIR\" run lint",
