@@ -5,7 +5,7 @@ import express, { Application, Request, Response } from 'express';
 import throttle from 'express-throttle-bandwidth';
 import admin from 'firebase-admin';
 import { ServiceAccount } from 'firebase-admin/lib/app/credential';
-import * as functions from 'firebase-functions';
+import * as functionsV2 from 'firebase-functions/v2';
 import helmet from 'helmet';
 import serviceAccount from '../serviceAccountKey.json';
 import { router as albumRoute } from './route/album-route';
@@ -50,4 +50,4 @@ app.use('/api/albums', albumRoute);
 app.use('/api/albumTags', albumTagsRoute);
 app.use('/api/photos', photoRoute);
 
-export const main = functions.https.onRequest(app);
+export const main = functionsV2.https.onRequest(app);

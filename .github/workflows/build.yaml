@@ -1,4 +1,4 @@
-name: Build and deploy to Google Firebase
+name: Build and deploy web app to Google Firebase
 
 on:
   pull_request:
