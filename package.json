@@ -24,16 +24,16 @@
     "vue-router": "^4.0.15"
   },
   "devDependencies": {
-    "@pinia/testing": "^0.0.15",
+    "@pinia/testing": "^0.1.1",
     "@quasar/app-vite": "^1.0.0",
     "@quasar/extras": "^1.14.0",
-    "@quasar/quasar-app-extension-testing-unit-vitest": "^0.2.1",
+    "@quasar/quasar-app-extension-testing-unit-vitest": "^0.3.0",
     "@types/lodash": "^4.14.178",
     "@types/mapbox-gl": "^2.7.3",
     "@types/node": "^18.7.16",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
-    "@vitest/coverage-c8": "^0.29.3",
+    "@vitest/coverage-c8": "^0.31.1",
     "@vue/test-utils": "^2.0.0",
     "autoprefixer": "^10.4.7",
     "dotenv": "^16.0.1",
@@ -41,13 +41,13 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-jest": "^27.0.1",
     "eslint-plugin-vue": "^9.0.1",
-    "firebase-tools": "^11.0.1",
+    "firebase-tools": "^12.0.1",
     "husky": "^8.0.1",
-    "jsdom": "^21.0.0",
+    "jsdom": "^22.0.0",
     "lint-staged": "^13.0.0",
     "prettier": "^2.5.1",
     "typescript": "^4.9.5",
-    "vitest": "^0.29.3"
+    "vitest": "^0.31.1"
   },
   "lint-staged": {
     "*.{js,ts,vue}": [
@@ -68,7 +68,7 @@
     "last 5 Opera versions"
   ],
   "engines": {
-    "node": "^18 || ^16 || ^14.19",
+    "node": "^18 || ^16",
     "npm": ">= 6.13.4",
     "yarn": ">= 1.21.1"
   },
