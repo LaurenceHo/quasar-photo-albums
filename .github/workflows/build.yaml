@@ -18,7 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ALBUM_APP_TITLE: ${{ secrets.ALBUM_APP_TITLE }}
-      AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
+      IMAGEKIT_CDN_URL: ${{ secrets.IMAGEKIT_CDN_URL }}
+      STATIC_FILES_URL: ${{ secrets.STATIC_FILES_URL }}
       GOOGLE_CLOUD_FUNCTION_URL: ${{ secrets.GOOGLE_CLOUD_FUNCTION_URL }}
       GOOGLE_FIREBASE_API_KEY: ${{ secrets.GOOGLE_FIREBASE_API_KEY }}
       GOOGLE_FIREBASE_APP_ID: ${{ secrets.GOOGLE_FIREBASE_APP_ID }}
@@ -26,7 +27,6 @@ jobs:
       GOOGLE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.GOOGLE_FIREBASE_MESSAGING_SENDER_ID }}
       GOOGLE_FIREBASE_PROJECT_ID: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
       GOOGLE_FIREBASE_STORAGE_BUCKET: ${{ secrets.GOOGLE_FIREBASE_STORAGE_BUCKET }}
-      IMAGEKIT_CDN_URL: ${{ secrets.IMAGEKIT_CDN_URL }}
       MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
 
     steps:
@@ -38,13 +38,14 @@ jobs:
           node-version: 16.x
 
       - name: Install dependencies
-        run: npm install --force
+        run: npm install
 
       - name: Write .env file
         run: |
           tee .env <<EOF
           ALBUM_APP_TITLE=$ALBUM_APP_TITLE
-          AWS_S3_BUCKET_NAME=$AWS_S3_BUCKET_NAME
+          IMAGEKIT_CDN_URL=$IMAGEKIT_CDN_URL
+          STATIC_FILES_URL=$STATIC_FILES_URL
           GOOGLE_CLOUD_FUNCTION_URL=$GOOGLE_CLOUD_FUNCTION_URL
           GOOGLE_FIREBASE_API_KEY=$GOOGLE_FIREBASE_API_KEY
           GOOGLE_FIREBASE_APP_ID=$GOOGLE_FIREBASE_APP_ID
@@ -52,7 +53,6 @@ jobs:
           GOOGLE_FIREBASE_MESSAGING_SENDER_ID=$GOOGLE_FIREBASE_MESSAGING_SENDER_ID
           GOOGLE_FIREBASE_PROJECT_ID=$GOOGLE_FIREBASE_PROJECT_ID
           GOOGLE_FIREBASE_STORAGE_BUCKET=$GOOGLE_FIREBASE_STORAGE_BUCKET
-          IMAGEKIT_CDN_URL=$IMAGEKIT_CDN_URL
           MAPBOX_API_KEY=$MAPBOX_API_KEY
           EOF
       - name: Test and build
