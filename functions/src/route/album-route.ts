@@ -1,5 +1,6 @@
 import express from 'express';
 import admin from 'firebase-admin';
+import { info, error }  from "firebase-functions/logger";
 import _ from 'lodash';
 import { Album } from '../models';
 import { emptyS3Folder, uploadObject } from '../services/aws-s3-service';
@@ -34,8 +35,8 @@ router.get('', async (req, res) => {
     }
     const albumList = await queryPhotoAlbums(isAdmin);
     res.send(albumList);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    error(err);
     res.status(500).send({ status: 'Server error' });
   }
 });
@@ -46,8 +47,8 @@ router.post('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
     await uploadObject(album.id + '/', null);
     await createPhotoAlbum(album);
     res.send({ status: 'Album created' });
-  } catch (error) {
-    console.log(`Failed to create album folder: ${error}`);
+  } catch (err) {
+    error(`Failed to create album folder: ${err}`);
     res.status(500).send({ status: 'Server error' });
   }
 });
@@ -57,8 +58,8 @@ router.put('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
 
   updatePhotoAlbum(album)
     .then(() => res.send({ status: 'Album updated' }))
-    .catch((error: Error) => {
-      console.log(error);
+    .catch((err: Error) => {
+      error(err);
       res.status(500).send({ status: 'Server error' });
     });
 });
@@ -67,9 +68,9 @@ router.delete('/:albumId', verifyJwtClaim, verifyUserPermission, async (req, res
   const albumId = req.params.albumId;
 
   try {
-    console.log('###### Delete album:', albumId);
     const result = await emptyS3Folder(albumId);
-    console.log('###### Delete result:', result);
+    info('###### Delete album:', albumId);
+    info('###### Delete result:', result);
     // @ts-ignore
     if (result.$metadata.httpStatusCode === 200) {
       await deletePhotoAlbum(albumId);
@@ -77,8 +78,8 @@ router.delete('/:albumId', verifyJwtClaim, verifyUserPermission, async (req, res
     } else {
       res.status(500).send({ status: 'Server error' });
     }
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    error(err);
     res.status(500).send({ status: 'Server error' });
   }
 });

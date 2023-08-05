@@ -4,10 +4,7 @@ import HttpRequestService from 'src/services/http-request-service';
 export default class AlbumTagService extends HttpRequestService {
   constructor() {
     super();
-    this.baseUrl =
-      process.env.NODE_ENV === 'production'
-        ? (process.env.GOOGLE_CLOUD_FUNCTION_URL as string) + '/api/albumTags'
-        : `http://localhost:5001/${process.env.GOOGLE_FIREBASE_PROJECT_ID}/us-central1/main/api/albumTags`;
+    this.baseUrl = this.baseUrl + '/albumTags';
   }
 
   getAlbumTags(): Promise<AlbumTag[]> {

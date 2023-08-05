@@ -1,5 +1,6 @@
 import express, { Response } from 'express';
 import admin from 'firebase-admin';
+import { info, error }  from "firebase-functions/logger";
 import _ from 'lodash';
 import { queryUserPermission } from '../services/firestore-service';
 
@@ -38,14 +39,14 @@ router.post('/verifyIdToken', async (req, res) => {
       await _setCookies(res, token);
       res.send(userPermission);
     } else {
-      console.log(`User ${decodedIdToken.email} doesn't have permission`);
+      info(`User ${decodedIdToken.email} doesn't have permission`);
       await admin.auth().revokeRefreshTokens(decodedIdToken.uid);
       res
         .status(403)
         .send({ status: 'Unauthorized', message: `User ${decodedIdToken.email} doesn't have login permission` });
     }
-  } catch (error) {
-    console.error('Error while getting Firebase User record:', error);
+  } catch (err) {
+    error('Error while getting Firebase User record:', err);
     res.status(403).send({ status: 'Unauthorized', message: 'Error while user login' });
   }
 });
@@ -59,7 +60,8 @@ router.post('/logout', async (req, res) => {
       .auth()
       .revokeRefreshTokens(decodedClaims?.sub)
       .then(() => res.sendStatus(200));
-  } catch (error) {
+  } catch (err) {
+    error(err);
     res.sendStatus(500);
   }
 });
