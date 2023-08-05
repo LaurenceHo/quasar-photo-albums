@@ -1,5 +1,6 @@
 import Busboy from 'busboy';
 import express from 'express';
+import { info, error }  from "firebase-functions/logger";
 import { deleteObject, fetchObjectFromS3, uploadObject } from '../services/aws-s3-service';
 import { verifyJwtClaim, verifyUserPermission } from './helpers';
 
@@ -24,7 +25,7 @@ router.get('/:albumId', async (req, res) => {
     }
     res.send(photos);
   } catch (err) {
-    console.log(err);
+    error(err);
     res.sendStatus(500);
   }
 });
@@ -34,14 +35,14 @@ router.delete('/photo', verifyJwtClaim, verifyUserPermission, async (req, res) =
 
   try {
     if (photo) {
-      console.log('###### Delete photo:', photo);
+      info('###### Delete photo:', photo);
       const response = await deleteObject(`${photo.albumId}/${photo.objectKey}`);
       res.send(response);
     } else {
       res.sendStatus(400);
     }
   } catch (err) {
-    console.log(err);
+    error(err);
     res.sendStatus(500);
   }
 });
@@ -54,17 +55,17 @@ router.post('/upload/:albumId', verifyJwtClaim, verifyUserPermission, async (req
   const busboy = Busboy({ headers: req.headers });
   const fileWrites: any[] = [];
 
-  busboy.on('file', async (fieldName, file, info) => {
-    const { filename, encoding, mimeType } = info;
-    console.log(`##### File [${fieldName}]: filename: ${filename}, encoding: ${encoding}, mimeType: ${mimeType}`);
+  busboy.on('file', async (fieldName, file, fileInfo) => {
+    const { filename, encoding, mimeType } = fileInfo;
+    info(`##### File [${fieldName}]: filename: ${filename}, encoding: ${encoding}, mimeType: ${mimeType}`);
 
     file
       .on('data', (buffer) => {
-        console.log(`##### File [${filename}] got ${buffer.length} bytes`);
+        info(`##### File [${filename}] got ${buffer.length} bytes`);
         const promise = new Promise((resolve, reject) => {
           uploadObject(`${albumId}/${filename}`, buffer)
             .then((result) => {
-              console.log('##### upload result', JSON.stringify(result));
+              info('##### upload result', JSON.stringify(result));
               resolve(result);
             })
             .catch((error) => reject(error));
@@ -72,20 +73,20 @@ router.post('/upload/:albumId', verifyJwtClaim, verifyUserPermission, async (req
         fileWrites.push(promise);
       })
       .on('close', () => {
-        console.log(`File [${filename}] done`);
+        info(`File [${filename}] done`);
       });
   });
 
   busboy.on('field', (fieldName, val) => {
-    console.log(`##### Processed field ${fieldName}: ${val}.`);
+    info(`##### Processed field ${fieldName}: ${val}.`);
   });
 
   busboy.on('finish', async () => {
     try {
       await Promise.all(fileWrites);
       res.send({ status: 'Success' });
-    } catch (error: any) {
-      console.log(error);
+    } catch (err) {
+      error(err);
       res.status(500).send({
         status: 'Server error',
         message: error.toString(),

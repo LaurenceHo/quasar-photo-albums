@@ -8,7 +8,8 @@
     "strict": true,
     "target": "esnext",
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "compileOnSave": true,
   "include": [

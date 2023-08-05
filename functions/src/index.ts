@@ -5,6 +5,7 @@ import express, { Application, Request, Response } from 'express';
 import throttle from 'express-throttle-bandwidth';
 import admin from 'firebase-admin';
 import { ServiceAccount } from 'firebase-admin/lib/app/credential';
+import { info }  from "firebase-functions/logger";
 import * as functionsV2 from 'firebase-functions/v2';
 import helmet from 'helmet';
 import serviceAccount from '../serviceAccountKey.json';
@@ -21,7 +22,7 @@ admin.initializeApp({
 
 const app: Application = express();
 const corsHeader = (req: Request, res: Response, next: any) => {
-  console.log('Request API:', req.url);
+  info('Request API:', req.url);
   const allowedOrigins = ['http://localhost:9000', process.env.ALBUM_URL];
   const origin = req.headers.origin as string;
   if (allowedOrigins.indexOf(origin) > -1) {

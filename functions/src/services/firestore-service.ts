@@ -1,4 +1,5 @@
 import { getFirestore } from 'firebase-admin/firestore';
+import { info }  from "firebase-functions/logger";
 import { fetchObjectFromS3 } from './aws-s3-service';
 
 // Reference:
@@ -86,7 +87,7 @@ export const setupDefaultAlbumCover = async (albumList: any[]) => {
 
         const albumRef = getFirestore().collection('s3-photo-albums').doc(album.id);
         albumRef.update({ ...album, albumCover: s3ObjectContents[0].Key }).then((res) => {
-          console.log(`Document updated at ${res.writeTime}`);
+          info(`Document updated at ${res.writeTime}`);
         });
       }
     }

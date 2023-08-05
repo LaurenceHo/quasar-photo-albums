@@ -7,6 +7,7 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
+import { info }  from "firebase-functions/logger";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -40,7 +41,7 @@ export const fetchObjectFromS3 = async (folderName: string, maxKeys: number) => 
 
 //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-photo-album-full.html
 export const uploadObject = async (filePath: string, object: any) => {
-  console.log('##### S3 FilePath:', filePath);
+  info('##### S3 FilePath:', filePath);
   const command = new PutObjectCommand({
     Body: object,
     Bucket: process.env.AWS_S3_BUCKET_NAME,
