@@ -1,16 +1,11 @@
 import express from 'express';
 import admin from 'firebase-admin';
-import { info, error }  from "firebase-functions/logger";
+import { info, error } from 'firebase-functions/logger';
 import _ from 'lodash';
-import { Album } from '../models';
+import { Album, AlbumV2 } from '../models';
+import { createPhotoAlbumV2, queryPhotoAlbumsV2 } from '../services/aws-dynamodb-service';
 import { emptyS3Folder, uploadObject } from '../services/aws-s3-service';
-import {
-  createPhotoAlbum,
-  deletePhotoAlbum,
-  queryPhotoAlbums,
-  queryUserPermission,
-  updatePhotoAlbum,
-} from '../services/firestore-service';
+import { deletePhotoAlbum, queryUserPermission, updatePhotoAlbum } from '../services/firestore-service';
 import { verifyJwtClaim, verifyUserPermission } from './helpers';
 
 // Reference:
@@ -33,7 +28,7 @@ router.get('', async (req, res) => {
     if (!isAdmin) {
       res.set('Cache-control', 'public, max-age=3600');
     }
-    const albumList = await queryPhotoAlbums(isAdmin);
+    const albumList = await queryPhotoAlbumsV2(isAdmin);
     res.send(albumList);
   } catch (err) {
     error(err);
@@ -42,20 +37,24 @@ router.get('', async (req, res) => {
 });
 
 router.post('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
-  const album = req.body as Album;
+  const album = req.body as AlbumV2;
+  album.order = 0;
+  album.createdAt = new Date().toISOString();
+  album.updatedAt = new Date().toISOString();
+
   try {
+    await createPhotoAlbumV2(album);
     await uploadObject(album.id + '/', null);
-    await createPhotoAlbum(album);
     res.send({ status: 'Album created' });
   } catch (err) {
-    error(`Failed to create album folder: ${err}`);
+    error(err);
     res.status(500).send({ status: 'Server error' });
   }
 });
 
 router.put('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
   const album = req.body as Album;
-
+  // TODO, use V2 API
   updatePhotoAlbum(album)
     .then(() => res.send({ status: 'Album updated' }))
     .catch((err: Error) => {
@@ -73,6 +72,7 @@ router.delete('/:albumId', verifyJwtClaim, verifyUserPermission, async (req, res
     info('###### Delete result:', result);
     // @ts-ignore
     if (result.$metadata.httpStatusCode === 200) {
+      // TODO, use V2 API
       await deletePhotoAlbum(albumId);
       res.send({ status: 'Album deleted' });
     } else {

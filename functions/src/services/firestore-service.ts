@@ -1,6 +1,7 @@
 import { getFirestore } from 'firebase-admin/firestore';
-import { info }  from "firebase-functions/logger";
+import { info } from 'firebase-functions/logger';
 import { fetchObjectFromS3 } from './aws-s3-service';
+import { Album } from '../models';
 
 // Reference:
 // https://firebase.google.com/docs/reference/admin/node/firebase-admin.firestore
@@ -18,7 +19,7 @@ export const queryUserPermission = async (uid: string) => {
 };
 
 export const queryPhotoAlbums = async (isAdmin: boolean) => {
-  const albumList: any[] = [];
+  const albumList: Album[] = [];
   const albumRef = getFirestore().collection('s3-photo-albums');
   let queryResult;
   if (isAdmin) {
@@ -27,7 +28,7 @@ export const queryPhotoAlbums = async (isAdmin: boolean) => {
     queryResult = await albumRef.where('private', '==', false).orderBy('albumName', 'desc').get();
   }
   queryResult.forEach((doc) => {
-    albumList.push({ ...doc.data(), id: doc.id });
+    albumList.push({ ...doc.data(), id: doc.id } as Album);
   });
   return albumList;
 };
@@ -54,13 +55,13 @@ export const deletePhotoAlbum = (albumId: string) => {
 };
 
 export const queryAlbumTags = async () => {
-  const albumTags: any[] = [];
+  const albumTags: { tag: string; id: string }[] = [];
 
   const docRef = getFirestore().collection('album-tags');
   const querySnapshot = await docRef.orderBy('tag', 'asc').get();
 
   querySnapshot.forEach((doc) => {
-    albumTags.push({ ...doc.data(), id: doc.id });
+    albumTags.push({ ...doc.data(), id: doc.id } as { tag: string; id: string });
   });
   return albumTags;
 };
