@@ -29,7 +29,7 @@ export const albumStore = defineStore('albums', {
       searchKey: '',
       sortOrder: 'desc',
       refreshAlbumList: false,
-    } as AlbumState),
+    }) as AlbumState,
   getters: {
     getAlbumById: (state: AlbumState) => (id: string) => state.allAlbumList.find((album) => album.id === id),
 
@@ -53,7 +53,7 @@ export const albumStore = defineStore('albums', {
             filteredAlbumList = filteredAlbumList.filter(
               (album) =>
                 album.albumName.toLowerCase().includes(searchKey.toLowerCase()) ||
-                album.desc.toLowerCase().includes(searchKey.toLowerCase())
+                album.description?.toLowerCase().includes(searchKey.toLowerCase())
             );
           }
           if (!isEmpty(selectedTags)) {

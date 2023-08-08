@@ -1,6 +1,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand, PutCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, PutCommand, QueryCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { error } from 'firebase-functions/logger';
+import _ from 'lodash';
 import { AlbumV2 } from '../models';
 
 const dynamoClient = new DynamoDBClient({
@@ -40,21 +41,23 @@ isPrivate: boolean
 order: number
 createdAt: string (Date time)
 updatedAt: string (Date time)
+createdBy: string (email)
  */
 const PHOTO_ALBUMS_TABLE_NAME = 'quasar-photo-albums';
 const PHOTO_ALBUM_TAGS_TABLE_NAME = 'quasar-album-tags';
 const PHOTO_USER_PERMISSION_TABLE_NAME = 'quasar-user-permission';
-export const queryUserPermissionV2 = async (uid: string, email: string) => {
+export const queryUserPermissionV2 = async (uid: string) => {
   const params = {
     TableName: PHOTO_USER_PERMISSION_TABLE_NAME,
-    Key: {
-      uid,
-      email,
+    ExpressionAttributeValues: {
+      ':uid': uid,
     },
+    KeyConditionExpression: 'uid = :uid',
   };
 
   try {
-    return await ddbDocClient.send(new GetCommand(params));
+    const response = await ddbDocClient.send(new QueryCommand(params));
+    return _.get(response, 'Items[0]', null);
   } catch (err) {
     error(`Failed to query user permission: ${err}`);
     throw Error('Error when query user permission');

@@ -26,7 +26,7 @@ export const userStore = defineStore('user-permission', {
         displayName: '',
       },
       isCheckingUserPermission: true,
-    } as UserState),
+    }) as UserState,
   getters: {
     isAdminUser: (state: UserState) => state.userPermission.role === 'admin',
   },
@@ -35,9 +35,9 @@ export const userStore = defineStore('user-permission', {
       try {
         Loading.show();
         this.isCheckingUserPermission = true;
-        const userPermission = await authService.getUserInfo();
-        if (userPermission) {
-          this.userPermission = userPermission;
+        const response = await authService.getUserInfo();
+        if (response && response.status !== 'Unauthorized') {
+          this.userPermission = response;
         }
       } catch (error: any) {
         console.log(error);

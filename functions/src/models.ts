@@ -17,6 +17,7 @@ export interface AlbumV2 {
   order: number;
   createdAt: string;
   updatedAt: string;
+  createdBy: string;
 }
 
 export interface Photo {
