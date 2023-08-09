@@ -1,5 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand, QueryCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, PutCommand, QueryCommand, ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { error } from 'firebase-functions/logger';
 import _ from 'lodash';
 import { AlbumV2 } from '../models';
@@ -42,6 +42,7 @@ order: number
 createdAt: string (Date time)
 updatedAt: string (Date time)
 createdBy: string (email)
+updatedBy: string (email)
  */
 const PHOTO_ALBUMS_TABLE_NAME = 'quasar-photo-albums';
 const PHOTO_ALBUM_TAGS_TABLE_NAME = 'quasar-album-tags';
@@ -110,8 +111,38 @@ export const createPhotoAlbumV2 = async (album: AlbumV2) => {
   }
 };
 
-export const updatePhotoAlbumV2 = (album: AlbumV2) => {
-  // TODO
+export const updatePhotoAlbumV2 = async (album: AlbumV2) => {
+  const params = {
+    TableName: PHOTO_ALBUMS_TABLE_NAME,
+    Key: {
+      id: album.id,
+    },
+    UpdateExpression:
+      'SET albumName = :albumName, ' +
+      'albumCover = :albumCover, ' +
+      'description = :description, ' +
+      'tags = :tags, ' +
+      'isPrivate = :isPrivate, ' +
+      'updatedAt = :updatedAt, ' +
+      'updatedBy = :updatedBy',
+    ExpressionAttributeValues: {
+      ':albumName': album.albumName,
+      ':albumCover': album.albumCover,
+      ':description': album.description,
+      ':tags': album.tags,
+      ':isPrivate': album.isPrivate,
+      ':updatedAt': album.updatedAt,
+      ':updatedBy': album.updatedBy,
+    },
+    ReturnValues: 'ALL_NEW',
+  };
+
+  try {
+    return await ddbDocClient.send(new UpdateCommand(params));
+  } catch (err) {
+    error(`Failed to create photo album: ${err}`);
+    throw Error('Error when insert photo album');
+  }
 };
 
 export const deletePhotoAlbumV2 = (albumId: string) => {

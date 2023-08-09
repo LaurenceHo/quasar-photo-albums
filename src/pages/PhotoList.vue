@@ -6,10 +6,10 @@
     <div class="row items-center">
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated to="/" />
       <div class="text-h4 q-py-md q-pl-sm" data-test-id="album-name">
-        {{ albumItem?.albumName }} {{ albumItem?.private ? '(private album)' : '' }}
+        {{ albumItem?.albumName }} {{ albumItem?.isPrivate ? '(private album)' : '' }}
       </div>
     </div>
-    <div class="text-h6 text-grey q-pb-md" data-test-id="album-desc">{{ albumItem?.desc }}</div>
+    <div class="text-h6 text-grey q-pb-md" data-test-id="album-desc">{{ albumItem?.description }}</div>
     <div v-if="albumItem?.tags?.length > 0" class="flex q-pb-md">
       <q-chip v-for="(tag, i) in albumItem.tags" :key="i" data-test-id="album-tag" color="secondary">
         {{ tag }}

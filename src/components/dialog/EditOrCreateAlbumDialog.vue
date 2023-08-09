@@ -83,25 +83,29 @@ const confirmUpdateAlbum = async () => {
 
   const albumToBeSubmitted = {
     id: getAlbumToBeUpdate.value.id || albumName.value,
-    albumName: albumName.value,
-    desc: albumDesc.value,
-    private: privateAlbum.value,
-    tags: selectedAlbumTags.value,
     albumCover: getAlbumToBeUpdate.value.albumCover,
+    albumName: albumName.value,
+    description: albumDesc.value,
+    isPrivate: privateAlbum.value,
+    tags: selectedAlbumTags.value,
   } as Album;
 
+  let result;
   if (getAlbumToBeUpdate.value.id) {
-    await albumService.updateAlbum(albumToBeSubmitted);
+    result = await albumService.updateAlbum(albumToBeSubmitted);
   } else {
-    await albumService.createAlbum(albumToBeSubmitted);
+    result = await albumService.createAlbum(albumToBeSubmitted);
   }
-  store.updateAlbum(albumToBeSubmitted, false);
+
   isProcessing.value = false;
-  resetAlbum();
+  if (result.status !== 'Server error') {
+    store.updateAlbum(albumToBeSubmitted, false);
+    resetAlbum();
+  }
 };
 
 const resetAlbum = () => {
-  setAlbumToBeUpdated({ id: '', albumName: '', desc: '', tags: [], private: false });
+  setAlbumToBeUpdated({ id: '', albumName: '', description: '', tags: [], isPrivate: false });
   setUpdateAlbumDialogState(false);
 };
 
@@ -110,8 +114,8 @@ watch(
   (newValue) => {
     if (newValue) {
       albumName.value = getAlbumToBeUpdate.value.albumName;
-      albumDesc.value = getAlbumToBeUpdate.value.desc;
-      privateAlbum.value = getAlbumToBeUpdate.value.private;
+      albumDesc.value = getAlbumToBeUpdate.value.description || '';
+      privateAlbum.value = getAlbumToBeUpdate.value.isPrivate;
       selectedAlbumTags.value = getAlbumToBeUpdate.value.tags;
     }
   },

@@ -54,6 +54,8 @@ router.post('/verifyIdToken', async (req, res) => {
 router.post('/logout', async (req, res) => {
   const firebaseToken = _.get(req, 'cookies.__session', '');
   res.clearCookie('__session');
+  // @ts-ignore
+  req.user = null;
   try {
     const decodedClaims = await admin.auth().verifySessionCookie(firebaseToken);
     admin

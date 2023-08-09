@@ -18,6 +18,7 @@ export interface AlbumV2 {
   createdAt: string;
   updatedAt: string;
   createdBy: string;
+  updatedBy: string;
 }
 
 export interface Photo {

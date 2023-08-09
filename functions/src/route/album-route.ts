@@ -2,10 +2,10 @@ import express from 'express';
 import admin from 'firebase-admin';
 import { info, error } from 'firebase-functions/logger';
 import _ from 'lodash';
-import { Album, AlbumV2 } from '../models';
-import { createPhotoAlbumV2, queryPhotoAlbumsV2 } from '../services/aws-dynamodb-service';
+import { AlbumV2 } from '../models';
+import { createPhotoAlbumV2, queryPhotoAlbumsV2, updatePhotoAlbumV2 } from '../services/aws-dynamodb-service';
 import { emptyS3Folder, uploadObject } from '../services/aws-s3-service';
-import { deletePhotoAlbum, queryUserPermission, updatePhotoAlbum } from '../services/firestore-service';
+import { deletePhotoAlbum, queryUserPermission } from '../services/firestore-service';
 import { verifyJwtClaim, verifyUserPermission } from './helpers';
 
 // Reference:
@@ -53,9 +53,11 @@ router.post('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
 });
 
 router.put('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
-  const album = req.body as Album;
-  // TODO, use V2 API
-  updatePhotoAlbum(album)
+  const album = req.body as AlbumV2;
+  album.updatedAt = new Date().toISOString();
+  // @ts-ignore
+  album.updatedBy = req.user.email;
+  updatePhotoAlbumV2(album)
     .then(() => res.send({ status: 'Album updated' }))
     .catch((err: Error) => {
       error(err);
