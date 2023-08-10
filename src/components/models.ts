@@ -15,3 +15,8 @@ export interface Photo {
 export interface AlbumTag {
   tag: string;
 }
+
+export interface ResponseStatus {
+  status: string;
+  message?: string;
+}

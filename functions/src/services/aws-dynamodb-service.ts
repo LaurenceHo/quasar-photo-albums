@@ -90,14 +90,9 @@ export const queryPhotoAlbumsV2 = async (isAdmin: boolean) => {
     };
   }
   try {
-    const albumList: AlbumV2[] = [];
     const response = await ddbDocClient.send(new ScanCommand(params));
-    if (response.Items) {
-      for (const album of response.Items) {
-        albumList.push(album as AlbumV2);
-      }
-    }
-    return albumList;
+
+    return response.Items as AlbumV2[];
   } catch (err) {
     error(`Failed to query photo album: ${err}`);
     throw Error('Error when fetching photo albums');
@@ -185,15 +180,15 @@ export const queryAlbumTagsV2 = async () => {
   }
 };
 export const createPhotoAlbumTagV2 = async (tag: { tag: string }) => {
-  const params = {
-    TableName: PHOTO_ALBUM_TAGS_TABLE_NAME,
-    Item: {
-      tag: tag.tag,
-    },
-  };
-
   try {
-    return await ddbDocClient.send(new PutCommand(params));
+    return await ddbDocClient.send(
+      new PutCommand({
+        TableName: PHOTO_ALBUM_TAGS_TABLE_NAME,
+        Item: {
+          tag: tag.tag,
+        },
+      })
+    );
   } catch (err) {
     error(`Failed to create album tag: ${err}`);
     throw Error('Error when creating album tag');

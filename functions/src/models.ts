@@ -21,9 +21,9 @@ export interface AlbumV2 {
   updatedBy: string;
 }
 
-export interface Photo {
-  url: string;
-  key: string;
+export interface PhotoObject {
+  albumId: string;
+  objectKey: string;
 }
 
 export interface ResponseStatus {
