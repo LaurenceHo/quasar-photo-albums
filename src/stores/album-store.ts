@@ -84,7 +84,8 @@ export const albumStore = defineStore('albums', {
     async getAlbumTags() {
       if (this.albumTags.length === 0) {
         this.loadingAlbumTags = true;
-        this.albumTags = await albumTagService.getAlbumTags();
+        const tempAlbumTags = await albumTagService.getAlbumTags();
+        this.albumTags = tempAlbumTags.sort((a, b) => a.tag.localeCompare(b.tag));
         this.loadingAlbumTags = false;
       }
     },
@@ -116,7 +117,7 @@ export const albumStore = defineStore('albums', {
 
     updateAlbumTags(albumTag: AlbumTag, deleteTag: boolean) {
       if (deleteTag) {
-        const findIndex = this.albumTags.findIndex((tag) => tag.id === albumTag.id);
+        const findIndex = this.albumTags.findIndex((tag) => tag.tag === albumTag.tag);
         this.albumTags.splice(findIndex, 1);
       } else {
         this.albumTags.push(albumTag);

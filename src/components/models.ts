@@ -13,6 +13,5 @@ export interface Photo {
 }
 
 export interface AlbumTag {
-  id?: string;
   tag: string;
 }

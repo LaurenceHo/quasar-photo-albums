@@ -19,7 +19,7 @@
         <q-select
           v-model="selectedAlbumTags"
           :options="albumTags"
-          option-value="id"
+          option-value="tag"
           option-label="tag"
           emit-value
           clearable

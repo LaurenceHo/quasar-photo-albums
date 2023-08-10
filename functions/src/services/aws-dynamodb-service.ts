@@ -165,11 +165,11 @@ export const queryAlbumTagsV2 = async () => {
     throw Error('Error when query photo album tags');
   }
 };
-export const createPhotoAlbumTagV2 = async (tag: string) => {
+export const createPhotoAlbumTagV2 = async (tag: { tag: string }) => {
   const params = {
     TableName: PHOTO_ALBUM_TAGS_TABLE_NAME,
     Item: {
-      tag,
+      tag: tag.tag,
     },
   };
 
