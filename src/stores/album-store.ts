@@ -1,5 +1,4 @@
 import isEmpty from 'lodash/isEmpty';
-import orderBy from 'lodash/orderBy';
 import { defineStore } from 'pinia';
 import { Loading } from 'quasar';
 import { Album, AlbumTag } from 'src/components/models';
@@ -75,7 +74,13 @@ export const albumStore = defineStore('albums', {
         Loading.show();
         this.loadingAlbums = true;
         const tempList = await albumService.getAlbums();
-        this.allAlbumList = orderBy(tempList, 'albumName', this.sortOrder);
+        this.allAlbumList = tempList.sort((a, b) => {
+          if (this.sortOrder === 'asc') {
+            return a.albumName.localeCompare(b.albumName);
+          } else {
+            return b.albumName.localeCompare(a.albumName);
+          }
+        });
         Loading.hide();
         this.loadingAlbums = false;
       }
@@ -100,7 +105,13 @@ export const albumStore = defineStore('albums', {
       const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
       if (findIndex === -1) {
         this.allAlbumList.push(albumToBeUpdated);
-        this.allAlbumList = orderBy(this.allAlbumList, 'albumName', this.sortOrder);
+        this.allAlbumList = this.allAlbumList.sort((a, b) => {
+          if (this.sortOrder === 'asc') {
+            return a.albumName.localeCompare(b.albumName);
+          } else {
+            return b.albumName.localeCompare(a.albumName);
+          }
+        });
       } else {
         if (deleteAlbum) {
           this.allAlbumList.splice(findIndex, 1);

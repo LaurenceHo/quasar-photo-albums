@@ -40,13 +40,6 @@
         <q-list separator>
           <q-item>
             <q-item-section class="text-h5"> Details</q-item-section>
-            <EditPhotoButton
-              v-if="isAdminUser"
-              :photo-key="selectedImage.key"
-              :album-item="albumItem"
-              :is-album-cover="selectedImage.key === albumItem.albumCover"
-              @refreshPhotoList="$emit('refreshPhotoList')"
-            />
           </q-item>
           <q-item v-if="exifTags['Image Height']">
             <q-item-section>

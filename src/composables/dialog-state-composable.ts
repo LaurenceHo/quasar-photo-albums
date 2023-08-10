@@ -10,7 +10,7 @@ const albumToBeUpdate = ref({
   albumName: '',
   description: '',
   tags: [],
-  isPrivate: false,
+  isPrivate: true,
 } as Album);
 
 export default function DialogStateComposable() {

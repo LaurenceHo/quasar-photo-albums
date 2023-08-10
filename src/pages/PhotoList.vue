@@ -3,7 +3,7 @@
     <PhotoDetail />
   </template>
   <div v-else class="q-pt-md">
-    <div class="row items-center">
+    <div class="row items-center" :key="photoId">
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated to="/" />
       <div class="text-h4 q-py-md q-pl-sm" data-test-id="album-name">
         {{ albumItem?.albumName }} {{ albumItem?.isPrivate ? '(private album)' : '' }}
@@ -54,22 +54,24 @@
 </template>
 
 <script lang="ts" setup>
+import { useQuasar } from 'quasar';
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
 import PhotoDetail from 'pages/PhotoDetail.vue';
-import { useQuasar } from 'quasar';
-import { Album, Photo } from 'src/components/models';
+import { Album, Photo } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import { albumStore } from 'src/stores/album-store';
-import { userStore } from 'src/stores/user-store';
+import AlbumService from 'src/services/album-service';
+import { albumStore } from 'stores/album-store';
+import { userStore } from 'stores/user-store';
 import { photoStore } from 'stores/photo-store';
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const q = useQuasar();
 const route = useRoute();
 const router = useRouter();
 
+const albumService = new AlbumService();
 const useAlbumStore = albumStore();
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
@@ -81,7 +83,18 @@ const albumItem = computed(() => useAlbumStore.getAlbumById(albumId.value) as Al
 const photosInAlbum = computed(() => usePhotoStore.photoList as Photo[]);
 const photoId = computed(() => route.query.photo as string);
 
-const refreshPhotoList = async () => usePhotoStore.getPhotos(albumId.value, true);
+const isAlbumEmpty = ref(false);
+const refreshPhotoList = async () => {
+  if (photosInAlbum.value.length === 0) {
+    isAlbumEmpty.value = true;
+  }
+  await usePhotoStore.getPhotos(albumId.value, true);
+  if (isAlbumEmpty.value) {
+    const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photosInAlbum.value[0].key as string };
+    await albumService.updateAlbum(albumToBeSubmitted);
+    useAlbumStore.updateAlbumCover(albumToBeSubmitted);
+  }
+};
 
 usePhotoStore.getPhotos(albumId.value);
 

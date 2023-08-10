@@ -46,6 +46,7 @@ import AlbumService from 'src/services/album-service';
 import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';
 import { ref, toRefs } from 'vue';
+import { useRouter } from 'vue-router';
 
 const emits = defineEmits(['refreshPhotoList']);
 const props = defineProps({
@@ -56,7 +57,7 @@ const props = defineProps({
   albumItem: {
     type: Object,
     required: true,
-    default: () => ({ id: '', albumName: '', desc: '', tags: [], private: false, albumCover: '' } as Album),
+    default: () => ({ id: '', albumName: '', description: '', tags: [], isPrivate: false, albumCover: '' }) as Album,
   },
   photoKey: {
     type: String,
@@ -74,6 +75,7 @@ const albumService = new AlbumService();
 const photoService = new PhotoService();
 const store = albumStore();
 const q = useQuasar();
+const router = useRouter();
 
 const deletePhotoDialog = ref(false);
 const isProcessing = ref(false);
@@ -88,8 +90,12 @@ const confirmDeletePhoto = async () => {
   deletePhotoDialog.value = false;
   const photoKeyArray = photoKey.value?.split('/');
   const photoKeyString = photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
-  await photoService.deletePhoto(albumItem.value.id, photoKeyString);
-  emits('refreshPhotoList');
+
+  const result = await photoService.deletePhoto(albumItem.value.id, photoKeyString);
+  if (result.status === 'Success') {
+    await router.replace({ query: undefined });
+    emits('refreshPhotoList');
+  }
 };
 
 const copyPhotoLink = () => {

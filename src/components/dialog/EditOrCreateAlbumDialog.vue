@@ -98,14 +98,14 @@ const confirmUpdateAlbum = async () => {
   }
 
   isProcessing.value = false;
-  if (result.status !== 'Server error') {
+  if (result.status !== 'Error') {
     store.updateAlbum(albumToBeSubmitted, false);
     resetAlbum();
   }
 };
 
 const resetAlbum = () => {
-  setAlbumToBeUpdated({ id: '', albumName: '', description: '', tags: [], isPrivate: false });
+  setAlbumToBeUpdated({ id: '', albumName: '', albumCover: '', description: '', tags: [], isPrivate: true });
   setUpdateAlbumDialogState(false);
 };
 
