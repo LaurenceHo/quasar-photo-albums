@@ -1,7 +1,6 @@
 import express from 'express';
 import { error } from 'firebase-functions/logger';
-import { createPhotoAlbumTagV2, queryAlbumTagsV2 } from '../services/aws-dynamodb-service';
-import { deletePhotoAlbumTag } from '../services/firestore-service';
+import { createPhotoAlbumTagV2, deletePhotoAlbumTagV2, queryAlbumTagsV2 } from '../services/aws-dynamodb-service';
 import { verifyJwtClaim, verifyUserPermission } from './helpers';
 
 export const router = express.Router();
@@ -28,8 +27,8 @@ router.post('', verifyJwtClaim, verifyUserPermission, (req, res) => {
 
 router.delete('/:tagId', verifyJwtClaim, verifyUserPermission, async (req, res) => {
   const tagId = req.params['tagId'];
-  // TODO, use V2 API
-  deletePhotoAlbumTag(tagId)
+
+  deletePhotoAlbumTagV2(tagId)
     .then(() => res.send({ status: 'Tag deleted' }))
     .catch((err: Error) => {
       error(err);

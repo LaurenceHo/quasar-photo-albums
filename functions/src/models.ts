@@ -26,13 +26,7 @@ export interface Photo {
   key: string;
 }
 
-export interface AlbumTag {
-  id?: string;
-  tag: string;
-}
-
-export interface LightBoxImage {
-  name: string;
-  alt?: string;
-  filter?: string;
+export interface ResponseStatus {
+  status: string;
+  message?: string;
 }

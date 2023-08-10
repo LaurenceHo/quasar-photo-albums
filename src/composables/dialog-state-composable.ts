@@ -4,7 +4,7 @@ import { computed, ref } from 'vue';
 const uploadPhotoDialogState = ref(false);
 const updateAlbumDialogState = ref(false);
 const updateAlbumTagsDialogState = ref(false);
-const albumToBeUpdate = ref({ id: '', albumName: '', desc: '', tags: [], private: false } as Album);
+const albumToBeUpdate = ref({ id: '', albumName: '', description: '', tags: [], isPrivate: false } as Album);
 
 export default function DialogStateComposable() {
   const setUploadPhotoDialogState = (state: boolean) => {
