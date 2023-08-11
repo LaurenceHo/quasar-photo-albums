@@ -1,8 +1,10 @@
 import Busboy from 'busboy';
 import express from 'express';
-import { info, error }  from "firebase-functions/logger";
+import { info, error } from 'firebase-functions/logger';
 import { deleteObject, fetchObjectFromS3, uploadObject } from '../services/aws-s3-service';
 import { verifyJwtClaim, verifyUserPermission } from './helpers';
+import { STATUS_ERROR, STATUS_SUCCESS } from '../constants';
+import { PhotoObject } from '../models';
 
 export const router = express.Router();
 
@@ -11,8 +13,9 @@ router.get('/:albumId', async (req, res) => {
   const cdnURL = process.env.IMAGEKIT_CDN_URL;
   try {
     const s3ObjectContents = await fetchObjectFromS3(albumId, 1000);
-    let photos: any[] = [];
+    let photos: { url: string; key: string }[] = [];
     if (s3ObjectContents) {
+      // Compose photos array from s3ObjectContents
       photos = s3ObjectContents.map((photo) => {
         let url = '';
         let key = '';
@@ -24,26 +27,25 @@ router.get('/:albumId', async (req, res) => {
       });
     }
     res.send(photos);
-  } catch (err) {
+  } catch (err: any) {
     error(err);
-    res.sendStatus(500);
+    res.status(500).send({ status: STATUS_ERROR, message: err.message });
   }
 });
 
-router.delete('/photo', verifyJwtClaim, verifyUserPermission, async (req, res) => {
-  const photo = req.body;
+router.delete('/photo', verifyJwtClaim, verifyUserPermission, (req, res) => {
+  const photo = req.body as PhotoObject;
 
-  try {
-    if (photo) {
-      info('###### Delete photo:', photo);
-      const response = await deleteObject(`${photo.albumId}/${photo.objectKey}`);
-      res.send(response);
-    } else {
-      res.sendStatus(400);
-    }
-  } catch (err) {
-    error(err);
-    res.sendStatus(500);
+  if (photo) {
+    info('###### Delete photo:', photo);
+    deleteObject(`${photo.albumId}/${photo.objectKey}`)
+      .then(() => res.send({ status: STATUS_SUCCESS, message: 'Photo deleted' }))
+      .catch((err: Error) => {
+        error(err);
+        res.status(500).send({ status: STATUS_ERROR, message: err.message });
+      });
+  } else {
+    res.status(400).send({ status: STATUS_ERROR, message: 'Photo is empty' });
   }
 });
 
@@ -84,12 +86,12 @@ router.post('/upload/:albumId', verifyJwtClaim, verifyUserPermission, async (req
   busboy.on('finish', async () => {
     try {
       await Promise.all(fileWrites);
-      res.send({ status: 'Success' });
-    } catch (err) {
+      res.send({ status: STATUS_SUCCESS });
+    } catch (err: any) {
       error(err);
       res.status(500).send({
-        status: 'Server error',
-        message: error.toString(),
+        status: STATUS_ERROR,
+        message: err.message,
       });
     }
   });

@@ -7,10 +7,10 @@
       </q-card-section>
       <q-card-section style="max-height: 50vh" class="scroll">
         <q-list separator>
-          <q-item v-for="albumTag in albumTags" :key="albumTag.id">
+          <q-item v-for="albumTag in albumTags" :key="albumTag.tag">
             <q-item-section>{{ albumTag.tag }}</q-item-section>
             <q-item-section side>
-              <q-btn icon="mdi-delete" color="primary" dense flat @click="openDeleteDialog(albumTag.id)" />
+              <q-btn icon="mdi-delete" color="primary" dense flat @click="openDeleteDialog(albumTag.tag)" />
             </q-item-section>
           </q-item>
         </q-list>
@@ -88,12 +88,13 @@ const albumTags = computed(() => store.albumTags);
 const confirmCreateTag = async () => {
   isProcessing.value = true;
   const tag = {
-    id: tagName.value,
     tag: tagName.value,
   };
 
-  await albumTagService.createAlbumTag(tag);
-  store.updateAlbumTags(tag, false);
+  const result = await albumTagService.createAlbumTag(tag);
+  if (result.status !== 'Error') {
+    store.updateAlbumTags(tag, false);
+  }
   createTagDialog.value = false;
   isProcessing.value = false;
   tagName.value = '';
@@ -101,14 +102,15 @@ const confirmCreateTag = async () => {
 
 const confirmDeleteAlbum = async () => {
   isProcessing.value = true;
-  await albumTagService.deleteAlbumTag(tagName.value);
-  store.updateAlbumTags(
-    {
-      id: tagName.value,
-      tag: tagName.value,
-    },
-    true
-  );
+  const result = await albumTagService.deleteAlbumTag(tagName.value);
+  if (result.status !== 'Error') {
+    store.updateAlbumTags(
+      {
+        tag: tagName.value,
+      },
+      true
+    );
+  }
   deleteTagDialog.value = false;
   isProcessing.value = false;
   tagName.value = '';

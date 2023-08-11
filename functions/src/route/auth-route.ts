@@ -1,8 +1,8 @@
 import express, { Response } from 'express';
 import admin from 'firebase-admin';
-import { info, error }  from "firebase-functions/logger";
+import { info, error } from 'firebase-functions/logger';
 import _ from 'lodash';
-import { queryUserPermission } from '../services/firestore-service';
+import { queryUserPermissionV2 } from '../services/aws-dynamodb-service';
 
 // Reference:
 // https://firebase.google.com/docs/auth/admin/manage-cookies
@@ -18,7 +18,7 @@ router.get('/userInfo', async (req, res) => {
       res.clearCookie('__session');
       res.send({ status: 'Unauthorized', message: 'User is not logged-in' });
     }
-    const userPermission = await queryUserPermission(decodedClaims?.uid);
+    const userPermission = await queryUserPermissionV2(decodedClaims?.uid);
 
     res.send(userPermission);
   } catch (error) {
@@ -32,7 +32,7 @@ router.post('/verifyIdToken', async (req, res) => {
 
   try {
     const decodedIdToken = await admin.auth().verifyIdToken(String(token));
-    const userPermission = await queryUserPermission(decodedIdToken.uid);
+    const userPermission = await queryUserPermissionV2(decodedIdToken.uid);
     // Only process if the authorised user just signed-in in the last 5 minutes.
     if (userPermission && new Date().getTime() / 1000 - decodedIdToken.auth_time < 5 * 60) {
       // Set idToken as cookies
@@ -54,6 +54,8 @@ router.post('/verifyIdToken', async (req, res) => {
 router.post('/logout', async (req, res) => {
   const firebaseToken = _.get(req, 'cookies.__session', '');
   res.clearCookie('__session');
+  // @ts-ignore
+  req.user = null;
   try {
     const decodedClaims = await admin.auth().verifySessionCookie(firebaseToken);
     admin

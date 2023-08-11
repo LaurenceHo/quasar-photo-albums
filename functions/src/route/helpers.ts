@@ -1,8 +1,13 @@
 import { Request, Response } from 'express';
 import admin from 'firebase-admin';
 import _ from 'lodash';
-import { queryUserPermission } from '../services/firestore-service';
+import { queryUserPermissionV2 } from '../services/aws-dynamodb-service';
 
+/**
+ * Clean cookie and return 401
+ * @param res
+ * @param message
+ */
 const _cleanCookie = (res: Response, message: string) => {
   res.clearCookie('__session');
   return res.status(401).send({
@@ -11,6 +16,12 @@ const _cleanCookie = (res: Response, message: string) => {
   });
 };
 
+/**
+ * Verify JWT claim
+ * @param req
+ * @param res
+ * @param next
+ */
 export const verifyJwtClaim = async (req: Request, res: Response, next: any) => {
   if (req.cookies && req.cookies['__session']) {
     try {
@@ -20,7 +31,7 @@ export const verifyJwtClaim = async (req: Request, res: Response, next: any) => 
         _cleanCookie(res, 'User is not logged-in');
       }
 
-      const user = await queryUserPermission(decodedClaims?.uid);
+      const user = await queryUserPermissionV2(decodedClaims?.uid);
       if (user) {
         // @ts-ignore
         req.user = user;

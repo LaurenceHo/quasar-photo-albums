@@ -42,16 +42,10 @@ const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => 
   routes.push({ label: 'Home', icon: 'mdi-home' });
   routes.push({ label: 'Albums', icon: 'mdi-apps', to: { name: 'Albums' } });
   if (route.name === 'Photos') {
-    if (!photoId.value) {
-      routes.push({ label: 'Photos', icon: 'mdi-image-multiple' });
-    } else {
-      routes.push({
-        label: selectedAlbumItem.value.albumName || 'Photos',
-        icon: 'mdi-image-multiple',
-        to: { path: `/album/${selectedAlbumItem.value.id}` },
-      });
-      routes.push({ label: 'Photo', icon: 'mdi-image' });
-    }
+    routes.push({
+      label: selectedAlbumItem.value.albumName,
+      icon: 'mdi-image-multiple',
+    });
   }
   return routes;
 });

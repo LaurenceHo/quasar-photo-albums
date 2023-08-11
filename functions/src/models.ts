@@ -7,18 +7,26 @@ export interface Album {
   private: boolean;
 }
 
-export interface Photo {
-  url: string;
-  key: string;
+export interface AlbumV2 {
+  id: string;
+  albumName: string;
+  albumCover?: string;
+  description: string;
+  tags: string[];
+  isPrivate: boolean;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  updatedBy: string;
 }
 
-export interface AlbumTag {
-  id?: string;
-  tag: string;
+export interface PhotoObject {
+  albumId: string;
+  objectKey: string;
 }
 
-export interface LightBoxImage {
-  name: string;
-  alt?: string;
-  filter?: string;
+export interface ResponseStatus {
+  status: string;
+  message?: string;
 }

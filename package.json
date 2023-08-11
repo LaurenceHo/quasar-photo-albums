@@ -7,7 +7,7 @@
   "scripts": {
     "serve": "quasar dev",
     "build": "quasar build",
-    "lint": "eslint --ext .js,.ts,.vue ./ && prettier --write ./src/**/*.{js,ts,vue,scss}",
+    "lint": "eslint --ext ./src/**/*.{js,ts,vue} && prettier --write ./src/**/*.{js,ts,vue,scss}",
     "postinstall": "husky install",
     "firebase:deploy": "npm run build && firebase deploy",
     "test:unit": "vitest",
@@ -67,7 +67,7 @@
     "last 5 Opera versions"
   ],
   "engines": {
-    "node": "^18 || ^16",
+    "node": "^18",
     "npm": ">= 8",
     "yarn": ">= 1.21.1"
   },
