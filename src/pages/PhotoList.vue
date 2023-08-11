@@ -87,6 +87,7 @@ const refreshPhotoList = async () => {
     isAlbumEmpty.value = true;
   }
   await usePhotoStore.getPhotos(albumId.value, true);
+  // If album is empty before uploading photos, set the first photo as album cover.
   if (isAlbumEmpty.value) {
     const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photosInAlbum.value[0].key as string };
     await albumService.updateAlbum(albumToBeSubmitted);

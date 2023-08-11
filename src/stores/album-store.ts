@@ -99,6 +99,7 @@ export const albumStore = defineStore('albums', {
     updateAlbumCover(albumToBeUpdated: Album) {
       const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
       this.allAlbumList.splice(findIndex, 1, albumToBeUpdated);
+      // Update the selected album item in photo store so that the album cover is updated in the photo detail dialog
       const store = photoStore();
       store.selectedAlbumItem = albumToBeUpdated;
       this.refreshAlbumList = true;
