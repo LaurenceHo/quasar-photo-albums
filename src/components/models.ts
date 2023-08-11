@@ -2,9 +2,9 @@ export interface Album {
   id: string;
   albumName: string;
   albumCover?: string;
-  desc: string;
+  description?: string;
+  isPrivate: boolean;
   tags: string[];
-  private: boolean;
 }
 
 export interface Photo {
@@ -13,12 +13,10 @@ export interface Photo {
 }
 
 export interface AlbumTag {
-  id?: string;
   tag: string;
 }
 
-export interface LightBoxImage {
-  name: string;
-  alt?: string;
-  filter?: string;
+export interface ResponseStatus {
+  status: string;
+  message?: string;
 }

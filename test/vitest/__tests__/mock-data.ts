@@ -13,16 +13,16 @@ export const mockFetch = () => {
 };
 
 export const mockAlbumList = [
-  { id: 'Sport', albumName: 'Sport', desc: 'Sport', tags: ['sport'], private: false },
-  { id: 'Food', albumName: 'Food title', desc: 'Food desc', tags: ['food', 'test'], private: false },
-  { id: 'Hiking', albumName: 'Hiking', desc: 'Hiking', tags: ['hiking'], private: false },
-  { id: 'Shoes', albumName: 'Shoes', desc: 'Shoes', tags: [], private: false },
+  { id: 'Sport', albumName: 'Sport', description: 'Sport', tags: ['sport'], isPrivate: false },
+  { id: 'Food', albumName: 'Food title', description: 'Food desc', tags: ['food', 'test'], isPrivate: false },
+  { id: 'Hiking', albumName: 'Hiking', description: 'Hiking', tags: ['hiking'], isPrivate: false },
+  { id: 'Shoes', albumName: 'Shoes', description: 'Shoes', tags: [], isPrivate: false },
   {
     id: 'Do something secret',
     albumName: 'Do something secret',
-    desc: 'Do something secret',
+    description: 'Do something secret',
     tags: ['secret'],
-    private: true,
+    isPrivate: true,
   },
 ];
 

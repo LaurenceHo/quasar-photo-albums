@@ -1,4 +1,4 @@
-import { Photo } from 'components/models';
+import { Photo, ResponseStatus } from 'components/models';
 import HttpRequestService from 'src/services/http-request-service';
 
 export default class PhotoService extends HttpRequestService {
@@ -12,12 +12,12 @@ export default class PhotoService extends HttpRequestService {
     return this.perform('GET', `/${albumId}`);
   }
 
-  uploadPhotos(file: any, albumId: string): Promise<any> {
+  uploadPhotos(file: any, albumId: string): Promise<ResponseStatus> {
     this.setDisplayingParameters(true);
     return this.perform('POST', `/upload/${albumId}`, null, null, { file });
   }
 
-  deletePhoto(albumId: string, objectKey: string): Promise<any> {
+  deletePhoto(albumId: string, objectKey: string): Promise<ResponseStatus> {
     this.setDisplayingParameters(true);
     return this.perform('DELETE', '/photo', { albumId, objectKey });
   }

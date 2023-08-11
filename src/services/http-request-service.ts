@@ -2,9 +2,10 @@ import isEmpty from 'lodash/isEmpty';
 import { LoadingBar, Notify } from 'quasar';
 
 export default class HttpRequestService {
-  baseUrl = process.env.NODE_ENV === 'production'
-    ? (process.env.GOOGLE_CLOUD_FUNCTION_URL as string)
-    : `http://localhost:5001/${process.env.GOOGLE_FIREBASE_PROJECT_ID}/us-central1/main/api`;
+  baseUrl =
+    process.env.NODE_ENV === 'production'
+      ? (process.env.GOOGLE_CLOUD_FUNCTION_URL as string)
+      : `http://localhost:5001/${process.env.GOOGLE_FIREBASE_PROJECT_ID}/us-central1/main/api`;
   displayLoadingBar = false;
   customSuccessMessage: string | null = null;
   displayErrorNotification = true;
@@ -75,9 +76,8 @@ export default class HttpRequestService {
     requestOptions.method = method.toUpperCase();
     requestOptions.headers = headers;
 
-    let data = {};
+    let data = {} as any;
     const response = await fetch(urlPath, requestOptions);
-
     if (response.status >= 200 && response.status < 300) {
       if (this.customSuccessMessage) {
         this.notifyMessage(false, this.customSuccessMessage);
@@ -93,7 +93,7 @@ export default class HttpRequestService {
         data = await this.parseResponse(response);
       }
     } else {
-      await this.errorHandling(response);
+      data = await this.errorHandling(response);
     }
     LoadingBar.stop();
     return data;
@@ -117,6 +117,7 @@ export default class HttpRequestService {
       if (this.displayErrorNotification) {
         this.notifyMessage(true, errorJson.message || errorJson.status || response.statusText);
       }
+      return errorJson;
     } catch (error) {
       // If we cannot parse error response to JSON (exception will occur),
       // display original response status text as warning message

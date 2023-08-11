@@ -30,7 +30,7 @@
           <q-img v-if="albumItem?.albumCover" :ratio="1" :src="`${thumbnail}?tr=w-90,h-90`" class="rounded-borders" />
           <q-icon v-else name="mdi-image" />
           <q-icon
-            v-if="albumItem.private"
+            v-if="albumItem.isPrivate"
             class="absolute"
             color="white"
             name="mdi-lock"
@@ -42,8 +42,8 @@
 
       <q-item-section @click="goToAlbum">
         <q-item-label class="text-h6 text-weight-medium">{{ albumItem.albumName }}</q-item-label>
-        <q-item-label v-if="albumItem.desc" class="text-subtitle1 text-grey-7">
-          {{ albumItem.desc }}
+        <q-item-label v-if="albumItem.description" class="text-subtitle1 text-grey-7">
+          {{ albumItem.description }}
         </q-item-label>
         <div class="flex">
           <q-chip v-for="tag in albumItem.tags" :key="tag" color="secondary" dense square>{{ tag }}</q-chip>
@@ -73,7 +73,7 @@ const props = defineProps({
   albumItem: {
     type: Object,
     required: true,
-    default: () => ({ albumName: '', desc: '', tags: [], private: false, albumCover: '' }),
+    default: () => ({ albumName: '', description: '', tags: [], isPrivate: false, albumCover: '' }),
   },
 });
 

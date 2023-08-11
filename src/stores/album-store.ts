@@ -1,10 +1,10 @@
 import isEmpty from 'lodash/isEmpty';
-import orderBy from 'lodash/orderBy';
 import { defineStore } from 'pinia';
 import { Loading } from 'quasar';
 import { Album, AlbumTag } from 'src/components/models';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
+import { photoStore } from 'stores/photo-store';
 
 export interface AlbumState {
   loadingAlbums: boolean;
@@ -29,7 +29,7 @@ export const albumStore = defineStore('albums', {
       searchKey: '',
       sortOrder: 'desc',
       refreshAlbumList: false,
-    } as AlbumState),
+    }) as AlbumState,
   getters: {
     getAlbumById: (state: AlbumState) => (id: string) => state.allAlbumList.find((album) => album.id === id),
 
@@ -53,7 +53,7 @@ export const albumStore = defineStore('albums', {
             filteredAlbumList = filteredAlbumList.filter(
               (album) =>
                 album.albumName.toLowerCase().includes(searchKey.toLowerCase()) ||
-                album.desc.toLowerCase().includes(searchKey.toLowerCase())
+                album.description?.toLowerCase().includes(searchKey.toLowerCase())
             );
           }
           if (!isEmpty(selectedTags)) {
@@ -75,7 +75,13 @@ export const albumStore = defineStore('albums', {
         Loading.show();
         this.loadingAlbums = true;
         const tempList = await albumService.getAlbums();
-        this.allAlbumList = orderBy(tempList, 'albumName', this.sortOrder);
+        this.allAlbumList = tempList.sort((a, b) => {
+          if (this.sortOrder === 'asc') {
+            return a.albumName.localeCompare(b.albumName);
+          } else {
+            return b.albumName.localeCompare(a.albumName);
+          }
+        });
         Loading.hide();
         this.loadingAlbums = false;
       }
@@ -84,7 +90,8 @@ export const albumStore = defineStore('albums', {
     async getAlbumTags() {
       if (this.albumTags.length === 0) {
         this.loadingAlbumTags = true;
-        this.albumTags = await albumTagService.getAlbumTags();
+        const tempAlbumTags = await albumTagService.getAlbumTags();
+        this.albumTags = tempAlbumTags.sort((a, b) => a.tag.localeCompare(b.tag));
         this.loadingAlbumTags = false;
       }
     },
@@ -92,6 +99,9 @@ export const albumStore = defineStore('albums', {
     updateAlbumCover(albumToBeUpdated: Album) {
       const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
       this.allAlbumList.splice(findIndex, 1, albumToBeUpdated);
+      // Update the selected album item in photo store so that the album cover is updated in the photo detail dialog
+      const store = photoStore();
+      store.selectedAlbumItem = albumToBeUpdated;
       this.refreshAlbumList = true;
     },
 
@@ -99,7 +109,13 @@ export const albumStore = defineStore('albums', {
       const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
       if (findIndex === -1) {
         this.allAlbumList.push(albumToBeUpdated);
-        this.allAlbumList = orderBy(this.allAlbumList, 'albumName', this.sortOrder);
+        this.allAlbumList = this.allAlbumList.sort((a, b) => {
+          if (this.sortOrder === 'asc') {
+            return a.albumName.localeCompare(b.albumName);
+          } else {
+            return b.albumName.localeCompare(a.albumName);
+          }
+        });
       } else {
         if (deleteAlbum) {
           this.allAlbumList.splice(findIndex, 1);
@@ -116,7 +132,7 @@ export const albumStore = defineStore('albums', {
 
     updateAlbumTags(albumTag: AlbumTag, deleteTag: boolean) {
       if (deleteTag) {
-        const findIndex = this.albumTags.findIndex((tag) => tag.id === albumTag.id);
+        const findIndex = this.albumTags.findIndex((tag) => tag.tag === albumTag.tag);
         this.albumTags.splice(findIndex, 1);
       } else {
         this.albumTags.push(albumTag);

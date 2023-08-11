@@ -7,7 +7,7 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
-import { info }  from "firebase-functions/logger";
+import { info, error } from 'firebase-functions/logger';
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -35,29 +35,45 @@ export const fetchObjectFromS3 = async (folderName: string, maxKeys: number) => 
     StartAfter: folderNameKey,
   });
 
-  const result = await s3Client.send(command);
-  return result?.Contents;
+  try {
+    const result = await s3Client.send(command);
+    return result?.Contents;
+  } catch (err) {
+    error(`Failed to fetch objects from S3: ${err}`);
+    throw Error('Error when fetching photos');
+  }
 };
 
 //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-photo-album-full.html
 export const uploadObject = async (filePath: string, object: any) => {
   info('##### S3 FilePath:', filePath);
-  const command = new PutObjectCommand({
-    Body: object,
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Key: filePath,
-  });
 
-  return s3Client.send(command);
+  try {
+    return await s3Client.send(
+      new PutObjectCommand({
+        Body: object,
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: filePath,
+      })
+    );
+  } catch (err) {
+    error(`Failed to upload photo: ${err}`);
+    throw Error('Error when uploading photo');
+  }
 };
 
 export const deleteObject = async (objectKey: string) => {
-  const command = new DeleteObjectCommand({
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Key: objectKey,
-  });
-
-  return s3Client.send(command);
+  try {
+    return await s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: objectKey,
+      })
+    );
+  } catch (err) {
+    error(`Failed to delete photo: ${err}`);
+    throw Error('Error when deleting photo');
+  }
 };
 
 export const emptyS3Folder = async (folderName: string) => {
@@ -86,5 +102,10 @@ export const emptyS3Folder = async (folderName: string) => {
 
   const deleteObjectsCommand = new DeleteObjectsCommand(deleteParams);
 
-  return s3Client.send(deleteObjectsCommand);
+  try {
+    return await s3Client.send(deleteObjectsCommand);
+  } catch (err) {
+    error(`Failed to empty S3 folder: ${err}`);
+    throw Error('Error when emptying S3 folder');
+  }
 };
