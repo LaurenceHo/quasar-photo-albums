@@ -1,8 +1,5 @@
 <template>
-  <template v-if="photoId">
-    <PhotoDetail />
-  </template>
-  <div v-else class="q-pt-md">
+  <div class="q-pt-md">
     <div class="row items-center" :key="photoId">
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated to="/" />
       <div class="text-h4 q-py-md q-pl-sm" data-test-id="album-name">
@@ -51,13 +48,14 @@
     </div>
   </div>
   <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem?.id" @refreshPhotoList="refreshPhotoList" />
+  <PhotoDetail v-if="photoId" @refreshPhotoList="refreshPhotoList" />
 </template>
 
 <script lang="ts" setup>
 import { useQuasar } from 'quasar';
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
-import PhotoDetail from 'pages/PhotoDetail.vue';
+import PhotoDetail from 'components/dialog/PhotoDetail.vue';
 import { Album, Photo } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';

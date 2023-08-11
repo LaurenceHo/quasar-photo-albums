@@ -4,6 +4,7 @@ import { Loading } from 'quasar';
 import { Album, AlbumTag } from 'src/components/models';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
+import { photoStore } from 'stores/photo-store';
 
 export interface AlbumState {
   loadingAlbums: boolean;
@@ -98,6 +99,8 @@ export const albumStore = defineStore('albums', {
     updateAlbumCover(albumToBeUpdated: Album) {
       const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
       this.allAlbumList.splice(findIndex, 1, albumToBeUpdated);
+      const store = photoStore();
+      store.selectedAlbumItem = albumToBeUpdated;
       this.refreshAlbumList = true;
     },
 

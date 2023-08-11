@@ -20,13 +20,13 @@ export const photoStore = defineStore('photos', {
         id: '',
         albumName: '',
         albumCover: '',
-        desc: '',
+        description: '',
         tags: [],
-        private: false,
+        isPrivate: false,
       },
       photoList: [],
       selectedImageIndex: -1,
-    } as PhotoStoreState),
+    }) as PhotoStoreState,
 
   getters: {
     findPhotoIndex: (state: PhotoStoreState) => (photoId: string) =>

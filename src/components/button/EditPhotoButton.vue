@@ -93,8 +93,8 @@ const confirmDeletePhoto = async () => {
 
   const result = await photoService.deletePhoto(albumItem.value.id, photoKeyString);
   if (result.status === 'Success') {
-    await router.replace({ query: undefined });
     emits('refreshPhotoList');
+    await router.replace({ query: undefined });
   }
 };
 
