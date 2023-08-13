@@ -1,12 +1,3 @@
-export interface Album {
-  id: string;
-  albumName: string;
-  albumCover?: string;
-  desc: string;
-  tags: string[];
-  private: boolean;
-}
-
 export interface AlbumV2 {
   id: string;
   albumName: string;

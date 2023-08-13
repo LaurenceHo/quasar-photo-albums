@@ -6,15 +6,43 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input v-model="albumName" autofocus class="q-pb-md" label="Album name" outlined stack-label />
+        <q-input
+          v-model="albumId"
+          autofocus
+          class="q-pb-lg"
+          label="Album id"
+          outlined
+          stack-label
+          counter
+          maxlength="50"
+          :hint="getAlbumToBeUpdate.id ? '' : 'Once album is created, album id cannot be changed.'"
+          :disable="getAlbumToBeUpdate.id !== ''"
+          :rules="[
+            (val: string) => !!val || 'Album id is required',
+            (val: string) => /^[A-Za-z0-9\s-]*$/.test(val) || 'Only alphanumeric, space and dash are allowed',
+          ]"
+        />
+        <q-input
+          v-model="albumName"
+          autofocus
+          class="q-pb-lg"
+          label="Album name"
+          outlined
+          stack-label
+          counter
+          maxlength="50"
+          :rules="[(val) => !!val || 'Album name is required']"
+        />
         <q-input
           v-model="albumDesc"
           :disable="isProcessing"
           autofocus
-          class="q-pb-md"
+          class="q-pb-lg"
           label="Album description"
           outlined
           stack-label
+          counter
+          maxlength="200"
         />
         <q-select
           v-model="selectedAlbumTags"
@@ -72,6 +100,7 @@ const { getUpdateAlbumDialogState, setUpdateAlbumDialogState, getAlbumToBeUpdate
   DialogStateComposable();
 const { albumTags, filterTags } = AlbumTagsFilterComposable();
 
+const albumId = ref('');
 const albumName = ref('');
 const albumDesc = ref('');
 const privateAlbum = ref(false);
@@ -82,7 +111,7 @@ const confirmUpdateAlbum = async () => {
   isProcessing.value = true;
 
   const albumToBeSubmitted = {
-    id: getAlbumToBeUpdate.value.id || albumName.value,
+    id: getAlbumToBeUpdate.value.id || albumId.value,
     albumCover: getAlbumToBeUpdate.value.albumCover,
     albumName: albumName.value,
     description: albumDesc.value,
@@ -113,6 +142,7 @@ watch(
   getUpdateAlbumDialogState,
   (newValue) => {
     if (newValue) {
+      albumId.value = getAlbumToBeUpdate.value.id;
       albumName.value = getAlbumToBeUpdate.value.albumName;
       albumDesc.value = getAlbumToBeUpdate.value.description || '';
       privateAlbum.value = getAlbumToBeUpdate.value.isPrivate;
