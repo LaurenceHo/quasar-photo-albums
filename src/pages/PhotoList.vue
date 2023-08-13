@@ -83,9 +83,8 @@ const photoId = computed(() => route.query.photo as string);
 
 const isAlbumEmpty = ref(false);
 const refreshPhotoList = async () => {
-  if (photosInAlbum.value.length === 0) {
-    isAlbumEmpty.value = true;
-  }
+  isAlbumEmpty.value = photosInAlbum.value.length === 0;
+
   await usePhotoStore.getPhotos(albumId.value, true);
   // If album is empty before uploading photos, set the first photo as album cover.
   if (isAlbumEmpty.value) {

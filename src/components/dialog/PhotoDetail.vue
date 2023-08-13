@@ -1,5 +1,13 @@
 <template>
-  <q-dialog v-model="dialog" maximized persistent transition-hide="slide-down" transition-show="slide-up">
+  <q-dialog
+    v-model="dialog"
+    maximized
+    persistent
+    transition-hide="slide-down"
+    transition-show="slide-up"
+    @keyup.left="nextPhoto(-1)"
+    @keyup.right="nextPhoto(1)"
+  >
     <q-card>
       <q-card-section class="row items-center q-pb-none">
         <q-space />
