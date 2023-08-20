@@ -78,7 +78,10 @@ export const queryUserPermissionV2 = async (uid: string) => {
 export const queryPhotoAlbumsV2 = async (isAdmin: boolean) => {
   let params = {
     TableName: PHOTO_ALBUMS_TABLE_NAME,
-    ProjectionExpression: 'id, albumName, albumCover, description, tags, isPrivate',
+    IndexName: 'id-order-index',
+    ProjectionExpression: 'id, albumName, albumCover, description, tags, isPrivate, #Order',
+    ExpressionAttributeNames: { '#Order': 'order' },
+    // How to sort the result????
   } as any;
   if (!isAdmin) {
     params = {
@@ -119,12 +122,14 @@ export const updatePhotoAlbumV2 = async (album: AlbumV2) => {
     Key: {
       id: album.id,
     },
+    ExpressionAttributeNames: { '#Order': 'order' },
     UpdateExpression:
       'SET albumName = :albumName, ' +
       'albumCover = :albumCover, ' +
       'description = :description, ' +
       'tags = :tags, ' +
       'isPrivate = :isPrivate, ' +
+      '#Order = :order,' +
       'updatedAt = :updatedAt, ' +
       'updatedBy = :updatedBy',
     ExpressionAttributeValues: {
@@ -133,6 +138,7 @@ export const updatePhotoAlbumV2 = async (album: AlbumV2) => {
       ':description': album.description,
       ':tags': album.tags,
       ':isPrivate': album.isPrivate,
+      ':order': album.order,
       ':updatedAt': album.updatedAt,
       ':updatedBy': album.updatedBy,
     },

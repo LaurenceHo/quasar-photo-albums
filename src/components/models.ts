@@ -1,3 +1,5 @@
+import { ExifTags, FileTags } from 'exifreader';
+
 export interface Album {
   id: string;
   albumName: string;
@@ -5,6 +7,7 @@ export interface Album {
   description?: string;
   isPrivate: boolean;
   tags: string[];
+  order: number;
 }
 
 export interface Photo {
@@ -20,3 +23,5 @@ export interface ResponseStatus {
   status: string;
   message?: string;
 }
+
+export type ExifData = ExifTags & FileTags;
