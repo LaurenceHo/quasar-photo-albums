@@ -44,7 +44,6 @@ router.get('', async (req, res) => {
 
 router.post('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
   const album = req.body as AlbumV2;
-  album.order = 0;
   // @ts-ignore
   album.createdBy = req.user.email;
   album.createdAt = new Date().toISOString();

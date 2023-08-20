@@ -2,11 +2,11 @@
   <q-dialog
     v-model="dialog"
     maximized
-    persistent
     transition-hide="slide-down"
     transition-show="slide-up"
-    @keyup.left="nextPhoto(-1)"
-    @keyup.right="nextPhoto(1)"
+    @keydown.left="nextPhoto(-1)"
+    @keydown.right="nextPhoto(1)"
+    @escapeKey="closeDialog"
   >
     <q-card>
       <q-card-section class="row items-center q-pb-none">
@@ -66,56 +66,58 @@
               <q-item v-if="exifTags['Image Height']">
                 <q-item-section>
                   <q-item-label>Image Height</q-item-label>
-                  <q-item-label caption>{{ exifTags['Image Height'].description }}</q-item-label>
+                  <q-item-label caption>{{ exifTags['Image Height']?.description }}</q-item-label>
                 </q-item-section>
               </q-item>
 
               <q-item v-if="exifTags['Image Width']">
                 <q-item-section>
                   <q-item-label>Image Width</q-item-label>
-                  <q-item-label caption>{{ exifTags['Image Width'].description }}</q-item-label>
+                  <q-item-label caption>{{ exifTags['Image Width']?.description }}</q-item-label>
                 </q-item-section>
               </q-item>
 
               <q-item v-if="exifTags.Model">
                 <q-item-section>
                   <q-item-label>Device</q-item-label>
-                  <q-item-label caption>{{ exifTags.Make?.description }}, {{ exifTags.Model.value[0] }}</q-item-label>
+                  <q-item-label caption>
+                    {{ exifTags.Make?.description }}, {{ (exifTags.Model as StringArrayTag).value[0] }}
+                  </q-item-label>
                 </q-item-section>
               </q-item>
 
               <q-item v-if="exifTags.LensModel">
                 <q-item-section>
                   <q-item-label>Lens Model</q-item-label>
-                  <q-item-label caption>{{ exifTags.LensModel.value[0] }}</q-item-label>
+                  <q-item-label caption>{{ (exifTags.LensModel as StringArrayTag).value[0] }}</q-item-label>
                 </q-item-section>
               </q-item>
 
               <q-item v-if="exifTags.DateTime">
                 <q-item-section>
                   <q-item-label>Date Time</q-item-label>
-                  <q-item-label caption>{{ exifTags.DateTime.value[0] }}</q-item-label>
+                  <q-item-label caption>{{ (exifTags.DateTime as StringArrayTag).value[0] }}</q-item-label>
                 </q-item-section>
               </q-item>
 
               <q-item v-if="exifTags.OffsetTime">
                 <q-item-section>
                   <q-item-label>Offset Time</q-item-label>
-                  <q-item-label caption>{{ exifTags.OffsetTime.value[0] }}</q-item-label>
+                  <q-item-label caption>{{ (exifTags.OffsetTime as StringArrayTag).value[0] }}</q-item-label>
                 </q-item-section>
               </q-item>
 
               <q-item v-if="exifTags.ShutterSpeedValue">
                 <q-item-section>
                   <q-item-label>Shutter Speed</q-item-label>
-                  <q-item-label caption>{{ exifTags.ShutterSpeedValue.description }}</q-item-label>
+                  <q-item-label caption>{{ (exifTags.ShutterSpeedValue as NumberTag).description }}</q-item-label>
                 </q-item-section>
               </q-item>
 
               <q-item v-if="exifTags.ApertureValue">
                 <q-item-section>
                   <q-item-label>Aperture</q-item-label>
-                  <q-item-label caption>{{ exifTags.ApertureValue.description }}</q-item-label>
+                  <q-item-label caption>{{ (exifTags.ApertureValue as NumberTag).description }}</q-item-label>
                 </q-item-section>
               </q-item>
 
@@ -129,7 +131,7 @@
               <q-item v-if="exifTags.ISOSpeedRatings">
                 <q-item-section>
                   <q-item-label>ISO</q-item-label>
-                  <q-item-label caption>{{ exifTags.ISOSpeedRatings.description }}</q-item-label>
+                  <q-item-label caption>{{ (exifTags.ISOSpeedRatings as NumberTag).description }}</q-item-label>
                 </q-item-section>
               </q-item>
 
@@ -158,15 +160,15 @@
 import { isEmpty } from 'lodash';
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
 import { getS3Url } from 'components/helper';
-import { Photo } from 'components/models';
+import { ExifData, Photo } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import * as ExifReader from 'exifreader';
-import { Tags } from 'exifreader';
 import { useQuasar } from 'quasar';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { NumberTag, StringArrayTag } from 'exifreader';
 
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
@@ -184,7 +186,7 @@ const dialog = computed(() => !isEmpty(photoId.value));
 
 const selectedImage = ref({ url: '', key: '' } as Photo);
 const photoFileName = ref('');
-const exifTags = ref({} as Tags);
+const exifTags = ref({} as ExifData);
 const loadImage = ref(false);
 const latitude = ref(-1000);
 const longitude = ref(-1000);
@@ -255,7 +257,7 @@ watch(
       loadImage.value = true;
       try {
         // Need to load photo from the original source instead of CDN
-        exifTags.value = await ExifReader.load(getS3Url(newValue.key) as any);
+        exifTags.value = (await ExifReader.load(getS3Url(newValue.key))) as ExifData;
         if (exifTags.value?.GPSLatitude?.description) {
           latitude.value = Number(exifTags.value.GPSLatitude.description);
         }

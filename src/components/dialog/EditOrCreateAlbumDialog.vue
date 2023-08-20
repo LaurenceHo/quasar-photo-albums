@@ -117,6 +117,7 @@ const confirmUpdateAlbum = async () => {
     description: albumDesc.value,
     isPrivate: privateAlbum.value,
     tags: selectedAlbumTags.value,
+    order: getAlbumToBeUpdate.value.order,
   } as Album;
 
   let result;
@@ -134,7 +135,7 @@ const confirmUpdateAlbum = async () => {
 };
 
 const resetAlbum = () => {
-  setAlbumToBeUpdated({ id: '', albumName: '', albumCover: '', description: '', tags: [], isPrivate: true });
+  setAlbumToBeUpdated({ id: '', albumName: '', albumCover: '', description: '', tags: [], isPrivate: true, order: 0 });
   setUpdateAlbumDialogState(false);
 };
 
