@@ -74,6 +74,7 @@ export const albumStore = defineStore('albums', {
       if (this.allAlbumList.length === 0) {
         Loading.show();
         this.loadingAlbums = true;
+        // TODO - Need to check if the album list is updated
         // Get albums from local storage
         let albumsString = LocalStorage.getItem('ALL_ALBUMS');
         if (isEmpty(albumsString)) {
