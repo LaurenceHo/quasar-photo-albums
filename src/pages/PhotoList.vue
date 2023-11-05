@@ -1,22 +1,29 @@
 <template>
   <div class="q-pt-md">
-    <div class="row items-center" :key="photoId">
-      <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated to="/" />
+    <div :key="photoId" class="row items-center">
+      <q-btn color="primary" icon="mdi-arrow-left" round size="md" to="/" unelevated />
       <div class="text-h4 q-py-md q-pl-sm" data-test-id="album-name">
         {{ albumItem?.albumName }} {{ albumItem?.isPrivate ? '(private album)' : '' }}
       </div>
     </div>
     <div class="text-h6 text-grey q-pb-md" data-test-id="album-desc">{{ albumItem?.description }}</div>
     <div v-if="albumItem?.tags?.length > 0" class="flex q-pb-md">
-      <q-chip v-for="(tag, i) in albumItem.tags" :key="i" data-test-id="album-tag" color="secondary">
+      <q-chip v-for="(tag, i) in albumItem.tags" :key="i" color="secondary" data-test-id="album-tag">
         {{ tag }}
       </q-chip>
+    </div>
+    <div v-if="selectedPhotos.length > 0" class="flex items-center justify-between q-pb-md">
+      <div class="text-h6 flex items-center">
+        <q-btn flat icon="mdi-close" round @click="selectedPhotos = []" />
+        <div>{{ selectedPhotos.length }} selected</div>
+      </div>
+      <q-btn flat icon="mdi-file-image-remove" round @click="setDeletePhotoDialogState(true)" />
     </div>
     <div class="q-col-gutter-md row">
       <div v-if="isAdminUser" class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6" data-test-id="add-photo-item">
         <div class="relative-position">
           <div class="no-album-cover-square rounded-borders-lg cursor-pointer" @click="setUploadPhotoDialogState(true)">
-            <q-icon class="absolute-center" name="mdi-image-plus" size="48px" color="black" />
+            <q-icon class="absolute-center" color="black" name="mdi-image-plus" size="48px" />
           </div>
         </div>
       </div>
@@ -24,7 +31,7 @@
         <div
           v-for="(photo, index) in photosInAlbum"
           :key="photo.key"
-          class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6"
+          class="photo-items col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6"
           data-test-id="photo-item"
         >
           <div class="relative-position">
@@ -34,19 +41,35 @@
               class="rounded-borders-lg cursor-pointer"
               @click="goToPhotoDetail(index)"
             />
+            <q-checkbox
+              v-if="isAdminUser"
+              v-model="selectedPhotos"
+              :val="photo.key"
+              checked-icon="mdi-check-circle"
+              class="absolute-top-left"
+              color="white"
+              size="lg"
+              unchecked-icon="mdi-check-circle-outline"
+            />
             <EditPhotoButton
               v-if="isAdminUser"
-              :photo-key="photo.key"
               :album-item="albumItem"
               :is-album-cover="photo.key === albumItem?.albumCover"
-              @refreshPhotoList="refreshPhotoList"
+              :photo-key="photo.key"
               color="white"
+              @refreshPhotoList="refreshPhotoList"
             />
           </div>
         </div>
       </template>
     </div>
   </div>
+  <ConfirmDeletePhotosDialog
+    v-if="getDeletePhotoDialogState"
+    :album-id="albumItem?.id"
+    :selected-photos="selectedPhotos"
+    @refreshPhotoList="refreshPhotoList"
+  />
   <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem?.id" @refreshPhotoList="refreshPhotoList" />
   <PhotoDetail v-if="photoId" @refreshPhotoList="refreshPhotoList" />
 </template>
@@ -54,8 +77,9 @@
 <script lang="ts" setup>
 import { useQuasar } from 'quasar';
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
-import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
+import ConfirmDeletePhotosDialog from 'components/dialog/ConfirmDeletePhotosDialog.vue';
 import PhotoDetail from 'components/dialog/PhotoDetail.vue';
+import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
 import { Album, Photo } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
@@ -73,7 +97,8 @@ const albumService = new AlbumService();
 const useAlbumStore = albumStore();
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
-const { getUploadPhotoDialogState, setUploadPhotoDialogState } = DialogStateComposable();
+const { getUploadPhotoDialogState, setUploadPhotoDialogState, getDeletePhotoDialogState, setDeletePhotoDialogState } =
+  DialogStateComposable();
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumId = computed(() => route.params.albumId as string);
@@ -82,7 +107,9 @@ const photosInAlbum = computed(() => usePhotoStore.photoList as Photo[]);
 const photoId = computed(() => route.query.photo as string);
 
 const isAlbumEmpty = ref(false);
+const selectedPhotos = ref([] as string[]);
 const refreshPhotoList = async () => {
+  selectedPhotos.value = [];
   isAlbumEmpty.value = photosInAlbum.value.length === 0;
 
   await usePhotoStore.getPhotos(albumId.value, true);
@@ -108,3 +135,11 @@ watch(albumId, (newValue) => {
   }
 });
 </script>
+<style lang="scss">
+.photo-items {
+  .q-checkbox,
+  .q-checkbox__inner {
+    color: white !important;
+  }
+}
+</style>

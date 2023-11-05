@@ -14,7 +14,8 @@ export interface AlbumV2 {
 
 export interface PhotoObject {
   albumId: string;
-  objectKey: string;
+  objectKey?: string;
+  objectKeys?: string[];
 }
 
 export interface ResponseStatus {

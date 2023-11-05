@@ -1,4 +1,4 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, ReturnValue } from '@aws-sdk/client-dynamodb';
 import {
   DeleteCommand,
   DynamoDBDocumentClient,
@@ -142,7 +142,7 @@ export const updatePhotoAlbumV2 = async (album: AlbumV2) => {
       ':updatedAt': album.updatedAt,
       ':updatedBy': album.updatedBy,
     },
-    ReturnValues: 'ALL_NEW',
+    ReturnValues: ReturnValue.ALL_NEW,
   };
 
   try {

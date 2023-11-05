@@ -5,6 +5,7 @@ import { deleteObject, fetchObjectFromS3, uploadObject } from '../services/aws-s
 import { verifyJwtClaim, verifyUserPermission } from './helpers';
 import { STATUS_ERROR, STATUS_SUCCESS } from '../constants';
 import { PhotoObject } from '../models';
+import { isEmpty, isUndefined } from 'lodash';
 
 export const router = express.Router();
 
@@ -46,6 +47,25 @@ router.delete('/photo', verifyJwtClaim, verifyUserPermission, (req, res) => {
       });
   } else {
     res.status(400).send({ status: STATUS_ERROR, message: 'Photo is empty' });
+  }
+});
+
+router.delete('/photos', verifyJwtClaim, verifyUserPermission, (req, res) => {
+  const photos = req.body as PhotoObject;
+  const { albumId, objectKeys } = photos;
+
+  if (!isUndefined(objectKeys) && !isEmpty(objectKeys)) {
+    objectKeys.forEach((objectKey) => {
+      info('###### Delete photo:', objectKey);
+      deleteObject(`${albumId}/${objectKey}`)
+        .then(() => res.send({ status: STATUS_SUCCESS, message: 'Photo deleted' }))
+        .catch((err: Error) => {
+          error(err);
+          res.status(500).send({ status: STATUS_ERROR, message: err.message });
+        });
+    });
+  } else {
+    res.status(400).send({ status: STATUS_ERROR, message: 'No photo needs to be deleted' });
   }
 });
 

@@ -21,4 +21,9 @@ export default class PhotoService extends HttpRequestService {
     this.setDisplayingParameters(true);
     return this.perform('DELETE', '/photo', { albumId, objectKey });
   }
+
+  deletePhotos(albumId: string, objectKeys: string[]): Promise<ResponseStatus> {
+    this.setDisplayingParameters(true);
+    return this.perform('DELETE', '/photos', { albumId, objectKeys });
+  }
 }
