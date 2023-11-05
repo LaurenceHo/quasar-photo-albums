@@ -5,6 +5,7 @@ import { Album, AlbumTag } from 'src/components/models';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
 import { photoStore } from 'stores/photo-store';
+import { compareDbUpdatedTime } from 'src/helper';
 
 export interface AlbumState {
   loadingAlbums: boolean;
@@ -74,22 +75,20 @@ export const albumStore = defineStore('albums', {
       if (this.allAlbumList.length === 0) {
         Loading.show();
         this.loadingAlbums = true;
-        // TODO - Need to check if the album list is updated
-        // Get albums from local storage
-        let albumsString = LocalStorage.getItem('ALL_ALBUMS');
-        if (isEmpty(albumsString)) {
-          // If it's empty, get albums from database
+
+        // If updated time from localStorage is empty or different from S3, get albums from database
+        const compareResult = await compareDbUpdatedTime();
+        if (!compareResult.isLatest) {
           const tempList = await albumService.getAlbums();
-          albumsString = JSON.stringify(tempList);
+          const albumsString = JSON.stringify(tempList);
           LocalStorage.set('ALL_ALBUMS', albumsString);
+          LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
         }
-        // Get albums from local storage again
-        albumsString = LocalStorage.getItem('ALL_ALBUMS') || '';
-        let tempList = [];
-        if (typeof albumsString === 'string') {
-          tempList = JSON.parse(albumsString);
-        }
-        this.allAlbumList = tempList.sort((a: Album, b: Album) => {
+
+        // Get albums from local storage
+        const albumsString: string = LocalStorage.getItem('ALL_ALBUMS') || '';
+        const tempList: Album[] = JSON.parse(albumsString);
+        this.allAlbumList = tempList.sort((a, b) => {
           if (this.sortOrder === 'asc') {
             return a.albumName.localeCompare(b.albumName);
           } else {
@@ -104,7 +103,18 @@ export const albumStore = defineStore('albums', {
     async getAlbumTags() {
       if (this.albumTags.length === 0) {
         this.loadingAlbumTags = true;
-        const tempAlbumTags = await albumTagService.getAlbumTags();
+
+        const compareResult = await compareDbUpdatedTime();
+        if (!compareResult.isLatest) {
+          const tempAlbumTags = await albumTagService.getAlbumTags();
+          const albumTagsString = JSON.stringify(tempAlbumTags);
+          LocalStorage.set('ALBUM_TAGS', albumTagsString);
+          LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
+        }
+
+        const albumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
+        const tempAlbumTags: { tag: string }[] = JSON.parse(albumTagsString);
+
         this.albumTags = tempAlbumTags.sort((a, b) => a.tag.localeCompare(b.tag));
         this.loadingAlbumTags = false;
       }

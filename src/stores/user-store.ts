@@ -40,7 +40,7 @@ export const userStore = defineStore('user-permission', {
           this.userPermission = response;
         }
       } catch (error: any) {
-        console.log(error);
+        console.error(error);
       } finally {
         Loading.hide();
         this.isCheckingUserPermission = false;

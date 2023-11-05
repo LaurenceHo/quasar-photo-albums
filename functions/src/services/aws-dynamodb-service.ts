@@ -10,6 +10,7 @@ import {
 import { error } from 'firebase-functions/logger';
 import _ from 'lodash';
 import { AlbumV2 } from '../models';
+import { uploadObject } from './aws-s3-service';
 
 const dynamoClient = new DynamoDBClient({
   region: process.env.AWS_REGION,
@@ -54,6 +55,8 @@ updatedBy: string (email)
 const PHOTO_ALBUMS_TABLE_NAME = 'quasar-photo-albums';
 const PHOTO_ALBUM_TAGS_TABLE_NAME = 'quasar-album-tags';
 const PHOTO_USER_PERMISSION_TABLE_NAME = 'quasar-user-permission';
+
+// TODO - Implement the basic CRUD operations
 export const queryUserPermissionV2 = async (uid: string) => {
   const params = {
     TableName: PHOTO_USER_PERMISSION_TABLE_NAME,
@@ -81,7 +84,7 @@ export const queryPhotoAlbumsV2 = async (isAdmin: boolean) => {
     IndexName: 'id-order-index',
     ProjectionExpression: 'id, albumName, albumCover, description, tags, isPrivate, #Order',
     ExpressionAttributeNames: { '#Order': 'order' },
-    // How to sort the result????
+    // TODO - How to sort the result????
   } as any;
   if (!isAdmin) {
     params = {
@@ -104,12 +107,17 @@ export const queryPhotoAlbumsV2 = async (isAdmin: boolean) => {
 
 export const createPhotoAlbumV2 = async (album: AlbumV2) => {
   try {
-    return await ddbDocClient.send(
+    const result = await ddbDocClient.send(
       new PutCommand({
         TableName: PHOTO_ALBUMS_TABLE_NAME,
         Item: album,
       })
     );
+
+    if (result.$metadata.httpStatusCode === 200) {
+      await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+    }
+    return result;
   } catch (err) {
     error(`Failed to insert photo album: ${err}`);
     throw Error('Error when creating photo album');
@@ -146,7 +154,12 @@ export const updatePhotoAlbumV2 = async (album: AlbumV2) => {
   };
 
   try {
-    return await ddbDocClient.send(new UpdateCommand(params));
+    const result = await ddbDocClient.send(new UpdateCommand(params));
+
+    if (result.$metadata.httpStatusCode === 200) {
+      await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+    }
+    return result;
   } catch (err) {
     error(`Failed to update photo album: ${err}`);
     throw Error('Error when updating photo album');
@@ -155,7 +168,7 @@ export const updatePhotoAlbumV2 = async (album: AlbumV2) => {
 
 export const deletePhotoAlbumV2 = async (id: string) => {
   try {
-    return await ddbDocClient.send(
+    const result = await ddbDocClient.send(
       new DeleteCommand({
         TableName: PHOTO_ALBUMS_TABLE_NAME,
         Key: {
@@ -163,6 +176,12 @@ export const deletePhotoAlbumV2 = async (id: string) => {
         },
       })
     );
+
+    if (result.$metadata.httpStatusCode === 200) {
+      await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+    }
+
+    return result;
   } catch (err) {
     error(`Failed to delete photo album: ${err}`);
     throw Error('Error when deleting photo album');
@@ -187,7 +206,7 @@ export const queryAlbumTagsV2 = async () => {
 };
 export const createPhotoAlbumTagV2 = async (tag: { tag: string }) => {
   try {
-    return await ddbDocClient.send(
+    const result = await ddbDocClient.send(
       new PutCommand({
         TableName: PHOTO_ALBUM_TAGS_TABLE_NAME,
         Item: {
@@ -195,6 +214,11 @@ export const createPhotoAlbumTagV2 = async (tag: { tag: string }) => {
         },
       })
     );
+
+    if (result.$metadata.httpStatusCode === 200) {
+      await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+    }
+    return result;
   } catch (err) {
     error(`Failed to create album tag: ${err}`);
     throw Error('Error when creating album tag');
@@ -203,7 +227,7 @@ export const createPhotoAlbumTagV2 = async (tag: { tag: string }) => {
 
 export const deletePhotoAlbumTagV2 = async (tag: string) => {
   try {
-    return await ddbDocClient.send(
+    const result = await ddbDocClient.send(
       new DeleteCommand({
         TableName: PHOTO_ALBUM_TAGS_TABLE_NAME,
         Key: {
@@ -211,6 +235,11 @@ export const deletePhotoAlbumTagV2 = async (tag: string) => {
         },
       })
     );
+
+    if (result.$metadata.httpStatusCode === 200) {
+      await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+    }
+    return result;
   } catch (err) {
     error(`Failed to delete album tag: ${err}`);
     throw Error('Error when deleting album tag');

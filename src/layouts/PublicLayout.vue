@@ -62,6 +62,7 @@ import { albumStore } from 'src/stores/album-store';
 import { UserPermission, userStore } from 'src/stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { LocalStorage } from 'quasar';
 
 const authService = new AuthService();
 const userPermissionStore = userStore();
@@ -80,7 +81,10 @@ const isCheckingUserPermission = computed(() => userPermissionStore.isCheckingUs
 userPermissionStore.checkUserPermission();
 
 const logout = () => {
-  authService.logout().then(() => location.reload());
+  authService.logout().then(() => {
+    LocalStorage.clear();
+    location.reload();
+  });
 };
 
 watch(searchKey, (newValue) => {

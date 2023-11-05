@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { getS3Url } from 'components/helper';
+import { getS3Url } from 'src/helper';
 import { Album } from 'components/models';
 import { copyToClipboard, useQuasar } from 'quasar';
 import AlbumService from 'src/services/album-service';
