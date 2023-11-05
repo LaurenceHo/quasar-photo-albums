@@ -34,22 +34,6 @@ router.get('/:albumId', async (req, res) => {
   }
 });
 
-router.delete('/photo', verifyJwtClaim, verifyUserPermission, (req, res) => {
-  const photo = req.body as PhotoObject;
-
-  if (photo) {
-    info('###### Delete photo:', photo);
-    deleteObject(`${photo.albumId}/${photo.objectKey}`)
-      .then(() => res.send({ status: STATUS_SUCCESS, message: 'Photo deleted' }))
-      .catch((err: Error) => {
-        error(err);
-        res.status(500).send({ status: STATUS_ERROR, message: err.message });
-      });
-  } else {
-    res.status(400).send({ status: STATUS_ERROR, message: 'Photo is empty' });
-  }
-});
-
 router.delete('/photos', verifyJwtClaim, verifyUserPermission, (req, res) => {
   const photos = req.body as PhotoObject;
   const { albumId, objectKeys } = photos;

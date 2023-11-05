@@ -102,7 +102,7 @@ const makeCoverPhoto = async () => {
 
 const confirmDeletePhoto = async () => {
   isProcessing.value = true;
-  const result = await photoService.deletePhoto(albumItem.value.id, photoKeyString.value);
+  const result = await photoService.deletePhotos(albumItem.value.id, [photoKeyString.value]);
   isProcessing.value = false;
   if (result.status === 'Success') {
     emits('refreshPhotoList');
