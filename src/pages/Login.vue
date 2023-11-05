@@ -12,7 +12,7 @@
               unelevated
               @click="handleClickSignIn"
             >
-              <img class="absolute" src="/icons/google-icon.svg" style="left: 20px" />
+              <img alt="google icon" class="absolute" src="/icons/google-icon.svg" style="left: 20px" />
               Sign In With Google
             </q-btn>
           </q-card-section>
@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { useQuasar } from 'quasar';
+import { useQuasar, LocalStorage } from 'quasar';
 import AuthService from 'src/services/auth-service';
 import { userStore } from 'src/stores/user-store';
 import { ref } from 'vue';
@@ -58,6 +58,7 @@ const handleClickSignIn = async () => {
             message: `Welcome, ${userPermission.displayName}`,
             timeout: 2000,
           });
+          LocalStorage.remove('ALL_ALBUMS');
           setTimeout(() => router.push('/'), 1000);
         }
         loading.value = false;

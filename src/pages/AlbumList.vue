@@ -45,7 +45,7 @@
           label="Category"
           multiple
           option-label="tag"
-          option-value="id"
+          option-value="tag"
           outlined
           use-chips
           use-input
