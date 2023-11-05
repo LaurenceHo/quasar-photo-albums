@@ -1,6 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 import { defineStore } from 'pinia';
-import { Loading } from 'quasar';
+import { Loading, LocalStorage } from 'quasar';
 import { Album, AlbumTag } from 'src/components/models';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
@@ -74,8 +74,21 @@ export const albumStore = defineStore('albums', {
       if (this.allAlbumList.length === 0) {
         Loading.show();
         this.loadingAlbums = true;
-        const tempList = await albumService.getAlbums();
-        this.allAlbumList = tempList.sort((a, b) => {
+        // Get albums from local storage
+        let albumsString = LocalStorage.getItem('ALL_ALBUMS');
+        if (isEmpty(albumsString)) {
+          // If it's empty, get albums from database
+          const tempList = await albumService.getAlbums();
+          albumsString = JSON.stringify(tempList);
+          LocalStorage.set('ALL_ALBUMS', albumsString);
+        }
+        // Get albums from local storage again
+        albumsString = LocalStorage.getItem('ALL_ALBUMS') || '';
+        let tempList = [];
+        if (typeof albumsString === 'string') {
+          tempList = JSON.parse(albumsString);
+        }
+        this.allAlbumList = tempList.sort((a: Album, b: Album) => {
           if (this.sortOrder === 'asc') {
             return a.albumName.localeCompare(b.albumName);
           } else {
