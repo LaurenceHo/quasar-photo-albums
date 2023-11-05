@@ -23,6 +23,7 @@ export const photoStore = defineStore('photos', {
         description: '',
         tags: [],
         isPrivate: false,
+        order: 0,
       },
       photoList: [],
       selectedImageIndex: -1,

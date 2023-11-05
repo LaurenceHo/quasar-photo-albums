@@ -1,6 +1,7 @@
 ﻿import { Album } from 'src/components/models';
 import { computed, ref } from 'vue';
 
+const deletePhotoDialogState = ref(false);
 const uploadPhotoDialogState = ref(false);
 const updateAlbumDialogState = ref(false);
 const updateAlbumTagsDialogState = ref(false);
@@ -15,6 +16,10 @@ const albumToBeUpdate = ref({
 } as Album);
 
 export default function DialogStateComposable() {
+  const setDeletePhotoDialogState = (state: boolean) => {
+    deletePhotoDialogState.value = state;
+  };
+
   const setUploadPhotoDialogState = (state: boolean) => {
     uploadPhotoDialogState.value = state;
   };
@@ -32,13 +37,20 @@ export default function DialogStateComposable() {
   };
 
   return {
+    getDeletePhotoDialogState: computed(() => deletePhotoDialogState.value),
+    setDeletePhotoDialogState,
+    deletePhotoDialogState,
+
     getUploadPhotoDialogState: computed(() => uploadPhotoDialogState.value),
     setUploadPhotoDialogState,
+
     getAlbumToBeUpdate: computed(() => albumToBeUpdate.value),
     setAlbumToBeUpdated,
-    updateAlbumDialogState,
+
     getUpdateAlbumDialogState: computed(() => updateAlbumDialogState.value),
     setUpdateAlbumDialogState,
+    updateAlbumDialogState,
+
     getUpdateAlbumTagsDialogState: computed(() => updateAlbumTagsDialogState.value),
     setUpdateAlbumTagsDialogState,
     updateAlbumTagsDialogState,

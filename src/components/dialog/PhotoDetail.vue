@@ -159,7 +159,7 @@
 <script lang="ts" setup>
 import { isEmpty } from 'lodash';
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
-import { getS3Url } from 'components/helper';
+import { getS3Url } from 'src/helper';
 import { ExifData, Photo } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import * as ExifReader from 'exifreader';

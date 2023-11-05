@@ -1,10 +1,11 @@
 import isEmpty from 'lodash/isEmpty';
 import { defineStore } from 'pinia';
-import { Loading } from 'quasar';
+import { Loading, LocalStorage } from 'quasar';
 import { Album, AlbumTag } from 'src/components/models';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
 import { photoStore } from 'stores/photo-store';
+import { compareDbUpdatedTime } from 'src/helper';
 
 export interface AlbumState {
   loadingAlbums: boolean;
@@ -74,7 +75,20 @@ export const albumStore = defineStore('albums', {
       if (this.allAlbumList.length === 0) {
         Loading.show();
         this.loadingAlbums = true;
-        const tempList = await albumService.getAlbums();
+
+        const tempAlbumsString = LocalStorage.getItem('ALL_ALBUMS');
+        // If updated time from localStorage is empty or different from S3, get albums from database
+        const compareResult = await compareDbUpdatedTime();
+        if (!compareResult.isLatest || !tempAlbumsString) {
+          const tempList = await albumService.getAlbums();
+          const albumsString = JSON.stringify(tempList);
+          LocalStorage.set('ALL_ALBUMS', albumsString);
+          LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
+        }
+
+        // Get albums from local storage again
+        const albumsString: string = LocalStorage.getItem('ALL_ALBUMS') || '';
+        const tempList: Album[] = JSON.parse(albumsString);
         this.allAlbumList = tempList.sort((a, b) => {
           if (this.sortOrder === 'asc') {
             return a.albumName.localeCompare(b.albumName);
@@ -90,7 +104,18 @@ export const albumStore = defineStore('albums', {
     async getAlbumTags() {
       if (this.albumTags.length === 0) {
         this.loadingAlbumTags = true;
-        const tempAlbumTags = await albumTagService.getAlbumTags();
+
+        const compareResult = await compareDbUpdatedTime();
+        if (!compareResult.isLatest) {
+          const tempAlbumTags = await albumTagService.getAlbumTags();
+          const albumTagsString = JSON.stringify(tempAlbumTags);
+          LocalStorage.set('ALBUM_TAGS', albumTagsString);
+          LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
+        }
+
+        const albumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
+        const tempAlbumTags: { tag: string }[] = JSON.parse(albumTagsString);
+
         this.albumTags = tempAlbumTags.sort((a, b) => a.tag.localeCompare(b.tag));
         this.loadingAlbumTags = false;
       }

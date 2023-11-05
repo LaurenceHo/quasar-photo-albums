@@ -1,5 +1,5 @@
 <template>
-  <q-btn class="absolute-top-right" :color="color" flat icon="mdi-dots-vertical" round>
+  <q-btn :color="color" flat icon="mdi-dots-vertical" round>
     <q-menu>
       <q-list style="min-width: 100px">
         <q-item v-close-popup clickable @click="copyPhotoLink">
@@ -10,7 +10,7 @@
         </q-item>
         <q-item v-close-popup clickable @click="deletePhotoDialog = true">
           <q-item-section avatar>
-            <q-icon color="primary" name="mdi-file-image-remove" />
+            <q-icon color="primary" name="mdi-delete" />
           </q-item-section>
           <q-item-section>Delete Photo</q-item-section>
         </q-item>
@@ -27,7 +27,8 @@
     <q-card>
       <q-card-section class="row items-center">
         <q-icon color="primary" name="mdi-alert-circle" size="md" />
-        <span class="q-ml-sm text-h6">Do you want to delete photo "{{ photoKey }}"?</span>
+        <span class="q-ml-sm text-h6">Do you want to delete photo as below?</span>
+        <span class="q-mt-sm">{{ photoKeyString }}</span>
       </q-card-section>
 
       <q-card-actions align="right">
@@ -39,13 +40,13 @@
 </template>
 
 <script setup lang="ts">
-import { getS3Url } from 'components/helper';
+import { getS3Url } from 'src/helper';
 import { Album } from 'components/models';
 import { copyToClipboard, useQuasar } from 'quasar';
 import AlbumService from 'src/services/album-service';
 import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';
-import { ref, toRefs } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
 
 const emits = defineEmits(['refreshPhotoList']);
@@ -57,7 +58,8 @@ const props = defineProps({
   albumItem: {
     type: Object,
     required: true,
-    default: () => ({ id: '', albumName: '', description: '', tags: [], isPrivate: false, albumCover: '' }) as Album,
+    default: () =>
+      ({ id: '', albumName: '', description: '', tags: [], isPrivate: false, albumCover: '', order: 0 }) as Album,
   },
   photoKey: {
     type: String,
@@ -80,6 +82,11 @@ const router = useRouter();
 const deletePhotoDialog = ref(false);
 const isProcessing = ref(false);
 
+const photoKeyString = computed(() => {
+  const photoKeyArray = photoKey.value?.split('/');
+  return photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
+});
+
 const makeCoverPhoto = async () => {
   const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photoKey.value as string };
   await albumService.updateAlbum(albumToBeSubmitted);
@@ -87,15 +94,14 @@ const makeCoverPhoto = async () => {
 };
 
 const confirmDeletePhoto = async () => {
-  deletePhotoDialog.value = false;
-  const photoKeyArray = photoKey.value?.split('/');
-  const photoKeyString = photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
-
-  const result = await photoService.deletePhoto(albumItem.value.id, photoKeyString);
+  isProcessing.value = true;
+  const result = await photoService.deletePhotos(albumItem.value.id, [photoKeyString.value]);
+  isProcessing.value = false;
   if (result.status === 'Success') {
     emits('refreshPhotoList');
     await router.replace({ query: undefined });
   }
+  deletePhotoDialog.value = false;
 };
 
 const copyPhotoLink = () => {
