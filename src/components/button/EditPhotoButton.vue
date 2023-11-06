@@ -1,5 +1,5 @@
 <template>
-  <q-btn class="absolute-top-right" :color="color" flat icon="mdi-dots-vertical" round>
+  <q-btn :color="color" flat icon="mdi-dots-vertical" round>
     <q-menu>
       <q-list style="min-width: 100px">
         <q-item v-close-popup clickable @click="copyPhotoLink">
@@ -10,7 +10,7 @@
         </q-item>
         <q-item v-close-popup clickable @click="deletePhotoDialog = true">
           <q-item-section avatar>
-            <q-icon color="primary" name="mdi-file-image-remove" />
+            <q-icon color="primary" name="mdi-delete" />
           </q-item-section>
           <q-item-section>Delete Photo</q-item-section>
         </q-item>
@@ -27,7 +27,8 @@
     <q-card>
       <q-card-section class="row items-center">
         <q-icon color="primary" name="mdi-alert-circle" size="md" />
-        <span class="q-ml-sm text-h6">Do you want to delete photo "{{ photoKeyString }}"?</span>
+        <span class="q-ml-sm text-h6">Do you want to delete photo as below?</span>
+        <span class="q-mt-sm">{{ photoKeyString }}</span>
       </q-card-section>
 
       <q-card-actions align="right">
@@ -36,14 +37,6 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
-
-  <!-- TODO -->
-  <!--  <ConfirmDeletePhotosDialog-->
-  <!--    v-if="getDeletePhotoDialogState"-->
-  <!--    :album-id="albumItem?.id"-->
-  <!--    :selected-photos="selectedPhotos"-->
-  <!--    @refreshPhotoList="refreshPhotoList"-->
-  <!--  />-->
 </template>
 
 <script setup lang="ts">

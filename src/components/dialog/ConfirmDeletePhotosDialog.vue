@@ -3,7 +3,8 @@
     <q-card>
       <q-card-section class="row items-center">
         <q-icon color="primary" name="mdi-alert-circle" size="md" />
-        <span class="q-ml-sm text-h6">Do you want to delete photo(s) "{{ photoKeysString }}"?</span>
+        <span class="q-ml-sm text-h6">Do you want to delete photo(s) as below?</span>
+        <span class="q-mt-sm">{{ photoKeysString }}</span>
       </q-card-section>
 
       <q-card-actions align="right">

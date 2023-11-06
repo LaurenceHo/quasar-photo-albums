@@ -12,12 +12,23 @@
         {{ tag }}
       </q-chip>
     </div>
-    <div v-if="selectedPhotos.length > 0" class="flex items-center justify-between q-pb-md">
+    <div v-if="isAdminUser" class="flex items-center justify-between q-pb-md">
       <div class="text-h6 flex items-center">
-        <q-btn flat icon="mdi-close" round @click="selectedPhotos = []" />
-        <div>{{ selectedPhotos.length }} selected</div>
+        <q-btn
+          v-if="selectedPhotos.length !== photoKeysList.length"
+          icon="mdi-check-all"
+          round
+          @click="selectedPhotos = photoKeysList"
+          flat
+        >
+          <q-tooltip> Select all photos </q-tooltip>
+        </q-btn>
+        <q-btn v-if="selectedPhotos.length > 0" flat icon="mdi-close" round @click="selectedPhotos = []">
+          <q-tooltip> Unselect all photos </q-tooltip>
+        </q-btn>
+        <div v-if="selectedPhotos.length > 0">{{ selectedPhotos.length }} selected</div>
       </div>
-      <q-btn flat icon="mdi-file-image-remove" round @click="setDeletePhotoDialogState(true)" />
+      <q-btn v-if="selectedPhotos.length > 0" flat icon="mdi-delete" round @click="setDeletePhotoDialogState(true)" />
     </div>
     <div class="q-col-gutter-md row">
       <div v-if="isAdminUser" class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6" data-test-id="add-photo-item">
@@ -31,7 +42,7 @@
         <div
           v-for="(photo, index) in photosInAlbum"
           :key="photo.key"
-          class="photo-items col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6"
+          class="photo-item col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6"
           data-test-id="photo-item"
         >
           <div class="relative-position">
@@ -41,24 +52,26 @@
               class="rounded-borders-lg cursor-pointer"
               @click="goToPhotoDetail(index)"
             />
-            <q-checkbox
-              v-if="isAdminUser"
-              v-model="selectedPhotos"
-              :val="photo.key"
-              checked-icon="mdi-check-circle"
-              class="absolute-top-left"
-              color="white"
-              size="lg"
-              unchecked-icon="mdi-check-circle-outline"
-            />
-            <EditPhotoButton
-              v-if="isAdminUser"
-              :album-item="albumItem"
-              :is-album-cover="photo.key === albumItem?.albumCover"
-              :photo-key="photo.key"
-              color="white"
-              @refreshPhotoList="refreshPhotoList"
-            />
+            <div class="absolute-top flex justify-between photo-top-button-container">
+              <q-checkbox
+                v-if="isAdminUser"
+                v-model="selectedPhotos"
+                :val="photo.key"
+                checked-icon="mdi-check-circle"
+                color="positive"
+                unchecked-icon="mdi-check-circle"
+              >
+                <q-tooltip> Select photo </q-tooltip>
+              </q-checkbox>
+              <EditPhotoButton
+                v-if="isAdminUser"
+                :album-item="albumItem"
+                :is-album-cover="photo.key === albumItem?.albumCover"
+                :photo-key="photo.key"
+                color="white"
+                @refreshPhotoList="refreshPhotoList"
+              />
+            </div>
           </div>
         </div>
       </template>
@@ -104,6 +117,7 @@ const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumId = computed(() => route.params.albumId as string);
 const albumItem = computed(() => useAlbumStore.getAlbumById(albumId.value) as Album);
 const photosInAlbum = computed(() => usePhotoStore.photoList as Photo[]);
+const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.key));
 const photoId = computed(() => route.query.photo as string);
 
 const isAlbumEmpty = ref(false);
@@ -136,9 +150,20 @@ watch(albumId, (newValue) => {
 });
 </script>
 <style lang="scss">
-.photo-items {
+.photo-item {
+  .photo-top-button-container {
+    &:hover {
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.2);
+      opacity: 1;
+      transition: all 0.5s;
+      -webkit-transition: all 0.5s;
+      -moz-transition: all 0.5s;
+      border-radius: 8px 8px 0 0;
+    }
+  }
   .q-checkbox,
-  .q-checkbox__inner {
+  .q-checkbox__inner--falsy {
     color: white !important;
   }
 }
