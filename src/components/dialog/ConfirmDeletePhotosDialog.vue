@@ -32,20 +32,15 @@ const props = defineProps({
     type: String,
     required: true,
   },
-
-  selectedPhotos: {
-    type: Object,
-    required: true,
-  },
 });
 
-const { albumId, selectedPhotos } = toRefs(props);
+const { albumId } = toRefs(props);
 const photoService = new PhotoService();
-const { deletePhotoDialogState, setDeletePhotoDialogState } = DialogStateComposable();
+const { getSelectedPhotoList, deletePhotoDialogState, setDeletePhotoDialogState } = DialogStateComposable();
 
 const photoKeysArray = computed(
   () =>
-    selectedPhotos.value.map((photoKey: string) => {
+    getSelectedPhotoList.value.map((photoKey: string) => {
       const photoKeyArray = photoKey?.split('/');
       return photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
     }) as string[]

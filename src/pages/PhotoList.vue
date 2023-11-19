@@ -15,20 +15,26 @@
     <div v-if="isAdminUser" class="flex items-center justify-between q-pb-md">
       <div class="text-h6 flex items-center">
         <q-btn
-          v-if="selectedPhotos.length !== photoKeysList.length"
+          v-if="getSelectedPhotoList.length !== photoKeysList.length"
           icon="mdi-check-all"
           round
-          @click="selectedPhotos = photoKeysList"
+          @click="setSelectedPhotosList(photoKeysList)"
           flat
         >
           <q-tooltip> Select all photos </q-tooltip>
         </q-btn>
-        <q-btn v-if="selectedPhotos.length > 0" flat icon="mdi-close" round @click="selectedPhotos = []">
+        <q-btn v-if="getSelectedPhotoList.length > 0" flat icon="mdi-close" round @click="setSelectedPhotosList([])">
           <q-tooltip> Unselect all photos </q-tooltip>
         </q-btn>
-        <div v-if="selectedPhotos.length > 0">{{ selectedPhotos.length }} selected</div>
+        <div v-if="getSelectedPhotoList.length > 0">{{ getSelectedPhotoList.length }} selected</div>
       </div>
-      <q-btn v-if="selectedPhotos.length > 0" flat icon="mdi-delete" round @click="setDeletePhotoDialogState(true)" />
+      <q-btn
+        v-if="getSelectedPhotoList.length > 0"
+        flat
+        icon="mdi-delete"
+        round
+        @click="setDeletePhotoDialogState(true)"
+      />
     </div>
     <div class="q-col-gutter-md row">
       <div v-if="isAdminUser" class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6" data-test-id="add-photo-item">
@@ -55,7 +61,7 @@
             <div class="absolute-top flex justify-between photo-top-button-container">
               <q-checkbox
                 v-if="isAdminUser"
-                v-model="selectedPhotos"
+                v-model="selectedPhotosList"
                 :val="photo.key"
                 checked-icon="mdi-check-circle"
                 color="positive"
@@ -80,7 +86,6 @@
   <ConfirmDeletePhotosDialog
     v-if="getDeletePhotoDialogState"
     :album-id="albumItem?.id"
-    :selected-photos="selectedPhotos"
     @refreshPhotoList="refreshPhotoList"
   />
   <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem?.id" @refreshPhotoList="refreshPhotoList" />
@@ -110,8 +115,15 @@ const albumService = new AlbumService();
 const useAlbumStore = albumStore();
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
-const { getUploadPhotoDialogState, setUploadPhotoDialogState, getDeletePhotoDialogState, setDeletePhotoDialogState } =
-  DialogStateComposable();
+const {
+  selectedPhotosList,
+  getSelectedPhotoList,
+  setSelectedPhotosList,
+  getUploadPhotoDialogState,
+  setUploadPhotoDialogState,
+  getDeletePhotoDialogState,
+  setDeletePhotoDialogState,
+} = DialogStateComposable();
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumId = computed(() => route.params.albumId as string);
@@ -121,9 +133,8 @@ const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.ke
 const photoId = computed(() => route.query.photo as string);
 
 const isAlbumEmpty = ref(false);
-const selectedPhotos = ref([] as string[]);
 const refreshPhotoList = async () => {
-  selectedPhotos.value = [];
+  setSelectedPhotosList([]);
   isAlbumEmpty.value = photosInAlbum.value.length === 0;
 
   await usePhotoStore.getPhotos(albumId.value, true);

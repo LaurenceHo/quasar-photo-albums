@@ -84,7 +84,7 @@ export const queryPhotoAlbumsV2 = async (isAdmin: boolean) => {
     IndexName: 'id-order-index',
     ProjectionExpression: 'id, albumName, albumCover, description, tags, isPrivate, #Order',
     ExpressionAttributeNames: { '#Order': 'order' },
-    // TODO - How to sort the result????
+    // TODO - Need to sort by order
   } as any;
   if (!isAdmin) {
     params = {

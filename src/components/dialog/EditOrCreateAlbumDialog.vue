@@ -91,7 +91,7 @@ import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composa
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
 import { albumStore } from 'stores/album-store';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const albumService = new AlbumService();
 const store = albumStore();
@@ -107,6 +107,8 @@ const privateAlbum = ref(false);
 const selectedAlbumTags = ref([] as string[]);
 const isProcessing = ref(false);
 
+const amountOfAllAlbums = computed(() => store.allAlbumList.length);
+
 const confirmUpdateAlbum = async () => {
   isProcessing.value = true;
 
@@ -117,7 +119,7 @@ const confirmUpdateAlbum = async () => {
     description: albumDesc.value,
     isPrivate: privateAlbum.value,
     tags: selectedAlbumTags.value,
-    order: getAlbumToBeUpdate.value.order,
+    order: getAlbumToBeUpdate.value.id ? getAlbumToBeUpdate.value.order : amountOfAllAlbums.value,
   } as Album;
 
   let result;
