@@ -8,7 +8,7 @@
           </q-item-section>
           <q-item-section>Copy Image Link</q-item-section>
         </q-item>
-        <q-item v-close-popup clickable @click="deletePhotoDialog = true">
+        <q-item v-close-popup clickable @click="deletePhoto">
           <q-item-section avatar>
             <q-icon color="primary" name="mdi-delete" />
           </q-item-section>
@@ -23,20 +23,6 @@
       </q-list>
     </q-menu>
   </q-btn>
-  <q-dialog v-model="deletePhotoDialog" persistent>
-    <q-card>
-      <q-card-section class="row items-center">
-        <q-icon color="primary" name="mdi-alert-circle" size="md" />
-        <span class="q-ml-sm text-h6">Do you want to delete photo as below?</span>
-        <span class="q-mt-sm">{{ photoKeyString }}</span>
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn v-close-popup :disable="isProcessing" color="primary" flat label="Cancel" no-caps />
-        <q-btn :loading="isProcessing" color="primary" unelevated label="Confirm" no-caps @click="confirmDeletePhoto" />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
 </template>
 
 <script setup lang="ts">
@@ -46,8 +32,8 @@ import { copyToClipboard, useQuasar } from 'quasar';
 import AlbumService from 'src/services/album-service';
 import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';
-import { computed, ref, toRefs } from 'vue';
-import { useRouter } from 'vue-router';
+import { toRefs } from 'vue';
+import DialogStateComposable from 'src/composables/dialog-state-composable';
 
 const emits = defineEmits(['refreshPhotoList']);
 const props = defineProps({
@@ -77,15 +63,8 @@ const albumService = new AlbumService();
 const photoService = new PhotoService();
 const store = albumStore();
 const q = useQuasar();
-const router = useRouter();
 
-const deletePhotoDialog = ref(false);
-const isProcessing = ref(false);
-
-const photoKeyString = computed(() => {
-  const photoKeyArray = photoKey.value?.split('/');
-  return photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
-});
+const { setSelectedPhotosList, setDeletePhotoDialogState } = DialogStateComposable();
 
 const makeCoverPhoto = async () => {
   const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photoKey.value as string };
@@ -93,15 +72,9 @@ const makeCoverPhoto = async () => {
   store.updateAlbumCover(albumToBeSubmitted);
 };
 
-const confirmDeletePhoto = async () => {
-  isProcessing.value = true;
-  const result = await photoService.deletePhotos(albumItem.value.id, [photoKeyString.value]);
-  isProcessing.value = false;
-  if (result.status === 'Success') {
-    emits('refreshPhotoList');
-    await router.replace({ query: undefined });
-  }
-  deletePhotoDialog.value = false;
+const deletePhoto = () => {
+  setSelectedPhotosList([photoKey.value]);
+  setDeletePhotoDialogState(true);
 };
 
 const copyPhotoLink = () => {

@@ -16,7 +16,6 @@ import { STATUS_ERROR, STATUS_SUCCESS } from '../constants';
 
 // Reference:
 // https://firebase.google.com/docs/reference/admin/node/firebase-admin.firestore
-// https://googleapis.dev/nodejs/firestore/latest/Firestore.html
 
 export const router = express.Router();
 
@@ -31,9 +30,6 @@ router.get('', async (req, res) => {
     }
 
     const isAdmin = _.get(userPermission, 'role') === 'admin';
-    if (!isAdmin) {
-      res.set('Cache-control', 'public, max-age=3600');
-    }
     const albumList = await queryPhotoAlbumsV2(isAdmin);
     res.send(albumList);
   } catch (err: any) {

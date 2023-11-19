@@ -14,8 +14,13 @@ const albumToBeUpdate = ref({
   isPrivate: true,
   order: 0,
 } as Album);
+const selectedPhotosList = ref([] as string[]);
 
 export default function DialogStateComposable() {
+  const setSelectedPhotosList = (photos: string[]) => {
+    selectedPhotosList.value = photos;
+  };
+
   const setDeletePhotoDialogState = (state: boolean) => {
     deletePhotoDialogState.value = state;
   };
@@ -37,6 +42,10 @@ export default function DialogStateComposable() {
   };
 
   return {
+    getSelectedPhotoList: computed(() => selectedPhotosList.value),
+    setSelectedPhotosList,
+    selectedPhotosList,
+
     getDeletePhotoDialogState: computed(() => deletePhotoDialogState.value),
     setDeletePhotoDialogState,
     deletePhotoDialogState,
