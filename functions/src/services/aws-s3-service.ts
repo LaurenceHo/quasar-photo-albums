@@ -6,6 +6,7 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import { PutObjectCommandInput } from '@aws-sdk/client-s3/dist-types/commands/PutObjectCommand';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
 import { info, error } from 'firebase-functions/logger';
 
@@ -49,13 +50,17 @@ export const uploadObject = async (filePath: string, object: any) => {
   info('##### S3 FilePath:', filePath);
 
   try {
-    return await s3Client.send(
-      new PutObjectCommand({
-        Body: object,
-        Bucket: process.env.AWS_S3_BUCKET_NAME,
-        Key: filePath,
-      })
-    );
+    const putObject: PutObjectCommandInput = {
+      Body: object,
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: filePath,
+    };
+
+    if (filePath === 'updateDatabaseAt.json') {
+      putObject.CacheControl = 'no-cache';
+    }
+
+    return await s3Client.send(new PutObjectCommand(putObject));
   } catch (err) {
     error(`Failed to upload photo: ${err}`);
     throw Error('Error when uploading photo');
