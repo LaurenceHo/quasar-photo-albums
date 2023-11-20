@@ -157,6 +157,7 @@ const goToPhotoDetail = (imageIndex: number) => {
 watch(albumId, (newValue) => {
   if (newValue) {
     usePhotoStore.getPhotos(newValue);
+    setSelectedPhotosList([]);
   }
 });
 </script>

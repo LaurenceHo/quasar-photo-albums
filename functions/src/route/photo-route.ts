@@ -1,10 +1,10 @@
 import Busboy from 'busboy';
 import express from 'express';
 import { info, error } from 'firebase-functions/logger';
-import { deleteObject, fetchObjectFromS3, uploadObject } from '../services/aws-s3-service';
+import { deleteObjects, fetchObjectFromS3, uploadObject } from '../services/aws-s3-service';
 import { verifyJwtClaim, verifyUserPermission } from './helpers';
 import { STATUS_ERROR, STATUS_SUCCESS } from '../constants';
-import { PhotoObject } from '../models';
+import { PhotosRequest } from '../models';
 import { isEmpty, isUndefined } from 'lodash';
 
 export const router = express.Router();
@@ -34,25 +34,41 @@ router.get('/:albumId', async (req, res) => {
   }
 });
 
-router.delete('/photos', verifyJwtClaim, verifyUserPermission, (req, res) => {
-  const photos = req.body as PhotoObject;
-  const { albumId, objectKeys } = photos;
+router.delete('', verifyJwtClaim, verifyUserPermission, (req, res) => {
+  const photos = req.body as PhotosRequest;
+  const { albumId, photoKeys } = photos;
 
-  if (!isUndefined(objectKeys) && !isEmpty(objectKeys)) {
-    objectKeys.forEach((objectKey) => {
-      info('###### Delete photo:', objectKey);
-      deleteObject(`${albumId}/${objectKey}`)
-        .then(() => res.send({ status: STATUS_SUCCESS, message: 'Photo deleted' }))
-        .catch((err: Error) => {
-          error(err);
-          res.status(500).send({ status: STATUS_ERROR, message: err.message });
-        });
-    });
+  if (!isUndefined(photoKeys) && !isEmpty(photoKeys)) {
+    const photoKeysArray = photoKeys.map((photoKey) => `${albumId}/${photoKey}`);
+    deleteObjects(photoKeysArray)
+      .then((result) => {
+        info('###### Delete photos:', result);
+        res.send({ status: STATUS_SUCCESS, message: 'Photo deleted' });
+      })
+      .catch((err: Error) => {
+        error(err);
+        res.status(500).send({ status: STATUS_ERROR, message: err.message });
+      });
   } else {
     res.status(400).send({ status: STATUS_ERROR, message: 'No photo needs to be deleted' });
   }
 });
 
+router.put('', verifyJwtClaim, verifyUserPermission, (req, res) => {
+  const photos = req.body as PhotosRequest;
+  const { destinationAlbumId, albumId, photoKeys } = photos;
+  if (isUndefined(destinationAlbumId) || isEmpty(destinationAlbumId)) {
+    res.status(400).send({ status: STATUS_ERROR, message: 'No destination album' });
+  }
+
+  if (!isUndefined(photoKeys) && !isEmpty(photoKeys)) {
+    const targetPhotoKeysArray = photoKeys.map((photoKey) => `${albumId}/${photoKey}`);
+    console.log(targetPhotoKeysArray);
+    // TODO
+  } else {
+    res.status(400).send({ status: STATUS_ERROR, message: 'No photo needs to be moved' });
+  }
+});
 /**
  * https://cloud.google.com/functions/docs/writing/http#multipart_data
  */

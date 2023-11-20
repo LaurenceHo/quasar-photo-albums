@@ -12,9 +12,10 @@ export interface AlbumV2 {
   updatedBy: string;
 }
 
-export interface PhotoObject {
+export interface PhotosRequest {
   albumId: string;
-  objectKeys: string[];
+  destinationAlbumId?: string;
+  photoKeys: string[];
 }
 
 export interface ResponseStatus {
