@@ -28,19 +28,34 @@
         </q-btn>
         <div v-if="getSelectedPhotoList.length > 0">{{ getSelectedPhotoList.length }} selected</div>
       </div>
-      <q-btn
-        v-if="getSelectedPhotoList.length > 0"
-        flat
-        icon="mdi-delete"
-        round
-        @click="setDeletePhotoDialogState(true)"
-      />
+      <div>
+        <q-btn
+          v-if="getSelectedPhotoList.length > 0"
+          flat
+          icon="mdi-delete"
+          round
+          @click="setDeletePhotoDialogState(true)"
+        >
+          <q-tooltip> Delete selected photos </q-tooltip>
+        </q-btn>
+        <q-btn
+          v-if="getSelectedPhotoList.length > 0"
+          flat
+          icon="mdi-image-move"
+          round
+          @click="setMovePhotoDialogState(true)"
+        >
+          <q-tooltip> Move selected photos to another album </q-tooltip>
+        </q-btn>
+      </div>
     </div>
     <div class="q-col-gutter-md row">
       <div v-if="isAdminUser" class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6" data-test-id="add-photo-item">
         <div class="relative-position">
           <div class="no-album-cover-square rounded-borders-lg cursor-pointer" @click="setUploadPhotoDialogState(true)">
-            <q-icon class="absolute-center" color="black" name="mdi-image-plus" size="48px" />
+            <q-icon class="absolute-center" color="black" name="mdi-image-plus" size="48px">
+              <q-tooltip> Upload photos </q-tooltip>
+            </q-icon>
           </div>
         </div>
       </div>
@@ -83,6 +98,7 @@
       </template>
     </div>
   </div>
+  <MovePhotoDialog v-if="getMovePhotoDialogState" @refreshPhotoList="refreshPhotoList" />
   <ConfirmDeletePhotosDialog
     v-if="getDeletePhotoDialogState"
     :album-id="albumItem?.id"
@@ -94,8 +110,9 @@
 
 <script lang="ts" setup>
 import { useQuasar } from 'quasar';
-import EditPhotoButton from 'components/button/EditPhotoButton.vue';
 import ConfirmDeletePhotosDialog from 'components/dialog/ConfirmDeletePhotosDialog.vue';
+import EditPhotoButton from 'components/button/EditPhotoButton.vue';
+import MovePhotoDialog from 'components/dialog/MovePhotoDialog.vue';
 import PhotoDetail from 'components/dialog/PhotoDetail.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
 import { Album, Photo } from 'components/models';
@@ -123,6 +140,8 @@ const {
   setUploadPhotoDialogState,
   getDeletePhotoDialogState,
   setDeletePhotoDialogState,
+  getMovePhotoDialogState,
+  setMovePhotoDialogState,
 } = DialogStateComposable();
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);

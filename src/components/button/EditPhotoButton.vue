@@ -16,9 +16,9 @@
         </q-item>
         <q-item v-if="!isAlbumCover" v-close-popup clickable @click="makeCoverPhoto">
           <q-item-section avatar>
-            <q-icon color="primary" name="mdi-image-area" />
+            <q-icon color="primary" name="mdi-folder-image" />
           </q-item-section>
-          <q-item-section>Make Cover Photo</q-item-section>
+          <q-item-section>Make Album Cover</q-item-section>
         </q-item>
       </q-list>
     </q-menu>
