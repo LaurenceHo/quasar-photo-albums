@@ -1,7 +1,7 @@
 <template>
   <div class="q-pt-md">
     <div class="q-pb-md row justify-between items-center content-center">
-      <div class="col-shrink q-mr-sm">
+      <div class="col-shrink q-mr-sm q-pb-sm">
         <q-btn-group outline>
           <q-btn
             data-test-id="album-list-style-button"
@@ -23,7 +23,7 @@
           />
         </q-btn-group>
       </div>
-      <div class="col-shrink q-mr-sm">
+      <div class="col-shrink q-mr-sm q-pb-sm">
         <q-btn
           data-test-id="album-sort-order-button"
           :icon="sortIcon"
@@ -34,7 +34,7 @@
           @click="updateSortOrder"
         />
       </div>
-      <div class="col-12 col-xl-3 col-lg-3 col-md-4">
+      <div class="col-12 col-xl-3 col-lg-3 col-md-4 q-pb-sm">
         <q-select
           v-model="selectedTags"
           :options="albumTags"

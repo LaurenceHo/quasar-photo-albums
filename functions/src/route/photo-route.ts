@@ -1,7 +1,7 @@
 import Busboy from 'busboy';
 import express from 'express';
 import { info, error } from 'firebase-functions/logger';
-import { deleteObjects, fetchObjectFromS3, uploadObject } from '../services/aws-s3-service';
+import { copyObject, deleteObjects, fetchObjectFromS3, uploadObject } from '../services/aws-s3-service';
 import { verifyJwtClaim, verifyUserPermission } from './helpers';
 import { STATUS_ERROR, STATUS_SUCCESS } from '../constants';
 import { PhotosRequest } from '../models';
@@ -35,8 +35,8 @@ router.get('/:albumId', async (req, res) => {
 });
 
 router.delete('', verifyJwtClaim, verifyUserPermission, (req, res) => {
-  const photos = req.body as PhotosRequest;
-  const { albumId, photoKeys } = photos;
+  const photosRequest = req.body as PhotosRequest;
+  const { albumId, photoKeys } = photosRequest;
 
   if (!isUndefined(photoKeys) && !isEmpty(photoKeys)) {
     const photoKeysArray = photoKeys.map((photoKey) => `${albumId}/${photoKey}`);
@@ -62,9 +62,26 @@ router.put('', verifyJwtClaim, verifyUserPermission, (req, res) => {
   }
 
   if (!isUndefined(photoKeys) && !isEmpty(photoKeys)) {
-    const targetPhotoKeysArray = photoKeys.map((photoKey) => `${albumId}/${photoKey}`);
-    console.log(targetPhotoKeysArray);
-    // TODO
+    photoKeys.forEach((photoKey) => {
+      const sourcePhotoKey = `${albumId}/${photoKey}`;
+      copyObject(sourcePhotoKey, `${destinationAlbumId}/${photoKey}`)
+        .then((result) => {
+          if (result.$metadata.httpStatusCode === 200) {
+            deleteObjects([sourcePhotoKey])
+              .then(() => {
+                info('###### Photo moved:', sourcePhotoKey);
+              })
+              .catch((err: Error) => {
+                error(err);
+                res.status(500).send({ status: STATUS_ERROR, message: err.message });
+              });
+          }
+        })
+        .catch((err: Error) => {
+          error(err);
+          res.status(500).send({ status: STATUS_ERROR, message: err.message });
+        });
+    });
   } else {
     res.status(400).send({ status: STATUS_ERROR, message: 'No photo needs to be moved' });
   }

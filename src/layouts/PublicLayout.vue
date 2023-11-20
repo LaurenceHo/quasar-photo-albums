@@ -6,7 +6,7 @@
           <q-avatar>
             <img src="/icons/favicon-128x128.png" />
           </q-avatar>
-          <q-toolbar-title v-if="$q.screen.gt.xs"> {{ albumAppName }}</q-toolbar-title>
+          <q-toolbar-title> {{ $q.screen.gt.xs === true ? albumAppName : '' }}</q-toolbar-title>
           <q-input v-if="routeName === 'Albums'" v-model="searchKey" dense standout="bg-grey">
             <template v-slot:prepend>
               <q-icon name="mdi-magnify" />

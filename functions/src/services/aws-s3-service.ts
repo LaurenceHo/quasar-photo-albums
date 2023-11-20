@@ -1,5 +1,6 @@
 import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity';
 import {
+  CopyObjectCommand,
   DeleteObjectsCommand,
   DeleteObjectsCommandInput,
   ListObjectsV2Command,
@@ -80,6 +81,21 @@ export const deleteObjects = async (objectKeys: string[]) => {
   } catch (err) {
     error(`Failed to delete photos: ${err}`);
     throw Error('Error when deleting photos');
+  }
+};
+
+export const copyObject = async (sourceObjectKey: string, destinationObjectKey: string) => {
+  try {
+    return await s3Client.send(
+      new CopyObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        CopySource: sourceObjectKey,
+        Key: destinationObjectKey,
+      })
+    );
+  } catch (err) {
+    error(`Failed to copy photo: ${err}`);
+    throw Error('Error when copying photo');
   }
 };
 
