@@ -1,12 +1,13 @@
 import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity';
 import {
-  DeleteObjectCommand,
+  CopyObjectCommand,
   DeleteObjectsCommand,
+  DeleteObjectsCommandInput,
   ListObjectsV2Command,
   PutObjectCommand,
+  PutObjectCommandInput,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { PutObjectCommandInput } from '@aws-sdk/client-s3/dist-types/commands/PutObjectCommand';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
 import { info, error } from 'firebase-functions/logger';
 
@@ -67,17 +68,34 @@ export const uploadObject = async (filePath: string, object: any) => {
   }
 };
 
-export const deleteObject = async (objectKey: string) => {
+export const deleteObjects = async (objectKeys: string[]) => {
+  const deleteParams: DeleteObjectsCommandInput = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Delete: { Objects: [] },
+  };
+
+  objectKeys.forEach((objectKeys) => deleteParams.Delete?.Objects?.push({ Key: objectKeys }));
+
+  try {
+    return await s3Client.send(new DeleteObjectsCommand(deleteParams));
+  } catch (err) {
+    error(`Failed to delete photos: ${err}`);
+    throw Error('Error when deleting photos');
+  }
+};
+
+export const copyObject = async (sourceObjectKey: string, destinationObjectKey: string) => {
   try {
     return await s3Client.send(
-      new DeleteObjectCommand({
+      new CopyObjectCommand({
         Bucket: process.env.AWS_S3_BUCKET_NAME,
-        Key: objectKey,
+        CopySource: `/${process.env.AWS_S3_BUCKET_NAME}/${sourceObjectKey}`,
+        Key: destinationObjectKey,
       })
     );
   } catch (err) {
-    error(`Failed to delete photo: ${err}`);
-    throw Error('Error when deleting photo');
+    error(`Failed to copy photo: ${err}`);
+    throw Error('Error when copying photo');
   }
 };
 
@@ -95,20 +113,10 @@ export const emptyS3Folder = async (folderName: string) => {
     await emptyS3Folder(folderName);
   }
 
-  const deleteParams = {
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Delete: { Objects: [] },
-  };
-
-  listedObjects.Contents.forEach(({ Key }: any) => {
-    // @ts-ignore
-    deleteParams.Delete.Objects.push({ Key });
-  });
-
-  const deleteObjectsCommand = new DeleteObjectsCommand(deleteParams);
+  const listedObjectArray = listedObjects.Contents.map(({ Key }: any) => Key);
 
   try {
-    return await s3Client.send(deleteObjectsCommand);
+    return await deleteObjects(listedObjectArray);
   } catch (err) {
     error(`Failed to empty S3 folder: ${err}`);
     throw Error('Error when emptying S3 folder');

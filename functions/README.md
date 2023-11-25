@@ -91,5 +91,6 @@ In your firebase.json file, direct all requests to the app function. This rewrit
 
 ### Photos
 * /api/photos/:albumId - GET: Get photos by album ID
-* /api/photos/photos - DELETE: Delete photos
+* /api/photos - DELETE: Delete photos
+* /api/photos - PUT: Move photos to different folder
 * /api/photos/upload/:albumId - POST: Upload photos to AWS S3 folder

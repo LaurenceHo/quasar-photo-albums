@@ -1,13 +1,24 @@
 <template>
-  <q-dialog v-model="deletePhotoDialogState" persistent>
-    <q-card>
-      <q-card-section class="row items-center">
-        <q-icon color="primary" name="mdi-alert-circle" size="md" />
-        <span class="q-ml-sm text-h6">Do you want to delete photo{{getSelectedPhotoList.length > 1 ? 's' :''}} as below?</span>
+  <q-dialog v-model="movePhotoDialogState">
+    <q-card style="min-width: 400px">
+      <q-card-section>
+        <div class="text-h6">Move photo{{getSelectedPhotoList.length > 1 ? 's' : ''}} to another album</div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <div class="row" v-for='photoKey in photoKeysArray' :key="photoKey">{{photoKey}}</div>
+        Select another album for {{getSelectedPhotoList.length > 1 ? 'these':'this'}} photo.
+        <q-select
+          v-model="selectedAlbum"
+          :options="allAlbumsList"
+          clearable
+          dense
+          emit-value
+          input-debounce="0"
+          map-options
+          option-label="albumName"
+          option-value="id"
+          outlined
+        />
       </q-card-section>
 
       <q-card-actions align="right">
@@ -16,9 +27,9 @@
           :loading="isProcessing"
           color="primary"
           unelevated
-          label="Confirm"
+          label="Move"
           no-caps
-          @click="confirmDeletePhotos"
+          @click="confirmMovePhotos"
         />
       </q-card-actions>
     </q-card>
@@ -27,6 +38,7 @@
 <script setup lang="ts">
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import { computed, ref, toRefs } from 'vue';
+import { albumStore } from 'stores/album-store';
 import PhotoService from 'src/services/photo-service';
 
 const emits = defineEmits(['refreshPhotoList']);
@@ -36,11 +48,12 @@ const props = defineProps({
     required: true,
   },
 });
-
 const { albumId } = toRefs(props);
+const { getSelectedPhotoList, setMovePhotoDialogState, movePhotoDialogState } = DialogStateComposable();
 const photoService = new PhotoService();
-const { getSelectedPhotoList, deletePhotoDialogState, setDeletePhotoDialogState } = DialogStateComposable();
+const store = albumStore();
 
+const allAlbumsList = computed(() => store.allAlbumList.filter((album) => album.id !== albumId.value));
 const photoKeysArray = computed(
   () =>
     getSelectedPhotoList.value.map((photoKey: string) => {
@@ -49,15 +62,16 @@ const photoKeysArray = computed(
     }) as string[]
 );
 
+const selectedAlbum = ref(allAlbumsList.value[0]?.id ?? '');
 const isProcessing = ref(false);
 
-const confirmDeletePhotos = async () => {
+const confirmMovePhotos = async () => {
   isProcessing.value = true;
-  const result = await photoService.deletePhotos(albumId?.value, photoKeysArray.value);
+  const result = await photoService.movePhotos(albumId?.value, selectedAlbum.value, photoKeysArray.value);
   isProcessing.value = false;
   if (result.status === 'Success') {
     emits('refreshPhotoList');
   }
-  setDeletePhotoDialogState(false);
-};
+  setMovePhotoDialogState(false);
+}
 </script>
