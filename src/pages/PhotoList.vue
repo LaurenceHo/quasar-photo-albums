@@ -98,7 +98,7 @@
       </template>
     </div>
   </div>
-  <MovePhotoDialog v-if="getMovePhotoDialogState" @refreshPhotoList="refreshPhotoList" />
+  <MovePhotoDialog v-if="getMovePhotoDialogState"  :album-id="albumItem?.id" @refreshPhotoList="refreshPhotoList" />
   <ConfirmDeletePhotosDialog
     v-if="getDeletePhotoDialogState"
     :album-id="albumItem?.id"
@@ -112,7 +112,7 @@
 import { useQuasar } from 'quasar';
 import ConfirmDeletePhotosDialog from 'components/dialog/ConfirmDeletePhotosDialog.vue';
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
-import MovePhotoDialog from 'components/dialog/MovePhotoDialog.vue';
+import MovePhotoDialog from 'components/dialog/MovePhotosDialog.vue';
 import PhotoDetail from 'components/dialog/PhotoDetail.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
 import { Album, Photo } from 'components/models';

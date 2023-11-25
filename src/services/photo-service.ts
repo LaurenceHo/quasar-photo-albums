@@ -17,13 +17,13 @@ export default class PhotoService extends HttpRequestService {
     return this.perform('POST', `/upload/${albumId}`, null, null, { file });
   }
 
+  movePhotos(albumId: string, destinationAlbumId: string, photoKeys: string[]): Promise<ResponseStatus> {
+    this.setDisplayingParameters(true);
+    return this.perform('PUT', '', { albumId, destinationAlbumId, photoKeys });
+  }
+
   deletePhotos(albumId: string, photoKeys: string[]): Promise<ResponseStatus> {
     this.setDisplayingParameters(true);
     return this.perform('DELETE', '', { albumId, photoKeys });
-  }
-
-  movePhotos(albumId: string, photoKeys: string[]): Promise<ResponseStatus> {
-    this.setDisplayingParameters(true);
-    return this.perform('PUT', '', { albumId, photoKeys });
   }
 }
