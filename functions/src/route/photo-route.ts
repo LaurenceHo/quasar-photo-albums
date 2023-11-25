@@ -69,7 +69,7 @@ router.put('', verifyJwtClaim, verifyUserPermission, (req, res) => {
           if (result.$metadata.httpStatusCode === 200) {
             deleteObjects([sourcePhotoKey])
               .then(() => {
-                info('###### Photo moved:', sourcePhotoKey);
+                info('##### Photo moved:', sourcePhotoKey);
               })
               .catch((err: Error) => {
                 error(err);
@@ -82,6 +82,7 @@ router.put('', verifyJwtClaim, verifyUserPermission, (req, res) => {
           res.status(500).send({ status: STATUS_ERROR, message: err.message });
         });
     });
+    res.send({ status: STATUS_SUCCESS, message: 'Photo moved' });
   } else {
     res.status(400).send({ status: STATUS_ERROR, message: 'No photo needs to be moved' });
   }
@@ -104,7 +105,6 @@ router.post('/upload/:albumId', verifyJwtClaim, verifyUserPermission, async (req
         const promise = new Promise((resolve, reject) => {
           uploadObject(`${albumId}/${filename}`, buffer)
             .then((result) => {
-              info('##### upload result', JSON.stringify(result));
               resolve(result);
             })
             .catch((error) => reject(error));
@@ -112,7 +112,7 @@ router.post('/upload/:albumId', verifyJwtClaim, verifyUserPermission, async (req
         fileWrites.push(promise);
       })
       .on('close', () => {
-        info(`File [${filename}] done`);
+        info(`##### File [${filename}] done`);
       });
   });
 

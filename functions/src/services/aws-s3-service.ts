@@ -89,7 +89,7 @@ export const copyObject = async (sourceObjectKey: string, destinationObjectKey: 
     return await s3Client.send(
       new CopyObjectCommand({
         Bucket: process.env.AWS_S3_BUCKET_NAME,
-        CopySource: sourceObjectKey,
+        CopySource: `/${process.env.AWS_S3_BUCKET_NAME}/${sourceObjectKey}`,
         Key: destinationObjectKey,
       })
     );

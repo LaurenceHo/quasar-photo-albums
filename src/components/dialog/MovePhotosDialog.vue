@@ -14,6 +14,7 @@
           dense
           emit-value
           input-debounce="0"
+          map-options
           option-label="albumName"
           option-value="id"
           outlined
@@ -47,12 +48,12 @@ const props = defineProps({
     required: true,
   },
 });
-
+const { albumId } = toRefs(props);
 const { getSelectedPhotoList, setMovePhotoDialogState, movePhotoDialogState } = DialogStateComposable();
 const photoService = new PhotoService();
 const store = albumStore();
 
-const allAlbumsList = computed(() => store.allAlbumList);
+const allAlbumsList = computed(() => store.allAlbumList.filter((album) => album.id !== albumId.value));
 const photoKeysArray = computed(
   () =>
     getSelectedPhotoList.value.map((photoKey: string) => {
@@ -61,8 +62,7 @@ const photoKeysArray = computed(
     }) as string[]
 );
 
-const { albumId } = toRefs(props);
-const selectedAlbum = ref(allAlbumsList.value[0]?.albumName ?? '');
+const selectedAlbum = ref(allAlbumsList.value[0]?.id ?? '');
 const isProcessing = ref(false);
 
 const confirmMovePhotos = async () => {

@@ -68,7 +68,6 @@
                 data-test-id="finish-button"
                 v-if="isCompleteUploading"
                 unelevated
-                rounded
                 color="primary"
                 size="lg"
                 padding="sm xl"
