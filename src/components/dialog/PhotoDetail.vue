@@ -1,6 +1,6 @@
 <template>
   <q-dialog
-    v-model="dialog"
+    v-model="isDialogOpen"
     maximized
     transition-hide="slide-down"
     transition-show="slide-up"
@@ -182,7 +182,7 @@ const photoList = computed(() => usePhotoStore.photoList);
 const albumItem = computed(() => usePhotoStore.selectedAlbumItem);
 const albumId = computed(() => route.params.albumId as string);
 const photoId = computed(() => route.query.photo as string);
-const dialog = computed(() => !isEmpty(photoId.value));
+const isDialogOpen = ref(!isEmpty(photoId.value));
 
 const selectedImage = ref({ url: '', key: '' } as Photo);
 const photoFileName = ref('');
