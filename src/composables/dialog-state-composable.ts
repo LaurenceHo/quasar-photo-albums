@@ -1,6 +1,7 @@
 ﻿import { Album } from 'src/components/models';
 import { computed, ref } from 'vue';
 
+const movePhotoDialogState = ref(false);
 const deletePhotoDialogState = ref(false);
 const uploadPhotoDialogState = ref(false);
 const updateAlbumDialogState = ref(false);
@@ -17,6 +18,10 @@ const albumToBeUpdate = ref({
 const selectedPhotosList = ref([] as string[]);
 
 export default function DialogStateComposable() {
+  const setMovePhotoDialogState = (state: boolean) => {
+    movePhotoDialogState.value = state;
+  };
+
   const setSelectedPhotosList = (photos: string[]) => {
     selectedPhotosList.value = photos;
   };
@@ -42,6 +47,10 @@ export default function DialogStateComposable() {
   };
 
   return {
+    getMovePhotoDialogState: computed(() => movePhotoDialogState.value),
+    setMovePhotoDialogState,
+    movePhotoDialogState,
+
     getSelectedPhotoList: computed(() => selectedPhotosList.value),
     setSelectedPhotosList,
     selectedPhotosList,

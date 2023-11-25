@@ -76,8 +76,8 @@ router.delete('/:albumId', verifyJwtClaim, verifyUserPermission, async (req, res
     const result = await emptyS3Folder(albumId);
     info('###### Delete album:', albumId);
     info('###### Delete result:', result);
-    // @ts-ignore
-    if (result.$metadata.httpStatusCode === 200) {
+
+    if (result?.$metadata?.httpStatusCode === 200) {
       await deletePhotoAlbumV2(albumId);
       res.send({ status: STATUS_SUCCESS, message: 'Album deleted' });
     } else {

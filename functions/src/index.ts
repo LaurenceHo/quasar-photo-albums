@@ -5,7 +5,7 @@ import express, { Application, Request, Response } from 'express';
 import throttle from 'express-throttle-bandwidth';
 import admin from 'firebase-admin';
 import { ServiceAccount } from 'firebase-admin/lib/app/credential';
-import { info }  from "firebase-functions/logger";
+import { info } from 'firebase-functions/logger';
 import * as functionsV2 from 'firebase-functions/v2';
 import helmet from 'helmet';
 import serviceAccount from '../serviceAccountKey.json';

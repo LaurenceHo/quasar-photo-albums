@@ -41,7 +41,6 @@
                 data-test-id="clear-button"
                 v-if="!isCompleteUploading"
                 outline
-                rounded
                 color="primary"
                 size="lg"
                 padding="sm xl"
@@ -56,7 +55,6 @@
                 data-test-id="upload-button"
                 v-if="!isCompleteUploading"
                 unelevated
-                rounded
                 color="primary"
                 size="lg"
                 padding="sm xl"
@@ -70,7 +68,6 @@
                 data-test-id="finish-button"
                 v-if="isCompleteUploading"
                 unelevated
-                rounded
                 color="primary"
                 size="lg"
                 padding="sm xl"
