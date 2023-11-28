@@ -1,4 +1,4 @@
-import { DynamoDBClient, DynamoDBClientConfig, ReturnValue } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, ReturnValue } from '@aws-sdk/client-dynamodb';
 import {
   DeleteCommand,
   DynamoDBDocumentClient,
@@ -7,23 +7,10 @@ import {
   ScanCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
-import dotenv from 'dotenv';
-import _ from 'lodash';
+import get from 'lodash/get';
 import { AlbumV2 } from '../models';
 import { uploadObject } from './aws-s3-service';
-
-dotenv.config();
-
-const configuration = {
-  region: process.env.AWS_REGION,
-};
-
-if (process.env.NODE_ENV === 'development') {
-  (configuration as DynamoDBClientConfig).credentials = {
-    accessKeyId: process.env.AWS_ACCESS_KEY!,
-    secretAccessKey: process.env.AWS_SECRET_KEY!,
-  };
-}
+import { configuration } from './config';
 
 const dynamoClient = new DynamoDBClient(configuration);
 
@@ -76,7 +63,7 @@ export const queryUserPermissionV2 = async (uid: string) => {
 
   try {
     const response = await ddbDocClient.send(new QueryCommand(params));
-    return _.get(response, 'Items[0]', null);
+    return get(response, 'Items[0]', null);
   } catch (err) {
     console.error(`Failed to query user permission: ${err}`);
     throw Error('Error when fetching user permission');

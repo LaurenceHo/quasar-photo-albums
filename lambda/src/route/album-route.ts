@@ -1,6 +1,6 @@
 import express from 'express';
 import admin from 'firebase-admin';
-import _ from 'lodash';
+import get from 'lodash/get';
 import { AlbumV2 } from '../models';
 import {
   createPhotoAlbumV2,
@@ -20,7 +20,7 @@ export const router = express.Router();
 
 router.get('', async (req, res) => {
   try {
-    const firebaseToken = _.get(req, 'cookies.__session', '');
+    const firebaseToken = get(req, 'cookies.__session', '');
     let decodedClaims = null;
     let userPermission = null;
     if (firebaseToken) {
@@ -28,7 +28,7 @@ router.get('', async (req, res) => {
       userPermission = await queryUserPermissionV2(decodedClaims?.uid);
     }
 
-    const isAdmin = _.get(userPermission, 'role') === 'admin';
+    const isAdmin = get(userPermission, 'role') === 'admin';
     const albumList = await queryPhotoAlbumsV2(isAdmin);
     res.send(albumList);
   } catch (err: any) {
@@ -74,7 +74,6 @@ router.delete('/:albumId', verifyJwtClaim, verifyUserPermission, async (req, res
   try {
     const result = await emptyS3Folder(albumId);
     console.log('###### Delete album:', albumId);
-    console.log('###### Delete result:', result);
 
     if (result?.$metadata?.httpStatusCode === 200) {
       await deletePhotoAlbumV2(albumId);
