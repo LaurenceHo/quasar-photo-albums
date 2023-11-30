@@ -1,0 +1,13 @@
+service: quasar-photo-album-lambda
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: us-east-1
+
+functions:
+  app:
+    handler: lib/src/app.handler
+    events:
+      - http: ANY /
+      - http: ANY /{proxy+}

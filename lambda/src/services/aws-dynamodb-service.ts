@@ -7,18 +7,13 @@ import {
   ScanCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { error } from 'firebase-functions/logger';
-import _ from 'lodash';
+import get from 'lodash/get';
 import { AlbumV2 } from '../models';
 import { uploadObject } from './aws-s3-service';
+import { configuration } from './config';
 
-const dynamoClient = new DynamoDBClient({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
-  },
-});
+const dynamoClient = new DynamoDBClient(configuration);
+
 const marshallOptions = {
   // Whether to automatically convert empty strings, blobs, and sets to `null`.
   convertEmptyValues: false, // false, by default.
@@ -68,9 +63,9 @@ export const queryUserPermissionV2 = async (uid: string) => {
 
   try {
     const response = await ddbDocClient.send(new QueryCommand(params));
-    return _.get(response, 'Items[0]', null);
+    return get(response, 'Items[0]', null);
   } catch (err) {
-    error(`Failed to query user permission: ${err}`);
+    console.error(`Failed to query user permission: ${err}`);
     throw Error('Error when fetching user permission');
   }
 };
@@ -100,7 +95,7 @@ export const queryPhotoAlbumsV2 = async (isAdmin: boolean) => {
 
     return response.Items as AlbumV2[];
   } catch (err) {
-    error(`Failed to query photo album: ${err}`);
+    console.error(`Failed to query photo album: ${err}`);
     throw Error('Error when fetching photo albums');
   }
 };
@@ -119,7 +114,7 @@ export const createPhotoAlbumV2 = async (album: AlbumV2) => {
     }
     return result;
   } catch (err) {
-    error(`Failed to insert photo album: ${err}`);
+    console.error(`Failed to insert photo album: ${err}`);
     throw Error('Error when creating photo album');
   }
 };
@@ -161,7 +156,7 @@ export const updatePhotoAlbumV2 = async (album: AlbumV2) => {
     }
     return result;
   } catch (err) {
-    error(`Failed to update photo album: ${err}`);
+    console.error(`Failed to update photo album: ${err}`);
     throw Error('Error when updating photo album');
   }
 };
@@ -183,7 +178,7 @@ export const deletePhotoAlbumV2 = async (id: string) => {
 
     return result;
   } catch (err) {
-    error(`Failed to delete photo album: ${err}`);
+    console.error(`Failed to delete photo album: ${err}`);
     throw Error('Error when deleting photo album');
   }
 };
@@ -200,7 +195,7 @@ export const queryAlbumTagsV2 = async () => {
     );
     return response.Items;
   } catch (err) {
-    error(`Failed to query album tags: ${err}`);
+    console.error(`Failed to query album tags: ${err}`);
     throw Error('Error when fetching album tags');
   }
 };
@@ -220,7 +215,7 @@ export const createPhotoAlbumTagV2 = async (tag: { tag: string }) => {
     }
     return result;
   } catch (err) {
-    error(`Failed to create album tag: ${err}`);
+    console.error(`Failed to create album tag: ${err}`);
     throw Error('Error when creating album tag');
   }
 };
@@ -241,7 +236,7 @@ export const deletePhotoAlbumTagV2 = async (tag: string) => {
     }
     return result;
   } catch (err) {
-    error(`Failed to delete album tag: ${err}`);
+    console.error(`Failed to delete album tag: ${err}`);
     throw Error('Error when deleting album tag');
   }
 };

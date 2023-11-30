@@ -2,10 +2,7 @@ import isEmpty from 'lodash/isEmpty';
 import { LoadingBar, Notify } from 'quasar';
 
 export default class HttpRequestService {
-  baseUrl =
-    process.env.NODE_ENV === 'production'
-      ? (process.env.GOOGLE_CLOUD_FUNCTION_URL as string)
-      : `http://localhost:5001/${process.env.GOOGLE_FIREBASE_PROJECT_ID}/us-central1/main/api`;
+  baseUrl = process.env.NODE_ENV === 'production' ? process.env.AWS_API_GATEWAY_URL : 'http://localhost:3000/api';
   displayLoadingBar = false;
   customSuccessMessage: string | null = null;
   displayErrorNotification = true;

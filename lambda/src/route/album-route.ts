@@ -1,7 +1,6 @@
 import express from 'express';
 import admin from 'firebase-admin';
-import { info, error } from 'firebase-functions/logger';
-import _ from 'lodash';
+import get from 'lodash/get';
 import { AlbumV2 } from '../models';
 import {
   createPhotoAlbumV2,
@@ -21,7 +20,7 @@ export const router = express.Router();
 
 router.get('', async (req, res) => {
   try {
-    const firebaseToken = _.get(req, 'cookies.__session', '');
+    const firebaseToken = get(req, 'cookies.__session', '');
     let decodedClaims = null;
     let userPermission = null;
     if (firebaseToken) {
@@ -29,11 +28,11 @@ router.get('', async (req, res) => {
       userPermission = await queryUserPermissionV2(decodedClaims?.uid);
     }
 
-    const isAdmin = _.get(userPermission, 'role') === 'admin';
+    const isAdmin = get(userPermission, 'role') === 'admin';
     const albumList = await queryPhotoAlbumsV2(isAdmin);
     res.send(albumList);
   } catch (err: any) {
-    error(err);
+    console.error(err);
     res.status(500).send({ status: STATUS_ERROR, message: err.message });
   }
 });
@@ -50,7 +49,7 @@ router.post('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
     await uploadObject(album.id + '/', null);
     res.send({ status: STATUS_SUCCESS, message: 'Album created' });
   } catch (err: any) {
-    error(err);
+    console.error(err);
     res.status(500).send({ status: STATUS_ERROR, message: err.message });
   }
 });
@@ -64,7 +63,7 @@ router.put('', verifyJwtClaim, verifyUserPermission, (req, res) => {
   updatePhotoAlbumV2(album)
     .then(() => res.send({ status: STATUS_SUCCESS, message: 'Album updated' }))
     .catch((err: Error) => {
-      error(err);
+      console.error(err);
       res.status(500).send({ status: STATUS_ERROR, message: err.message });
     });
 });
@@ -74,8 +73,7 @@ router.delete('/:albumId', verifyJwtClaim, verifyUserPermission, async (req, res
 
   try {
     const result = await emptyS3Folder(albumId);
-    info('###### Delete album:', albumId);
-    info('###### Delete result:', result);
+    console.log('###### Delete album:', albumId);
 
     if (result?.$metadata?.httpStatusCode === 200) {
       await deletePhotoAlbumV2(albumId);
@@ -84,7 +82,7 @@ router.delete('/:albumId', verifyJwtClaim, verifyUserPermission, async (req, res
       res.status(500).send({ status: STATUS_ERROR, message: 'Failed to delete album' });
     }
   } catch (err: any) {
-    error(err);
+    console.error(err);
     res.status(500).send({ status: STATUS_ERROR, message: err.message });
   }
 });

@@ -1,6 +1,5 @@
-import Busboy from 'busboy';
 import express from 'express';
-import { info, error } from 'firebase-functions/logger';
+import multer from 'multer';
 import { copyObject, deleteObjects, fetchObjectFromS3, uploadObject } from '../services/aws-s3-service';
 import { verifyJwtClaim, verifyUserPermission } from './helpers';
 import { STATUS_ERROR, STATUS_SUCCESS } from '../constants';
@@ -8,6 +7,12 @@ import { PhotosRequest } from '../models';
 import { isEmpty, isUndefined } from 'lodash';
 
 export const router = express.Router();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024,
+  },
+});
 
 router.get('/:albumId', async (req, res) => {
   const albumId = req.params['albumId'];
@@ -29,7 +34,7 @@ router.get('/:albumId', async (req, res) => {
     }
     res.send(photos);
   } catch (err: any) {
-    error(err);
+    console.error(err);
     res.status(500).send({ status: STATUS_ERROR, message: err.message });
   }
 });
@@ -42,11 +47,13 @@ router.delete('', verifyJwtClaim, verifyUserPermission, (req, res) => {
     const photoKeysArray = photoKeys.map((photoKey) => `${albumId}/${photoKey}`);
     deleteObjects(photoKeysArray)
       .then((result) => {
-        info('###### Delete photos:', result);
-        res.send({ status: STATUS_SUCCESS, message: 'Photo deleted' });
+        if (result.$metadata.httpStatusCode === 200) {
+          console.log('###### Delete photos:', result.Deleted?.map((deleted) => deleted.Key));
+          res.send({ status: STATUS_SUCCESS, message: 'Photo deleted' });
+        }
       })
       .catch((err: Error) => {
-        error(err);
+        console.error(err);
         res.status(500).send({ status: STATUS_ERROR, message: err.message });
       });
   } else {
@@ -69,16 +76,16 @@ router.put('', verifyJwtClaim, verifyUserPermission, (req, res) => {
           if (result.$metadata.httpStatusCode === 200) {
             deleteObjects([sourcePhotoKey])
               .then(() => {
-                info('##### Photo moved:', sourcePhotoKey);
+                console.log('##### Photo moved:', sourcePhotoKey);
               })
               .catch((err: Error) => {
-                error(err);
+                console.error(err);
                 res.status(500).send({ status: STATUS_ERROR, message: err.message });
               });
           }
         })
         .catch((err: Error) => {
-          error(err);
+          console.error(err);
           res.status(500).send({ status: STATUS_ERROR, message: err.message });
         });
     });
@@ -90,49 +97,23 @@ router.put('', verifyJwtClaim, verifyUserPermission, (req, res) => {
 /**
  * https://cloud.google.com/functions/docs/writing/http#multipart_data
  */
-router.post('/upload/:albumId', verifyJwtClaim, verifyUserPermission, async (req, res) => {
+router.post('/upload/:albumId', verifyJwtClaim, verifyUserPermission, upload.single('file'), async (req, res) => {
   const albumId = req.params['albumId'];
-  const busboy = Busboy({ headers: req.headers });
-  const fileWrites: any[] = [];
 
-  busboy.on('file', async (fieldName, file, fileInfo) => {
-    const { filename, encoding, mimeType } = fileInfo;
-    info(`##### File [${fieldName}]: filename: ${filename}, encoding: ${encoding}, mimeType: ${mimeType}`);
-
-    file
-      .on('data', (buffer) => {
-        info(`##### File [${filename}] got ${buffer.length} bytes`);
-        const promise = new Promise((resolve, reject) => {
-          uploadObject(`${albumId}/${filename}`, buffer)
-            .then((result) => {
-              resolve(result);
-            })
-            .catch((error) => reject(error));
-        });
-        fileWrites.push(promise);
-      })
-      .on('close', () => {
-        info(`##### File [${filename}] done`);
-      });
-  });
-
-  busboy.on('field', (fieldName, val) => {
-    info(`##### Processed field ${fieldName}: ${val}.`);
-  });
-
-  busboy.on('finish', async () => {
-    try {
-      await Promise.all(fileWrites);
+  try {
+    const filename = req.file?.originalname;
+    const buffer = req.file?.buffer;
+    console.log(`##### Uploading file: ${filename}, mimeType: ${req.file?.mimetype}`);
+    const result = await uploadObject(`${albumId}/${filename}`, buffer);
+    if (result?.$metadata?.httpStatusCode === 200) {
       res.send({ status: STATUS_SUCCESS });
-    } catch (err: any) {
-      error(err);
-      res.status(500).send({
-        status: STATUS_ERROR,
-        message: err.message,
-      });
+      console.log(`##### File uploaded: ${filename}`);
     }
-  });
-
-  //@ts-ignore
-  busboy.end(req.rawBody);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).send({
+      status: STATUS_ERROR,
+      message: err.message,
+    });
+  }
 });
