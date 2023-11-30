@@ -11,32 +11,7 @@
       {
         "source": "!/@(api)/**",
         "destination": "/index.html"
-      },
-      {
-        "source": "/api/**",
-        "function": "main"
       }
     ]
-  },
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".env.example",
-        ".eslintrc.js",
-        ".gitignore",
-        "package.lock.json",
-        "README.md",
-        "tsconfig.*",
-        "firebase-debug.*",
-        "ui-debug.*"
-      ],
-      "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run lint",
-        "npm --prefix \"$RESOURCE_DIR\" run build:functions"
-      ]
-    }
-  ]
+  }
 }

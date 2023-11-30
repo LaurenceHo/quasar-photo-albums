@@ -1,77 +1,89 @@
-# Functions With Express Routing and TypeScript
+# AWS Lambda Functions With Express Routing and TypeScript
 
-## Initializing a new Cloud Functions project with TypeScript
-Reference:
-https://firebase.google.com/docs/functions/typescript
+## Use serverless-http to wrap Express.js app
+Assume you already have an Express.js app, you can use serverless-http to wrap it and deploy to AWS Lambda.
 
-Run `firebase init functions` in a new directory. The tool gives you options to build the project with JavaScript or TypeScript.
-Choose *TypeScript* to output the following project structure:
-
-```
-myproject
- +- functions/     # Directory containing all your functions code
-      |
-      +- package.json  # npm package file describing your Cloud Functions code
-      |
-      +- tsconfig.json
-      |
-      +- .eslintrc.js # Optional file if you enabled ESLint
-      |
-      +- tsconfig.dev.json # Optional file that references .eslintrc.js
-      |
-      +- src/     # Directory containing TypeScript source
-      |   |
-      |   +- app.ts  # main source file for your Cloud Functions code
-      |
-      +- lib/
-          |
-          +- index.js  # Built/transpiled JavaScript code
-          |
-          +- index.js.map # Source map for debugging
+Firstly, install serverless-http and serverless
+```bash
+$ npm install --save serverless-http
 ```
 
-Express routing comes built-in with the express module, making it easy to integrate with the Functions Framework.
+Then, wrap your Express.js app with serverless-http
 
-Reference:
+```javascript
+// app.ts
 
-## Use Express.js
-The following section provides a walk-through example for using Express.js with Firebase Hosting and Cloud Functions.
+import bodyParser from 'body-parser';
+import serverless from 'serverless-http';
+import express from 'express';
 
-* Install Express.js in your local project by running the following command from your function directory:
-```
-npm install express --save
-```
+export const app: Application = express();
 
-Open your /functions/src/app.ts file, then import and initialize Express.js:
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-```
-import express, { Application, Request, Response } from 'express';
-import * as functions from 'firebase-functions';
+app.get('/', function (req, res) {
+  res.send('Hello World!')
+})
 
-const app: Application = express();
-```
-
-Export the Express.js app as an HTTPS function:
-
-```
-export const main = functions.https.onRequest(app);
+module.exports.handler = serverless(app);
 ```
 
-In your firebase.json file, direct all requests to the app function. This rewrite allows Express.js to serve the different sub-path that we configured (in this example, / and /api).
+We also need to export app object to index.ts, so you can run it locally.
+```javascript
+// index.ts
 
-```
-{
-  "hosting": {
-    // ...
+import { app } from './app';
 
-    // Add the "rewrites" attribute within "hosting"
-    "rewrites": [ {
-        "source": "/api/**",
-        "function": "main"
-    } ]
-  }
-}
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => console.log(`App is listening on port ${port}.`));
 ```
+
+To get this application deployed, let's create a `serverless.yml` in our working directory:
+
+```yaml
+# serverless.yml
+
+service: my-express-application
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: us-east-1
+
+functions:
+  app:
+    handler: lib/src/app.handler
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'
+```
+
+Before deploying Express.js app to AWS Lambda, we need to compile TypeScript to JavaScript. We can use `tsc` to compile
+TypeScript to JavaScript, and then use `serverless` to deploy it to AWS Lambda. After that, point `app.handler` to your
+`serverless.yml`.
+
+Now, let's deploy it to AWS Lambda:
+```bash
+$ npx serverless deploy
+
+... snip ...
+Service Information
+service: my-express-application
+stage: dev
+region: us-east-1
+stack: my-express-application-dev
+api keys:
+  None
+endpoints:
+  ANY - https://bl4r0gjjv5.execute-api.us-east-1.amazonaws.com/dev
+  ANY - https://bl4r0gjjv5.execute-api.us-east-1.amazonaws.com/dev/{proxy+}
+functions:
+  app: my-express-application-dev-app
+```
+
 ## API endpoint list
 ### Authentication
 * /api/auth/userInfo - GET: Get user information
@@ -94,3 +106,6 @@ In your firebase.json file, direct all requests to the app function. This rewrit
 * /api/photos - DELETE: Delete photos
 * /api/photos - PUT: Move photos to different folder
 * /api/photos/upload/:albumId - POST: Upload photos to AWS S3 folder
+
+Reference:
+https://www.serverless.com/framework/docs

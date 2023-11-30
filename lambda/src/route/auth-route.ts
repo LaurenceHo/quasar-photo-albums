@@ -12,11 +12,14 @@ export const router = express.Router();
 
 router.get('/userInfo', async (req, res) => {
   try {
-    const firebaseToken = get(req, 'cookies.__session', '');
+    const firebaseToken = get(req, 'cookies.__session', null);
+    if (!firebaseToken) {
+      res.send({ status: 'Unauthorized', message: 'No auth token provided' });
+    }
     const decodedClaims = await admin.auth().verifySessionCookie(firebaseToken, true);
-    if (decodedClaims?.exp <= Date.now() / 1000) {
+    if (decodedClaims.exp <= Date.now() / 1000) {
       res.clearCookie('__session');
-      res.send({ status: 'Unauthorized', message: 'User is not logged-in' });
+      res.send({ status: 'Unauthorized', message: 'Auth token expired' });
     }
     const userPermission = await queryUserPermissionV2(decodedClaims?.uid);
 
@@ -72,10 +75,9 @@ const _setCookies = async (res: Response, token: any) => {
   const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days
   const sessionCookie = await admin.auth().createSessionCookie(String(token), { expiresIn });
   const options = {
-    sameSite: 'none',
     maxAge: expiresIn,
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
   } as CookieOptions;
   res.cookie('__session', sessionCookie, options);
   res.setHeader('Cache-Control', 'private');
