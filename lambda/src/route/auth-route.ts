@@ -15,15 +15,17 @@ router.get('/userInfo', async (req, res) => {
     const firebaseToken = get(req, 'cookies.__session', null);
     if (!firebaseToken) {
       res.send({ status: 'Unauthorized', message: 'No auth token provided' });
-    }
-    const decodedClaims = await admin.auth().verifySessionCookie(firebaseToken, true);
-    if (decodedClaims.exp <= Date.now() / 1000) {
-      res.clearCookie('__session');
-      res.send({ status: 'Unauthorized', message: 'Auth token expired' });
-    }
-    const userPermission = await queryUserPermissionV2(decodedClaims?.uid);
+    } else {
+      const decodedClaims = await admin.auth().verifySessionCookie(firebaseToken, true);
+      if (decodedClaims.exp <= Date.now() / 1000) {
+        res.clearCookie('__session');
+        res.send({ status: 'Unauthorized', message: 'Auth token expired' });
+      } else {
+        const userPermission = await queryUserPermissionV2(decodedClaims?.uid);
 
-    res.send(userPermission);
+        res.send(userPermission);
+      }
+    }
   } catch (error) {
     res.clearCookie('__session');
     res.send({ status: 'Unauthorized', message: 'User is not logged-in' });

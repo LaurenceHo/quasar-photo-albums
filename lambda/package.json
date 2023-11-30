@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "deploy": "tsc && serverless deploy",
+    "deploy:lambda": "tsc && serverless deploy",
     "lint": "eslint --ext .js,.ts .",
     "start:server": "rimraf lib/src && tsc && node lib/src/index.js",
     "type-check": "tsc --noEmit"

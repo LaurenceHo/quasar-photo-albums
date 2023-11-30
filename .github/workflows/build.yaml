@@ -1,4 +1,4 @@
-name: Build and deploy web app to Google Firebase
+name: Build and deploy web app to Google Firebase Hosting
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ on:
       buildManually:
         description: 'Run build manually'
         required: true
-        default: 'Run'
+        default: 'build'
 
 jobs:
   build-and-deploy:
@@ -66,7 +66,7 @@ jobs:
           projectId: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
 
       - name: Deploy to Firebase prod
-        if: ${{ success() && (github.event_name == 'push' || github.event.pull_request.merged == true || github.event.inputs.buildManually == 'Run') }}
+        if: ${{ success() && (github.event_name == 'push' || github.event.pull_request.merged == true || github.event.inputs.buildManually == 'build') }}
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
