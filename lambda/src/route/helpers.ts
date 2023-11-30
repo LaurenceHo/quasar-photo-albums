@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import admin from 'firebase-admin';
-import _ from 'lodash';
+import get from 'lodash/get';
 import { queryUserPermissionV2 } from '../services/aws-dynamodb-service';
 
 /**
@@ -25,7 +25,7 @@ const _cleanCookie = (res: Response, message: string) => {
 export const verifyJwtClaim = async (req: Request, res: Response, next: any) => {
   if (req.cookies && req.cookies['__session']) {
     try {
-      const firebaseToken = _.get(req, 'cookies.__session', '');
+      const firebaseToken = get(req, 'cookies.__session', '');
       const decodedClaims = await admin.auth().verifySessionCookie(firebaseToken, true);
       if (decodedClaims.exp <= Date.now() / 1000) {
         _cleanCookie(res, 'User is not logged-in');

@@ -9,15 +9,9 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
-import { info, error } from 'firebase-functions/logger';
+import { configuration } from './config';
 
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
-  },
-});
+const s3Client = new S3Client(configuration);
 
 export const fetchObjectFromS3 = async (folderName: string, maxKeys: number) => {
   const folderNameKey = decodeURIComponent(folderName) + '/';
@@ -41,14 +35,14 @@ export const fetchObjectFromS3 = async (folderName: string, maxKeys: number) => 
     const result = await s3Client.send(command);
     return result?.Contents;
   } catch (err) {
-    error(`Failed to fetch objects from S3: ${err}`);
+    console.error(`Failed to fetch objects from S3: ${err}`);
     throw Error('Error when fetching photos');
   }
 };
 
 //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-photo-album-full.html
 export const uploadObject = async (filePath: string, object: any) => {
-  info('##### S3 FilePath:', filePath);
+  console.log('##### S3 FilePath:', filePath);
 
   try {
     const putObject: PutObjectCommandInput = {
@@ -63,7 +57,7 @@ export const uploadObject = async (filePath: string, object: any) => {
 
     return await s3Client.send(new PutObjectCommand(putObject));
   } catch (err) {
-    error(`Failed to upload photo: ${err}`);
+    console.error(`Failed to upload photo: ${err}`);
     throw Error('Error when uploading photo');
   }
 };
@@ -79,7 +73,7 @@ export const deleteObjects = async (objectKeys: string[]) => {
   try {
     return await s3Client.send(new DeleteObjectsCommand(deleteParams));
   } catch (err) {
-    error(`Failed to delete photos: ${err}`);
+    console.error(`Failed to delete photos: ${err}`);
     throw Error('Error when deleting photos');
   }
 };
@@ -94,7 +88,7 @@ export const copyObject = async (sourceObjectKey: string, destinationObjectKey: 
       })
     );
   } catch (err) {
-    error(`Failed to copy photo: ${err}`);
+    console.error(`Failed to copy photo: ${err}`);
     throw Error('Error when copying photo');
   }
 };
@@ -118,7 +112,7 @@ export const emptyS3Folder = async (folderName: string) => {
   try {
     return await deleteObjects(listedObjectArray);
   } catch (err) {
-    error(`Failed to empty S3 folder: ${err}`);
+    console.error(`Failed to empty S3 folder: ${err}`);
     throw Error('Error when emptying S3 folder');
   }
 };
