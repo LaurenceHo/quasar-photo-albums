@@ -23,7 +23,7 @@ export default function () {
     return response;
   };
 
-  const uploadFiles = (files: any, albumId: string) => {
+  const uploadFiles = async (files: any, albumId: string) => {
     isUploading.value = true;
     isCompleteUploading.value = false;
     return Promise.all(files.map((file: any) => uploadFile(file, albumId))).then(() => {
@@ -32,7 +32,6 @@ export default function () {
       Notify.create({
         color: 'positive',
         message: 'Upload finished.',
-        position: 'top',
         icon: 'mdi-check-circle-outline',
       });
     });
