@@ -6,6 +6,7 @@ import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
 import { photoStore } from 'stores/photo-store';
 import { compareDbUpdatedTime } from 'src/helper';
+import { userStore } from 'stores/user-store';
 
 export interface AlbumState {
   loadingAlbums: boolean;
@@ -76,6 +77,9 @@ export const albumStore = defineStore('albums', {
         Loading.show();
         this.loadingAlbums = true;
 
+        const store = userStore();
+        const isAdminUser = store.isAdminUser;
+
         const tempAlbumsString = LocalStorage.getItem('ALL_ALBUMS');
         // If updated time from localStorage is empty or different from S3, get albums from database
         const compareResult = await compareDbUpdatedTime();
@@ -88,7 +92,10 @@ export const albumStore = defineStore('albums', {
 
         // Get albums from local storage again
         const albumsString: string = LocalStorage.getItem('ALL_ALBUMS') || '';
-        const tempList: Album[] = JSON.parse(albumsString);
+        let tempList: Album[] = JSON.parse(albumsString);
+        if (!isAdminUser) {
+          tempList = tempList.filter((album) => !album.isPrivate);
+        }
         this.allAlbumList = tempList.sort((a, b) => {
           if (this.sortOrder === 'asc') {
             return a.albumName.localeCompare(b.albumName);

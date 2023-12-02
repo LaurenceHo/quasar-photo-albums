@@ -94,16 +94,14 @@ router.put('', verifyJwtClaim, verifyUserPermission, (req, res) => {
     res.status(400).send({ status: STATUS_ERROR, message: 'No photo needs to be moved' });
   }
 });
-/**
- * https://cloud.google.com/functions/docs/writing/http#multipart_data
- */
+
 router.post('/upload/:albumId', verifyJwtClaim, verifyUserPermission, upload.single('file'), async (req, res) => {
   const albumId = req.params['albumId'];
 
   try {
     const filename = req.file?.originalname;
     const buffer = req.file?.buffer;
-    console.log(`##### Uploading file: ${filename}, mimeType: ${req.file?.mimetype}`);
+    console.log(`##### Uploading file: ${filename}, mimeType: ${req.file?.mimetype}, file size: ${req.file?.size}`);
     const result = await uploadObject(`${albumId}/${filename}`, buffer);
     if (result?.$metadata?.httpStatusCode === 200) {
       res.send({ status: STATUS_SUCCESS });

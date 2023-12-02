@@ -84,6 +84,54 @@ functions:
   app: my-express-application-dev-app
 ```
 
+### AWS Permissions
+Make sure your Lambda functions have the following permissions:
+
+```yaml
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"dynamodb:PutItem",
+				"dynamodb:DeleteItem",
+				"dynamodb:GetItem",
+				"dynamodb:Scan",
+				"dynamodb:Query",
+				"dynamodb:UpdateItem"
+			],
+			"Resource": "YOU_AWS_DYNAMODB_TABLE_ARN"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"s3:PutObject",
+				"s3:GetObject",
+				"s3:DeleteObject",
+				"s3:ListBucket"
+			],
+			"Resource": [
+				"YOUR_AWS_S3_BUCKET_ARN",
+				"YOUR_AWS_S3_BUCKET_ARN/*"
+			]
+		},
+		{
+			"Action": [
+				"logs:CreateLogGroup",
+				"logs:CreateLogStream",
+				"logs:PutLogEvents",
+				"logs:TagResource"
+			],
+			"Effect": "Allow",
+			"Resource": [
+				"YOUR_AWS_LOG_GROUP_ARN"
+			]
+		}
+	]
+}
+```
+
 ## API endpoint list
 ### Authentication
 * /api/auth/userInfo - GET: Get user information
