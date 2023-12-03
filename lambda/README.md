@@ -84,7 +84,7 @@ functions:
   app: my-express-application-dev-app
 ```
 
-### AWS Permissions
+## AWS Permissions
 Make sure your Lambda functions have the following permissions:
 
 ```yaml
@@ -131,6 +131,14 @@ Make sure your Lambda functions have the following permissions:
 	]
 }
 ```
+
+## Enabling binary support using the API Gateway console
+Make sure you enable binary support for your API Gateway. Otherwise, the uploaded photos will be corrupted.
+1. Go to API Gateway console -> Select your API -> API Settings -> Binary Media Types -> Click "Manage media types"
+2. Add `image/*` and `multipart/form-data` to the list of binary media types
+3. Redeploy your Lambda functions or it won't take effect
+
+Please check [here](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings-configure-with-console.html) for the further information.
 
 ## API endpoint list
 ### Authentication

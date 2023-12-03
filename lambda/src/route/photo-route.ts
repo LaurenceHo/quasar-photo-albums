@@ -61,7 +61,7 @@ router.delete('', verifyJwtClaim, verifyUserPermission, (req, res) => {
   }
 });
 
-router.put('', verifyJwtClaim, verifyUserPermission, (req, res) => {
+router.put('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
   const photos = req.body as PhotosRequest;
   const { destinationAlbumId, albumId, photoKeys } = photos;
   if (isUndefined(destinationAlbumId) || isEmpty(destinationAlbumId)) {
@@ -69,27 +69,42 @@ router.put('', verifyJwtClaim, verifyUserPermission, (req, res) => {
   }
 
   if (!isUndefined(photoKeys) && !isEmpty(photoKeys)) {
+    const promises: Promise<any>[] = [];
     photoKeys.forEach((photoKey) => {
       const sourcePhotoKey = `${albumId}/${photoKey}`;
-      copyObject(sourcePhotoKey, `${destinationAlbumId}/${photoKey}`)
-        .then((result) => {
-          if (result.$metadata.httpStatusCode === 200) {
-            deleteObjects([sourcePhotoKey])
-              .then(() => {
-                console.log('##### Photo moved:', sourcePhotoKey);
-              })
-              .catch((err: Error) => {
-                console.error(err);
-                res.status(500).send({ status: STATUS_ERROR, message: err.message });
-              });
-          }
-        })
-        .catch((err: Error) => {
-          console.error(err);
-          res.status(500).send({ status: STATUS_ERROR, message: err.message });
-        });
+
+      const promise = new Promise((resolve, reject) => {
+        copyObject(sourcePhotoKey, `${destinationAlbumId}/${photoKey}`)
+          .then((result) => {
+            if (result.$metadata.httpStatusCode === 200) {
+              deleteObjects([sourcePhotoKey])
+                .then(() => {
+                  console.log('##### Photo moved:', sourcePhotoKey);
+                })
+                .catch((err: Error) => {
+                  console.error(err);
+                  res.status(500).send({ status: STATUS_ERROR, message: err.message });
+                });
+            }
+          })
+          .catch((err: Error) => {
+            console.error(err);
+            res.status(500).send({ status: STATUS_ERROR, message: err.message });
+          });
+      });
+
+      promises.push(promise);
     });
-    res.send({ status: STATUS_SUCCESS, message: 'Photo moved' });
+    try {
+      await Promise.all(promises);
+      res.send({ status: STATUS_SUCCESS, message: 'Photo moved' });
+    } catch (err: any) {
+      console.error(err);
+      res.status(500).send({
+        status: STATUS_ERROR,
+        message: err.message,
+      });
+    }
   } else {
     res.status(400).send({ status: STATUS_ERROR, message: 'No photo needs to be moved' });
   }
