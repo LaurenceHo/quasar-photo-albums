@@ -1,11 +1,11 @@
 import { LocalStorage } from 'quasar';
 
-export const getS3Url = (objectKey: string): string => {
+export const getStaticFileUrl = (objectKey: string): string => {
   return `${process.env.STATIC_FILES_URL}/${objectKey}`;
 };
 
 export const compareDbUpdatedTime = async () => {
-  const response = await fetch(getS3Url('updateDatabaseAt.json'));
+  const response = await fetch(getStaticFileUrl('updateDatabaseAt.json'));
   const dbUpdatedTimeJSON = await response.json();
   // Updated time from s3
   const { time } = dbUpdatedTimeJSON;

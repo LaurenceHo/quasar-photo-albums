@@ -2,6 +2,7 @@ import { DynamoDBClient, ReturnValue } from '@aws-sdk/client-dynamodb';
 import {
   DeleteCommand,
   DynamoDBDocumentClient,
+  GetCommand,
   PutCommand,
   QueryCommand,
   ScanCommand,
@@ -47,9 +48,9 @@ updatedAt: string (Date time)
 createdBy: string (email)
 updatedBy: string (email)
  */
-const PHOTO_ALBUMS_TABLE_NAME = 'quasar-photo-albums';
-const PHOTO_ALBUM_TAGS_TABLE_NAME = 'quasar-album-tags';
-const PHOTO_USER_PERMISSION_TABLE_NAME = 'quasar-user-permission';
+const PHOTO_ALBUMS_TABLE_NAME = process.env.PHOTO_ALBUMS_TABLE_NAME ?? '';
+const PHOTO_ALBUM_TAGS_TABLE_NAME = process.env.PHOTO_ALBUM_TAGS_TABLE_NAME ?? '';
+const PHOTO_USER_PERMISSION_TABLE_NAME = process.env.PHOTO_USER_PERMISSION_TABLE_NAME ?? '';
 
 // TODO - Implement the basic CRUD operations
 export const queryUserPermissionV2 = async (uid: string) => {
@@ -97,6 +98,22 @@ export const queryPhotoAlbumsV2 = async (isAdmin: boolean) => {
   } catch (err) {
     console.error(`Failed to query photo album: ${err}`);
     throw Error('Error when fetching photo albums');
+  }
+};
+
+export const queryPhotoAlbumById = async (id: string) => {
+  const params = {
+    TableName: PHOTO_ALBUMS_TABLE_NAME,
+    Key: {
+      id,
+    },
+  };
+
+  try {
+    return (await ddbDocClient.send(new GetCommand(params))).Item as AlbumV2;
+  } catch (err) {
+    console.error(`Failed to query photo album: ${err}`);
+    throw Error('Error when fetching photo album');
   }
 };
 
@@ -152,6 +169,7 @@ export const updatePhotoAlbumV2 = async (album: AlbumV2) => {
     const result = await ddbDocClient.send(new UpdateCommand(params));
 
     if (result.$metadata.httpStatusCode === 200) {
+      console.log('##### Album updated: ', album.id);
       await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
     }
     return result;

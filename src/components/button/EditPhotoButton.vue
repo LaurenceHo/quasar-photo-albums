@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { getS3Url } from 'src/helper';
+import { getStaticFileUrl } from 'src/helper';
 import { Album } from 'components/models';
 import { copyToClipboard, useQuasar } from 'quasar';
 import AlbumService from 'src/services/album-service';
@@ -88,7 +88,7 @@ const movePhoto = () => {
 };
 
 const copyPhotoLink = () => {
-  const photoLink = getS3Url(photoKey.value);
+  const photoLink = getStaticFileUrl(photoKey.value);
   copyToClipboard(photoLink).then(() => {
     q.notify({
       color: 'white',

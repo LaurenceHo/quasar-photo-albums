@@ -63,6 +63,15 @@
         />
       </div>
     </div>
+    <q-toggle
+      v-if="isAdminUser"
+      v-model="privateAlbum"
+      checked-icon="mdi-lock"
+      color="primary"
+      icon="mdi-lock-open"
+      label="Only show private album"
+      left-label
+    />
     <template v-if="chunkAlbumList.length">
       <div v-if="albumStyle === 'grid'" class="q-col-gutter-md row">
         <Album v-for="album in chunkAlbumList" :key="album.id" :albumItem="album" :albumStyle="albumStyle" />
@@ -98,12 +107,14 @@ import orderBy from 'lodash/orderBy';
 import { Album as AlbumItem } from 'src/components/models';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import { albumStore } from 'src/stores/album-store';
-import { computed, DebuggerEvent, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { userStore } from 'stores/user-store';
 
 const route = useRoute();
 const router = useRouter();
 const store = albumStore();
+const userPermissionStore = userStore();
 
 const { albumTags, filterTags } = AlbumTagsFilterComposable();
 
@@ -113,7 +124,9 @@ const albumStyle = ref((route.query.albumStyle as string) || 'list');
 const totalItems = ref(store.allAlbumList.length);
 const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
 const selectedTags = ref([]);
+const privateAlbum = ref(false);
 
+const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const sortOrder = computed(() => store.sortOrder);
 const refreshAlbumList = computed(() => store.refreshAlbumList);
 const searchKey = computed(() => store.searchKey);
@@ -127,8 +140,8 @@ const sortIcon = computed(() =>
 );
 
 const getFilteredAlbumList = () => {
-  if (!isEmpty(searchKey.value) || !isEmpty(selectedTags.value)) {
-    const filteredAlbumList = store.filteredAlbumList(searchKey.value, selectedTags.value);
+  if (!isEmpty(searchKey.value) || !isEmpty(selectedTags.value) || privateAlbum.value) {
+    const filteredAlbumList = store.filteredAlbumList(searchKey.value, selectedTags.value, privateAlbum.value);
     totalItems.value = filteredAlbumList.length;
     chunkAlbumList.value = filteredAlbumList.slice(firstIndex.value, lastIndex.value);
   } else {
@@ -162,7 +175,7 @@ watch(refreshAlbumList, (newValue) => {
   }
 });
 
-watch([pageNumber, itemsPerPage, searchKey, selectedTags], () => {
+watch([pageNumber, itemsPerPage, searchKey, selectedTags, privateAlbum], () => {
   getFilteredAlbumList();
 });
 </script>

@@ -20,7 +20,7 @@ dotenv.config();
 
 export const app: Application = express();
 const corsHeader = (req: Request, res: Response, next: any) => {
-  console.log('Request API:', req.url);
+  console.log('###### Request API:', req.url, '| Method:', req.method);
   const allowedOrigins = ['http://localhost:9000', process.env.ALBUM_URL];
   const origin = req.headers.origin as string;
   if (allowedOrigins.indexOf(origin) > -1) {
