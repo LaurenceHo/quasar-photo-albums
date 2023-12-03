@@ -27,7 +27,7 @@
     <q-card>
       <q-card-section class="row items-center">
         <q-icon color="primary" name="mdi-alert-circle" size="md" />
-        <span class="q-ml-sm text-h6">Do you want to delete album "{{ albumItem.albumName }}"?</span>
+        <span class="q-ml-sm text-h6">Do you want to delete album "{{ albumName }}"?</span>
         <span class="q-ma-sm text-subtitle2">
           All photos in this album will be deleted, and any new photos added while the delete action is in progress
           might also be deleted.</span
@@ -77,8 +77,10 @@ const setAlbum = () => {
 
 const confirmDeleteAlbum = async () => {
   isProcessing.value = true;
-  await albumService.deleteAlbum(albumItem?.value.id);
-  store.updateAlbum(albumItem?.value as Album, true);
+  const result = await albumService.deleteAlbum(albumItem?.value.id);
+  if (result.status === 'Success') {
+    store.updateAlbum(albumItem?.value as Album, true);
+  }
   deleteAlbum.value = false;
   isProcessing.value = false;
 };

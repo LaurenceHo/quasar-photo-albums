@@ -2,14 +2,14 @@
   <q-dialog v-model="movePhotoDialogState">
     <q-card style="min-width: 400px">
       <q-card-section>
-        <div class="text-h6">Move photo{{getSelectedPhotoList.length > 1 ? 's' : ''}} to another album</div>
+        <div class="text-h6">Move photo{{ getSelectedPhotoList.length > 1 ? 's' : '' }} to another album</div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        Select another album for {{getSelectedPhotoList.length > 1 ? 'these':'this'}} photo.
+        Select another album for {{ getSelectedPhotoList.length > 1 ? 'these' : 'this' }} photo.
         <q-select
           v-model="selectedAlbum"
-          :options="allAlbumsList"
+          :options="filteredAlbumsList"
           clearable
           dense
           emit-value
@@ -18,6 +18,8 @@
           option-label="albumName"
           option-value="id"
           outlined
+          use-input
+          @filter="filterAlbums"
         />
       </q-card-section>
 
@@ -29,6 +31,7 @@
           unelevated
           label="Move"
           no-caps
+          :disable="!selectedAlbum"
           @click="confirmMovePhotos"
         />
       </q-card-actions>
@@ -53,7 +56,7 @@ const { getSelectedPhotoList, setMovePhotoDialogState, movePhotoDialogState } = 
 const photoService = new PhotoService();
 const store = albumStore();
 
-const allAlbumsList = computed(() => store.allAlbumList.filter((album) => album.id !== albumId.value));
+const filteredAlbumsList = ref(store.allAlbumList.filter((album) => album.id !== albumId.value));
 const photoKeysArray = computed(
   () =>
     getSelectedPhotoList.value.map((photoKey: string) => {
@@ -62,8 +65,22 @@ const photoKeysArray = computed(
     }) as string[]
 );
 
-const selectedAlbum = ref(allAlbumsList.value[0]?.id ?? '');
+const selectedAlbum = ref(filteredAlbumsList.value[0]?.id ?? '');
 const isProcessing = ref(false);
+
+const filterAlbums = (input: string, update: any) => {
+  if (input === '') {
+    update(() => {
+      filteredAlbumsList.value = store.allAlbumList.filter((album) => album.id !== albumId.value);
+    });
+    return;
+  }
+
+  update(() => {
+    const needle = input.toLowerCase();
+    filteredAlbumsList.value = store.allAlbumList.filter((album) => album.albumName.toLowerCase().indexOf(needle) > -1);
+  });
+};
 
 const confirmMovePhotos = async () => {
   isProcessing.value = true;
@@ -73,5 +90,5 @@ const confirmMovePhotos = async () => {
     emits('refreshPhotoList');
   }
   setMovePhotoDialogState(false);
-}
+};
 </script>

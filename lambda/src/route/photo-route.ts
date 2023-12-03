@@ -61,7 +61,7 @@ router.delete('', verifyJwtClaim, verifyUserPermission, (req, res) => {
   }
 });
 
-router.put('', verifyJwtClaim, verifyUserPermission, (req, res) => {
+router.put('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
   const photos = req.body as PhotosRequest;
   const { destinationAlbumId, albumId, photoKeys } = photos;
   if (isUndefined(destinationAlbumId) || isEmpty(destinationAlbumId)) {
@@ -69,41 +69,58 @@ router.put('', verifyJwtClaim, verifyUserPermission, (req, res) => {
   }
 
   if (!isUndefined(photoKeys) && !isEmpty(photoKeys)) {
+    const promises: Promise<any>[] = [];
     photoKeys.forEach((photoKey) => {
       const sourcePhotoKey = `${albumId}/${photoKey}`;
-      copyObject(sourcePhotoKey, `${destinationAlbumId}/${photoKey}`)
-        .then((result) => {
-          if (result.$metadata.httpStatusCode === 200) {
-            deleteObjects([sourcePhotoKey])
-              .then(() => {
-                console.log('##### Photo moved:', sourcePhotoKey);
-              })
-              .catch((err: Error) => {
-                console.error(err);
-                res.status(500).send({ status: STATUS_ERROR, message: err.message });
-              });
-          }
-        })
-        .catch((err: Error) => {
-          console.error(err);
-          res.status(500).send({ status: STATUS_ERROR, message: err.message });
-        });
+
+      const promise = new Promise((resolve, reject) =>
+        copyObject(sourcePhotoKey, `${destinationAlbumId}/${photoKey}`)
+          .then((result) => {
+            if (result.$metadata.httpStatusCode === 200) {
+              deleteObjects([sourcePhotoKey])
+                .then(() => {
+                  console.log('##### Photo moved:', sourcePhotoKey);
+                  resolve('Photo moved');
+                })
+                .catch((err: Error) => {
+                  console.error(err);
+                  reject(err);
+                  res.status(500).send({ status: STATUS_ERROR, message: err.message });
+                });
+            }
+          })
+          .catch((err: Error) => {
+            console.error(err);
+            reject(err);
+            res.status(500).send({ status: STATUS_ERROR, message: err.message });
+          })
+      );
+
+      promises.push(promise);
     });
-    res.send({ status: STATUS_SUCCESS, message: 'Photo moved' });
+
+    try {
+      await Promise.all(promises);
+      res.send({ status: STATUS_SUCCESS, message: 'Photo moved' });
+    } catch (err: any) {
+      console.error(err);
+      res.status(500).send({
+        status: STATUS_ERROR,
+        message: err.message,
+      });
+    }
   } else {
     res.status(400).send({ status: STATUS_ERROR, message: 'No photo needs to be moved' });
   }
 });
-/**
- * https://cloud.google.com/functions/docs/writing/http#multipart_data
- */
+
 router.post('/upload/:albumId', verifyJwtClaim, verifyUserPermission, upload.single('file'), async (req, res) => {
   const albumId = req.params['albumId'];
 
   try {
     const filename = req.file?.originalname;
     const buffer = req.file?.buffer;
-    console.log(`##### Uploading file: ${filename}, mimeType: ${req.file?.mimetype}`);
+    console.log(`##### Uploading file: ${filename}, mimeType: ${req.file?.mimetype}, file size: ${req.file?.size}`);
     const result = await uploadObject(`${albumId}/${filename}`, buffer);
     if (result?.$metadata?.httpStatusCode === 200) {
       res.send({ status: STATUS_SUCCESS });
