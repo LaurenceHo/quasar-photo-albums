@@ -140,6 +140,10 @@ Make sure you enable binary support for your API Gateway. Otherwise, the uploade
 
 Please check [here](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings-configure-with-console.html) for the further information.
 
+## Enable API Gateway Stage Logging
+If your API Gateway returns an HTTP 502 status code, you can enable API Gateway stage logging by updating stage setting to get more information.
+Please check [here](https://docs.aws.amazon.com/apigateway/latest/developerguide/stages.html#how-to-stage-settings-console) for the further information.
+
 ## API endpoint list
 ### Authentication
 * /api/auth/userInfo - GET: Get user information

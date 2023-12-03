@@ -73,28 +73,32 @@ router.put('', verifyJwtClaim, verifyUserPermission, async (req, res) => {
     photoKeys.forEach((photoKey) => {
       const sourcePhotoKey = `${albumId}/${photoKey}`;
 
-      const promise = new Promise((resolve, reject) => {
+      const promise = new Promise((resolve, reject) =>
         copyObject(sourcePhotoKey, `${destinationAlbumId}/${photoKey}`)
           .then((result) => {
             if (result.$metadata.httpStatusCode === 200) {
               deleteObjects([sourcePhotoKey])
                 .then(() => {
                   console.log('##### Photo moved:', sourcePhotoKey);
+                  resolve('Photo moved');
                 })
                 .catch((err: Error) => {
                   console.error(err);
+                  reject(err);
                   res.status(500).send({ status: STATUS_ERROR, message: err.message });
                 });
             }
           })
           .catch((err: Error) => {
             console.error(err);
+            reject(err);
             res.status(500).send({ status: STATUS_ERROR, message: err.message });
-          });
-      });
+          })
+      );
 
       promises.push(promise);
     });
+
     try {
       await Promise.all(promises);
       res.send({ status: STATUS_SUCCESS, message: 'Photo moved' });
