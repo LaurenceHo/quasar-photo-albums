@@ -87,9 +87,11 @@ export const albumStore = defineStore('albums', {
         // If updated time from localStorage is empty or different from S3, get albums from database
         const compareResult = await compareDbUpdatedTime();
         if (!compareResult.isLatest || !tempAlbumsString) {
-          const tempList = await albumService.getAlbums();
-          const albumsString = JSON.stringify(tempList);
-          LocalStorage.set('ALL_ALBUMS', albumsString);
+          const { data } = await albumService.getAlbums();
+          if (data) {
+            const albumsString = JSON.stringify(data);
+            LocalStorage.set('ALL_ALBUMS', albumsString);
+          }
           LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
         }
 

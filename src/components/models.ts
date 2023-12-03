@@ -20,8 +20,14 @@ export interface AlbumTag {
 }
 
 export interface ResponseStatus {
+  code?: number;
   status: string;
   message?: string;
+  data?: any;
+}
+
+export interface ApiResponse<T> extends ResponseStatus {
+  data?: T;
 }
 
 export type ExifData = ExifTags & FileTags;
