@@ -47,8 +47,11 @@ export const albumStore = defineStore('albums', {
 
     filteredAlbumList:
       (state: AlbumState) =>
-      (searchKey: string, selectedTags: string[]): Album[] => {
+      (searchKey: string, selectedTags: string[], privateAlbum: boolean): Album[] => {
         let filteredAlbumList = state.allAlbumList;
+        if (privateAlbum) {
+          filteredAlbumList = filteredAlbumList.filter((album) => album.isPrivate);
+        }
         if (!isEmpty(searchKey) || !isEmpty(selectedTags)) {
           const filterByTags: Album[] = [];
           if (!isEmpty(searchKey)) {

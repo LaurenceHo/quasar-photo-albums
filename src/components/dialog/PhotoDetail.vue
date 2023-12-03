@@ -159,7 +159,6 @@
 <script lang="ts" setup>
 import { isEmpty } from 'lodash';
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
-import { getS3Url } from 'src/helper';
 import { ExifData, Photo } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import * as ExifReader from 'exifreader';
@@ -253,11 +252,12 @@ watch(
   selectedImage,
   async (newValue) => {
     if (newValue?.key) {
+      // Remove album id for displaying photo file name
       photoFileName.value = selectedImage.value.key.split('/')[1];
       loadImage.value = true;
       try {
-        // Need to load photo from the original source instead of CDN
-        exifTags.value = (await ExifReader.load(getS3Url(newValue.key))) as ExifData;
+        // Read EXIF data
+        exifTags.value = (await ExifReader.load(newValue.url)) as ExifData;
         if (exifTags.value?.GPSLatitude?.description) {
           latitude.value = Number(exifTags.value.GPSLatitude.description);
         }

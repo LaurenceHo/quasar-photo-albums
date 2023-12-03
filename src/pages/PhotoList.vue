@@ -15,7 +15,7 @@
     <div v-if="isAdminUser" class="flex items-center justify-between q-pb-md">
       <div class="text-h6 flex items-center">
         <q-btn
-          v-if="getSelectedPhotoList.length !== photoKeysList.length"
+          v-if="getSelectedPhotoList.length !== photoAmount"
           icon="mdi-check-all"
           round
           @click="setSelectedPhotosList(photoKeysList)"
@@ -98,7 +98,7 @@
       </template>
     </div>
   </div>
-  <MovePhotoDialog v-if="getMovePhotoDialogState"  :album-id="albumItem?.id" @refreshPhotoList="refreshPhotoList" />
+  <MovePhotoDialog v-if="getMovePhotoDialogState" :album-id="albumItem?.id" @refreshPhotoList="refreshPhotoList" />
   <ConfirmDeletePhotosDialog
     v-if="getDeletePhotoDialogState"
     :album-id="albumItem?.id"
@@ -124,11 +124,9 @@ import { photoStore } from 'stores/photo-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-const q = useQuasar();
 const route = useRoute();
 const router = useRouter();
 
-const albumService = new AlbumService();
 const useAlbumStore = albumStore();
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
@@ -149,20 +147,23 @@ const albumId = computed(() => route.params.albumId as string);
 const albumItem = computed(() => useAlbumStore.getAlbumById(albumId.value) as Album);
 const photosInAlbum = computed(() => usePhotoStore.photoList as Photo[]);
 const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.key));
+const photoAmount = computed(() => photosInAlbum.value.length);
 const photoId = computed(() => route.query.photo as string);
 
-const isAlbumEmpty = ref(false);
 const refreshPhotoList = async () => {
-  setSelectedPhotosList([]);
-  isAlbumEmpty.value = photosInAlbum.value.length === 0;
-
+  const isPrevAlbumEmpty = photosInAlbum.value.length === 0;
   await usePhotoStore.getPhotos(albumId.value, true);
-  // If album is empty before uploading photos, set the first photo as album cover.
-  if (isAlbumEmpty.value) {
+  const isCurrentAlbumEmpty = photosInAlbum.value.length === 0;
+  if (isPrevAlbumEmpty) {
+    // If album is empty before uploading photos, set the first photo as album cover.
     const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photosInAlbum.value[0].key as string };
-    await albumService.updateAlbum(albumToBeSubmitted);
+    useAlbumStore.updateAlbumCover(albumToBeSubmitted);
+  } else if (!isPrevAlbumEmpty && isCurrentAlbumEmpty) {
+    const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: '' };
     useAlbumStore.updateAlbumCover(albumToBeSubmitted);
   }
+
+  setSelectedPhotosList([]);
 };
 
 usePhotoStore.getPhotos(albumId.value);

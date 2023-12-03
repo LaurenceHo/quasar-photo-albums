@@ -78,7 +78,9 @@ const filterAlbums = (input: string, update: any) => {
 
   update(() => {
     const needle = input.toLowerCase();
-    filteredAlbumsList.value = store.allAlbumList.filter((album) => album.albumName.toLowerCase().indexOf(needle) > -1);
+    filteredAlbumsList.value = store.allAlbumList.filter(
+      (album) => album.albumName.toLowerCase().indexOf(needle) > -1 && album.id !== albumId.value
+    );
   });
 };
 

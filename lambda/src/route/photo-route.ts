@@ -5,6 +5,7 @@ import { verifyJwtClaim, verifyUserPermission } from './helpers';
 import { STATUS_ERROR, STATUS_SUCCESS } from '../constants';
 import { PhotosRequest } from '../models';
 import { isEmpty, isUndefined } from 'lodash';
+import { queryPhotoAlbumById, updatePhotoAlbumV2 } from '../services/aws-dynamodb-service';
 
 export const router = express.Router();
 const upload = multer({
@@ -18,6 +19,7 @@ router.get('/:albumId', async (req, res) => {
   const albumId = req.params['albumId'];
   const cdnURL = process.env.IMAGEKIT_CDN_URL;
   try {
+    const album = await queryPhotoAlbumById(albumId);
     const s3ObjectContents = await fetchObjectFromS3(albumId, 1000);
     let photos: { url: string; key: string }[] = [];
     if (s3ObjectContents) {
@@ -31,6 +33,25 @@ router.get('/:albumId', async (req, res) => {
         }
         return { url, key };
       });
+
+      if (isEmpty(album.albumCover)) {
+        await updatePhotoAlbumV2({
+          ...album,
+          albumCover: photos[0].key,
+          updatedBy: 'System',
+          updatedAt: new Date().toISOString(),
+        });
+      }
+    } else {
+      // Remove album cover photo
+      if (!isEmpty(album.albumCover)) {
+        await updatePhotoAlbumV2({
+          ...album,
+          albumCover: '',
+          updatedBy: 'System',
+          updatedAt: new Date().toISOString(),
+        });
+      }
     }
     res.send(photos);
   } catch (err: any) {
