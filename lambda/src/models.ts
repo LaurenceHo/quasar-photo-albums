@@ -48,6 +48,13 @@ export interface AlbumTag {
   tag: string;
 }
 
+export interface UserPermission {
+  uid: string;
+  email: string;
+  role: string;
+  displayName: string;
+}
+
 export interface PhotosRequest {
   albumId: string;
   destinationAlbumId?: string;

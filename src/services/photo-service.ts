@@ -1,4 +1,4 @@
-import { Photo, ResponseStatus } from 'components/models';
+import { ApiResponse, Photo, ResponseStatus } from 'components/models';
 import HttpRequestService from 'src/services/http-request-service';
 
 export default class PhotoService extends HttpRequestService {
@@ -7,7 +7,7 @@ export default class PhotoService extends HttpRequestService {
     this.baseUrl = this.baseUrl + '/photos';
   }
 
-  getPhotosByAlbumId(albumId: string): Promise<Photo[]> {
+  getPhotosByAlbumId(albumId: string): Promise<ApiResponse<Photo[]>> {
     this.setDisplayingParameters(true);
     return this.perform('GET', `/${albumId}`);
   }

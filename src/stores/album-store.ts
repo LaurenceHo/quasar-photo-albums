@@ -117,11 +117,14 @@ export const albumStore = defineStore('albums', {
       if (this.albumTags.length === 0) {
         this.loadingAlbumTags = true;
 
+        const tempAlbumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
         const compareResult = await compareDbUpdatedTime();
-        if (!compareResult.isLatest) {
-          const tempAlbumTags = await albumTagService.getAlbumTags();
-          const albumTagsString = JSON.stringify(tempAlbumTags);
-          LocalStorage.set('ALBUM_TAGS', albumTagsString);
+        if (!compareResult.isLatest || !tempAlbumTagsString) {
+          const { data } = await albumTagService.getAlbumTags();
+          if (data) {
+            const albumTagsString = JSON.stringify(data);
+            LocalStorage.set('ALBUM_TAGS', albumTagsString);
+          }
           LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
         }
 

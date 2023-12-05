@@ -11,6 +11,7 @@ import { router as albumRoute } from './route/album-route';
 import { router as albumTagsRoute } from './route/album-tag-route';
 import { router as authRoute } from './route/auth-route';
 import { router as photoRoute } from './route/photo-route';
+import { errorHandler } from './utils/error-handler';
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount),
@@ -41,11 +42,13 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(helmet());
+app.use(errorHandler);
 
 // Route
 app.use('/api/auth', authRoute);
 app.use('/api/albums', albumRoute);
 app.use('/api/albumTags', albumTagsRoute);
+
 app.use('/api/photos', photoRoute);
 
 export const handler = serverless(app);

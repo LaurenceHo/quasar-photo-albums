@@ -1,27 +1,28 @@
-import { STATUS_ERROR, STATUS_SUCCESS } from '../constants';
 import { AlbumTag, BaseController } from '../models';
 import AlbumTagService from '../services/album-tag-service';
 import { uploadObject } from './helpers';
 import { Request, Response } from 'express';
+import { asyncHandler } from '../utils/async-handler';
+import JsonResponse from '../utils/json-response';
 
 const albumTagService = new AlbumTagService();
 const tableName = process.env.PHOTO_ALBUM_TAGS_TABLE_NAME;
 
 export default class AlbumTagController implements BaseController {
-  async findAll(req: Request, res: Response): Promise<void> {
+  findAll = asyncHandler(async (req: Request, res: Response) => {
     try {
       const albumTags = await albumTagService.findAll({
         TableName: tableName,
       });
 
-      res.send(albumTags);
+      return new JsonResponse().success(res, '', albumTags);
     } catch (err: any) {
       console.error(`Failed to query album tags: ${err}`);
-      res.status(500).send({ status: STATUS_ERROR, message: 'Failed to query album tags' });
+      return new JsonResponse(500).error(res, 'Failed to query album tags');
     }
-  }
+  });
 
-  async create(req: Request, res: Response): Promise<void> {
+  create = asyncHandler(async (req: Request, res: Response) => {
     const tag: AlbumTag = req.body;
     try {
       const result = await albumTagService.create({
@@ -31,16 +32,17 @@ export default class AlbumTagController implements BaseController {
         },
       });
       if (result) {
-        res.send({ status: STATUS_SUCCESS, message: 'Album tag created' });
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+        return new JsonResponse().success(res, 'Album tag created', null);
       }
+      return new JsonResponse(500).error(res, 'Failed to create album tag');
     } catch (err) {
       console.error(`Failed to create album tag: ${err}`);
-      res.status(500).send({ status: STATUS_ERROR, message: 'Failed to create album tag' });
+      return new JsonResponse(500).error(res, 'Failed to create album tag');
     }
-  }
+  });
 
-  async delete(req: Request, res: Response): Promise<void> {
+  delete = asyncHandler(async (req: Request, res: Response) => {
     const tag = req.params['tagId'];
     try {
       const result = await albumTagService.delete({
@@ -50,12 +52,13 @@ export default class AlbumTagController implements BaseController {
         },
       });
       if (result) {
-        res.send({ status: STATUS_SUCCESS, message: 'Album tag deleted' });
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+        return new JsonResponse().success(res, 'Album tag deleted', null);
       }
+      return new JsonResponse(500).error(res, 'Failed to delete album tag');
     } catch (err) {
       console.error(`Failed to delete album tag: ${err}`);
-      res.status(500).send({ status: STATUS_ERROR, message: 'Failed to delete album tag' });
+      return new JsonResponse(500).error(res, 'Failed to delete album tag');
     }
-  }
+  });
 }

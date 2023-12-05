@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { ResponseStatus } from '../models';
-import { STATUS_SUCCESS } from '../constants';
+import { STATUS_ERROR, STATUS_SUCCESS } from '../constants';
 
 export default class JsonResponse {
   private readonly statusCode: number;
@@ -9,10 +9,10 @@ export default class JsonResponse {
     this.statusCode = statusCode;
   }
 
-  error = (res: Response, status: string, message: string) => {
+  error = (res: Response, message: string) => {
     return res.status(this.statusCode).json({
       code: this.statusCode,
-      status,
+      status: STATUS_ERROR,
       message,
     } as ResponseStatus);
   };
