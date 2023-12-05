@@ -1,13 +1,7 @@
 import { defineStore } from 'pinia';
 import { Loading } from 'quasar';
 import AuthService from 'src/services/auth-service';
-
-export interface UserPermission {
-  uid: string;
-  email: string;
-  role: string;
-  displayName: string;
-}
+import { UserPermission } from 'components/models';
 
 export interface UserState {
   userPermission: UserPermission;
@@ -36,8 +30,8 @@ export const userStore = defineStore('user-permission', {
         Loading.show();
         this.isCheckingUserPermission = true;
         const response = await authService.getUserInfo();
-        if (response && response.status !== 'Unauthorized') {
-          this.userPermission = response;
+        if (response && response.status !== 'Unauthorized' && response.data) {
+          this.userPermission = response.data;
         }
       } catch (error: any) {
         console.error(error);

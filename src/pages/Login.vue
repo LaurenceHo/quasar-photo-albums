@@ -24,12 +24,12 @@
 
 <script setup lang="ts">
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { useQuasar, LocalStorage } from 'quasar';
+import isEmpty from 'lodash/isEmpty';
+import { LocalStorage, useQuasar } from 'quasar';
 import AuthService from 'src/services/auth-service';
 import { userStore } from 'src/stores/user-store';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import isEmpty from 'lodash/isEmpty';
 
 const router = useRouter();
 const q = useQuasar();
@@ -48,7 +48,7 @@ const handleClickSignIn = async () => {
     const credential = GoogleAuthProvider.credentialFromResult(result);
     if (auth && credential) {
       auth.currentUser?.getIdToken().then(async (idToken) => {
-        const userPermission = await authService.verifyIdToken(idToken);
+        const { data: userPermission } = await authService.verifyIdToken(idToken);
 
         if (!isEmpty(userPermission)) {
           userPermissionStore.setUserPermission(userPermission);

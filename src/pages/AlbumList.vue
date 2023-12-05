@@ -107,9 +107,9 @@ import orderBy from 'lodash/orderBy';
 import { Album as AlbumItem } from 'src/components/models';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import { albumStore } from 'src/stores/album-store';
+import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { userStore } from 'stores/user-store';
 
 const route = useRoute();
 const router = useRouter();

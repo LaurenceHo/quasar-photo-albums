@@ -46,7 +46,8 @@ export const photoStore = defineStore('photos', {
           if (!refreshPhotosList) {
             this.photoList = [];
           }
-          this.photoList = await photoService.getPhotosByAlbumId(albumId);
+          const { data } = await photoService.getPhotosByAlbumId(albumId);
+          this.photoList = data ?? [];
         }
       } else {
         Notify.create({

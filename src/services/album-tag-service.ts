@@ -1,4 +1,4 @@
-import { AlbumTag, ResponseStatus } from 'src/components/models';
+import { AlbumTag, ApiResponse, ResponseStatus } from 'src/components/models';
 import HttpRequestService from 'src/services/http-request-service';
 
 export default class AlbumTagService extends HttpRequestService {
@@ -7,7 +7,7 @@ export default class AlbumTagService extends HttpRequestService {
     this.baseUrl = this.baseUrl + '/albumTags';
   }
 
-  getAlbumTags(): Promise<AlbumTag[]> {
+  getAlbumTags(): Promise<ApiResponse<AlbumTag[]>> {
     this.setDisplayingParameters(false);
     return this.perform('GET', '');
   }

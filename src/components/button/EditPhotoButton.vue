@@ -32,14 +32,13 @@
 </template>
 
 <script setup lang="ts">
-import { getStaticFileUrl } from 'src/helper';
 import { Album } from 'components/models';
 import { copyToClipboard, useQuasar } from 'quasar';
+import DialogStateComposable from 'src/composables/dialog-state-composable';
+import { getStaticFileUrl } from 'src/helper';
 import AlbumService from 'src/services/album-service';
-import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';
 import { toRefs } from 'vue';
-import DialogStateComposable from 'src/composables/dialog-state-composable';
 
 const emits = defineEmits(['refreshPhotoList']);
 const props = defineProps({

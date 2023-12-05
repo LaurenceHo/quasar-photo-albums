@@ -40,9 +40,9 @@
 </template>
 <script setup lang="ts">
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import { computed, ref, toRefs } from 'vue';
-import { albumStore } from 'stores/album-store';
 import PhotoService from 'src/services/photo-service';
+import { albumStore } from 'stores/album-store';
+import { computed, ref, toRefs } from 'vue';
 
 const emits = defineEmits(['refreshPhotoList']);
 const props = defineProps({
