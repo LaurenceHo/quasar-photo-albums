@@ -1,37 +1,45 @@
-import { data } from 'autoprefixer';
 import { Response } from 'express';
-import { ResponseStatus } from '../models';
+import { ApiResponse, ResponseStatus } from '../models';
 import { STATUS_ERROR, STATUS_SUCCESS } from '../constants';
 
-export default class JsonResponse {
-  private readonly statusCode: number;
+export default class JsonResponse<T> {
+  private readonly code: number;
   private _status: string;
 
   constructor(statusCode = 200) {
-    this.statusCode = statusCode;
+    this.code = statusCode;
     this._status = '';
   }
 
   error = (res: Response, message: string) => {
     this._status = STATUS_ERROR;
-    return res.status(this.statusCode).json({
-      code: this.statusCode,
+    return res.status(this.code).json({
+      code: this.code,
       status: this._status,
       message,
     } as ResponseStatus);
   };
 
-  success = (res: Response, message: string, data: any) => {
+  success = (res: Response, message: string, data?: T) => {
     this._status = STATUS_SUCCESS;
-    return res.status(this.statusCode).json({
-      code: this.statusCode,
-      status: this._status,
-      message,
-      data,
-    } as ResponseStatus);
+    if (!!data) {
+      return res.status(this.code).json({
+        code: this.code,
+        status: this._status,
+        message,
+        data,
+      } as ApiResponse<T>);
+    } else {
+      return res.status(this.code).json({
+        code: this.code,
+        status: this._status,
+        message,
+      } as ResponseStatus);
+    }
   };
 
-  set status(value: string) {
-    this._status = value;
+  setStatus(status: string) {
+    this._status = status;
+    return this;
   }
 }

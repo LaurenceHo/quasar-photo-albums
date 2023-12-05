@@ -1,24 +1,24 @@
-import { AlbumTag, BaseController } from '../models';
+import { AlbumTag } from '../models';
 import AlbumTagService from '../services/album-tag-service';
+import { BaseController } from './base-controller';
 import { uploadObject } from './helpers';
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import { asyncHandler } from '../utils/async-handler';
-import JsonResponse from '../utils/json-response';
 
 const albumTagService = new AlbumTagService();
 const tableName = process.env.PHOTO_ALBUM_TAGS_TABLE_NAME;
 
-export default class AlbumTagController implements BaseController {
+export default class AlbumTagController extends BaseController {
   findAll = asyncHandler(async (req: Request, res: Response) => {
     try {
       const albumTags = await albumTagService.findAll({
         TableName: tableName,
       });
 
-      return new JsonResponse().success(res, '', albumTags);
+      return this.ok<AlbumTag[]>(res, 'ok', albumTags);
     } catch (err: any) {
       console.error(`Failed to query album tags: ${err}`);
-      return new JsonResponse(500).error(res, 'Failed to query album tags');
+      return this.fail(res, 'Failed to query album tags');
     }
   });
 
@@ -33,12 +33,12 @@ export default class AlbumTagController implements BaseController {
       });
       if (result) {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
-        return new JsonResponse().success(res, 'Album tag created', null);
+        return this.ok(res, 'Album tag created');
       }
-      return new JsonResponse(500).error(res, 'Failed to create album tag');
+      return this.fail(res, 'Failed to create album tag');
     } catch (err) {
       console.error(`Failed to create album tag: ${err}`);
-      return new JsonResponse(500).error(res, 'Failed to create album tag');
+      return this.fail(res, 'Failed to create album tag');
     }
   });
 
@@ -53,12 +53,20 @@ export default class AlbumTagController implements BaseController {
       });
       if (result) {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
-        return new JsonResponse().success(res, 'Album tag deleted', null);
+        return this.ok(res, 'Album tag deleted');
       }
-      return new JsonResponse(500).error(res, 'Failed to delete album tag');
+      return this.fail(res, 'Failed to delete album tag');
     } catch (err) {
       console.error(`Failed to delete album tag: ${err}`);
-      return new JsonResponse(500).error(res, 'Failed to delete album tag');
+      return this.fail(res, 'Failed to delete album tag');
     }
+  });
+
+  findOne: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+    throw new Error('Method not implemented.');
+  });
+
+  update: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+    throw new Error('Method not implemented.');
   });
 }

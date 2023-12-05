@@ -44,15 +44,11 @@ export default class AlbumController extends BaseController {
       }
       const albumList = await albumService.findAll(params);
 
-      return this.ok<Album[]>(res, '', albumList);
+      return this.ok<Album[]>(res, 'ok', albumList);
     } catch (err: any) {
       console.error(`Failed to query photo album: ${err}`);
       return this.fail(res, 'Failed to query photo album');
     }
-  });
-
-  findOne: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
-    throw new Error('Method not implemented.');
   });
 
   create = asyncHandler(async (req: Request, res: Response) => {
@@ -68,10 +64,11 @@ export default class AlbumController extends BaseController {
       });
       if (result) {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+        // Create folder in S3
+        await uploadObject(album.id + '/', null);
+        return this.ok(res, 'Album created');
       }
-      await uploadObject(album.id + '/', null);
-
-      return this.ok(res, 'Album created', null);
+      return this.fail(res, 'Failed to create photo album');
     } catch (err: any) {
       console.error(`Failed to insert photo album: ${err}`);
       return this.fail(res, 'Failed to create photo album');
@@ -87,7 +84,7 @@ export default class AlbumController extends BaseController {
       const result = await updatePhotoAlbum(album);
 
       if (result) {
-        return this.ok(res, 'Album updated', null);
+        return this.ok(res, 'Album updated');
       }
       return this.fail(res, 'Failed to update photo album');
     } catch (err: any) {
@@ -114,7 +111,7 @@ export default class AlbumController extends BaseController {
 
         if (result) {
           await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
-          return this.ok(res, 'Album deleted', null);
+          return this.ok(res, 'Album deleted');
         }
         return this.fail(res, 'Failed to delete photo album');
       } else {
@@ -124,5 +121,9 @@ export default class AlbumController extends BaseController {
       console.error(`Failed to delete photo album: ${err}`);
       return this.fail(res, 'Failed to delete photo album');
     }
+  });
+
+  findOne: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+    throw new Error('Method not implemented.');
   });
 }

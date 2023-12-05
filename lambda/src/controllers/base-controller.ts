@@ -15,9 +15,9 @@ export abstract class BaseController implements IBaseController {
 
   public ok<T>(res: Response, message = '', data?: T) {
     if (!!data) {
-      return new JsonResponse().success(res, message, data);
+      return new JsonResponse<T>().success(res, message, data);
     } else {
-      return new JsonResponse().success(res, message, null);
+      return new JsonResponse().success(res, message);
     }
   }
 
@@ -26,8 +26,8 @@ export abstract class BaseController implements IBaseController {
   }
 
   public unauthorized(res: Response, message = '') {
-    const jsonResponse = new JsonResponse(401).error(res, message);
-    jsonResponse.status = 'Unauthorized';
+    const jsonResponse = new JsonResponse(401);
+    jsonResponse.setStatus('Unauthorized').error(res, message);
 
     return jsonResponse;
   }

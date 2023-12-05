@@ -12,7 +12,7 @@ const upload = multer({
   },
 });
 
-router.get('/:albumId', controller.findPhotosByAlbumId);
+router.get('/:albumId', controller.findAll);
 
 router.delete('', verifyJwtClaim, verifyUserPermission, controller.delete);
 

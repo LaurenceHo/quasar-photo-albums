@@ -1,19 +1,22 @@
 import { isEmpty, isUndefined } from 'lodash';
-import { BaseController, PhotosRequest } from '../models';
+import { Photo, PhotosRequest } from '../models';
 import AlbumService from '../services/album-service';
 import { S3Service } from '../services/s3-service';
+import { BaseController } from './base-controller';
 import { deleteObjects, updatePhotoAlbum, uploadObject } from './helpers';
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import { asyncHandler } from '../utils/async-handler';
-import JsonResponse from '../utils/json-response';
 
 const s3Service = new S3Service();
 const albumService = new AlbumService();
 const bucketName = process.env.AWS_S3_BUCKET_NAME;
 const albumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME;
 
-export default class PhotoController implements BaseController {
-  findPhotosByAlbumId = asyncHandler(async (req: Request, res: Response) => {
+export default class PhotoController extends BaseController {
+  /**
+   * Get all photos in an album
+   */
+  findAll = asyncHandler(async (req: Request, res: Response) => {
     const albumId = req.params['albumId'];
 
     try {
@@ -50,10 +53,10 @@ export default class PhotoController implements BaseController {
           });
         }
       }
-      return new JsonResponse().success(res, '', photos);
+      return this.ok<Photo[]>(res, 'ok', photos);
     } catch (err: any) {
-      console.error(err);
-      return new JsonResponse(500).error(res, 'Failed to get photos');
+      console.error('Failed to get photos:', err);
+      return this.fail(res, 'Failed to get photos');
     }
   });
 
@@ -66,21 +69,24 @@ export default class PhotoController implements BaseController {
       console.log(`##### Uploading file: ${filename}, mimeType: ${req.file?.mimetype}, file size: ${req.file?.size}`);
       const result = await uploadObject(`${albumId}/${filename}`, buffer);
       if (result) {
-        console.log(`##### File uploaded: ${filename}`);
-        return new JsonResponse().success(res, '', null);
+        console.log(`##### Photo uploaded: ${filename}`);
+        return this.ok(res, 'Photo uploaded');
       }
-      return new JsonResponse(500).error(res, 'Failed to upload photos');
+      return this.fail(res, 'Failed to upload photos');
     } catch (err: any) {
-      console.error(err);
-      return new JsonResponse(500).error(res, 'Failed to upload photos');
+      console.error('Failed to upload photos:', err);
+      return this.fail(res, 'Failed to upload photos');
     }
   });
 
+  /**
+   * Move photos to another album
+   */
   update = asyncHandler(async (req: Request, res: Response) => {
     const photos = req.body as PhotosRequest;
     const { destinationAlbumId, albumId, photoKeys } = photos;
     if (isUndefined(destinationAlbumId) || isEmpty(destinationAlbumId)) {
-      return new JsonResponse(400).error(res, 'No destination album');
+      return this.clientError(res, 'No destination album');
     }
 
     if (!isUndefined(photoKeys) && !isEmpty(photoKeys)) {
@@ -121,14 +127,13 @@ export default class PhotoController implements BaseController {
 
       try {
         await Promise.all(promises);
-        return new JsonResponse().success(res, 'Photos moved', null);
+        return this.ok(res, 'Photo moved');
       } catch (err: any) {
-        console.error(err);
-        return new JsonResponse(500).error(res, 'Failed to move photo');
+        console.error('Failed to move photos:', err);
+        return this.fail(res, 'Failed to move photos');
       }
-    } else {
-      return new JsonResponse(400).error(res, 'No photo needs to be moved');
     }
+    return this.clientError(res, 'No photo needs to be moved');
   });
 
   delete = asyncHandler(async (req: Request, res: Response) => {
@@ -140,15 +145,18 @@ export default class PhotoController implements BaseController {
       try {
         const result = await deleteObjects(photoKeysArray);
         if (result) {
-          return new JsonResponse().success(res, 'Photo deleted', null);
+          return this.ok(res, 'Photo deleted');
         }
-        return new JsonResponse(500).error(res, 'Failed to delete photo');
+        return this.fail(res, 'Failed to delete photos');
       } catch (err: any) {
-        console.error(err);
-        return new JsonResponse(500).error(res, 'Failed to delete photo');
+        console.error('Failed to delete photos:', err);
+        return this.fail(res, 'Failed to delete photos');
       }
-    } else {
-      return new JsonResponse(400).error(res, 'No photo needs to be deleted');
     }
+    return this.clientError(res, 'No photo needs to be deleted');
+  });
+
+  findOne: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+    throw new Error('Method not implemented.');
   });
 }
