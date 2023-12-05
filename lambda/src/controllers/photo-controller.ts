@@ -14,7 +14,7 @@ const albumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME;
 
 export default class PhotoController extends BaseController {
   /**
-   * Get all photos in an album
+   * Get all photos from an album
    */
   findAll = asyncHandler(async (req: Request, res: Response) => {
     const albumId = req.params['albumId'];
@@ -94,7 +94,7 @@ export default class PhotoController extends BaseController {
       photoKeys.forEach((photoKey) => {
         const sourcePhotoKey = `${albumId}/${photoKey}`;
 
-        const promise = new Promise((resolve, reject) =>
+        const promise = new Promise((resolve, reject) => {
           s3Service
             .copy({
               Bucket: process.env.AWS_S3_BUCKET_NAME,
@@ -119,8 +119,8 @@ export default class PhotoController extends BaseController {
             })
             .catch((err: Error) => {
               reject(err);
-            })
-        );
+            });
+        });
 
         promises.push(promise);
       });
