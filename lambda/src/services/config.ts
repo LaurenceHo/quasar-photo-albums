@@ -1,6 +1,6 @@
-import dotenv from 'dotenv';
 import { DynamoDBClientConfig } from '@aws-sdk/client-dynamodb';
 import { S3ClientConfig } from '@aws-sdk/client-s3/dist-types/S3Client';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
