@@ -109,19 +109,17 @@
 </template>
 
 <script lang="ts" setup>
-import { useQuasar } from 'quasar';
-import ConfirmDeletePhotosDialog from 'components/dialog/ConfirmDeletePhotosDialog.vue';
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
+import ConfirmDeletePhotosDialog from 'components/dialog/ConfirmDeletePhotosDialog.vue';
 import MovePhotoDialog from 'components/dialog/MovePhotosDialog.vue';
 import PhotoDetail from 'components/dialog/PhotoDetail.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
 import { Album, Photo } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import AlbumService from 'src/services/album-service';
 import { albumStore } from 'stores/album-store';
-import { userStore } from 'stores/user-store';
 import { photoStore } from 'stores/photo-store';
-import { computed, ref, watch } from 'vue';
+import { userStore } from 'stores/user-store';
+import { computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();

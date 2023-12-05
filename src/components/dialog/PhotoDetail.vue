@@ -157,17 +157,17 @@
 </template>
 
 <script lang="ts" setup>
-import { isEmpty } from 'lodash';
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
 import { ExifData, Photo } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import * as ExifReader from 'exifreader';
+import { NumberTag, StringArrayTag } from 'exifreader';
+import { isEmpty } from 'lodash';
 import { useQuasar } from 'quasar';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { NumberTag, StringArrayTag } from 'exifreader';
 
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();

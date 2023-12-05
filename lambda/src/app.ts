@@ -48,7 +48,6 @@ app.use(errorHandler);
 app.use('/api/auth', authRoute);
 app.use('/api/albums', albumRoute);
 app.use('/api/albumTags', albumTagsRoute);
-
 app.use('/api/photos', photoRoute);
 
 export const handler = serverless(app);

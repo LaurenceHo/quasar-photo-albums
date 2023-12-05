@@ -15,7 +15,8 @@
 /**
  * https://www.smashingmagazine.com/2022/03/drag-drop-file-uploader-vuejs-3/
  */
-import { ref, onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
+
 const emit = defineEmits(['files-dropped']);
 
 const active = ref(false);
@@ -27,22 +28,22 @@ let inActiveTimeout: any = null;
 const setActive = () => {
   active.value = true;
   clearTimeout(inActiveTimeout);
-}
+};
 
 const setInactive = () => {
   inActiveTimeout = setTimeout(() => {
     active.value = false;
   }, 50);
-}
+};
 
 const onDrop = (e: any) => {
   setInactive();
   emit('files-dropped', [...e.dataTransfer.files]);
-}
+};
 
 const preventDefaults = (e: any) => {
   e.preventDefault();
-}
+};
 
 const events = ['dragenter', 'dragover', 'dragleave', 'drop'];
 

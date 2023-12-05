@@ -84,9 +84,9 @@
 </template>
 
 <script setup lang="ts">
-import DialogStateComposable from 'src/composables/dialog-state-composable';
 import DropZone from 'components/file-uploader/DropZone.vue';
 import FilePreview from 'components/file-uploader/FilePreview.vue';
+import DialogStateComposable from 'src/composables/dialog-state-composable';
 import useFileList from 'src/composables/file-list-composable';
 import fileUploader from 'src/composables/file-uploader-composable';
 import { toRefs, watch } from 'vue';
