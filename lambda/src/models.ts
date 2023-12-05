@@ -1,4 +1,6 @@
-import express from 'express';
+import { Request, RequestHandler } from 'express';
+
+export type RequestWithUser = Request & { user: UserPermission };
 
 export interface Read<T> {
   findAll?(param: any): Promise<T[]>;
@@ -14,15 +16,15 @@ export interface Write {
 export type BaseService<T> = Read<T> & Write;
 
 export interface BaseController {
-  findAll?: express.RequestHandler;
+  findAll?: RequestHandler;
 
-  findOne?: express.RequestHandler;
+  findOne?: RequestHandler;
 
-  create?: express.RequestHandler;
+  create?: RequestHandler;
 
-  update?: express.RequestHandler;
+  update?: RequestHandler;
 
-  delete?: express.RequestHandler;
+  delete?: RequestHandler;
 }
 
 export interface Album {

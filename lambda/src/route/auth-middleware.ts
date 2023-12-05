@@ -2,9 +2,8 @@ import { Request, Response } from 'express';
 import admin from 'firebase-admin';
 import get from 'lodash/get';
 import UserService from '../services/user-service';
-import { ResponseStatus, UserPermission } from '../models';
+import { RequestWithUser, ResponseStatus } from '../models';
 
-type RequestWithUser = Request & { user: UserPermission };
 const userService = new UserService();
 
 /**

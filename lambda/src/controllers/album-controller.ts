@@ -1,19 +1,19 @@
+import { Request, RequestHandler, Response } from 'express';
 import admin from 'firebase-admin';
 import get from 'lodash/get';
-import { Album, BaseController } from '../models';
+import { Album, RequestWithUser } from '../models';
 import AlbumService from '../services/album-service';
-import { emptyS3Folder, updatePhotoAlbum, uploadObject } from './helpers';
-import { Request, Response } from 'express';
-import { asyncHandler } from '../utils/async-handler';
-import JsonResponse from '../utils/json-response';
 import UserService from '../services/user-service';
+import { asyncHandler } from '../utils/async-handler';
+import { BaseController } from './base-controller';
+import { emptyS3Folder, updatePhotoAlbum, uploadObject } from './helpers';
 
 const userService = new UserService();
 const albumService = new AlbumService();
 const photoAlbumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME;
 
-export default class AlbumController implements BaseController {
-  findAll = asyncHandler(async (req: Request, res: Response) => {
+export default class AlbumController extends BaseController {
+  findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     try {
       const firebaseToken = get(req, 'cookies.__session', '');
       let userPermission = null;
@@ -44,17 +44,20 @@ export default class AlbumController implements BaseController {
       }
       const albumList = await albumService.findAll(params);
 
-      return new JsonResponse().success(res, '', albumList);
+      return this.ok<Album[]>(res, '', albumList);
     } catch (err: any) {
       console.error(`Failed to query photo album: ${err}`);
-      return new JsonResponse(500).error(res, 'Failed to query photo album');
+      return this.fail(res, 'Failed to query photo album');
     }
+  });
+
+  findOne: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+    throw new Error('Method not implemented.');
   });
 
   create = asyncHandler(async (req: Request, res: Response) => {
     const album = req.body as Album;
-    // @ts-ignore
-    album.createdBy = req.user.email;
+    album.createdBy = (req as RequestWithUser).user.email;
     album.createdAt = new Date().toISOString();
     album.updatedAt = new Date().toISOString();
 
@@ -67,28 +70,28 @@ export default class AlbumController implements BaseController {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
       }
       await uploadObject(album.id + '/', null);
-      return new JsonResponse().success(res, 'Album created', null);
+
+      return this.ok(res, 'Album created', null);
     } catch (err: any) {
       console.error(`Failed to insert photo album: ${err}`);
-      return new JsonResponse(500).error(res, 'Failed to create photo album');
+      return this.fail(res, 'Failed to create photo album');
     }
   });
 
   update = asyncHandler(async (req: Request, res: Response) => {
     try {
       const album: Album = req.body;
-      // @ts-ignore
-      album.updatedBy = req.user.email;
+      album.updatedBy = (req as RequestWithUser).user.email;
       album.updatedAt = new Date().toISOString();
 
       const result = await updatePhotoAlbum(album);
 
       if (result) {
-        return new JsonResponse().success(res, 'Album updated', null);
+        return this.ok(res, 'Album updated', null);
       }
-      return new JsonResponse(500).error(res, 'Failed to update photo album');
+      return this.fail(res, 'Failed to update photo album');
     } catch (err: any) {
-      return new JsonResponse(500).error(res, 'Failed to update photo album');
+      return this.fail(res, 'Failed to update photo album');
     }
   });
 
@@ -111,15 +114,15 @@ export default class AlbumController implements BaseController {
 
         if (result) {
           await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
-          return new JsonResponse().success(res, 'Album deleted', null);
+          return this.ok(res, 'Album deleted', null);
         }
-        return new JsonResponse(500).error(res, 'Failed to delete photo album');
+        return this.fail(res, 'Failed to delete photo album');
       } else {
-        return new JsonResponse(500).error(res, 'Failed to delete photo album');
+        return this.fail(res, 'Failed to delete photo album');
       }
     } catch (err: any) {
       console.error(`Failed to delete photo album: ${err}`);
-      return new JsonResponse(500).error(res, 'Failed to delete photo album');
+      return this.fail(res, 'Failed to delete photo album');
     }
   });
 }
