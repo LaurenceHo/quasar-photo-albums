@@ -3,11 +3,13 @@
     <q-card>
       <q-card-section class="row items-center">
         <q-icon color="primary" name="mdi-alert-circle" size="md" />
-        <span class="q-ml-sm text-h6">Do you want to delete photo{{getSelectedPhotoList.length > 1 ? 's' :''}} as below?</span>
+        <span class="q-ml-sm text-h6"
+          >Do you want to delete photo{{ getSelectedPhotoList.length > 1 ? 's' : '' }} as below?</span
+        >
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <div class="row" v-for='photoKey in photoKeysArray' :key="photoKey">{{photoKey}}</div>
+        <div class="row" v-for="photoKey in photoKeysArray" :key="photoKey">{{ photoKey }}</div>
       </q-card-section>
 
       <q-card-actions align="right">
@@ -26,8 +28,8 @@
 </template>
 <script setup lang="ts">
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import { computed, ref, toRefs } from 'vue';
 import PhotoService from 'src/services/photo-service';
+import { computed, ref, toRefs } from 'vue';
 
 const emits = defineEmits(['refreshPhotoList']);
 const props = defineProps({

@@ -1,4 +1,4 @@
-import { Album, ResponseStatus } from 'src/components/models';
+import { Album, ApiResponse, ResponseStatus } from 'src/components/models';
 import HttpRequestService from 'src/services/http-request-service';
 
 export default class AlbumService extends HttpRequestService {
@@ -7,7 +7,12 @@ export default class AlbumService extends HttpRequestService {
     this.baseUrl = this.baseUrl + '/albums';
   }
 
-  public getAlbums(sort?: string, startIndex?: number, endIndex?: number, filter?: string): Promise<Album[]> {
+  public getAlbums(
+    sort?: string,
+    startIndex?: number,
+    endIndex?: number,
+    filter?: string
+  ): Promise<ApiResponse<Album[]>> {
     // TODO: May need to apply filter in the feature. It only runs filter in the memory atm.
     this.setDisplayingParameters(false);
     return this.perform('GET', '');

@@ -2,13 +2,14 @@ import express, { Response } from 'express';
 import { CookieOptions } from 'express-serve-static-core';
 import admin from 'firebase-admin';
 import get from 'lodash/get';
-import { queryUserPermissionV2 } from '../services/aws-dynamodb-service';
+import UserService from '../services/user-service';
 
 // Reference:
 // https://firebase.google.com/docs/auth/admin/manage-cookies
 // https://firebase.google.com/docs/auth/admin/verify-id-tokens
 
 export const router = express.Router();
+const userService = new UserService();
 
 router.get('/userInfo', async (req, res) => {
   try {
@@ -16,12 +17,12 @@ router.get('/userInfo', async (req, res) => {
     if (!firebaseToken) {
       res.send({ status: 'Unauthorized', message: 'No auth token provided' });
     } else {
-      const decodedClaims = await admin.auth().verifySessionCookie(firebaseToken, true);
-      if (decodedClaims.exp <= Date.now() / 1000) {
+      const { exp, uid } = await admin.auth().verifySessionCookie(firebaseToken, true);
+      if (exp <= Date.now() / 1000) {
         res.clearCookie('__session');
         res.send({ status: 'Unauthorized', message: 'Auth token expired' });
       } else {
-        const userPermission = await queryUserPermissionV2(decodedClaims?.uid);
+        const userPermission = await userService.queryUserPermissionByUid(uid);
 
         res.send(userPermission);
       }
@@ -36,22 +37,20 @@ router.post('/verifyIdToken', async (req, res) => {
   const token = req.body.token; // Firebase ID Token
 
   try {
-    const decodedIdToken = await admin.auth().verifyIdToken(String(token));
-    const userPermission = await queryUserPermissionV2(decodedIdToken.uid);
+    const { uid, auth_time, email } = await admin.auth().verifyIdToken(String(token));
+    const userPermission = await userService.queryUserPermissionByUid(uid);
     // Only process if the authorised user just signed-in in the last 5 minutes.
-    if (userPermission && new Date().getTime() / 1000 - decodedIdToken.auth_time < 5 * 60) {
+    if (userPermission && new Date().getTime() / 1000 - auth_time < 5 * 60) {
       // Set idToken as cookies
       await _setCookies(res, token);
       res.send(userPermission);
     } else {
-      console.log(`User ${decodedIdToken.email} doesn't have permission`);
-      await admin.auth().revokeRefreshTokens(decodedIdToken.uid);
-      res
-        .status(403)
-        .send({ status: 'Unauthorized', message: `User ${decodedIdToken.email} doesn't have login permission` });
+      console.log(`User ${email} doesn't have permission`);
+      await admin.auth().revokeRefreshTokens(uid);
+      res.status(403).send({ status: 'Unauthorized', message: `User ${email} doesn't have login permission` });
     }
   } catch (err) {
-    console.error('Error while getting Firebase User record:', err);
+    console.error('Error while getting user permission:', err);
     res.status(403).send({ status: 'Unauthorized', message: 'Error while user login' });
   }
 });

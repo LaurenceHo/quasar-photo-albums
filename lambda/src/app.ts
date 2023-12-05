@@ -11,6 +11,7 @@ import { router as albumRoute } from './route/album-route';
 import { router as albumTagsRoute } from './route/album-tag-route';
 import { router as authRoute } from './route/auth-route';
 import { router as photoRoute } from './route/photo-route';
+import { errorHandler } from './utils/error-handler';
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount),
@@ -20,7 +21,7 @@ dotenv.config();
 
 export const app: Application = express();
 const corsHeader = (req: Request, res: Response, next: any) => {
-  console.log('###### Request API:', req.url, '| Method:', req.method);
+  console.log('##### Request API:', req.url, '| Method:', req.method);
   const allowedOrigins = ['http://localhost:9000', process.env.ALBUM_URL];
   const origin = req.headers.origin as string;
   if (allowedOrigins.indexOf(origin) > -1) {
@@ -41,6 +42,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(helmet());
+app.use(errorHandler);
 
 // Route
 app.use('/api/auth', authRoute);
