@@ -8,8 +8,8 @@ import { asyncHandler } from '../utils/async-handler';
 import { BaseController } from './base-controller';
 import { emptyS3Folder, updatePhotoAlbum, uploadObject } from './helpers';
 
-const userService = new UserService();
 const albumService = new AlbumService();
+const userService = new UserService();
 
 export default class AlbumController extends BaseController {
   findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
@@ -52,7 +52,7 @@ export default class AlbumController extends BaseController {
 
   create: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const album = req.body as Album;
-    album.createdBy = (req as RequestWithUser).user.email;
+    album.createdBy = (req as RequestWithUser).user?.email ?? 'unknown';
     album.createdAt = new Date().toISOString();
     album.updatedAt = new Date().toISOString();
 
@@ -74,7 +74,7 @@ export default class AlbumController extends BaseController {
   update: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     try {
       const album: Album = req.body;
-      album.updatedBy = (req as RequestWithUser).user.email;
+      album.updatedBy = (req as RequestWithUser).user?.email ?? 'unknown';
       album.updatedAt = new Date().toISOString();
 
       const result = await updatePhotoAlbum(album);

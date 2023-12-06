@@ -1,6 +1,6 @@
 import { Request, RequestHandler } from 'express';
 
-export type RequestWithUser = Request & { user: UserPermission };
+export type RequestWithUser = Request & { user: UserPermission | null };
 
 export interface Read<T> {
   findAll?(param: any): Promise<T[]>;
