@@ -31,7 +31,11 @@ export abstract class DynamoDbService<T> implements IBaseService<T> {
     return get(response, 'Items', []);
   }
 
-  async findOne(params: GetCommandInput): Promise<T> {
+  async findOne(objectKey: { [key: string]: string | number }): Promise<T> {
+    const params: GetCommandInput = {
+      TableName: this._tableName,
+      Key: objectKey,
+    };
     const response = await this.client.send(new GetCommand(params));
     return get(response, 'Item', {});
   }

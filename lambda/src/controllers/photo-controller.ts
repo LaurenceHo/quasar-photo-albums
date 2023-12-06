@@ -10,7 +10,6 @@ import { asyncHandler } from '../utils/async-handler';
 const s3Service = new S3Service();
 const albumService = new AlbumService();
 const bucketName = process.env.AWS_S3_BUCKET_NAME;
-const albumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME;
 
 export default class PhotoController extends BaseController {
   /**
@@ -20,12 +19,7 @@ export default class PhotoController extends BaseController {
     const albumId = req.params['albumId'];
 
     try {
-      const album = await albumService.findOne({
-        TableName: albumTableName,
-        Key: {
-          id: albumId,
-        },
-      });
+      const album = await albumService.findOne({ id: albumId });
       const folderNameKey = decodeURIComponent(albumId) + '/';
       const photos = await s3Service.findPhotosByAlbumId({
         Prefix: folderNameKey,

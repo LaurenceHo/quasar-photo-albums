@@ -19,8 +19,8 @@ export default class AlbumController extends BaseController {
       if (firebaseToken) {
         // Reference:
         // https://firebase.google.com/docs/reference/admin/node/firebase-admin.firestore
-        const { uid } = await admin.auth().verifySessionCookie(firebaseToken, true);
-        userPermission = await userService.queryUserPermissionByUid(uid);
+        const { uid, email = '' } = await admin.auth().verifySessionCookie(firebaseToken, true);
+        userPermission = await userService.findOne({ uid, email });
       }
 
       const isAdmin = get(userPermission, 'role') === 'admin';

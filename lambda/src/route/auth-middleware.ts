@@ -30,12 +30,12 @@ export const verifyJwtClaim = async (req: Request, res: Response, next: any) => 
   if (req.cookies && req.cookies['__session']) {
     try {
       const firebaseToken = get(req, 'cookies.__session', '');
-      const { exp, uid } = await admin.auth().verifySessionCookie(firebaseToken, true);
+      const { exp, uid, email = '' } = await admin.auth().verifySessionCookie(firebaseToken, true);
       if (exp <= Date.now() / 1000) {
         _cleanCookie(res, 'User is not logged-in');
       }
 
-      const user = await userService.queryUserPermissionByUid(uid);
+      const user = await userService.findOne({ uid, email });
       if (user) {
         (req as RequestWithUser).user = user;
       } else {

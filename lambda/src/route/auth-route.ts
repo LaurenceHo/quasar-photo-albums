@@ -17,12 +17,12 @@ router.get('/userInfo', async (req, res) => {
     if (!firebaseToken) {
       res.send({ status: 'Unauthorized', message: 'No auth token provided' });
     } else {
-      const { exp, uid } = await admin.auth().verifySessionCookie(firebaseToken, true);
+      const { exp, uid, email = '' } = await admin.auth().verifySessionCookie(firebaseToken, true);
       if (exp <= Date.now() / 1000) {
         res.clearCookie('__session');
         res.send({ status: 'Unauthorized', message: 'Auth token expired' });
       } else {
-        const userPermission = await userService.queryUserPermissionByUid(uid);
+        const userPermission = await userService.findOne({ uid, email });
 
         res.send(userPermission);
       }
@@ -37,8 +37,8 @@ router.post('/verifyIdToken', async (req, res) => {
   const token = req.body.token; // Firebase ID Token
 
   try {
-    const { uid, auth_time, email } = await admin.auth().verifyIdToken(String(token));
-    const userPermission = await userService.queryUserPermissionByUid(uid);
+    const { uid, auth_time, email = '' } = await admin.auth().verifyIdToken(String(token));
+    const userPermission = await userService.findOne({ uid, email });
     // Only process if the authorised user just signed-in in the last 5 minutes.
     if (userPermission && new Date().getTime() / 1000 - auth_time < 5 * 60) {
       // Set idToken as cookies
