@@ -10,7 +10,6 @@ import { emptyS3Folder, updatePhotoAlbum, uploadObject } from './helpers';
 
 const userService = new UserService();
 const albumService = new AlbumService();
-const photoAlbumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME;
 
 export default class AlbumController extends BaseController {
   findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
@@ -27,7 +26,7 @@ export default class AlbumController extends BaseController {
       const isAdmin = get(userPermission, 'role') === 'admin';
 
       let params = {
-        TableName: photoAlbumTableName,
+        TableName: albumService.tableName,
         IndexName: 'id-order-index',
         ProjectionExpression: 'id, albumName, albumCover, description, tags, isPrivate, #Order',
         ExpressionAttributeNames: { '#Order': 'order' },
@@ -51,17 +50,14 @@ export default class AlbumController extends BaseController {
     }
   });
 
-  create = asyncHandler(async (req: Request, res: Response) => {
+  create: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const album = req.body as Album;
     album.createdBy = (req as RequestWithUser).user.email;
     album.createdAt = new Date().toISOString();
     album.updatedAt = new Date().toISOString();
 
     try {
-      const result = await albumService.create({
-        TableName: photoAlbumTableName,
-        Item: album,
-      });
+      const result = await albumService.create(album);
       if (result) {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
         // Create folder in S3
@@ -75,7 +71,7 @@ export default class AlbumController extends BaseController {
     }
   });
 
-  update = asyncHandler(async (req: Request, res: Response) => {
+  update: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     try {
       const album: Album = req.body;
       album.updatedBy = (req as RequestWithUser).user.email;
@@ -92,7 +88,7 @@ export default class AlbumController extends BaseController {
     }
   });
 
-  delete = asyncHandler(async (req: Request, res: Response) => {
+  delete: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const albumId = req.params.albumId;
 
     try {
@@ -102,12 +98,7 @@ export default class AlbumController extends BaseController {
 
       if (result) {
         // Delete album from database
-        const result = await albumService.delete({
-          TableName: photoAlbumTableName,
-          Key: {
-            id: albumId,
-          },
-        });
+        const result = await albumService.delete({ id: albumId });
 
         if (result) {
           await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));

@@ -16,7 +16,7 @@ export default class PhotoController extends BaseController {
   /**
    * Get all photos from an album
    */
-  findAll = asyncHandler(async (req: Request, res: Response) => {
+  findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const albumId = req.params['albumId'];
 
     try {
@@ -60,7 +60,7 @@ export default class PhotoController extends BaseController {
     }
   });
 
-  create = asyncHandler(async (req: Request, res: Response) => {
+  create: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const albumId = req.params['albumId'];
 
     try {
@@ -82,7 +82,7 @@ export default class PhotoController extends BaseController {
   /**
    * Move photos to another album
    */
-  update = asyncHandler(async (req: Request, res: Response) => {
+  update: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const photos = req.body as PhotosRequest;
     const { destinationAlbumId, albumId, photoKeys } = photos;
     if (isUndefined(destinationAlbumId) || isEmpty(destinationAlbumId)) {
@@ -136,7 +136,7 @@ export default class PhotoController extends BaseController {
     return this.clientError(res, 'No photo needs to be moved');
   });
 
-  delete = asyncHandler(async (req: Request, res: Response) => {
+  delete: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const photosRequest = req.body as PhotosRequest;
     const { albumId, photoKeys } = photosRequest;
 

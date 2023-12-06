@@ -16,6 +16,15 @@ import { ddbDocClient } from './dynamodb-client';
 
 export abstract class DynamoDbService<T> implements IBaseService<T> {
   public readonly client: any = ddbDocClient;
+  private _tableName: any;
+
+  get tableName(): any {
+    return this._tableName;
+  }
+
+  set tableName(value: any) {
+    this._tableName = value;
+  }
 
   async findAll(params: ScanCommandInput): Promise<T[]> {
     const response = await this.client.send(new ScanCommand(params));
@@ -27,7 +36,11 @@ export abstract class DynamoDbService<T> implements IBaseService<T> {
     return get(response, 'Item', {});
   }
 
-  async create(params: PutCommandInput): Promise<boolean> {
+  async create(item: T): Promise<boolean> {
+    const params: PutCommandInput = {
+      TableName: this._tableName,
+      Item: item as Record<string, any>,
+    };
     const response = await this.client.send(new PutCommand(params));
     return response.$metadata.httpStatusCode === 200;
   }
@@ -37,7 +50,12 @@ export abstract class DynamoDbService<T> implements IBaseService<T> {
     return response.$metadata.httpStatusCode === 200;
   }
 
-  async delete(params: DeleteCommandInput): Promise<boolean> {
+  async delete(objectKey: { [key: string]: string | number }): Promise<boolean> {
+    const params: DeleteCommandInput = {
+      TableName: this._tableName,
+      Key: objectKey,
+    };
+
     const response = await this.client.send(new DeleteCommand(params));
     return response.$metadata.httpStatusCode === 200;
   }
