@@ -4,15 +4,13 @@ import { Album } from '../models';
 import AlbumService from '../services/album-service';
 import { S3Service } from '../services/s3-service';
 
+const s3BucketName = process.env.AWS_S3_BUCKET_NAME;
 const albumService = new AlbumService();
 const s3Service = new S3Service();
 
-const albumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME;
-const s3BucketName = process.env.AWS_S3_BUCKET_NAME;
-
 export const updatePhotoAlbum = async (album: Album) => {
   const params = {
-    TableName: albumTableName,
+    TableName: albumService.tableName,
     Key: {
       id: album.id,
     },

@@ -1,5 +1,5 @@
 import HttpRequestService from 'src/services/http-request-service';
-import { UserPermission } from 'components/models';
+import { ApiResponse, UserPermission } from 'components/models';
 
 export default class AuthService extends HttpRequestService {
   constructor() {
@@ -7,12 +7,12 @@ export default class AuthService extends HttpRequestService {
     this.baseUrl = this.baseUrl + '/auth';
   }
 
-  verifyIdToken(token: string): Promise<UserPermission> {
+  verifyIdToken(token: string): Promise<ApiResponse<UserPermission>> {
     this.setDisplayingParameters(true);
     return this.perform('POST', '/verifyIdToken', { token });
   }
 
-  getUserInfo(): Promise<UserPermission> {
+  getUserInfo(): Promise<ApiResponse<UserPermission>> {
     this.setDisplayingParameters(false);
     return this.perform('GET', '/userInfo');
   }

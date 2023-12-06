@@ -1,23 +1,33 @@
 import { Request, Response } from 'express';
+import { CookieOptions } from 'express-serve-static-core';
 import admin from 'firebase-admin';
 import get from 'lodash/get';
 import UserService from '../services/user-service';
-import { RequestWithUser, ResponseStatus } from '../models';
+import { RequestWithUser } from '../models';
+import JsonResponse from '../utils/json-response';
 
 const userService = new UserService();
+
+export const setCookies = async (res: Response, token: any) => {
+  const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days
+  const sessionCookie = await admin.auth().createSessionCookie(String(token), { expiresIn });
+  const options = {
+    maxAge: expiresIn,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+  } as CookieOptions;
+  res.cookie('__session', sessionCookie, options);
+  res.setHeader('Cache-Control', 'private');
+};
 
 /**
  * Clean cookie and return 401
  * @param res
  * @param message
  */
-const _cleanCookie = (res: Response, message: string) => {
+export const cleanCookie = (res: Response, message: string) => {
   res.clearCookie('__session');
-
-  res.status(401).send({
-    status: 'Unauthorized',
-    message,
-  } as ResponseStatus);
+  return new JsonResponse(401).unauthorized(res, message);
 };
 
 /**
@@ -30,30 +40,30 @@ export const verifyJwtClaim = async (req: Request, res: Response, next: any) => 
   if (req.cookies && req.cookies['__session']) {
     try {
       const firebaseToken = get(req, 'cookies.__session', '');
-      const { exp, uid } = await admin.auth().verifySessionCookie(firebaseToken, true);
+      const { exp, uid, email = '' } = await admin.auth().verifySessionCookie(firebaseToken, true);
       if (exp <= Date.now() / 1000) {
-        _cleanCookie(res, 'User is not logged-in');
+        cleanCookie(res, 'User is not logged-in');
       }
 
-      const user = await userService.queryUserPermissionByUid(uid);
+      const user = await userService.findOne({ uid, email });
       if (user) {
         (req as RequestWithUser).user = user;
       } else {
-        _cleanCookie(res, 'Authentication failed. Please login.');
+        cleanCookie(res, 'Authentication failed. Please login.');
       }
       next();
     } catch (error) {
-      _cleanCookie(res, 'Authentication failed. Please login.');
+      cleanCookie(res, 'Authentication failed. Please login.');
     }
   } else {
-    _cleanCookie(res, 'No auth token provided. Please login.');
+    cleanCookie(res, 'No auth token provided. Please login.');
   }
 };
 
 export const verifyUserPermission = async (req: Request, res: Response, next: any) => {
-  if ((req as RequestWithUser).user.role === 'admin') {
+  if ((req as RequestWithUser).user?.role === 'admin') {
     next();
   } else {
-    res.status(403).send({ status: 'Unauthorized', message: 'Unauthorized action' } as ResponseStatus);
+    new JsonResponse(403).unauthorized(res, 'Unauthorized action');
   }
 };

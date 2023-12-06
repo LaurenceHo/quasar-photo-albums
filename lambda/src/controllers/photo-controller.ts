@@ -10,22 +10,16 @@ import { asyncHandler } from '../utils/async-handler';
 const s3Service = new S3Service();
 const albumService = new AlbumService();
 const bucketName = process.env.AWS_S3_BUCKET_NAME;
-const albumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME;
 
 export default class PhotoController extends BaseController {
   /**
    * Get all photos from an album
    */
-  findAll = asyncHandler(async (req: Request, res: Response) => {
+  findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const albumId = req.params['albumId'];
 
     try {
-      const album = await albumService.findOne({
-        TableName: albumTableName,
-        Key: {
-          id: albumId,
-        },
-      });
+      const album = await albumService.findOne({ id: albumId });
       const folderNameKey = decodeURIComponent(albumId) + '/';
       const photos = await s3Service.findPhotosByAlbumId({
         Prefix: folderNameKey,
@@ -60,7 +54,7 @@ export default class PhotoController extends BaseController {
     }
   });
 
-  create = asyncHandler(async (req: Request, res: Response) => {
+  create: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const albumId = req.params['albumId'];
 
     try {
@@ -82,7 +76,7 @@ export default class PhotoController extends BaseController {
   /**
    * Move photos to another album
    */
-  update = asyncHandler(async (req: Request, res: Response) => {
+  update: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const photos = req.body as PhotosRequest;
     const { destinationAlbumId, albumId, photoKeys } = photos;
     if (isUndefined(destinationAlbumId) || isEmpty(destinationAlbumId)) {
@@ -136,7 +130,7 @@ export default class PhotoController extends BaseController {
     return this.clientError(res, 'No photo needs to be moved');
   });
 
-  delete = asyncHandler(async (req: Request, res: Response) => {
+  delete: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const photosRequest = req.body as PhotosRequest;
     const { albumId, photoKeys } = photosRequest;
 

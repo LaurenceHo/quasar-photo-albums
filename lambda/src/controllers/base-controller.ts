@@ -26,10 +26,7 @@ export abstract class BaseController implements IBaseController {
   }
 
   public unauthorized(res: Response, message = '') {
-    const jsonResponse = new JsonResponse(401);
-    jsonResponse.setStatus('Unauthorized').error(res, message);
-
-    return jsonResponse;
+    return new JsonResponse(401).unauthorized(res, message);
   }
 
   public clientError(res: Response, message = '') {

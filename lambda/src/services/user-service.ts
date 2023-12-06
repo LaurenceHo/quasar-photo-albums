@@ -3,16 +3,15 @@ import { DynamoDbService } from './dynamo-db-service';
 import { QueryCommand } from '@aws-sdk/lib-dynamodb';
 import get from 'lodash/get';
 
-const PHOTO_USER_PERMISSION_TABLE_NAME = process.env.PHOTO_USER_PERMISSION_TABLE_NAME;
-
 export default class UserService extends DynamoDbService<UserPermission> {
   constructor() {
     super();
+    this.tableName = process.env.PHOTO_USER_PERMISSION_TABLE_NAME;
   }
 
   async queryUserPermissionByUid(uid: string) {
     const params = {
-      TableName: PHOTO_USER_PERMISSION_TABLE_NAME,
+      TableName: this.tableName,
       ExpressionAttributeValues: {
         ':uid': uid,
       },

@@ -6,13 +6,12 @@ import { Request, RequestHandler, Response } from 'express';
 import { asyncHandler } from '../utils/async-handler';
 
 const albumTagService = new AlbumTagService();
-const tableName = process.env.PHOTO_ALBUM_TAGS_TABLE_NAME;
 
 export default class AlbumTagController extends BaseController {
-  findAll = asyncHandler(async (req: Request, res: Response) => {
+  findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     try {
       const albumTags = await albumTagService.findAll({
-        TableName: tableName,
+        TableName: albumTagService.tableName,
       });
 
       return this.ok<AlbumTag[]>(res, 'ok', albumTags);
@@ -22,15 +21,10 @@ export default class AlbumTagController extends BaseController {
     }
   });
 
-  create = asyncHandler(async (req: Request, res: Response) => {
+  create: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const tag: AlbumTag = req.body;
     try {
-      const result = await albumTagService.create({
-        TableName: tableName,
-        Item: {
-          tag: tag.tag,
-        },
-      });
+      const result = await albumTagService.create(tag);
       if (result) {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
         return this.ok(res, 'Album tag created');
@@ -42,15 +36,10 @@ export default class AlbumTagController extends BaseController {
     }
   });
 
-  delete = asyncHandler(async (req: Request, res: Response) => {
+  delete: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const tag = req.params['tagId'];
     try {
-      const result = await albumTagService.delete({
-        TableName: tableName,
-        Key: {
-          tag,
-        },
-      });
+      const result = await albumTagService.delete({ tag });
       if (result) {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
         return this.ok(res, 'Album tag deleted');
