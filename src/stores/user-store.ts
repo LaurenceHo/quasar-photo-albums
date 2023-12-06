@@ -30,8 +30,8 @@ export const userStore = defineStore('user-permission', {
         Loading.show();
         this.isCheckingUserPermission = true;
         const response = await authService.getUserInfo();
-        if (response && response.status !== 'Unauthorized') {
-          this.userPermission = response;
+        if (response && response.status !== 'Unauthorized' && response.data) {
+          this.userPermission = response.data;
         }
       } catch (error: any) {
         console.error(error);

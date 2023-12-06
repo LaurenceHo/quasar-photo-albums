@@ -19,7 +19,7 @@ export default class AuthController extends BaseController {
     try {
       const firebaseToken = get(req, 'cookies.__session', null);
       if (!firebaseToken) {
-        return this.clientError(res, 'No auth token provided');
+        return this.ok(res, 'No auth token provided');
       } else {
         const { exp, uid, email = '' } = await admin.auth().verifySessionCookie(firebaseToken, true);
         if (exp <= Date.now() / 1000) {
