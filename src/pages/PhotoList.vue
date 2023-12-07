@@ -12,8 +12,12 @@
         {{ tag }}
       </q-chip>
     </div>
-    <div v-if="isAdminUser" class="flex items-center justify-between q-pb-md">
+    <q-card v-if="isAdminUser" flat bordered class="admin-panel q-mb-md flex items-center justify-between">
       <div class="text-h6 flex items-center">
+        <q-btn icon="mdi-image-plus" round @click="setUploadPhotoDialogState(true)" flat>
+          <q-tooltip> Upload photos </q-tooltip>
+        </q-btn>
+        <q-separator vertical inset />
         <q-btn
           v-if="getSelectedPhotoList.length !== photoAmount"
           icon="mdi-check-all"
@@ -48,17 +52,8 @@
           <q-tooltip> Move selected photos to another album </q-tooltip>
         </q-btn>
       </div>
-    </div>
+    </q-card>
     <div class="q-col-gutter-md row">
-      <div v-if="isAdminUser" class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6" data-test-id="add-photo-item">
-        <div class="relative-position">
-          <div class="no-album-cover-square rounded-borders-lg cursor-pointer" @click="setUploadPhotoDialogState(true)">
-            <q-icon class="absolute-center" color="black" name="mdi-image-plus" size="48px">
-              <q-tooltip> Upload photos </q-tooltip>
-            </q-icon>
-          </div>
-        </div>
-      </div>
       <template v-if="photosInAlbum.length > 0">
         <div
           v-for="(photo, index) in photosInAlbum"
