@@ -57,6 +57,16 @@ export interface UserPermission {
   displayName: string;
 }
 
+export interface Place {
+  formattedAddress: string;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  displayName: {
+    text: string;
+  };
+}
 export interface PhotosRequest {
   albumId: string;
   destinationAlbumId?: string;
