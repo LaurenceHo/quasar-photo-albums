@@ -40,7 +40,6 @@ import AlbumService from 'src/services/album-service';
 import { albumStore } from 'stores/album-store';
 import { toRefs } from 'vue';
 
-const emits = defineEmits(['refreshPhotoList']);
 const props = defineProps({
   color: {
     type: String,
