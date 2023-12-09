@@ -8,7 +8,7 @@ export interface Album {
   isPrivate: boolean;
   tags: string[];
   order: number;
-  place?: Place;
+  place?: Place | null;
 }
 
 export interface Photo {

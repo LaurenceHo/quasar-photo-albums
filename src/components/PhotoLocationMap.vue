@@ -30,7 +30,7 @@ const internalLatitude = computed(() => (latitudeRef.value !== 'N' ? latitude.va
 const internalLongitude = computed(() => (longitudeRef.value !== 'E' ? longitude.value * -1 : longitude.value));
 
 onMounted(() => {
-  mapboxgl.accessToken = process.env.MAPBOX_API_KEY;
+  mapboxgl.accessToken = process.env.MAPBOX_API_KEY as string;
   const map = new mapboxgl.Map({
     container: 'photo-location-map',
     style: 'mapbox://styles/mapbox/streets-v11',
@@ -46,5 +46,9 @@ onMounted(() => {
 #photo-location-map {
   width: 100%;
   height: 300px;
+
+  canvas.mapboxgl-canvas {
+    width: 100% !important;
+  }
 }
 </style>

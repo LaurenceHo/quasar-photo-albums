@@ -45,6 +45,7 @@
           maxlength="200"
         />
         <q-select
+          class="q-pb-lg"
           v-model="selectedAlbumTags"
           :options="albumTags"
           option-value="tag"
@@ -70,7 +71,23 @@
           outlined
           use-input
           :loading="isSearching"
-        />
+        >
+          <template v-slot:option="place">
+            <q-item v-bind="place.itemProps">
+              <q-item-section>
+                <q-item-label>
+                  <div class="text-h6">{{ place.opt.displayName }}</div>
+                  <div class="text-caption">{{ place.opt.formattedAddress }}</div>
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-italic text-grey"> No suggestion found </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
         <q-toggle
           v-model="privateAlbum"
           :disable="isProcessing"
@@ -82,6 +99,14 @@
         />
       </q-card-section>
 
+      <q-card-section>
+        <PhotoLocationMap
+          :latitude="Math.abs(locationLatitude)"
+          :longitude="Math.abs(locationLongitude)"
+          :latitude-ref="latitudeRef"
+          :longitude-ref="longitudeRef"
+        />
+      </q-card-section>
       <q-card-actions align="right" class="text-primary">
         <q-btn :disable="isProcessing" flat label="Cancel" no-caps @click="resetAlbum" />
         <q-btn
@@ -99,6 +124,7 @@
 
 <script lang="ts" setup>
 import { Album, Place } from 'components/models';
+import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
@@ -121,12 +147,15 @@ const privateAlbum = ref(false);
 const selectedAlbumTags = ref([] as string[]);
 const isProcessing = ref(false);
 
-const selectedPlace = ref('');
+const selectedPlace = ref(null as Place | null);
 const placeSuggestions = ref([] as Place[]);
 const isSearching = ref(false);
+const locationLatitude = computed(() => selectedPlace.value?.location?.latitude ?? -36.86667);
+const locationLongitude = computed(() => selectedPlace.value?.location?.longitude ?? 174.76667);
+const latitudeRef = computed(() => (locationLatitude.value < 0 ? 'S' : 'N'));
+const longitudeRef = computed(() => (locationLongitude.value < 0 ? 'W' : 'E'));
 
 const amountOfAllAlbums = computed(() => store.allAlbumList.length);
-
 const searchPlace = async (searchText: string) => {
   if (searchText) {
     isSearching.value = true;
@@ -141,7 +170,7 @@ const searchPlace = async (searchText: string) => {
 const confirmUpdateAlbum = async () => {
   isProcessing.value = true;
 
-  const albumToBeSubmitted = {
+  const albumToBeSubmitted: Album = {
     id: getAlbumToBeUpdate.value.id || albumId.value,
     albumCover: getAlbumToBeUpdate.value.albumCover,
     albumName: albumName.value,
@@ -149,7 +178,8 @@ const confirmUpdateAlbum = async () => {
     isPrivate: privateAlbum.value,
     tags: selectedAlbumTags.value,
     order: getAlbumToBeUpdate.value.id ? getAlbumToBeUpdate.value.order : amountOfAllAlbums.value,
-  } as Album;
+    place: selectedPlace.value,
+  };
 
   let result;
   if (getAlbumToBeUpdate.value.id) {
@@ -166,6 +196,7 @@ const confirmUpdateAlbum = async () => {
 };
 
 const resetAlbum = () => {
+  selectedPlace.value = null;
   setAlbumToBeUpdated({ id: '', albumName: '', albumCover: '', description: '', tags: [], isPrivate: true, order: 0 });
   setUpdateAlbumDialogState(false);
 };
@@ -176,9 +207,10 @@ watch(
     if (newValue) {
       albumId.value = getAlbumToBeUpdate.value.id;
       albumName.value = getAlbumToBeUpdate.value.albumName;
-      albumDesc.value = getAlbumToBeUpdate.value.description || '';
+      albumDesc.value = getAlbumToBeUpdate.value.description ?? '';
       privateAlbum.value = getAlbumToBeUpdate.value.isPrivate;
       selectedAlbumTags.value = getAlbumToBeUpdate.value.tags;
+      selectedPlace.value = getAlbumToBeUpdate.value.place ?? null;
     }
   },
   { deep: true, immediate: true }
