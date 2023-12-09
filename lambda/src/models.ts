@@ -35,6 +35,7 @@ export interface Album {
   tags?: string[];
   isPrivate: boolean;
   order: number;
+  place?: Place;
   createdAt: string;
   updatedAt: string;
   createdBy: string;
@@ -58,15 +59,14 @@ export interface UserPermission {
 }
 
 export interface Place {
+  displayName: string;
   formattedAddress: string;
   location: {
     latitude: number;
     longitude: number;
   };
-  displayName: {
-    text: string;
-  };
 }
+
 export interface PhotosRequest {
   albumId: string;
   destinationAlbumId?: string;

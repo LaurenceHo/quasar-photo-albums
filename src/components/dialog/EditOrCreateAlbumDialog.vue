@@ -59,6 +59,18 @@
           use-input
           @filter="filterTags"
         />
+        <q-select
+          v-model="selectedPlace"
+          :options="placeSuggestions"
+          @input-value="searchPlace"
+          option-label="displayName"
+          clearable
+          input-debounce="500"
+          label="Location"
+          outlined
+          use-input
+          :loading="isSearching"
+        />
         <q-toggle
           v-model="privateAlbum"
           :disable="isProcessing"
@@ -86,13 +98,15 @@
 </template>
 
 <script lang="ts" setup>
-import { Album } from 'components/models';
+import { Album, Place } from 'components/models';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
+import LocationService from 'src/services/location-service';
 import { albumStore } from 'stores/album-store';
 import { computed, ref, watch } from 'vue';
 
+const locationService = new LocationService();
 const albumService = new AlbumService();
 const store = albumStore();
 
@@ -107,7 +121,22 @@ const privateAlbum = ref(false);
 const selectedAlbumTags = ref([] as string[]);
 const isProcessing = ref(false);
 
+const selectedPlace = ref('');
+const placeSuggestions = ref([] as Place[]);
+const isSearching = ref(false);
+
 const amountOfAllAlbums = computed(() => store.allAlbumList.length);
+
+const searchPlace = async (searchText: string) => {
+  if (searchText) {
+    isSearching.value = true;
+    const { data } = await locationService.searchPlaces(searchText);
+    placeSuggestions.value = data ?? [];
+    isSearching.value = false;
+  } else {
+    placeSuggestions.value = [];
+  }
+};
 
 const confirmUpdateAlbum = async () => {
   isProcessing.value = true;

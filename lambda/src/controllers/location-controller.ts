@@ -14,8 +14,19 @@ export default class LocationController extends BaseController {
       { textQuery, languageCode: 'en' },
       'places.formattedAddress,places.displayName,places.location'
     );
+    let places: Place[] = [];
+    if (response.places) {
+      places = response.places.map((place: any) => {
+        const { displayName, formattedAddress, location } = place;
+        return {
+          displayName: displayName.text,
+          formattedAddress,
+          location,
+        };
+      });
+    }
     if (!response.error) {
-      return this.ok<{ places: Place[] }>(res, 'Success', response);
+      return this.ok<Place[]>(res, 'ok', places);
     } else {
       return this.fail(res, response.error.message);
     }

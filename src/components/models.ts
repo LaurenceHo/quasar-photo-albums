@@ -8,6 +8,7 @@ export interface Album {
   isPrivate: boolean;
   tags: string[];
   order: number;
+  place?: Place;
 }
 
 export interface Photo {
@@ -24,6 +25,15 @@ export interface UserPermission {
   email: string;
   role: string;
   displayName: string;
+}
+
+export interface Place {
+  displayName: string;
+  formattedAddress: string;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
 }
 
 export interface ResponseStatus {
