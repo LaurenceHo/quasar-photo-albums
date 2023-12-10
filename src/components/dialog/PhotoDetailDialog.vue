@@ -63,75 +63,60 @@
                   @refreshPhotoList="$emit('refreshPhotoList')"
                 />
               </q-item>
-              <q-item v-if="exifTags['Image Height']">
-                <q-item-section>
-                  <q-item-label>Image Height</q-item-label>
-                  <q-item-label caption>{{ exifTags['Image Height']?.description }}</q-item-label>
+              <q-item v-if="dateTime">
+                <q-item-section avatar>
+                  <q-icon name="mdi-calendar-today" />
                 </q-item-section>
-              </q-item>
 
-              <q-item v-if="exifTags['Image Width']">
                 <q-item-section>
-                  <q-item-label>Image Width</q-item-label>
-                  <q-item-label caption>{{ exifTags['Image Width']?.description }}</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item v-if="exifTags.Model">
-                <q-item-section>
-                  <q-item-label>Device</q-item-label>
-                  <q-item-label caption>
-                    {{ exifTags.Make?.description }}, {{ (exifTags.Model as StringArrayTag).value[0] }}
+                  <q-item-label>
+                    {{ dateTime }}
                   </q-item-label>
                 </q-item-section>
               </q-item>
 
-              <q-item v-if="exifTags.LensModel">
+              <q-item v-if="exifTags['Image Height'] && exifTags['Image Width']">
+                <q-item-section avatar>
+                  <q-icon name="mdi-image" />
+                </q-item-section>
+
                 <q-item-section>
-                  <q-item-label>Lens Model</q-item-label>
-                  <q-item-label caption>{{ (exifTags.LensModel as StringArrayTag).value[0] }}</q-item-label>
+                  <q-item-label>
+                    {{ exifTags['Image Width']?.value }} x {{ exifTags['Image Height']?.value }}
+                  </q-item-label>
+                  <q-item-label
+                    caption
+                    v-if="
+                      exifTags.ApertureValue ||
+                      exifTags.ShutterSpeedValue ||
+                      exifTags.ISOSpeedRatings ||
+                      exifTags.ExposureBiasValue
+                    "
+                  >
+                    <template v-if="exifTags.ApertureValue"> f/{{ aperture }} </template>
+                    <template v-if="exifTags.ShutterSpeedValue">
+                      | {{ (exifTags.ShutterSpeedValue as NumberTag).description }}
+                    </template>
+                    <template v-if="exifTags.ISOSpeedRatings">
+                      | ISO {{ (exifTags.ISOSpeedRatings as NumberTag).description }}
+                    </template>
+                    <template v-if="exifTags.ExposureBiasValue"> | EV {{ exposureBias }} </template>
+                  </q-item-label>
                 </q-item-section>
               </q-item>
 
-              <q-item v-if="exifTags.DateTime">
-                <q-item-section>
-                  <q-item-label>Date Time</q-item-label>
-                  <q-item-label caption>{{ (exifTags.DateTime as StringArrayTag).value[0] }}</q-item-label>
+              <q-item v-if="exifTags.Model">
+                <q-item-section avatar>
+                  <q-icon name="mdi-camera" />
                 </q-item-section>
-              </q-item>
 
-              <q-item v-if="exifTags.OffsetTime">
                 <q-item-section>
-                  <q-item-label>Offset Time</q-item-label>
-                  <q-item-label caption>{{ (exifTags.OffsetTime as StringArrayTag).value[0] }}</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item v-if="exifTags.ShutterSpeedValue">
-                <q-item-section>
-                  <q-item-label>Shutter Speed</q-item-label>
-                  <q-item-label caption>{{ (exifTags.ShutterSpeedValue as NumberTag).description }}</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item v-if="exifTags.ApertureValue">
-                <q-item-section>
-                  <q-item-label>Aperture</q-item-label>
-                  <q-item-label caption>{{ (exifTags.ApertureValue as NumberTag).description }}</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item v-if="exifTags.ExposureBiasValue">
-                <q-item-section>
-                  <q-item-label>Exposure Bias</q-item-label>
-                  <q-item-label caption>{{ exposureBias }}</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item v-if="exifTags.ISOSpeedRatings">
-                <q-item-section>
-                  <q-item-label>ISO</q-item-label>
-                  <q-item-label caption>{{ (exifTags.ISOSpeedRatings as NumberTag).description }}</q-item-label>
+                  <q-item-label>
+                    {{ exifTags.Make?.description }} {{ (exifTags.Model as StringArrayTag).value[0] }}
+                  </q-item-label>
+                  <q-item-label caption v-if="exifTags.LensModel">
+                    {{ (exifTags.LensModel as StringArrayTag).value[0] }}
+                  </q-item-label>
                 </q-item-section>
               </q-item>
 
@@ -139,13 +124,7 @@
                 v-if="exifTags.GPSLatitudeRef && exifTags.GPSLongitudeRef && longitude > -1000 && latitude > -1000"
               >
                 <q-item-section>
-                  <q-item-label class="q-pb-sm">Location</q-item-label>
-                  <PhotoLocationMap
-                    :latitude="latitude"
-                    :longitude="longitude"
-                    :latitude-ref="exifTags.GPSLatitudeRef.value[0]"
-                    :longitude-ref="exifTags.GPSLongitudeRef.value[0]"
-                  />
+                  <PhotoLocationMap :latitude="latitude" :longitude="longitude" />
                 </q-item-section>
               </q-item>
             </q-list>
@@ -162,7 +141,7 @@ import { ExifData, Photo } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import * as ExifReader from 'exifreader';
 import { NumberTag, StringArrayTag } from 'exifreader';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { useQuasar } from 'quasar';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
@@ -187,14 +166,36 @@ const selectedImage = ref({ url: '', key: '' } as Photo);
 const photoFileName = ref('');
 const exifTags = ref({} as ExifData);
 const loadImage = ref(false);
-const latitude = ref(-1000);
-const longitude = ref(-1000);
 
-const exposureBias = computed(() =>
-  exifTags.value.ExposureBiasValue?.description
-    ? parseFloat(exifTags.value.ExposureBiasValue.description).toFixed(2)
-    : '1'
-);
+const dateTime = computed(() => {
+  if (exifTags.value.DateTime?.description) {
+    const dateTime = exifTags.value.DateTime?.description.split(' ');
+    const time = dateTime[1].split(':');
+    return `${dateTime[0].replaceAll(':', '/')} ${time[0]}:${time[1]} ${exifTags.value.OffsetTime?.value?.[0] ?? ''}`;
+  }
+  return '';
+});
+
+const latitude = computed(() => {
+  if (exifTags.value.GPSLatitude?.description) {
+    if (exifTags.value.GPSLatitudeRef?.value[0] === 'S') {
+      return Number(exifTags.value.GPSLatitude?.description) * -1;
+    }
+    return Number(exifTags.value.GPSLatitude?.description);
+  }
+  return -1000;
+});
+const longitude = computed(() => {
+  if (exifTags.value.GPSLongitude?.description) {
+    if (exifTags.value.GPSLongitudeRef?.value[0] === 'W') {
+      return Number(exifTags.value.GPSLongitude?.description) * -1;
+    }
+    return Number(exifTags.value.GPSLongitude?.description);
+  }
+  return -1000;
+});
+const exposureBias = computed(() => parseFloat(exifTags.value.ExposureBiasValue?.description ?? '0').toFixed(2));
+const aperture = computed(() => parseFloat(exifTags.value.ApertureValue?.description ?? '0').toFixed(1));
 
 // When opening photo detail URL directly (Not from album page)
 if (photoId.value && photoList.value.length === 0) {
@@ -258,12 +259,6 @@ watch(
       try {
         // Read EXIF data
         exifTags.value = (await ExifReader.load(newValue.url)) as ExifData;
-        if (exifTags.value?.GPSLatitude?.description) {
-          latitude.value = Number(exifTags.value.GPSLatitude.description);
-        }
-        if (exifTags.value?.GPSLongitude?.description) {
-          longitude.value = Number(exifTags.value.GPSLongitude.description);
-        }
       } catch (error) {
         console.error(error);
       } finally {

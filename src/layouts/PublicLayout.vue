@@ -3,13 +3,13 @@
     <q-header>
       <div class="q-pa-sm">
         <q-toolbar>
-          <q-btn round unelevated to='/'>
+          <q-btn round unelevated to="/">
             <q-avatar>
               <img src="/icons/favicon-128x128.png" />
             </q-avatar>
           </q-btn>
-          <q-toolbar-title>  {{ $q.screen.gt.xs === true ? albumAppName : '' }}</q-toolbar-title>
-          <q-input v-if="routeName === 'Albums'" v-model="searchKey" dense standout="bg-grey">
+          <q-toolbar-title> {{ $q.screen.gt.xs === true ? albumAppName : '' }}</q-toolbar-title>
+          <q-input v-if="routeName === 'Albums'" v-model="searchKey" dense outlined color="accent">
             <template v-slot:prepend>
               <q-icon name="mdi-magnify" />
             </template>
@@ -58,10 +58,11 @@
 <script lang="ts" setup>
 import EditAlbumTagsDialog from 'components/dialog/EditAlbumTagsDialog.vue';
 import EditOrCreateAlbumDialog from 'components/dialog/EditOrCreateAlbumDialog.vue';
+import { UserPermission } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AuthService from 'src/services/auth-service';
 import { albumStore } from 'src/stores/album-store';
-import { UserPermission, userStore } from 'src/stores/user-store';
+import { userStore } from 'src/stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { LocalStorage } from 'quasar';

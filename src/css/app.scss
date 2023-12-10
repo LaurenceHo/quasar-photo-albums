@@ -1,4 +1,7 @@
+@import "fonts";
+
 .container {
+  font-family: inter, serif;
   max-width: 1630px;
   margin-left: auto;
   margin-right: auto;
@@ -26,6 +29,6 @@
 }
 
 // Quasar css override
-.q-field--standout .q-field__control {
+.q-field--outlined .q-field__control {
   background: #fff;
 }

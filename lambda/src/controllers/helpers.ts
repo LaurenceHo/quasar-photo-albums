@@ -21,6 +21,7 @@ export const updatePhotoAlbum = async (album: Album) => {
       'description = :description, ' +
       'tags = :tags, ' +
       'isPrivate = :isPrivate, ' +
+      'place = :place, ' +
       '#Order = :order,' +
       'updatedAt = :updatedAt, ' +
       'updatedBy = :updatedBy',
@@ -30,6 +31,7 @@ export const updatePhotoAlbum = async (album: Album) => {
       ':description': album.description,
       ':tags': album.tags,
       ':isPrivate': album.isPrivate,
+      ':place': album.place,
       ':order': album.order,
       ':updatedAt': album.updatedAt,
       ':updatedBy': album.updatedBy,

@@ -2,11 +2,26 @@
   <div class="q-pt-md">
     <div :key="photoId" class="row items-center">
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" to="/" unelevated />
-      <div class="text-h4 q-py-md q-pl-sm" data-test-id="album-name">
+      <div class="text-h4 q-py-md q-pl-md-sm" data-test-id="album-name">
+        <q-btn v-if="albumItem.place" icon="mdi-map" round size="md" unelevated>
+          <q-tooltip class="bg-transparent">
+            <q-card>
+              <q-card-section class="text-h6 text-grey-7">
+                {{ albumItem.place.displayName }}
+              </q-card-section>
+              <q-card-section>
+                <PhotoLocationMap
+                  :latitude="albumItem.place.location.latitude"
+                  :longitude="albumItem.place.location.longitude"
+                />
+              </q-card-section>
+            </q-card>
+          </q-tooltip>
+        </q-btn>
         {{ albumItem?.albumName }} {{ albumItem?.isPrivate ? '(private album)' : '' }}
       </div>
     </div>
-    <div class="text-h6 text-grey q-pb-md" data-test-id="album-desc">{{ albumItem?.description }}</div>
+    <div class="text-h6 text-grey-7 q-pb-md" data-test-id="album-desc">{{ albumItem?.description }}</div>
     <div v-if="albumItem?.tags?.length > 0" class="flex q-pb-md">
       <q-chip v-for="(tag, i) in albumItem.tags" :key="i" color="secondary" data-test-id="album-tag">
         {{ tag }}
@@ -55,61 +70,40 @@
     </q-card>
     <div class="q-col-gutter-md row">
       <template v-if="photosInAlbum.length > 0">
-        <div
+        <Photo
           v-for="(photo, index) in photosInAlbum"
           :key="photo.key"
-          class="photo-item col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6"
-          data-test-id="photo-item"
-        >
-          <div class="relative-position">
-            <q-img
-              :ratio="1"
-              :src="`${photo.url}?tr=w-250,h-250`"
-              class="rounded-borders-lg cursor-pointer"
-              @click="goToPhotoDetail(index)"
-            />
-            <div class="absolute-top flex justify-between photo-top-button-container">
-              <q-checkbox
-                v-if="isAdminUser"
-                v-model="selectedPhotosList"
-                :val="photo.key"
-                checked-icon="mdi-check-circle"
-                color="positive"
-                unchecked-icon="mdi-check-circle"
-              >
-                <q-tooltip> Select photo </q-tooltip>
-              </q-checkbox>
-              <EditPhotoButton
-                v-if="isAdminUser"
-                :album-item="albumItem"
-                :is-album-cover="photo.key === albumItem?.albumCover"
-                :photo-key="photo.key"
-                color="white"
-                @refreshPhotoList="refreshPhotoList"
-              />
-            </div>
-          </div>
-        </div>
+          :index="index"
+          :photo="photo"
+          :albumItem="albumItem"
+        />
       </template>
     </div>
   </div>
-  <MovePhotoDialog v-if="getMovePhotoDialogState" :album-id="albumItem?.id" @refreshPhotoList="refreshPhotoList" />
+  <MovePhotoDialog
+    v-if="getMovePhotoDialogState"
+    :album-id="albumItem?.id"
+    @refreshPhotoList="refreshPhotoList"
+    @closePhotoDetailDialog="closePhotoDetailDialog"
+  />
   <ConfirmDeletePhotosDialog
     v-if="getDeletePhotoDialogState"
     :album-id="albumItem?.id"
     @refreshPhotoList="refreshPhotoList"
+    @closePhotoDetailDialog="closePhotoDetailDialog"
   />
   <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem?.id" @refreshPhotoList="refreshPhotoList" />
-  <PhotoDetail v-if="photoId" @refreshPhotoList="refreshPhotoList" />
+  <PhotoDetailDialog v-if="photoId" @refreshPhotoList="refreshPhotoList" />
 </template>
 
 <script lang="ts" setup>
-import EditPhotoButton from 'components/button/EditPhotoButton.vue';
 import ConfirmDeletePhotosDialog from 'components/dialog/ConfirmDeletePhotosDialog.vue';
 import MovePhotoDialog from 'components/dialog/MovePhotosDialog.vue';
-import PhotoDetail from 'components/dialog/PhotoDetail.vue';
+import PhotoDetailDialog from 'components/dialog/PhotoDetailDialog.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
-import { Album, Photo } from 'components/models';
+import { Album, Photo as IPhoto } from 'components/models';
+import Photo from 'components/Photo.vue';
+import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';
@@ -124,7 +118,6 @@ const useAlbumStore = albumStore();
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
 const {
-  selectedPhotosList,
   getSelectedPhotoList,
   setSelectedPhotosList,
   getUploadPhotoDialogState,
@@ -138,10 +131,14 @@ const {
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumId = computed(() => route.params.albumId as string);
 const albumItem = computed(() => useAlbumStore.getAlbumById(albumId.value) as Album);
-const photosInAlbum = computed(() => usePhotoStore.photoList as Photo[]);
+const photosInAlbum = computed(() => usePhotoStore.photoList as IPhoto[]);
 const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.key));
 const photoAmount = computed(() => photosInAlbum.value.length);
 const photoId = computed(() => route.query.photo as string);
+
+const closePhotoDetailDialog = () => {
+  router.replace({ query: { photo: undefined } });
+};
 
 const refreshPhotoList = async () => {
   const isPrevAlbumEmpty = photosInAlbum.value.length === 0;
@@ -160,12 +157,6 @@ const refreshPhotoList = async () => {
 };
 
 usePhotoStore.getPhotos(albumId.value);
-
-const goToPhotoDetail = (imageIndex: number) => {
-  usePhotoStore.$patch({ selectedImageIndex: imageIndex });
-  const photoKeyForUrl = photosInAlbum.value[imageIndex].key.split('/')[1];
-  router.replace({ query: { photo: photoKeyForUrl } });
-};
 
 watch(albumId, (newValue) => {
   if (newValue) {
