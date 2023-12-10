@@ -14,6 +14,7 @@ const albumToBeUpdate = ref({
   tags: [],
   isPrivate: true,
   order: 0,
+  place: null,
 } as Album);
 const selectedPhotosList = ref([] as string[]);
 

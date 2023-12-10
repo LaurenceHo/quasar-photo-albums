@@ -43,9 +43,9 @@
           stack-label
           counter
           maxlength="200"
+          type="textarea"
         />
         <q-select
-          class="q-pb-lg"
           v-model="selectedAlbumTags"
           :options="albumTags"
           option-value="tag"
@@ -59,7 +59,19 @@
           use-chips
           use-input
           @filter="filterTags"
+          stack-label
         />
+        <q-toggle
+          class="q-pb-lg"
+          v-model="privateAlbum"
+          :disable="isProcessing"
+          checked-icon="mdi-lock"
+          color="primary"
+          icon="mdi-lock-open"
+          label="Private album?"
+          left-label
+        />
+
         <q-select
           v-model="selectedPlace"
           :options="placeSuggestions"
@@ -71,6 +83,7 @@
           outlined
           use-input
           :loading="isSearching"
+          stack-label
         >
           <template v-slot:option="place">
             <q-item v-bind="place.itemProps">
@@ -88,24 +101,10 @@
             </q-item>
           </template>
         </q-select>
-        <q-toggle
-          v-model="privateAlbum"
-          :disable="isProcessing"
-          checked-icon="mdi-lock"
-          color="primary"
-          icon="mdi-lock-open"
-          label="Private album?"
-          left-label
-        />
       </q-card-section>
 
-      <q-card-section>
-        <PhotoLocationMap
-          :latitude="Math.abs(locationLatitude)"
-          :longitude="Math.abs(locationLongitude)"
-          :latitude-ref="latitudeRef"
-          :longitude-ref="longitudeRef"
-        />
+      <q-card-section v-if="selectedPlace">
+        <PhotoLocationMap :latitude="locationLatitude" :longitude="locationLongitude" />
       </q-card-section>
       <q-card-actions align="right" class="text-primary">
         <q-btn :disable="isProcessing" flat label="Cancel" no-caps @click="resetAlbum" />
@@ -150,10 +149,8 @@ const isProcessing = ref(false);
 const selectedPlace = ref(null as Place | null);
 const placeSuggestions = ref([] as Place[]);
 const isSearching = ref(false);
-const locationLatitude = computed(() => selectedPlace.value?.location?.latitude ?? -36.86667);
-const locationLongitude = computed(() => selectedPlace.value?.location?.longitude ?? 174.76667);
-const latitudeRef = computed(() => (locationLatitude.value < 0 ? 'S' : 'N'));
-const longitudeRef = computed(() => (locationLongitude.value < 0 ? 'W' : 'E'));
+const locationLatitude = computed(() => selectedPlace.value?.location?.latitude);
+const locationLongitude = computed(() => selectedPlace.value?.location?.longitude);
 
 const amountOfAllAlbums = computed(() => store.allAlbumList.length);
 const searchPlace = async (searchText: string) => {
@@ -197,7 +194,16 @@ const confirmUpdateAlbum = async () => {
 
 const resetAlbum = () => {
   selectedPlace.value = null;
-  setAlbumToBeUpdated({ id: '', albumName: '', albumCover: '', description: '', tags: [], isPrivate: true, order: 0 });
+  setAlbumToBeUpdated({
+    id: '',
+    albumName: '',
+    albumCover: '',
+    description: '',
+    tags: [],
+    isPrivate: true,
+    order: 0,
+    place: null,
+  });
   setUpdateAlbumDialogState(false);
 };
 
