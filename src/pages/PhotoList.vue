@@ -2,11 +2,26 @@
   <div class="q-pt-md">
     <div :key="photoId" class="row items-center">
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" to="/" unelevated />
-      <div class="text-h4 q-py-md q-pl-sm" data-test-id="album-name">
+      <div class="text-h4 q-py-md q-pl-md-sm" data-test-id="album-name">
+        <q-btn v-if="albumItem.place" icon="mdi-map" round size="md" unelevated>
+          <q-tooltip class="bg-transparent">
+            <q-card>
+              <q-card-section class="text-h6 text-grey-7">
+                {{ albumItem.place.displayName }}
+              </q-card-section>
+              <q-card-section>
+                <PhotoLocationMap
+                  :latitude="albumItem.place.location.latitude"
+                  :longitude="albumItem.place.location.longitude"
+                />
+              </q-card-section>
+            </q-card>
+          </q-tooltip>
+        </q-btn>
         {{ albumItem?.albumName }} {{ albumItem?.isPrivate ? '(private album)' : '' }}
       </div>
     </div>
-    <div class="text-h6 text-grey q-pb-md" data-test-id="album-desc">{{ albumItem?.description }}</div>
+    <div class="text-h6 text-grey-7 q-pb-md" data-test-id="album-desc">{{ albumItem?.description }}</div>
     <div v-if="albumItem?.tags?.length > 0" class="flex q-pb-md">
       <q-chip v-for="(tag, i) in albumItem.tags" :key="i" color="secondary" data-test-id="album-tag">
         {{ tag }}
@@ -86,8 +101,9 @@ import ConfirmDeletePhotosDialog from 'components/dialog/ConfirmDeletePhotosDial
 import MovePhotoDialog from 'components/dialog/MovePhotosDialog.vue';
 import PhotoDetailDialog from 'components/dialog/PhotoDetailDialog.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
-import Photo from 'components/Photo.vue';
 import { Album, Photo as IPhoto } from 'components/models';
+import Photo from 'components/Photo.vue';
+import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';

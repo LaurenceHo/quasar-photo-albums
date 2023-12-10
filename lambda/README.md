@@ -167,5 +167,8 @@ Please check [here](https://docs.aws.amazon.com/apigateway/latest/developerguide
 * /api/photos - PUT: Move photos to different folder
 * /api/photos/upload/:albumId - POST: Upload photos to AWS S3 folder
 
+### Location
+* /api/location/search - GET: Search location by keyword
+
 Reference:
 https://www.serverless.com/framework/docs

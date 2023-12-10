@@ -26,8 +26,13 @@
   <template v-else>
     <q-item clickable>
       <q-item-section avatar @click="goToAlbum">
-        <q-avatar rounded size="90px" :class="{ 'no-album-cover-square': !albumItem.albumCover }">
-          <q-img v-if="albumItem?.albumCover" :ratio="1" :src="`${thumbnail}?tr=w-90,h-90`" class="rounded-borders" />
+        <q-avatar rounded :size="`${thumbnailSize}px`" :class="{ 'no-album-cover-square': !albumItem.albumCover }">
+          <q-img
+            v-if="albumItem?.albumCover"
+            :ratio="1"
+            :src="`${thumbnail}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
+            class="rounded-borders"
+          />
           <q-icon v-else name="mdi-image" />
           <q-icon
             v-if="albumItem.isPrivate"
@@ -59,10 +64,13 @@
 
 <script lang="ts" setup>
 import EditAlbumButton from 'components/button/EditAlbumButton.vue';
+import { Album } from 'components/models';
+import { useQuasar } from 'quasar';
 import { userStore } from 'src/stores/user-store';
-import { computed } from 'vue';
+import { computed, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
 
+const q = useQuasar();
 const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
 
 const props = defineProps({
@@ -73,14 +81,26 @@ const props = defineProps({
   albumItem: {
     type: Object,
     required: true,
-    default: () => ({ albumName: '', description: '', tags: [], isPrivate: false, albumCover: '' }),
+    default: () =>
+      ({
+        id: '',
+        albumCover: '',
+        albumName: '',
+        description: '',
+        tags: [],
+        isPrivate: true,
+        order: 0,
+        place: null,
+      }) as Album,
   },
 });
 
+const { albumItem } = toRefs(props);
 const userPermissionStore = userStore();
 const router = useRouter();
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const thumbnail = computed(() => cdnURL + encodeURI(props.albumItem?.albumCover));
+const thumbnail = computed(() => cdnURL + encodeURI(albumItem.value?.albumCover));
+const thumbnailSize = computed(() => (q.screen.lt.sm ? 60 : 90));
 
-const goToAlbum = () => router.push(`/album/${props.albumItem.id}`);
+const goToAlbum = () => router.push(`/album/${albumItem.value?.id}`);
 </script>
