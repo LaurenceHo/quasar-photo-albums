@@ -33,6 +33,7 @@
 
 <script setup lang="ts">
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
+import { Album } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import { computed, toRefs } from 'vue';
 import { userStore } from 'stores/user-store';
@@ -47,7 +48,7 @@ const props = defineProps({
   albumItem: {
     type: Object,
     required: true,
-    default: () => ({ albumName: '', description: '', tags: [], isPrivate: false, albumCover: '' }),
+    default: () => ({ id: '', albumName: '', desc: '', tags: [], isPrivate: false, order: 0, place: null }) as Album,
   },
   photo: {
     type: Object,
