@@ -35,7 +35,6 @@ const route = useRoute();
 
 const loadingAlbums = computed(() => store.loadingAlbums);
 const selectedAlbumItem = computed(() => usePhotoStore.selectedAlbumItem);
-const photoId = computed(() => route.query.photo as string);
 
 const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => {
   const routes: { label: string; icon: string; to?: any }[] = [];

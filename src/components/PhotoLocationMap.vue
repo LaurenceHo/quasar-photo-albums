@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 import mapboxgl from 'mapbox-gl';
-import { computed, onMounted, toRefs } from 'vue';
+import { onMounted, toRefs } from 'vue';
 
 const props = defineProps({
   latitude: {
@@ -15,31 +15,25 @@ const props = defineProps({
     type: Number,
     default: () => 0,
   },
-  latitudeRef: {
-    type: String,
-    default: () => 'N',
-  },
-  longitudeRef: {
-    type: String,
-    default: () => 'E',
-  },
 });
 
-const { latitude, longitude, latitudeRef, longitudeRef } = toRefs(props);
-const internalLatitude = computed(() => (latitudeRef.value !== 'N' ? latitude.value * -1 : latitude.value));
-const internalLongitude = computed(() => (longitudeRef.value !== 'E' ? longitude.value * -1 : longitude.value));
+const { latitude, longitude } = toRefs(props);
 
 onMounted(() => {
-  mapboxgl.accessToken = process.env.MAPBOX_API_KEY;
+  mapboxgl.accessToken = process.env.MAPBOX_API_KEY as string;
   const map = new mapboxgl.Map({
     container: 'photo-location-map',
     style: 'mapbox://styles/mapbox/streets-v11',
-    center: [internalLongitude.value, internalLatitude.value],
-    zoom: 10,
+    center: [longitude.value, latitude.value],
+    zoom: 11,
   });
 
   // Create a default Marker and add it to the map.
-  new mapboxgl.Marker().setLngLat([internalLongitude.value as number, internalLatitude.value as number]).addTo(map);
+  new mapboxgl.Marker().setLngLat([longitude.value as number, latitude.value as number]).addTo(map);
+
+  map.on('idle', () => {
+    map.resize();
+  });
 });
 </script>
 <style lang="scss">

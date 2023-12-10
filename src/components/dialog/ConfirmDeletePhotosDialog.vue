@@ -31,7 +31,7 @@ import DialogStateComposable from 'src/composables/dialog-state-composable';
 import PhotoService from 'src/services/photo-service';
 import { computed, ref, toRefs } from 'vue';
 
-const emits = defineEmits(['refreshPhotoList']);
+const emits = defineEmits(['refreshPhotoList', 'closePhotoDetailDialog']);
 const props = defineProps({
   albumId: {
     type: String,
@@ -58,6 +58,7 @@ const confirmDeletePhotos = async () => {
   const result = await photoService.deletePhotos(albumId?.value, photoKeysArray.value);
   isProcessing.value = false;
   if (result.status === 'Success') {
+    emits('closePhotoDetailDialog');
     emits('refreshPhotoList');
   }
   setDeletePhotoDialogState(false);

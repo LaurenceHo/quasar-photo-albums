@@ -44,7 +44,7 @@ import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';
 import { computed, ref, toRefs } from 'vue';
 
-const emits = defineEmits(['refreshPhotoList']);
+const emits = defineEmits(['refreshPhotoList', 'closePhotoDetailDialog']);
 const props = defineProps({
   albumId: {
     type: String,
@@ -89,6 +89,7 @@ const confirmMovePhotos = async () => {
   const result = await photoService.movePhotos(albumId?.value, selectedAlbum.value, photoKeysArray.value);
   isProcessing.value = false;
   if (result.status === 'Success') {
+    emits('closePhotoDetailDialog');
     emits('refreshPhotoList');
   }
   setMovePhotoDialogState(false);
