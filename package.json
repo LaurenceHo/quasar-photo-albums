@@ -2,7 +2,7 @@
   "name": "vue-quasar-s3-albums",
   "version": "1.0.0",
   "description": "Quasar S3 photo album app",
-  "productName": "Quasar S3 albums",
+  "productName": "Quasar photo albums",
   "author": "Laurence Ho <bluegray.he@aol.com>",
   "scripts": {
     "serve": "quasar dev",
