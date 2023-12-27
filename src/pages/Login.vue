@@ -29,9 +29,7 @@ import { LocalStorage, useQuasar } from 'quasar';
 import AuthService from 'src/services/auth-service';
 import { userStore } from 'src/stores/user-store';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 
-const router = useRouter();
 const q = useQuasar();
 
 const loading = ref(false);
@@ -59,7 +57,7 @@ const handleClickSignIn = async () => {
             timeout: 2000,
           });
           LocalStorage.remove('ALL_ALBUMS');
-          setTimeout(() => router.push('/'), 1000);
+          setTimeout(() => window.location.assign('/'), 1000);
         }
         loading.value = false;
       });

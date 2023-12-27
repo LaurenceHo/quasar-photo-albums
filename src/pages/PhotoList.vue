@@ -3,8 +3,8 @@
     <div :key="photoId" class="row items-center">
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" to="/" unelevated />
       <div class="text-h4 q-py-md q-pl-md-sm" data-test-id="album-name">
-        <q-btn v-if="albumItem.place" icon="mdi-map" round size="md" unelevated>
-          <q-tooltip class="bg-transparent">
+        <q-btn v-if="albumItem?.place" icon="mdi-map" round size="md" unelevated>
+          <q-tooltip class="bg-transparent" style="width: 300px" :offset="[0, 0]" max-width="300px">
             <q-card>
               <q-card-section class="text-h6 text-grey-7">
                 {{ albumItem.place.displayName }}

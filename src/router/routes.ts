@@ -9,9 +9,10 @@ const routes: RouteRecordRaw[] = [
         path: '/',
         component: () => import('pages/Index.vue'),
         name: 'LandingPage',
+        redirect: '/albums',
         children: [
           {
-            path: '',
+            path: '/albums',
             name: 'Albums',
             component: () => import('pages/AlbumList.vue'),
           },
@@ -21,6 +22,11 @@ const routes: RouteRecordRaw[] = [
             component: () => import('pages/PhotoList.vue'),
           },
         ],
+      },
+      {
+        path: '/map',
+        component: () => import('pages/AlbumMap.vue'),
+        name: 'Map',
       },
       {
         path: '/login',
