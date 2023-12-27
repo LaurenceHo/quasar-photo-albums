@@ -23,6 +23,11 @@ const routes: RouteRecordRaw[] = [
         ],
       },
       {
+        path: '/map',
+        component: () => import('pages/AlbumMap.vue'),
+        name: 'Map',
+      },
+      {
         path: '/login',
         component: () => import('pages/Login.vue'),
         name: 'Login',
