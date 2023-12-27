@@ -81,6 +81,7 @@ export const albumStore = defineStore('albums', {
         this.loadingAlbums = true;
 
         const store = userStore();
+        await store.checkUserPermission();
         const isAdminUser = store.isAdminUser;
 
         const tempAlbumsString = LocalStorage.getItem('ALL_ALBUMS');

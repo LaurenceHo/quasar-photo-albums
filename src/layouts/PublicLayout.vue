@@ -114,9 +114,10 @@ const userPermission = computed(() => userPermissionStore.userPermission as User
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const isCheckingUserPermission = computed(() => userPermissionStore.isCheckingUserPermission);
 const loadingAlbums = computed(() => store.loadingAlbums);
-const buttonToggle = ref(routeName.value === 'Albums' || routeName.value === 'Photos' ? 'photos' : 'map');
+const buttonToggle = ref(
+  routeName.value === 'Albums' || routeName.value === 'Photos' ? 'photos' : routeName.value === 'Map' ? 'map' : ''
+);
 
-userPermissionStore.checkUserPermission();
 store.getAlbums();
 store.getAlbumTags();
 

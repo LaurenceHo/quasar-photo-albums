@@ -24,13 +24,16 @@
 </template>
 
 <script lang="ts" setup>
+import { albumStore } from 'src/stores/album-store';
 import { photoStore } from 'stores/photo-store';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
+const store = albumStore();
 const usePhotoStore = photoStore();
 const route = useRoute();
 
+const loadingAlbums = computed(() => store.loadingAlbums);
 const selectedAlbumItem = computed(() => usePhotoStore.selectedAlbumItem);
 
 const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => {
