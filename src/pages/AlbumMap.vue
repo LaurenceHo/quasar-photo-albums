@@ -8,6 +8,7 @@ import mapboxgl from 'mapbox-gl';
 import { albumStore } from 'stores/album-store';
 import { computed, onMounted, ref } from 'vue';
 
+const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
 const store = albumStore();
 const filteredAlbumList = ref(store.allAlbumList as AlbumItem[]);
 const geoJson = computed(() => {
@@ -26,8 +27,15 @@ const geoJson = computed(() => {
         },
         properties: {
           name: album.albumName,
-          description: `<strong>${album.place.displayName}</strong><br/>`,
-          icon: 'marker',
+          description:
+            `<strong>${album.place.displayName}</strong><br/>` +
+            `${
+              album.albumCover
+                ? `<img src='${cdnURL}${encodeURI(album.albumCover + '?tr=w-280' ?? '')}' alt='${album.albumName}' />`
+                : ''
+            }` +
+            `${album.description ? `<p>${album.description}</p>` : ''}` +
+            `<a href='/album/${album.id}'>View Album</a>`,
         },
       });
     }
@@ -49,14 +57,23 @@ onMounted(() => {
     map.resize();
   });
 
-  for (const marker of geoJson.value.features) {
-    new mapboxgl.Marker().setLngLat(marker.geometry.coordinates).addTo(map);
-  }
-
   map.on('load', () => {
     map.addSource('albums', {
       type: 'geojson',
       data: geoJson.value,
+    });
+
+    // Add a layer showing the places.
+    map.addLayer({
+      id: 'albums',
+      type: 'circle',
+      source: 'albums',
+      paint: {
+        'circle-color': '#ef6692',
+        'circle-radius': 6,
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#ffffff',
+      },
     });
 
     // Create a popup, but don't add it to the map yet.
@@ -68,7 +85,6 @@ onMounted(() => {
     // When mouse moves over a point on the map, open a popup at the
     // location of the feature, with description HTML from its properties.
     map.on('mouseenter', 'albums', (event: any) => {
-      console.log('event', event);
       // Change the cursor style as a UI indicator.
       map.getCanvas().style.cursor = 'pointer';
 
@@ -94,11 +110,27 @@ onMounted(() => {
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 #album-location-map {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 100%;
+}
+
+.mapboxgl-popup {
+  max-width: 300px !important;
+}
+
+.mapboxgl-popup-content {
+  text-align: center;
+  padding: 10px;
+  img {
+    padding-top: 10px;
+  }
+}
+
+.mapboxgl-marker {
+  cursor: pointer;
 }
 </style>
