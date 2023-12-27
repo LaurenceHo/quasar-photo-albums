@@ -80,7 +80,7 @@
     </q-header>
 
     <q-page-container>
-      <template v-if="!isCheckingUserPermission">
+      <template v-if="!isCheckingUserPermission && !loadingAlbums">
         <router-view />
       </template>
     </q-page-container>
@@ -93,13 +93,13 @@
 import EditAlbumTagsDialog from 'components/dialog/EditAlbumTagsDialog.vue';
 import EditOrCreateAlbumDialog from 'components/dialog/EditOrCreateAlbumDialog.vue';
 import { UserPermission } from 'components/models';
+import { LocalStorage } from 'quasar';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AuthService from 'src/services/auth-service';
 import { albumStore } from 'src/stores/album-store';
 import { userStore } from 'src/stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { LocalStorage } from 'quasar';
 
 const authService = new AuthService();
 const userPermissionStore = userStore();
@@ -113,9 +113,12 @@ const albumAppName = computed(() => process.env.ALBUM_APP_TITLE);
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const isCheckingUserPermission = computed(() => userPermissionStore.isCheckingUserPermission);
+const loadingAlbums = computed(() => store.loadingAlbums);
 const buttonToggle = ref(routeName.value === 'Albums' || routeName.value === 'Photos' ? 'photos' : 'map');
 
 userPermissionStore.checkUserPermission();
+store.getAlbums();
+store.getAlbumTags();
 
 const logout = () => {
   authService.logout().then(() => {
