@@ -7,7 +7,7 @@ export interface Album {
   description?: string;
   isPrivate: boolean;
   tags: string[];
-  order: number;
+  order?: number;
   place?: Place | null;
 }
 

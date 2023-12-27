@@ -84,23 +84,12 @@
                   <q-item-label>
                     {{ exifTags['Image Width']?.value }} x {{ exifTags['Image Height']?.value }}
                   </q-item-label>
-                  <q-item-label
-                    caption
-                    v-if="
-                      exifTags.ApertureValue ||
-                      exifTags.ShutterSpeedValue ||
-                      exifTags.ISOSpeedRatings ||
-                      exifTags.ExposureBiasValue
-                    "
-                  >
-                    <template v-if="exifTags.ApertureValue"> f/{{ aperture }} </template>
-                    <template v-if="exifTags.ShutterSpeedValue">
-                      | {{ (exifTags.ShutterSpeedValue as NumberTag).description }}
-                    </template>
-                    <template v-if="exifTags.ISOSpeedRatings">
-                      | ISO {{ (exifTags.ISOSpeedRatings as NumberTag).description }}
-                    </template>
-                    <template v-if="exifTags.ExposureBiasValue"> | EV {{ exposureBias }} </template>
+                  <q-item-label caption>
+                    <span> f/{{ aperture }} </span>
+                    <span> | {{ (exifTags.ExposureTime as NumberTag).description }} </span>
+                    <span> | {{ (exifTags.FocalLength as NumberTag).description }} </span>
+                    <span> | ISO{{ (exifTags.ISOSpeedRatings as NumberTag).description }} </span>
+                    <span> | EV{{ exposureBias }} </span>
                   </q-item-label>
                 </q-item-section>
               </q-item>
@@ -195,7 +184,11 @@ const longitude = computed(() => {
   return -1000;
 });
 const exposureBias = computed(() => parseFloat(exifTags.value.ExposureBiasValue?.description ?? '0').toFixed(2));
-const aperture = computed(() => parseFloat(exifTags.value.ApertureValue?.description ?? '0').toFixed(1));
+const aperture = computed(() =>
+  parseFloat(exifTags.value.ApertureValue?.description ?? exifTags.value.MaxApertureValue?.description ?? '0').toFixed(
+    1
+  )
+);
 
 // When opening photo detail URL directly (Not from album page)
 if (photoId.value && photoList.value.length === 0) {

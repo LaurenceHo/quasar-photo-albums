@@ -11,7 +11,7 @@
             :to="breadcrumb.to"
           />
         </q-breadcrumbs>
-        <template v-if="!loadingAlbums">
+        <template v-if="!loadingAllAlbumInformation">
           <router-view v-slot="{ Component }">
             <keep-alive>
               <component :is="Component" />
@@ -33,7 +33,7 @@ const store = albumStore();
 const usePhotoStore = photoStore();
 const route = useRoute();
 
-const loadingAlbums = computed(() => store.loadingAlbums);
+const loadingAllAlbumInformation = computed(() => store.loadingAllAlbumInformation);
 const selectedAlbumItem = computed(() => usePhotoStore.selectedAlbumItem);
 
 const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => {
@@ -48,7 +48,4 @@ const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => 
   }
   return routes;
 });
-
-store.getAlbums();
-store.getAlbumTags();
 </script>

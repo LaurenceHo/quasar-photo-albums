@@ -9,8 +9,7 @@ import { compareDbUpdatedTime } from 'src/helper';
 import { userStore } from 'stores/user-store';
 
 export interface AlbumState {
-  loadingAlbums: boolean;
-  loadingAlbumTags: boolean;
+  loadingAllAlbumInformation: boolean;
   allAlbumList: Album[];
   albumTags: AlbumTag[];
   searchKey: string;
@@ -24,8 +23,7 @@ const albumTagService = new AlbumTagService();
 export const albumStore = defineStore('albums', {
   state: () =>
     ({
-      loadingAlbums: false,
-      loadingAlbumTags: false,
+      loadingAllAlbumInformation: true,
       allAlbumList: [],
       albumTags: [],
       searchKey: '',
@@ -73,31 +71,45 @@ export const albumStore = defineStore('albums', {
         }
         return filteredAlbumList;
       },
+
+    albumsHaveLocation: (state: AlbumState) =>
+      state.allAlbumList.filter((album) => album.place?.location?.latitude && album.place?.location?.longitude),
   },
   actions: {
-    async getAlbums() {
-      if (this.allAlbumList.length === 0) {
-        Loading.show();
-        this.loadingAlbums = true;
-
-        const store = userStore();
-        const isAdminUser = store.isAdminUser;
-
+    async getAllAlbumInformation() {
+      if (this.allAlbumList.length === 0 || this.albumTags.length === 0) {
         const tempAlbumsString = LocalStorage.getItem('ALL_ALBUMS');
+        const tempAlbumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
+
         // If updated time from localStorage is empty or different from S3, get albums from database
         const compareResult = await compareDbUpdatedTime();
-        if (!compareResult.isLatest || !tempAlbumsString) {
-          const { data } = await albumService.getAlbums();
-          if (data) {
-            const albumsString = JSON.stringify(data);
+        if (!compareResult.isLatest || isEmpty(tempAlbumsString) || isEmpty(tempAlbumTagsString)) {
+          Loading.show();
+          this.loadingAllAlbumInformation = true;
+
+          const { data: albums } = await albumService.getAlbums();
+          if (albums) {
+            const albumsString = JSON.stringify(albums);
             LocalStorage.set('ALL_ALBUMS', albumsString);
           }
+
+          const { data: tags } = await albumTagService.getAlbumTags();
+          if (tags) {
+            const albumTagsString = JSON.stringify(tags);
+            LocalStorage.set('ALBUM_TAGS', albumTagsString);
+          }
+          // Set updated time in local storage
           LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
         }
 
+        // Check user permission
+        const store = userStore();
+        await store.checkUserPermission();
+        const isAdminUser = store.isAdminUser;
+
         // Get albums from local storage again
         const albumsString: string = LocalStorage.getItem('ALL_ALBUMS') || '';
-        let tempList: Album[] = JSON.parse(albumsString);
+        let tempList: Album[] = !isEmpty(albumsString) ? JSON.parse(albumsString) : [];
         if (!isAdminUser) {
           tempList = tempList.filter((album) => !album.isPrivate);
         }
@@ -108,31 +120,13 @@ export const albumStore = defineStore('albums', {
             return b.albumName.localeCompare(a.albumName);
           }
         });
-        Loading.hide();
-        this.loadingAlbums = false;
-      }
-    },
-
-    async getAlbumTags() {
-      if (this.albumTags.length === 0) {
-        this.loadingAlbumTags = true;
-
-        const tempAlbumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
-        const compareResult = await compareDbUpdatedTime();
-        if (!compareResult.isLatest || !tempAlbumTagsString) {
-          const { data } = await albumTagService.getAlbumTags();
-          if (data) {
-            const albumTagsString = JSON.stringify(data);
-            LocalStorage.set('ALBUM_TAGS', albumTagsString);
-          }
-          LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
-        }
-
+        // Get album tags from local storage again
         const albumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
-        const tempAlbumTags: { tag: string }[] = JSON.parse(albumTagsString);
-
+        const tempAlbumTags: { tag: string }[] = !isEmpty(albumTagsString) ? JSON.parse(albumTagsString) : [];
         this.albumTags = tempAlbumTags.sort((a, b) => a.tag.localeCompare(b.tag));
-        this.loadingAlbumTags = false;
+
+        Loading.hide();
+        this.loadingAllAlbumInformation = false;
       }
     },
 
