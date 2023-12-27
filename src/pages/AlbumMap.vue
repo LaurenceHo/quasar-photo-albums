@@ -42,7 +42,7 @@ onMounted(() => {
     container: 'album-location-map',
     style: 'mapbox://styles/mapbox/streets-v11',
     center: [174.763336, -36.848461],
-    zoom: 2,
+    zoom: 1,
   });
 
   map.on('idle', () => {

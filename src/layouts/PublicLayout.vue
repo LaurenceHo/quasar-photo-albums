@@ -125,4 +125,12 @@ const logout = () => {
 watch(searchKey, (newValue) => {
   store.$patch({ searchKey: newValue });
 });
+
+watch(routeName, (newValue) => {
+  if (newValue === 'Albums' || newValue === 'Photos') {
+    buttonToggle.value = 'photos';
+  } else if (newValue === 'Map') {
+    buttonToggle.value = 'map';
+  }
+});
 </script>
