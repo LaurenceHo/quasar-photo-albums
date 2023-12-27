@@ -6,43 +6,35 @@
 import { Album as AlbumItem } from 'components/models';
 import mapboxgl from 'mapbox-gl';
 import { albumStore } from 'stores/album-store';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted } from 'vue';
 
 const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
 const store = albumStore();
-const filteredAlbumList = ref(store.allAlbumList as AlbumItem[]);
-const geoJson = computed(() => {
-  const geoJson = {
-    type: 'FeatureCollection',
-    features: [] as any[],
-  } as any;
-
-  for (const album of filteredAlbumList.value) {
-    if (album.place?.location.latitude && album.place.location.longitude) {
-      geoJson.features.push({
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [album.place.location.longitude, album.place.location.latitude],
-        },
-        properties: {
-          name: album.albumName,
-          description:
-            `<strong>${album.place.displayName}</strong><br/>` +
-            `${
-              album.albumCover
-                ? `<img src='${cdnURL}${encodeURI(album.albumCover + '?tr=w-280' ?? '')}' alt='${album.albumName}' />`
-                : ''
-            }` +
-            `${album.description ? `<p>${album.description}</p>` : ''}` +
-            `<a href='/album/${album.id}'>View Album</a>`,
-        },
-      });
-    }
-  }
-
-  return geoJson;
-});
+const albumsHaveLocation = computed(() => store.albumsHaveLocation);
+const geoJson = computed(() => ({
+  type: 'FeatureCollection',
+  features: albumsHaveLocation.value.map((album: AlbumItem) => {
+    return {
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [album.place?.location.longitude, album.place?.location.latitude],
+      },
+      properties: {
+        name: album.albumName,
+        description:
+          `<strong>${album.place?.displayName}</strong><br/>` +
+          `${
+            album.albumCover
+              ? `<img src='${cdnURL}${encodeURI(album.albumCover + '?tr=w-280' ?? '')}' alt='${album.albumName}' />`
+              : ''
+          }` +
+          `${album.description ? `<p>${album.description}</p>` : ''}` +
+          `<a href='/album/${album.id}'>View Album</a>`,
+      },
+    };
+  }),
+}));
 
 onMounted(() => {
   mapboxgl.accessToken = process.env.MAPBOX_API_KEY as string;
@@ -61,7 +53,7 @@ onMounted(() => {
     map.addSource('albums', {
       type: 'geojson',
       data: geoJson.value,
-    });
+    } as any);
 
     // Add a layer showing the places.
     map.addLayer({

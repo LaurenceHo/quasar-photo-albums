@@ -36,13 +36,7 @@
                 </div>
               </template>
             </q-btn-toggle>
-            <q-input
-              v-if="routeName === 'Albums' || routeName === 'Map'"
-              v-model="searchKey"
-              dense
-              outlined
-              color="accent"
-            >
+            <q-input v-if="routeName === 'Albums'" v-model="searchKey" dense outlined color="accent">
               <template v-slot:prepend>
                 <q-icon name="mdi-magnify" />
               </template>

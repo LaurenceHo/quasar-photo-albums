@@ -9,9 +9,10 @@ const routes: RouteRecordRaw[] = [
         path: '/',
         component: () => import('pages/Index.vue'),
         name: 'LandingPage',
+        redirect: '/albums',
         children: [
           {
-            path: '',
+            path: '/albums',
             name: 'Albums',
             component: () => import('pages/AlbumList.vue'),
           },

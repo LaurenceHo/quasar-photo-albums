@@ -73,6 +73,9 @@ export const albumStore = defineStore('albums', {
         }
         return filteredAlbumList;
       },
+
+    albumsHaveLocation: (state: AlbumState) =>
+      state.allAlbumList.filter((album) => album.place?.location?.latitude && album.place?.location?.longitude),
   },
   actions: {
     async getAlbums() {
