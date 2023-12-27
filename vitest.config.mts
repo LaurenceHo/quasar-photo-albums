@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config';
 import vue from '@vitejs/plugin-vue';
-import { quasar, transformAssetUrls } from '@quasar/vite-plugin';
+import { quasar } from '@quasar/vite-plugin';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
@@ -11,7 +11,7 @@ export default defineConfig({
       reportsDirectory: 'test/vitest/coverage',
     },
     globals: true,
-    // setupFiles: 'setup-test-file.ts',
+    setupFiles: './vitest-setup.ts',
     environment: 'jsdom',
     include: [
       // Matches vitest tests in any subfolder of 'src' or into 'test/vitest/__tests__'
