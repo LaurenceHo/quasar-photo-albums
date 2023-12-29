@@ -36,7 +36,7 @@ jobs:
           tee .env <<EOF
           ALBUM_APP_TITLE="Quasar demo photo albums"
           STATIC_FILES_URL=https://demo-quasar-photo-albums.s3.amazonaws.com
-          IMAGEKIT_CDN_URL=https://demo-quasar-photo-albums.s3.amazonaws.com
+          IMAGEKIT_CDN_URL=https://demo-quasar-photo-albums.s3.amazonaws.com/
           AWS_API_GATEWAY_URL=https://qg9ajep8e0.execute-api.us-east-1.amazonaws.com/dev
           MAPBOX_API_KEY=$MAPBOX_API_KEY
           GOOGLE_FIREBASE_API_KEY=$GOOGLE_FIREBASE_API_KEY
