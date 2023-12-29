@@ -1,8 +1,6 @@
 name: Build and deploy web app to Google Firebase Hosting
 
 on:
-  pull_request:
-    branches: [ master ]
   push:
     branches: [ master ]
     paths: ["src/**"]
@@ -51,21 +49,14 @@ jobs:
           GOOGLE_FIREBASE_PROJECT_ID=$GOOGLE_FIREBASE_PROJECT_ID
           GOOGLE_FIREBASE_APP_ID=$GOOGLE_FIREBASE_APP_ID
           EOF
+
       - name: Test and build
         run: |
           npm run test:unit:ci
           npm run build
           npx firebase-tools --project $GOOGLE_FIREBASE_PROJECT_ID
 
-      - name: Deploy to Firebase preview channel
-        if: ${{ success() && github.event_name == 'pull_request' }}
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BLUEBOTTLE_PHOTO_ALBUMS }}
-          projectId: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
-
-      - name: Deploy to Firebase prod
+      - name: Deploy to Firebase
         if: ${{ success() && (github.event_name == 'push' || github.event.pull_request.merged == true || github.event.inputs.buildManually == 'build') }}
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
@@ -73,3 +64,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BLUEBOTTLE_PHOTO_ALBUMS }}
           channelId: live
           projectId: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
+          target: public

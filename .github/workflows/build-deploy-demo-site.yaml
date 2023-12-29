@@ -1,0 +1,62 @@
+name: Build and deploy web app to Google Firebase Hosting
+
+on:
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      buildManually:
+        description: 'Run build manually'
+        required: true
+        default: 'build'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
+      GOOGLE_FIREBASE_API_KEY: ${{ secrets.GOOGLE_FIREBASE_API_KEY }}
+      GOOGLE_FIREBASE_APP_ID: ${{ secrets.GOOGLE_FIREBASE_APP_ID }}
+      GOOGLE_FIREBASE_AUTH_DOMAIN: ${{ secrets.GOOGLE_FIREBASE_AUTH_DOMAIN }}
+      GOOGLE_FIREBASE_PROJECT_ID: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Write .env file
+        run: |
+          tee .env <<EOF
+          ALBUM_APP_TITLE="Quasar demo photo albums"
+          STATIC_FILES_URL=https://demo-quasar-photo-albums.s3.amazonaws.com
+          IMAGEKIT_CDN_URL=https://demo-quasar-photo-albums.s3.amazonaws.com
+          AWS_API_GATEWAY_URL=https://qg9ajep8e0.execute-api.us-east-1.amazonaws.com/dev
+          MAPBOX_API_KEY=$MAPBOX_API_KEY
+          GOOGLE_FIREBASE_API_KEY=$GOOGLE_FIREBASE_API_KEY
+          GOOGLE_FIREBASE_AUTH_DOMAIN=$GOOGLE_FIREBASE_AUTH_DOMAIN
+          GOOGLE_FIREBASE_PROJECT_ID=$GOOGLE_FIREBASE_PROJECT_ID
+          GOOGLE_FIREBASE_APP_ID=$GOOGLE_FIREBASE_APP_ID
+          EOF
+
+      - name: Test and build
+        run: |
+          npm run test:unit:ci
+          npm run build
+          npx firebase-tools --project $GOOGLE_FIREBASE_PROJECT_ID
+
+      - name: Deploy to demo site
+        if: ${{ success() && (github.event_name == 'push' || github.event.pull_request.merged == true || github.event.inputs.buildManually == 'build') }}
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BLUEBOTTLE_PHOTO_ALBUMS }}
+          channelId: live
+          projectId: ${{ secrets.GOOGLE_FIREBASE_PROJECT_ID }}
+          target: demo
