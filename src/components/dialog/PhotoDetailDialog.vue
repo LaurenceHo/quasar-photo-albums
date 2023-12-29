@@ -86,9 +86,11 @@
                   </q-item-label>
                   <q-item-label caption>
                     <span> f/{{ aperture }} </span>
-                    <span> | {{ (exifTags.ExposureTime as NumberTag).description }} </span>
-                    <span> | {{ (exifTags.FocalLength as NumberTag).description }} </span>
-                    <span> | ISO{{ (exifTags.ISOSpeedRatings as NumberTag).description }} </span>
+                    <span v-if="exifTags.ExposureTime"> | {{ (exifTags.ExposureTime as NumberTag).description }} </span>
+                    <span v-if="exifTags.FocalLength"> | {{ (exifTags.FocalLength as NumberTag).description }} </span>
+                    <span v-if="exifTags.ISOSpeedRatings">
+                      | ISO{{ (exifTags.ISOSpeedRatings as NumberTag).description }}
+                    </span>
                     <span> | EV{{ exposureBias }} </span>
                   </q-item-label>
                 </q-item-section>

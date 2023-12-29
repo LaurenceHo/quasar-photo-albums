@@ -1,17 +1,34 @@
 {
-  "hosting": {
-    "public": "dist/spa",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**",
-      "functions/**"
-    ],
-    "rewrites": [
-      {
-        "source": "!/@(api)/**",
-        "destination": "/index.html"
-      }
-    ]
-  }
+  "hosting": [
+    {
+      "target": "public",
+      "public": "dist/spa",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "!/@(api)/**",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    {
+      "target": "demo",
+      "public": "dist/spa",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "!/@(api)/**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ]
 }
