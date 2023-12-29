@@ -1,4 +1,4 @@
-name: Build and deploy web app to Google Firebase Hosting
+name: Build and deploy demo web app to Google Firebase Hosting
 
 on:
   pull_request:
@@ -37,7 +37,7 @@ jobs:
           ALBUM_APP_TITLE="Quasar demo photo albums"
           STATIC_FILES_URL=https://demo-quasar-photo-albums.s3.amazonaws.com
           IMAGEKIT_CDN_URL=https://demo-quasar-photo-albums.s3.amazonaws.com/
-          AWS_API_GATEWAY_URL=https://qg9ajep8e0.execute-api.us-east-1.amazonaws.com/dev
+          AWS_API_GATEWAY_URL=https://qg9ajep8e0.execute-api.us-east-1.amazonaws.com/dev/api
           MAPBOX_API_KEY=$MAPBOX_API_KEY
           GOOGLE_FIREBASE_API_KEY=$GOOGLE_FIREBASE_API_KEY
           GOOGLE_FIREBASE_AUTH_DOMAIN=$GOOGLE_FIREBASE_AUTH_DOMAIN
@@ -52,7 +52,7 @@ jobs:
           npx firebase-tools --project $GOOGLE_FIREBASE_PROJECT_ID
 
       - name: Deploy to demo site
-        if: ${{ success() && (github.event_name == 'push' || github.event.pull_request.merged == true || github.event.inputs.buildManually == 'build') }}
+        if: ${{ success() && github.event_name == 'pull_request' }}
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
