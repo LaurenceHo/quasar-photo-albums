@@ -1,5 +1,5 @@
 {
-  "name": "functions",
+  "name": "lambda-functions",
   "version": "1.0.0",
   "main": "lib/src/index.js",
   "files": [
@@ -8,9 +8,10 @@
   ],
   "scripts": {
     "build": "tsc",
-    "deploy:lambda": "tsc && serverless deploy",
+    "deploy:lambda:demo": "rimraf lib && tsc && serverless deploy",
+    "deploy:lambda": "rimraf lib && tsc && serverless deploy --stage prod",
     "lint": "eslint --ext .js,.ts .",
-    "start:server": "rimraf lib/src && tsc && node lib/src/index.js",
+    "start:server": "rimraf lib && tsc && node lib/src/index.js",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
