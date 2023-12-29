@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "bluebottle-photo-albums"
+  },
+  "targets": {
+    "bluebottle-photo-albums": {
+      "hosting": {
+        "demo": [
+          "quasar-photo-albums-demo"
+        ],
+        "public": [
+          "bluebottle-photo-albums"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
