@@ -99,7 +99,7 @@ const { albumItem } = toRefs(props);
 const userPermissionStore = userStore();
 const router = useRouter();
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const thumbnail = computed(() => cdnURL + encodeURI(albumItem.value?.albumCover));
+const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.albumCover)}`);
 const thumbnailSize = computed(() => (q.screen.lt.sm ? 60 : 90));
 
 const goToAlbum = () => router.push(`/album/${albumItem.value?.id}`);

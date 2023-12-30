@@ -9,8 +9,8 @@
     "build": "quasar build",
     "lint": "eslint --ext ./src/**/*.{js,ts,vue} && prettier --write ./src/**/*.{js,ts,vue,scss}",
     "postinstall": "husky install",
-    "firebase:deploy": "npm run build && firebase deploy --only hosting:bluebottle-photo-albums",
-    "firebase:deploy:demo": "npm run build && firebase deploy --only hosting:quasar-photo-albums-demo",
+    "firebase:deploy": "npm run build && firebase deploy --only hosting:public",
+    "firebase:deploy:demo": "npm run build && firebase deploy --only hosting:demo",
     "test:unit": "vitest",
     "test:unit:ci": "vitest run --coverage"
   },

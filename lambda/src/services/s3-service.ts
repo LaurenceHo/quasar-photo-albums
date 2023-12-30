@@ -38,7 +38,7 @@ export class S3Service implements BaseService<Photo> {
       let url = '';
       let key = '';
       if (photo && photo.Key) {
-        url = this.cdnURL + encodeURI(photo.Key);
+        url = `${this.cdnURL}/${encodeURI(photo.Key)}`;
         key = photo.Key;
       }
       return { url, key };
