@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const configuration = {
-  region: process.env.AWS_REGION,
+  region: process.env.AWS_REGION_NAME,
 };
 
 if (process.env.NODE_ENV === 'development') {

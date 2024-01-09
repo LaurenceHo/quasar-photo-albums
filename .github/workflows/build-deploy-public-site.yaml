@@ -1,9 +1,11 @@
-name: Build and deploy web app to Google Firebase Hosting
+name: Build and deploy web app to Firebase
 
 on:
   push:
-    branches: [ master ]
-    paths: ["src/**"]
+    branches:
+      - master
+    paths:
+      - "src/**"
   workflow_dispatch:
     inputs:
       buildManually:

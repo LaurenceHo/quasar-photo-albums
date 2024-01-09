@@ -1,4 +1,4 @@
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { defineStore } from 'pinia';
 import { Loading, LocalStorage } from 'quasar';
 import { Album, AlbumTag } from 'src/components/models';

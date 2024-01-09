@@ -1,8 +1,12 @@
-name: Build and deploy demo web app to Google Firebase Hosting
+name: Build and deploy demo web app to Firebase
 
 on:
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
+      - develop
+    paths:
+      - "src/**"
   workflow_dispatch:
     inputs:
       buildManually:

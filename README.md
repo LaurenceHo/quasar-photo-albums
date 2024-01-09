@@ -6,9 +6,9 @@ from S3 directly only has limited functionality (you can only display folder nam
 organise S3 photo folders information.
 
 ## Getting started
-### Create S3 bucket and Cognito Identity Pool
-Before you start, please create an AWS S3 bucket and an AWS Cognito Identity Pool at first [1]. Once you create them, replace those properties:
-STATIC_FILES_URL, AWS_REGION, AWS_IDENTITY_POOL_ID and IMAGEKIT_CDN_URL with your real information in`.env.example` and modify file name to `.env` then you are good to go.
+### Create S3 bucket
+Before you start, please create an AWS S3 bucket. Once you create them, replace this property STATIC_FILES_URL with
+your real information in`.env.example` and modify file name to `.env`.
 The file structure in the S3 bucket should be like this:
 ```
 my-photo-S3-bucket/
@@ -43,7 +43,7 @@ You usually want to make your S3 albums public so that your friends can see it, 
 ```
 
 ### S3 CORS policy
-Don't forget to put CORS into S3 bucket configuration[3] to prevent other people link your photos from their websites directly.
+Don't forget to put CORS into S3 bucket configuration[1] to prevent other people link your photos from their websites directly.
 No matter where you deploy your app (AWS or Google Firebase), you should add those URLs for hosting your website into CORS configuration.
 For example:
 ```json
@@ -69,15 +69,16 @@ For example:
 ### Integrate with ImageKit
 In order to reduce the traffic with S3 buckets (to save money!), this project integrate with ImageKit CDN. ImageKit.io
 is a cloud-based image CDN with real-time image optimization and transformation features that help you deliver perfectly
-optimized images across all devices[4]. You can follow this [documentation](https://imagekit.io/blog/image-optimization-resize-aws-s3-imagekit/)
-to create an account in the ImageKit. You will have 20GB bandwidth per month as a free user.
+optimized images across all devices[2]. You can follow this [documentation](https://imagekit.io/blog/image-optimization-resize-aws-s3-imagekit/)
+to create an account in the ImageKit. You will have 20GB bandwidth per month as a free user. Once you have your own ImageKit
+URL, replace this property IMAGEKIT_URL with your real information in`.env.example` and modify file name to `.env`.
 
 #### Important
-If you change S3 bucket name, don't forget to update the configuration in ImageKit, AWS IAM permission for Cognito and Imagekit.
+If you change S3 bucket name, don't forget to update the configuration in ImageKit, and AWS IAM permission for Imagekit.
 
 ### S3 static website
 If you want to place this Vue app in the S3 bucket along with your photos, you need to make your S3 bucket as a web server
-to serve your js, css, font... etc files[2]. If you want to configure your S3 bucket as a static website using a custom domain,
+to serve your js, css, font... etc files[3]. If you want to configure your S3 bucket as a static website using a custom domain,
 you can check out this [documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/website-hosting-custom-domain-walkthrough.html).
 
 ### Deploy to Firebase hosting
@@ -110,12 +111,7 @@ updatedBy: string (email)
 ```
 
 ### Upload photos to AWS S3 bucket
-I use AWS Cognito identity pool to provide temporary credentials to access AWS S3 bucket for anonymous guest users. For signed-in users,
-I use AWS IAM to create a role and attach the appropriate policy to the role. Then I use AWS credentials to access AWS S3 bucket.
-Before uploading photos to AWS S3 bucket via AWS Lambda Function, we need to set up AWS Cognito identity pool and IAM properly.
-Make sure attaching correct permissions to the [IAM role](https://docs.aws.amazon.com/cognito/latest/developerguide/security_iam_service-with-iam.html)
-which is used by AWS Cognito identity pool and use the [credential](https://docs.aws.amazon.com/cognito/latest/developerguide/getting-credentials.html)
-to access AWS S3 client.
+Before uploading photos to AWS S3 bucket via AWS Lambda Function, we need to set up AWS IAM properly.
 
 ### Install the dependencies
 ```bash
@@ -162,7 +158,7 @@ $ npm run deploy:lambda
 See [Configuring quasar.conf.js](https://v2.quasar.dev/quasar-cli/quasar-conf-js).
 
 ### References
-1. [Viewing Photos in an Amazon S3 Bucket from a Browser](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/s3-example-photos-view.html)
-2. [Enabling website hosting](https://docs.aws.amazon.com/AmazonS3/latest/userguide/EnableWebsiteHosting.html)
-3. [CORS Configuration](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ManageCorsUsing.html)
-4. [Optimize and resize images in AWS S3 in real-time with ImageKit](https://imagekit.io/blog/image-optimization-resize-aws-s3-imagekit/)
+1. [CORS Configuration](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ManageCorsUsing.html)
+2. [Optimize and resize images in AWS S3 in real-time with ImageKit](https://imagekit.io/blog/image-optimization-resize-aws-s3-imagekit/)
+3. [Enabling website hosting](https://docs.aws.amazon.com/AmazonS3/latest/userguide/EnableWebsiteHosting.html)
+
