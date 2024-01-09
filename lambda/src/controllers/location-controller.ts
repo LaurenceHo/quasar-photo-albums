@@ -8,7 +8,7 @@ export default class LocationController extends BaseController {
   // Find places by keyword
   findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const { textQuery } = req.query;
-    const response = await this.perform(
+    const response: any = await this.perform(
       'POST',
       ':searchText',
       { textQuery, languageCode: 'en' },

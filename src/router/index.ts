@@ -1,4 +1,4 @@
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { Notify } from 'quasar';
 import { route } from 'quasar/wrappers';
 import { userStore } from 'stores/user-store';
