@@ -1,4 +1,3 @@
-import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity';
 import {
   CopyObjectCommand,
   CopyObjectCommandInput,
@@ -11,7 +10,6 @@ import {
   PutObjectCommandInput,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
 import get from 'lodash/get';
 import { BaseService, Photo } from '../models';
 import { configuration } from './config';
@@ -21,16 +19,7 @@ export class S3Service implements BaseService<Photo> {
   public readonly cdnURL = process.env.IMAGEKIT_CDN_URL;
 
   async findPhotosByAlbumId(params: ListObjectsV2CommandInput): Promise<Photo[]> {
-    // Use unauthenticated identity
-    const s3Client = new S3Client({
-      region: process.env.AWS_REGION,
-      credentials: fromCognitoIdentityPool({
-        client: new CognitoIdentityClient({ region: process.env.AWS_REGION }),
-        identityPoolId: process.env.AWS_IDENTITY_POOL_ID as string,
-      }),
-    });
-
-    const response = await s3Client.send(new ListObjectsV2Command(params));
+    const response = await this.s3Client.send(new ListObjectsV2Command(params));
     const s3ObjectContents = get(response, 'Contents', []);
 
     // Compose photos array from s3ObjectContents

@@ -71,8 +71,10 @@ const { setSelectedPhotosList, setDeletePhotoDialogState, setMovePhotoDialogStat
 
 const makeCoverPhoto = async () => {
   const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photoKey.value as string };
-  await albumService.updateAlbum(albumToBeSubmitted);
-  store.updateAlbumCover(albumToBeSubmitted);
+  const response = await albumService.updateAlbum(albumToBeSubmitted);
+  if (response.code === 200) {
+    store.updateAlbumCover(albumToBeSubmitted);
+  }
 };
 
 const deletePhoto = () => {
