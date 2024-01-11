@@ -100,7 +100,7 @@ export default class HttpRequestService {
     Notify.create({
       color: error ? 'negative' : 'positive',
       textColor: 'white',
-      icon: error ? 'mdi-alert-circle-outline' : 'mdi-check-circle-outline',
+      icon: error ? 'mdi-alert-circle' : 'mdi-check-circle-outline',
       message: message,
     });
   };

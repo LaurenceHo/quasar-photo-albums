@@ -2,21 +2,14 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import express, { Application, Request, Response } from 'express';
-import admin from 'firebase-admin';
-import { ServiceAccount } from 'firebase-admin/lib/app/credential';
 import helmet from 'helmet';
 import serverless from 'serverless-http';
-import serviceAccount from '../serviceAccountKey.json';
 import { router as albumRoute } from './route/album-route';
 import { router as albumTagsRoute } from './route/album-tag-route';
 import { router as authRoute } from './route/auth-route';
 import { router as locationRoute } from './route/location-route';
 import { router as photoRoute } from './route/photo-route';
 import { errorHandler } from './utils/error-handler';
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as ServiceAccount),
-});
 
 dotenv.config();
 
