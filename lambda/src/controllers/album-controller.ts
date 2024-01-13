@@ -1,7 +1,7 @@
 import { Request, RequestHandler, Response } from 'express';
-import admin from 'firebase-admin';
 import get from 'lodash/get';
 import { Album, RequestWithUser } from '../models';
+import { verifyIdToken } from '../route/auth-middleware';
 import AlbumService from '../services/album-service';
 import UserService from '../services/user-service';
 import { asyncHandler } from '../utils/async-handler';
@@ -14,10 +14,12 @@ const userService = new UserService();
 export default class AlbumController extends BaseController {
   findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     try {
-      const firebaseToken = get(req, 'cookies.__session', '');
+      const token = get(req, 'cookies.__session', '');
       let userPermission = null;
-      if (firebaseToken) {
-        const { uid, email = '' } = await admin.auth().verifySessionCookie(firebaseToken, true);
+      if (token) {
+        const payload = await verifyIdToken(token);
+        const uid = payload?.sub ?? '';
+        const email = payload?.email ?? '';
         try {
           userPermission = await userService.findOne({ uid, email });
         } catch (e) {
