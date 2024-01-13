@@ -54,7 +54,7 @@ export const photoStore = defineStore('photos', {
           timeout: 2000,
           progress: true,
           color: 'negative',
-          icon: 'mdi-alert-circle-outline',
+          icon: 'mdi-alert-circle',
           message: "Album doesn't exist. You will be redirected to the home page in 3 seconds",
         });
         setTimeout(() => router.push('/'), 3000);

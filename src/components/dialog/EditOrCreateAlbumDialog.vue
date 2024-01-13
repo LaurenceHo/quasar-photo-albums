@@ -62,7 +62,6 @@
           stack-label
         />
         <q-toggle
-          class="q-pb-lg"
           v-model="privateAlbum"
           :disable="isProcessing"
           checked-icon="mdi-lock"
@@ -103,9 +102,10 @@
         </q-select>
       </q-card-section>
 
-      <q-card-section v-if="selectedPlace">
+      <q-card-section v-if="selectedPlace" class="q-pt-none">
         <PhotoLocationMap :latitude="locationLatitude" :longitude="locationLongitude" />
       </q-card-section>
+
       <q-card-actions align="right" class="text-primary">
         <q-btn :disable="isProcessing" flat label="Cancel" no-caps @click="resetAlbum" />
         <q-btn
