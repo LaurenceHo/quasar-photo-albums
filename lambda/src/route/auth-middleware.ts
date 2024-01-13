@@ -1,22 +1,22 @@
 import { Request, Response } from 'express';
 import { CookieOptions } from 'express-serve-static-core';
-import admin from 'firebase-admin';
+import { OAuth2Client } from 'google-auth-library';
 import get from 'lodash/get';
-import UserService from '../services/user-service';
 import { RequestWithUser } from '../models';
+import UserService from '../services/user-service';
 import JsonResponse from '../utils/json-response';
 
 const userService = new UserService();
+const client = new OAuth2Client();
 
 export const setCookies = async (res: Response, token: any) => {
   const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days
-  const sessionCookie = await admin.auth().createSessionCookie(String(token), { expiresIn });
   const options = {
     maxAge: expiresIn,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
   } as CookieOptions;
-  res.cookie('__session', sessionCookie, options);
+  res.cookie('__session', token, options);
   res.setHeader('Cache-Control', 'private');
 };
 
@@ -39,8 +39,11 @@ export const cleanCookie = (res: Response, message: string) => {
 export const verifyJwtClaim = async (req: Request, res: Response, next: any) => {
   if (req.cookies && req.cookies['__session']) {
     try {
-      const firebaseToken = get(req, 'cookies.__session', '');
-      const { exp, uid, email = '' } = await admin.auth().verifySessionCookie(firebaseToken, true);
+      const token = get(req, 'cookies.__session', '');
+      const payload = await verifyIdToken(token);
+      const uid = payload?.sub ?? '';
+      const email = payload?.email ?? '';
+      const exp = payload?.exp ?? 0;
       if (exp <= Date.now() / 1000) {
         cleanCookie(res, 'User is not logged-in');
       }
@@ -66,4 +69,12 @@ export const verifyUserPermission = async (req: Request, res: Response, next: an
   } else {
     new JsonResponse(403).unauthorized(res, 'Unauthorized action');
   }
+};
+
+export const verifyIdToken = async (token: string) => {
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_CLIENT_ID ?? '',
+  });
+  return ticket.getPayload();
 };

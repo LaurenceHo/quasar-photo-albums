@@ -76,7 +76,7 @@ module.exports = {
     // The core 'no-unused-vars' rules (in the eslint:recommeded ruleset)
     // does not work with type definitions
     'no-unused-vars': 'off',
-
+    'no-undef': 'off',
     // TypeScript
     quotes: ['warn', 'single', { avoidEscape: true }],
     // this rule, if on, would require explicit return type on the `render` function

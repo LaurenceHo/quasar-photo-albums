@@ -25,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_FIREBASE_API_KEY: ${{ secrets.GOOGLE_FIREBASE_API_KEY }}
       GOOGLE_FIREBASE_APP_ID: ${{ secrets.GOOGLE_FIREBASE_APP_ID }}
       GOOGLE_FIREBASE_AUTH_DOMAIN: ${{ secrets.GOOGLE_FIREBASE_AUTH_DOMAIN }}
@@ -47,8 +48,9 @@ jobs:
           ALBUM_APP_TITLE="Quasar demo photo albums"
           STATIC_FILES_URL=https://demo-quasar-photo-albums.s3.amazonaws.com
           IMAGEKIT_CDN_URL=https://demo-quasar-photo-albums.s3.amazonaws.com
-          AWS_API_GATEWAY_URL=https://qg9ajep8e0.execute-api.us-east-1.amazonaws.com/dev/api
           MAPBOX_API_KEY=$MAPBOX_API_KEY
+          AWS_API_GATEWAY_URL=https://qg9ajep8e0.execute-api.us-east-1.amazonaws.com/dev/api
+          GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
           GOOGLE_FIREBASE_API_KEY=$GOOGLE_FIREBASE_API_KEY
           GOOGLE_FIREBASE_AUTH_DOMAIN=$GOOGLE_FIREBASE_AUTH_DOMAIN
           GOOGLE_FIREBASE_PROJECT_ID=$GOOGLE_FIREBASE_PROJECT_ID

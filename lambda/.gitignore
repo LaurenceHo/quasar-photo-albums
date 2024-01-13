@@ -2,9 +2,8 @@
 node_modules/
 .env
 *.log
-serviceAccountKey.json
 # Compiled JavaScript files
-lib/
+dist/
 
 # TypeScript v1 declaration files
 typings/

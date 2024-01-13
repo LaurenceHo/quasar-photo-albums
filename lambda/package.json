@@ -1,17 +1,17 @@
 {
   "name": "lambda-functions",
   "version": "1.0.0",
-  "main": "lib/src/index.js",
+  "main": "dist/src/index.js",
   "files": [
-    "lib/**/*.*",
+    "dist/**/*.*",
     "package.json"
   ],
   "scripts": {
     "build": "tsc",
-    "deploy:lambda:demo": "rimraf lib && tsc && serverless deploy",
-    "deploy:lambda": "rimraf lib && tsc && serverless deploy --stage prod",
+    "deploy:lambda:demo": "rimraf dist && tsc && serverless deploy",
+    "deploy:lambda": "rimraf dist && tsc && serverless deploy --stage prod",
     "lint": "eslint --ext .js,.ts .",
-    "start:server": "rimraf lib && tsc && node lib/src/index.js",
+    "start:server": "rimraf dist && tsc && node dist/index.js",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -23,7 +23,7 @@
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
-    "firebase-admin": "^12.0.0",
+    "google-auth-library": "^9.4.2",
     "helmet": "^7.0.0",
     "lodash": "^4.17.21",
     "multer": "^1.4.5-lts.1",

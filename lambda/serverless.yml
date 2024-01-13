@@ -7,7 +7,7 @@ provider:
 
 functions:
   app:
-    handler: lib/src/app.handler
+    handler: dist/src/app.handler
     events:
       - http: ANY /
       - http: ANY /{proxy+}

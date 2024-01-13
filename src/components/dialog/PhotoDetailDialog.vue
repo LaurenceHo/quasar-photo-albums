@@ -226,7 +226,7 @@ watch(photoList, (newValue) => {
         timeout: 2000,
         progress: true,
         color: 'negative',
-        icon: 'mdi-alert-circle-outline',
+        icon: 'mdi-alert-circle',
         message: "Photo doesn't exist",
       });
       setTimeout(() => router.push(`/album/${albumId.value}`), 3000);
