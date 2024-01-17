@@ -14,9 +14,9 @@ export const setCookies = async (res: Response, token: any) => {
   const options = {
     maxAge: expiresIn,
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
   } as CookieOptions;
-  res.cookie('__session', token, options);
+  res.cookie('jwt', token, options);
   res.setHeader('Cache-Control', 'private');
 };
 
@@ -26,7 +26,7 @@ export const setCookies = async (res: Response, token: any) => {
  * @param message
  */
 export const cleanCookie = (res: Response, message: string) => {
-  res.clearCookie('__session');
+  res.clearCookie('jwt');
   return new JsonResponse(401).unauthorized(res, message);
 };
 
@@ -37,16 +37,12 @@ export const cleanCookie = (res: Response, message: string) => {
  * @param next
  */
 export const verifyJwtClaim = async (req: Request, res: Response, next: any) => {
-  if (req.cookies && req.cookies['__session']) {
+  const token = get(req, 'cookies.jwt', null);
+  if (token) {
     try {
-      const token = get(req, 'cookies.__session', '');
       const payload = await verifyIdToken(token);
       const uid = payload?.sub ?? '';
       const email = payload?.email ?? '';
-      const exp = payload?.exp ?? 0;
-      if (exp <= Date.now() / 1000) {
-        cleanCookie(res, 'User is not logged-in');
-      }
 
       const user = await userService.findOne({ uid, email });
       if (user) {
@@ -59,7 +55,7 @@ export const verifyJwtClaim = async (req: Request, res: Response, next: any) => 
       cleanCookie(res, 'Authentication failed. Please login.');
     }
   } else {
-    cleanCookie(res, 'No auth token provided. Please login.');
+    new JsonResponse(403).unauthorized(res, 'No auth token provided. Please login.');
   }
 };
 
@@ -72,6 +68,7 @@ export const verifyUserPermission = async (req: Request, res: Response, next: an
 };
 
 export const verifyIdToken = async (token: string) => {
+  // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
   const ticket = await client.verifyIdToken({
     idToken: token,
     audience: process.env.GOOGLE_CLIENT_ID ?? '',

@@ -68,7 +68,11 @@ onMounted(() => {
     client_id: process.env.GOOGLE_CLIENT_ID ?? '',
     callback: handleCredentialResponse,
   });
-  google.accounts.id.renderButton(document.getElementById('google-login-button'), { theme: 'outline', size: 'large' });
+  google.accounts.id.renderButton(document.getElementById('google-login-button'), {
+    theme: 'outline',
+    size: 'large',
+    width: '240',
+  });
 });
 
 const q = useQuasar();
