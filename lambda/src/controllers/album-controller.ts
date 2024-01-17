@@ -14,7 +14,7 @@ const userService = new UserService();
 export default class AlbumController extends BaseController {
   findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     try {
-      const token = get(req, 'cookies.__session', '');
+      const token = get(req, 'cookies.jwt', '');
       let userPermission = null;
       if (token) {
         const payload = await verifyIdToken(token);
