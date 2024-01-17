@@ -12,25 +12,22 @@ import { BaseController } from './base-controller';
 const userService = new UserService();
 
 export default class AuthController extends BaseController {
-  // Get user info from firebase token
+  // Get user info from token
   findOne: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     try {
-      const token = get(req, 'cookies.__session', null);
+      const token = get(req, 'cookies.jwt', null);
       if (!token) {
         return this.ok(res, 'No auth token provided');
       } else {
         const payload = await verifyIdToken(token);
         const uid = payload?.sub ?? '';
         const email = payload?.email ?? '';
-        const exp = payload?.exp ?? 0;
-        if (exp <= Date.now() / 1000) {
-          return cleanCookie(res, 'Auth token expired');
-        } else {
-          const userPermission = await userService.findOne({ uid, email });
-          return this.ok<UserPermission>(res, 'ok', userPermission);
-        }
+
+        const userPermission = await userService.findOne({ uid, email });
+        return this.ok<UserPermission>(res, 'ok', userPermission);
       }
     } catch (error) {
+      console.log(error);
       return cleanCookie(res, 'User is not logged-in');
     }
   });
@@ -62,7 +59,7 @@ export default class AuthController extends BaseController {
 
   logout: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     try {
-      res.clearCookie('__session');
+      res.clearCookie('jwt');
       (req as RequestWithUser).user = null;
       return this.ok(res);
     } catch (err) {
