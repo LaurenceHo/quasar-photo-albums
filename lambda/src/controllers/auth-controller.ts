@@ -23,7 +23,7 @@ export default class AuthController extends BaseController {
         return this.ok(res, 'ok');
       } else {
         let decodedPayload: any = null;
-        jwt.verify(token, process.env.JWT_SECRECT as string, (err: any, payload: any) => {
+        jwt.verify(token, process.env.JWT_SECRET as string, (err: any, payload: any) => {
           if (err) {
             res.clearCookie('jwt');
           }
@@ -53,7 +53,7 @@ export default class AuthController extends BaseController {
 
         if (userPermission) {
           // Sign JWT token
-          const token = jwt.sign(userPermission, process.env.JWT_SECRECT as string, { expiresIn: '7d' });
+          const token = jwt.sign(userPermission, process.env.JWT_SECRET as string, { expiresIn: '7d' });
           // Set token as cookies
           await setCookies(res, token);
           return this.ok<UserPermission>(res, 'ok', userPermission);

@@ -26,6 +26,7 @@ functions:
       PHOTO_ALBUMS_TABLE_NAME: ${param:PHOTO_ALBUMS_TABLE_NAME}
       PHOTO_ALBUM_TAGS_TABLE_NAME: ${param:PHOTO_ALBUM_TAGS_TABLE_NAME}
       PHOTO_USER_PERMISSION_TABLE_NAME: ${param:PHOTO_USER_PERMISSION_TABLE_NAME}
+      JWT_SECRET: ${param:JWT_SECRET}
 package:
   patterns:
     - '!.env.example'

@@ -15,7 +15,7 @@ export default class AlbumController extends BaseController {
       let isAdmin = false;
       const token = get(req, 'cookies.jwt', null);
       if (token) {
-        jwt.verify(token, process.env.JWT_SECRECT as string, (err: any, payload: any) => {
+        jwt.verify(token, process.env.JWT_SECRET as string, (err: any, payload: any) => {
           if (err) {
             res.clearCookie('jwt');
           }

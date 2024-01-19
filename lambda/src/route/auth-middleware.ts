@@ -36,7 +36,7 @@ export const verifyJwtClaim = async (req: Request, res: Response, next: any) => 
   const token = get(req, 'cookies.jwt', null);
   if (token) {
     try {
-      jwt.verify(token, process.env.JWT_SECRECT as string, async (err: any, payload: any) => {
+      jwt.verify(token, process.env.JWT_SECRET as string, async (err: any, payload: any) => {
         if (err) {
           cleanCookie(res, 'Authentication failed. Please login.');
         }
