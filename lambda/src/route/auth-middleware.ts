@@ -1,13 +1,9 @@
 import { Request, Response } from 'express';
 import { CookieOptions } from 'express-serve-static-core';
-import { OAuth2Client } from 'google-auth-library';
+import jwt from 'jsonwebtoken';
 import get from 'lodash/get';
 import { RequestWithUser } from '../models';
-import UserService from '../services/user-service';
 import JsonResponse from '../utils/json-response';
-
-const userService = new UserService();
-const client = new OAuth2Client();
 
 export const setCookies = async (res: Response, token: any) => {
   const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days
@@ -40,17 +36,14 @@ export const verifyJwtClaim = async (req: Request, res: Response, next: any) => 
   const token = get(req, 'cookies.jwt', null);
   if (token) {
     try {
-      const payload = await verifyIdToken(token);
-      const uid = payload?.sub ?? '';
-      const email = payload?.email ?? '';
+      jwt.verify(token, process.env.JWT_SECRECT as string, async (err: any, payload: any) => {
+        if (err) {
+          cleanCookie(res, 'Authentication failed. Please login.');
+        }
 
-      const user = await userService.findOne({ uid, email });
-      if (user) {
-        (req as RequestWithUser).user = user;
-      } else {
-        cleanCookie(res, 'Authentication failed. Please login.');
-      }
-      next();
+        (req as RequestWithUser).user = payload;
+        next();
+      });
     } catch (error) {
       cleanCookie(res, 'Authentication failed. Please login.');
     }
@@ -65,13 +58,4 @@ export const verifyUserPermission = async (req: Request, res: Response, next: an
   } else {
     new JsonResponse(403).unauthorized(res, 'Unauthorized action');
   }
-};
-
-export const verifyIdToken = async (token: string) => {
-  // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
-  const ticket = await client.verifyIdToken({
-    idToken: token,
-    audience: process.env.GOOGLE_CLIENT_ID ?? '',
-  });
-  return ticket.getPayload();
 };
