@@ -24,6 +24,7 @@
     "express": "^4.17.3",
     "google-auth-library": "^9.4.2",
     "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "multer": "^1.4.5-lts.1",
     "serverless-http": "^3.2.0"
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.129",
     "@types/cookie-parser": "^1.4.3",
+    "@types/jsonwebtoken": "^9.0.5",
     "@types/multer": "^1.4.11",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",

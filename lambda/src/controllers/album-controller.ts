@@ -1,33 +1,27 @@
 import { Request, RequestHandler, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import get from 'lodash/get';
 import { Album, RequestWithUser } from '../models';
-import { verifyIdToken } from '../route/auth-middleware';
 import AlbumService from '../services/album-service';
-import UserService from '../services/user-service';
 import { asyncHandler } from '../utils/async-handler';
 import { BaseController } from './base-controller';
 import { emptyS3Folder, updatePhotoAlbum, uploadObject } from './helpers';
 
 const albumService = new AlbumService();
-const userService = new UserService();
 
 export default class AlbumController extends BaseController {
   findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     try {
-      const token = get(req, 'cookies.jwt', '');
-      let userPermission = null;
+      let isAdmin = false;
+      const token = get(req, 'cookies.jwt', null);
       if (token) {
-        const payload = await verifyIdToken(token);
-        const uid = payload?.sub ?? '';
-        const email = payload?.email ?? '';
-        try {
-          userPermission = await userService.findOne({ uid, email });
-        } catch (e) {
-          console.error('##### Failed to find user permission:', e);
-        }
+        jwt.verify(token, process.env.JWT_SECRET as string, (err: any, payload: any) => {
+          if (err) {
+            res.clearCookie('jwt');
+          }
+          isAdmin = get(payload, 'role') === 'admin';
+        });
       }
-
-      const isAdmin = get(userPermission, 'role') === 'admin';
 
       let params = {
         TableName: albumService.tableName,

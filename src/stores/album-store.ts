@@ -77,6 +77,11 @@ export const albumStore = defineStore('albums', {
   },
   actions: {
     async getAllAlbumInformation() {
+      // Check user permission
+      const store = userStore();
+      await store.checkUserPermission();
+      const isAdminUser = store.isAdminUser;
+
       if (this.allAlbumList.length === 0 || this.albumTags.length === 0) {
         const tempAlbumsString = LocalStorage.getItem('ALL_ALBUMS');
         const tempAlbumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
@@ -101,11 +106,6 @@ export const albumStore = defineStore('albums', {
           // Set updated time in local storage
           LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
         }
-
-        // Check user permission
-        const store = userStore();
-        await store.checkUserPermission();
-        const isAdminUser = store.isAdminUser;
 
         // Get albums from local storage again
         const albumsString: string = LocalStorage.getItem('ALL_ALBUMS') || '';
