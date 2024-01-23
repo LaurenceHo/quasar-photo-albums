@@ -19,7 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
 
@@ -42,7 +41,7 @@ jobs:
           IMAGEKIT_CDN_URL=https://demo-quasar-photo-albums.s3.amazonaws.com
           MAPBOX_API_KEY=$MAPBOX_API_KEY
           AWS_API_GATEWAY_URL=https://qg9ajep8e0.execute-api.us-east-1.amazonaws.com/dev/api
-          GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+          GOOGLE_CLIENT_ID=DEMO_GOOGLE_CLIENT_ID
           EOF
 
       - name: Test and build
