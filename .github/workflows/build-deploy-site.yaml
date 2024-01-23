@@ -58,6 +58,8 @@ jobs:
         with:
           folder: dist/spa
           bucket: ${{ secrets.AWS_S3_BUCKET_FOR_GITHUB_DEPLOY }}
+          dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          invalidation: /
           bucket-region: us-east-1
           no-cache: true
           delete-removed: true
