@@ -22,7 +22,6 @@
           </ul>
         <li><a href="#integrate-with-imagekit">Integrate with ImageKit</a></li>
         <li><a href="#mapbox-api-key">Mapbox API key</a></li>
-        <li><a href="#deploy-to-firebase-hosting">Deploy to Firebase hosting</a></li>
         <li><a href="#aws-lambda-function">AWS Lambda Function</a></li>
       </ul>
     </li>
@@ -33,32 +32,31 @@
 </details>
 
 ## About The Project
-This is a fullstack photo album web app using Vue3, Quasar, Google Firebase hosting and AWS (including API Gateway, Lambda
-function, S3 and dynamoDB). You can use this web app to display your photos in S3 bucket and manage your photos. This app
+This is a fullstack photo album web app using Vue3, Quasar and AWS (including API Gateway, Lambda
+function, S3, CloudFront and dynamoDB). You can use this web app to display your photos in S3 bucket and manage your photos. This app
 is supposed to be used by a small group of people (e.g. family members) so it doesn't have any user management feature.
 
 [![Quasar][quasar]][quasar-url][![Vue][Vue.js]][Vue-url][![TypeScript][typescript]][type-url][![Vite][vite]][vite-url][![AWS][aws]][aws-url]
 
 ### Architecture
-![Architecture](doc-images/GCP-AWS-Architecture.webp)
+![Architecture](doc-images/AWS-Architecture.webp)
 
 ## Getting started
 ### Prerequisites
 
 You will need the follows:
-1. Google Firebase hosting
-2. Google Place API key
-3. Google OAuth 2.0 Client ID (For admin permission)
-4. AWS user with appropriate permission
-5. AWS S3 bucket
-6. AWS DynamoDB table
-7. AWS Lambda Function with API Gateway
-8. ImageKit account
-9. Mapbox API key
+1. Google Place API key (For admin manage albums)
+2. Google OAuth 2.0 Client ID (For admin access)
+3. AWS user and role with appropriate permission
+4. AWS S3 bucket (For SPA website hosting and storing photos)
+5. AWS DynamoDB table (For managing album information)
+6. AWS Lambda Function with API Gateway
+7. AWS CloudFront (It's not necessary)
+8. ImageKit account (It's not necessary)
+9. Mapbox API key (For displaying map)
 
 ### Create S3 bucket
-Before you start, you need create an AWS S3 bucket. Once you create it, replace this property `STATIC_FILES_URL` with
-your real information in`.env.example` and modify file name to `.env`.
+Before you start, you need create a AWS S3 bucket. This bucket will be for your SPA website hosting, and storing your photos. Once you create them, replace this property `STATIC_FILES_URL` with the bucket URL you created in`.env.example` and modify file name to `.env`.
 The file structure in the S3 bucket should be like this:
 ```
 my-photo-S3-bucket/
@@ -70,8 +68,10 @@ my-photo-S3-bucket/
       +- photo-b-2.jpg
 ```
 
+You will also need to replace `ALBUM_URL` and `AWS_S3_BUCKET_NAME` in`.env.example` in [./lambda](./lambda) folder with the bucket you created. 
+
 #### S3 bucket policy
-You usually want to make your S3 albums public so that your friends can see it. To achieve this, you need to add `getObject`
+You usually want to make your S3 bucket public so that your friends can see your photos and website. To achieve this, you need to add `getObject`
 in the bucket policy (under `Permissions` tab):
 ```json
 {
@@ -111,7 +111,7 @@ For example:
 ```
 
 ### Integrate with ImageKit
-In order to reduce the traffic with S3 buckets (to save money!), this project integrate with ImageKit CDN. ImageKit.io
+In order to reduce the traffic with S3 bucket (to save money!), this project integrate with ImageKit CDN. ImageKit.io
 is a cloud-based image CDN with real-time image optimization and transformation features that help you deliver perfectly
 optimized images across all devices[2]. You can follow this [documentation](https://imagekit.io/blog/image-optimization-resize-aws-s3-imagekit/)
 to create an account in the ImageKit. You will have 20GB bandwidth per month as a free user. Once you have your own ImageKit
@@ -143,14 +143,6 @@ with your Google account and see the admin page as below:
 ![web-capture3](doc-images/Web_capture_3.jpeg)
 ![web-capture4](doc-images/Web_capture_4.jpeg)
 
-### Deploy to Firebase hosting
-This web app uses Google Firebase for web hosting so Google will do all SSL configuration and CDN (for now).
-* Visit `https://console.firebase.google.com` to create a new project
-* Check [here](https://firebase.google.com/docs/hosting) for further detail about how to deploy your app to Firebase
-* You can run this command to deploy your project locally: `npm run firebase-deploy`
-* Place your Google Firebase information in the `.env` too (`GOOGLE_FIREBASE_API_KEY`, `GOOGLE_FIREBASE_AUTH_DOMAIN`,
-`GOOGLE_FIREBASE_PROJECT_ID`, `GOOGLE_FIREBASE_APP_ID`)
-
 ### AWS Lambda Function
 This project uses AWS Lambda Function to handle all APIs (as BFF, backend for frontend) and authentication process
 once it's deployed to AWS. Please check further information in the `lambda` folder. [here](lambda/README.md)
@@ -175,6 +167,12 @@ $ npm run serve
 $ npm run lint
 ```
 
+### Run unit tests
+```bash
+$ npm run test
+```
+
+
 ### Build the app for production
 ```bash
 $ quasar build
@@ -182,11 +180,6 @@ $ quasar build
 or
 ```bash
 $ npm run build
-```
-
-### Deploy Quasar web app to Google Firebase Hosting
-```bash
-$ npm run firebase:deploy
 ```
 
 ### Customize the Quasar configuration
