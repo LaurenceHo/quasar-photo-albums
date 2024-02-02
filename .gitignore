@@ -16,6 +16,4 @@ node_modules
 *.njsproj
 *.sln
 
-.env.demo
 .env
-.firebase/*

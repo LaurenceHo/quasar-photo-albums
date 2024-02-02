@@ -1,5 +1,5 @@
-org: bluegray
-app: quasar-photo-albums
+org: bluegray # Remove this line if you are not using the Serverless Dashboard
+app: quasar-photo-albums # Remove this line if you are not using the Serverless Dashboard
 service: quasar-photo-album-lambda
 provider:
   name: aws
@@ -27,11 +27,3 @@ functions:
       PHOTO_ALBUM_TAGS_TABLE_NAME: ${param:PHOTO_ALBUM_TAGS_TABLE_NAME}
       PHOTO_USER_PERMISSION_TABLE_NAME: ${param:PHOTO_USER_PERMISSION_TABLE_NAME}
       JWT_SECRET: ${param:JWT_SECRET}
-package:
-  patterns:
-    - '!.env.example'
-    - '!.eslintrc.js'
-    - '!.gitignore'
-    - '!package-lock.json'
-    - '!tsconfig.json'
-    - '!tsconfig.dev.json'
