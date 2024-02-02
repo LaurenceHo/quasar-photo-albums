@@ -93,7 +93,7 @@ module.exports = configure(function (/* ctx */) {
         },
       },
 
-      iconSet: 'mdi-v6', // Quasar icon set
+      iconSet: 'mdi-v7', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
 
       // For special cases outside of where the auto-import strategy can have an impact

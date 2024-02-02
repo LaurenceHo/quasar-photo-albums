@@ -36,6 +36,8 @@ This is a fullstack photo album web app using Vue3, Quasar and AWS (including AP
 function, S3, CloudFront and dynamoDB). You can use this web app to display your photos in S3 bucket and manage your photos. This app
 is supposed to be used by a small group of people (e.g. family members) so it doesn't have any user management feature.
 
+For the detailed tutorial, you can check [here](https://dev.to/laurenceho/a-fullstack-vuejs-photo-album-app-part-1-2bgd).
+
 [![Quasar][quasar]][quasar-url][![Vue][Vue.js]][Vue-url][![TypeScript][typescript]][type-url][![Vite][vite]][vite-url][![AWS][aws]][aws-url]
 
 ### Architecture
@@ -56,23 +58,17 @@ You will need the follows:
 9. Mapbox API key (For displaying map)
 
 ### Create S3 bucket
-Before you start, you need create a AWS S3 bucket. This bucket will be for your SPA website hosting, and storing your photos. Once you create them, replace this property `STATIC_FILES_URL` with the bucket URL you created in`.env.example` and modify file name to `.env`.
-The file structure in the S3 bucket should be like this:
-```
-my-photo-S3-bucket/
- +- photo-album-a/     # Directory containing your photos
-      +- photo-a-1.jpg
-      +- photo-a-2.jpg
- +- photo-album-b/     # Directory containing your photos
-      +- photo-b-1.jpg
-      +- photo-b-2.jpg
-```
+Before you start, you need create a AWS S3 bucket. This bucket will be for your SPA website hosting, and storing your photos.
+Once you create them, replace properties `STATIC_FILES_URL` and `IMAGEKIT_URL` with the bucket URL you created in`.env.example`
+and modify file name to `.env`. (the URL is like https://{YOUR_BUCKET_NAME}.s3.amazonaws.com)
 
-You will also need to replace `ALBUM_URL` and `AWS_S3_BUCKET_NAME` in`.env.example` in [./lambda](./lambda) folder with the bucket you created. 
+You will also need to replace `IMAGEKIT_CDN_URL` and `AWS_S3_BUCKET_NAME` in`.env.example` in [./lambda](./lambda) folder
+with the bucket you created.
 
 #### S3 bucket policy
-You usually want to make your S3 bucket public so that your friends can see your photos and website. To achieve this, you need to add `getObject`
-in the bucket policy (under `Permissions` tab):
+You usually want to make your S3 bucket public so that your friends can see your photos and website. To achieve this,
+you need to add `getObject` in the bucket policy (under `Permissions` tab):
+
 ```json
 {
   "Version": "2012-10-17",
@@ -122,7 +118,7 @@ use the same URL in the `lambda` folder.
 If you change S3 bucket name, don't forget to update the configuration in ImageKit, and AWS IAM permission for Imagekit.
 
 ### Mapbox API key
-This project uses Mapbox to display the [map](https://quasar-photo-albums-demo.web.app/map). You can get your own Mapbox API key [here](https://account.mapbox.com/auth/signup/).
+This project uses Mapbox to display the [map](http://demo-quasar-photo-albums.s3-website-us-east-1.amazonaws.com/map). You can get your own Mapbox API key [here](https://account.mapbox.com/auth/signup/).
 Once you have your own Mapbox API key, replace this property `MAPBOX_API_KEY` with your real information in`.env.example`
 and modify file name to `.env`.
 
