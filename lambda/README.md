@@ -2,6 +2,8 @@
 
 ## Prerequisites
 
+For the detailed tutorial, you can also check [here](https://dev.to/laurenceho/deploy-app-to-aws-by-using-serverless-framework-2gen).
+
 ### Create AWS user in IAM
 
 Before doing local development, you will need to create an AWS user in IAM with appropriate permission.
@@ -177,7 +179,6 @@ $ npm install
 ### Run ExpressJS locally
 
 ```bash
-$ cd lambda
 $ npm run start:server
 ```
 
@@ -328,7 +329,7 @@ You can check your AWS Lambda function in AWS console. You should see a new Lamb
 
 ### AWS Permissions
 
-Make sure your Lambda functions have the following permissions:
+Because your Lambda function will access S3 bucket and DynamoDB, make sure your Lambda functions have the following permissions:
 
 ```json
 {
@@ -344,7 +345,7 @@ Make sure your Lambda functions have the following permissions:
         "dynamodb:Scan",
         "dynamodb:Query"
       ],
-      "Resource": "YOU_AWS_DYNAMODB_TABLE_ARN"
+      "Resource": ["YOU_AWS_DYNAMODB_TABLE_ARN"] // There should be 3 tables you created before
     },
     {
       "Effect": "Allow",
@@ -362,7 +363,9 @@ Make sure your Lambda functions have the following permissions:
 
 ### Enabling binary support using the API Gateway console
 
-Make sure you enable binary support for your API Gateway. Otherwise, the uploaded photos will be corrupted.
+Next, you need to enable binary support using the API gateway console. Otherwise, the uploaded photos will be corrupted.
+I dug around in Serverless Framework doc, and I couldn't find a way to configure serverless.yml to enable binary support.
+It means we have to enable it using AWS admin console.
 
 1. Go to API Gateway console -> Select your API -> API Settings -> Binary Media Types -> Click "Manage media types"
 2. Add `image/*` and `multipart/form-data` to the list of binary media types
@@ -455,15 +458,3 @@ And set up [parameters](https://www.serverless.com/framework/docs/guides/paramet
 ### Location
 
 - /api/location/search - GET: Search location by keyword
-
-## How to run locally
-
-### Deploy to AWS Lambda Function
-
-```bash
-$ cd lambda
-$ npm run deploy:lambda
-```
-
-Reference:
-https://www.serverless.com/framework/docs

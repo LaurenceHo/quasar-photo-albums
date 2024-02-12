@@ -27,12 +27,12 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 20
 
       - name: Install dependencies
         run: npm install
@@ -53,13 +53,22 @@ jobs:
           npm run test
           npm run build
 
+      - name: Clean up old files
+        uses: keithweaver/aws-s3-github-action@v1.0.0
+        with:
+          command: rm
+          source: s3://${{ secrets.AWS_S3_BUCKET_FOR_GITHUB_DEPLOY }}/assets/
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
+          aws_region: us-east-1
+          flags: --recursive
+
       - name: Upload to S3
         uses: reggionick/s3-deploy@v4
         with:
           folder: dist/spa
           bucket: ${{ secrets.AWS_S3_BUCKET_FOR_GITHUB_DEPLOY }}
-          dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
-          invalidation: /
           bucket-region: us-east-1
           no-cache: true
-          delete-removed: true
+          dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          invalidation: /

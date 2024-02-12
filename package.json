@@ -64,9 +64,9 @@
     "last 5 Opera versions"
   ],
   "engines": {
-    "node": "^18",
-    "npm": ">= 8",
-    "yarn": ">= 1.21.1"
+    "node": "^20",
+    "npm": ">= 10",
+    "yarn": ">= 4"
   },
   "prettier": {
     "semi": true,
