@@ -63,12 +63,21 @@ jobs:
           aws_region: us-east-1
           flags: --recursive
 
-      - name: Upload to S3
-        uses: reggionick/s3-deploy@v4
+      - name: Upload assets to S3
+        uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
-          folder: dist/spa/assets
-          bucket: ${{ secrets.AWS_S3_BUCKET_FOR_GITHUB_DEPLOY }}
-          bucket-region: us-east-1
-          no-cache: true
-          dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
-          invalidation: /
+          source: dist/spa/assets
+          destination: s3://${{ secrets.AWS_S3_BUCKET_FOR_GITHUB_DEPLOY }}/assets
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
+          aws_region: us-east-1
+          flags: --recursive
+
+      - name: Upload index to S3
+        uses: keithweaver/aws-s3-github-action@v1.0.0
+        with:
+          source: dist/spa/index.html
+          destination: s3://${{ secrets.AWS_S3_BUCKET_FOR_GITHUB_DEPLOY }}/index.html
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
+          aws_region: us-east-1
