@@ -1,6 +1,7 @@
 ﻿import { Album } from 'src/components/models';
 import { computed, ref } from 'vue';
 
+const renamePhotoDialogState = ref(false);
 const movePhotoDialogState = ref(false);
 const deletePhotoDialogState = ref(false);
 const uploadPhotoDialogState = ref(false);
@@ -17,8 +18,17 @@ const albumToBeUpdate = ref({
   place: null,
 } as Album);
 const selectedPhotosList = ref([] as string[]);
+const currentPhotoToBeRenamed = ref('');
 
 export default function DialogStateComposable() {
+  const setCurrentPhotoToBeRenamed = (photoKey: string) => {
+    currentPhotoToBeRenamed.value = photoKey;
+  };
+
+  const setRenamePhotoDialogState = (state: boolean) => {
+    renamePhotoDialogState.value = state;
+  };
+
   const setMovePhotoDialogState = (state: boolean) => {
     movePhotoDialogState.value = state;
   };
@@ -48,6 +58,14 @@ export default function DialogStateComposable() {
   };
 
   return {
+    getCurrentPhotoToBeRenamed: computed(() => currentPhotoToBeRenamed.value),
+    setCurrentPhotoToBeRenamed,
+    currentPhotoToBeRenamed,
+
+    getRenamePhotoDialogState: computed(() => renamePhotoDialogState.value),
+    setRenamePhotoDialogState,
+    renamePhotoDialogState,
+
     getMovePhotoDialogState: computed(() => movePhotoDialogState.value),
     setMovePhotoDialogState,
     movePhotoDialogState,

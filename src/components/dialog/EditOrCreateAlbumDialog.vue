@@ -14,12 +14,13 @@
           outlined
           stack-label
           counter
-          maxlength="50"
+          maxlength="30"
           :hint="getAlbumToBeUpdate.id ? '' : 'Once album is created, album id cannot be changed.'"
           :disable="getAlbumToBeUpdate.id !== ''"
           :rules="[
             (val: string) => !!val || 'Album id is required',
-            (val: string) => /^[A-Za-z0-9\s-]*$/.test(val) || 'Only alphanumeric, space and dash are allowed',
+            (val: string) =>
+              /^[A-Za-z0-9\s-_]*$/.test(val) || 'Only alphanumeric, space, underscore and dash are allowed',
           ]"
         />
         <q-input
@@ -31,7 +32,7 @@
           stack-label
           counter
           maxlength="50"
-          :rules="[(val) => !!val || 'Album name is required']"
+          :rules="[(val: string) => !!val || 'Album name is required']"
         />
         <q-input
           v-model="albumDesc"
@@ -124,6 +125,7 @@
 <script lang="ts" setup>
 import { Album, Place } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
+import { isEmpty } from 'lodash';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
@@ -165,6 +167,15 @@ const searchPlace = async (searchText: string) => {
 };
 
 const confirmUpdateAlbum = async () => {
+  albumId.value = albumId.value.trim();
+  albumName.value = albumName.value.trim();
+
+  if (isEmpty(albumId.value) || isEmpty(albumName.value)) {
+    return;
+  }
+
+  albumDesc.value = albumDesc.value.trim();
+
   isProcessing.value = true;
 
   const albumToBeSubmitted: Album = {
