@@ -5,47 +5,52 @@
         <div class="text-h6">Rename Photo</div>
       </q-card-section>
 
-      <q-card-section class="q-pt-none">
-        <q-input
-          v-model="newPhotoNameWithoutExtension"
-          autofocus
-          label="Photo name"
-          outlined
-          stack-label
-          counter
-          maxlength="30"
-          :error="isExistedPhotoKey"
-          :error-message="isExistedPhotoKey ? 'Photo name already exists' : ''"
-          :suffix="`.${fileType}`"
-          :rules="[
-            (val: string) => !!val || 'Photo name is required',
-            (val: string) =>
-              /^[A-Za-z0-9\s-_]*$/.test(val) || 'Only alphanumeric, space, underscore and dash are allowed',
-          ]"
-        />
-      </q-card-section>
+      <q-form @submit.prevent.stop="confirmRenamePhoto">
+        <q-card-section class="q-pt-none">
+          <q-input
+            v-model="newPhotoNameWithoutExtension"
+            autofocus
+            label="Photo name"
+            outlined
+            stack-label
+            counter
+            maxlength="30"
+            :error="isExistedPhotoKey"
+            :error-message="isExistedPhotoKey ? 'Photo name already exists' : ''"
+            :suffix="fileType"
+            :rules="[
+              (val: string) => !!val || 'Photo name is required',
+              (val: string) =>
+                /^[A-Za-z0-9\s.\-_]*$/.test(val) ||
+                'Only alphanumeric, space, full stop, underscore and dash are allowed',
+            ]"
+          />
+        </q-card-section>
 
-      <q-card-actions align="right">
-        <q-btn v-close-popup :disable="isProcessing" color="primary" flat label="Cancel" no-caps />
-        <q-btn
-          :loading="isProcessing"
-          color="primary"
-          unelevated
-          label="Save"
-          no-caps
-          :disable="
-            !newPhotoName || isExistedPhotoKey || newPhotoNameWithoutExtension === currentFileNameWithoutExtension
-          "
-          @click="confirmRenamePhoto"
-        />
-      </q-card-actions>
+        <q-card-actions align="right">
+          <q-btn v-close-popup :disable="isProcessing" color="primary" flat label="Cancel" no-caps />
+          <q-btn
+            type="submit"
+            :loading="isProcessing"
+            color="primary"
+            unelevated
+            label="Save"
+            no-caps
+            :disable="
+              !newPhotoId || isExistedPhotoKey || newPhotoNameWithoutExtension === currentFileNameWithoutExtension
+            "
+          />
+        </q-card-actions>
+      </q-form>
     </q-card>
   </q-dialog>
 </template>
 <script setup lang="ts">
 import { isEmpty } from 'lodash';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
+import AlbumService from 'src/services/album-service';
 import PhotoService from 'src/services/photo-service';
+import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';
 import { computed, ref, toRefs, watch } from 'vue';
 
@@ -58,14 +63,20 @@ const props = defineProps({
 });
 const { albumId } = toRefs(props);
 const { setRenamePhotoDialogState, renamePhotoDialogState, getCurrentPhotoToBeRenamed } = DialogStateComposable();
+const albumService = new AlbumService();
 const photoService = new PhotoService();
-const store = photoStore();
 
-const fileType = computed(() => getCurrentPhotoToBeRenamed.value.split('.')[1]);
-const currentFileNameWithoutExtension = computed(() => getCurrentPhotoToBeRenamed.value.split('.')[0].split('/')[1]);
+const useAlbumStore = albumStore();
+const usePhotoStore = photoStore();
 
-const newPhotoNameWithoutExtension = ref(currentFileNameWithoutExtension.value || '');
-const newPhotoName = computed(() => `${newPhotoNameWithoutExtension.value || ''}.${fileType.value}`);
+const findFileTypeIndex = getCurrentPhotoToBeRenamed.value.lastIndexOf('.');
+const fileType = getCurrentPhotoToBeRenamed.value.slice(findFileTypeIndex);
+const currentFileNameWithoutExtension = getCurrentPhotoToBeRenamed.value.slice(0, findFileTypeIndex).split('/')[1];
+
+const newPhotoNameWithoutExtension = ref(currentFileNameWithoutExtension || '');
+const newPhotoId = computed(() => `${newPhotoNameWithoutExtension.value || ''}${fileType}`);
+const isAlbumCover = computed(() => usePhotoStore.isAlbumCover(getCurrentPhotoToBeRenamed.value));
+const selectedAlbum = computed(() => usePhotoStore.selectedAlbumItem);
 
 const isProcessing = ref(false);
 const isExistedPhotoKey = ref(false);
@@ -79,20 +90,30 @@ const confirmRenamePhoto = async () => {
   isProcessing.value = true;
   const result = await photoService.renamePhoto(
     albumId.value,
-    `${newPhotoNameWithoutExtension.value}.${fileType.value}`,
-    `${currentFileNameWithoutExtension.value}.${fileType.value}`
+    `${newPhotoNameWithoutExtension.value}${fileType}`,
+    `${currentFileNameWithoutExtension}${fileType}`
   );
-  isProcessing.value = false;
-  if (result.status === 'Success') {
+  if (result.code === 200) {
+    if (isAlbumCover.value) {
+      const albumToBeSubmitted = {
+        ...selectedAlbum.value,
+        albumCover: `${albumId.value}/${newPhotoNameWithoutExtension.value}${fileType}`,
+      };
+      const response = await albumService.updateAlbum(albumToBeSubmitted);
+      if (response.code === 200) {
+        useAlbumStore.updateAlbumCover(albumToBeSubmitted);
+      }
+    }
     emits('closePhotoDetailDialog');
     emits('refreshPhotoList');
+    setRenamePhotoDialogState(false);
   }
-  setRenamePhotoDialogState(false);
+  isProcessing.value = false;
 };
 
 watch(newPhotoNameWithoutExtension, (value) => {
   if (value) {
-    const photoIndex = store.findPhotoIndex(newPhotoName.value);
+    const photoIndex = usePhotoStore.findPhotoIndex(newPhotoId.value);
     // Should not allow duplicate photo name
     isExistedPhotoKey.value = photoIndex !== -1;
   }

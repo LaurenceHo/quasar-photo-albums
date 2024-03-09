@@ -44,34 +44,29 @@ import DialogStateComposable from 'src/composables/dialog-state-composable';
 import { getStaticFileUrl } from 'src/helper';
 import AlbumService from 'src/services/album-service';
 import { albumStore } from 'stores/album-store';
-import { toRefs } from 'vue';
+import { photoStore } from 'stores/photo-store';
+import { computed, toRefs } from 'vue';
 
 const props = defineProps({
   color: {
     type: String,
     default: () => 'black',
   },
-  albumItem: {
-    type: Object,
-    required: true,
-    default: () =>
-      ({ id: '', albumName: '', description: '', tags: [], isPrivate: false, albumCover: '', order: 0 }) as Album,
-  },
   photoKey: {
     type: String,
     required: true,
   },
-  isAlbumCover: {
-    type: Boolean,
-    default: false,
-  },
 });
 
-const { photoKey, albumItem } = toRefs(props);
-
 const albumService = new AlbumService();
-const store = albumStore();
+const useAlbumStore = albumStore();
+const usePhotoStore = photoStore();
 const q = useQuasar();
+
+const { photoKey } = toRefs(props);
+
+const albumItem = computed(() => usePhotoStore.selectedAlbumItem);
+const isAlbumCover = computed(() => usePhotoStore.isAlbumCover(photoKey.value));
 
 const {
   setSelectedPhotosList,
@@ -85,7 +80,7 @@ const makeCoverPhoto = async () => {
   const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photoKey.value as string };
   const response = await albumService.updateAlbum(albumToBeSubmitted);
   if (response.code === 200) {
-    store.updateAlbumCover(albumToBeSubmitted);
+    useAlbumStore.updateAlbumCover(albumToBeSubmitted);
   }
 };
 

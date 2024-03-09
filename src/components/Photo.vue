@@ -21,8 +21,6 @@
         </q-checkbox>
         <EditPhotoButton
           v-if="isAdminUser"
-          :album-item="albumItem"
-          :is-album-cover="photo.key === albumItem?.albumCover"
           :photo-key="photo.key"
           color="white"
           @refreshPhotoList="$emit('refreshPhotoList')"
@@ -34,7 +32,6 @@
 
 <script setup lang="ts">
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
-import { Album } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import { computed, onMounted, ref, toRefs } from 'vue';
 import { userStore } from 'stores/user-store';
@@ -45,11 +42,6 @@ const props = defineProps({
   index: {
     type: Number,
     required: true,
-  },
-  albumItem: {
-    type: Object,
-    required: true,
-    default: () => ({ id: '', albumName: '', desc: '', tags: [], isPrivate: false, order: 0, place: null }) as Album,
   },
   photo: {
     type: Object,
@@ -64,6 +56,7 @@ const usePhotoStore = photoStore();
 const userPermissionStore = userStore();
 const { selectedPhotosList } = DialogStateComposable();
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
+
 const imageWidth = ref(document.getElementById('photo-image')?.clientWidth ?? 0);
 const goToPhotoDetail = () => {
   usePhotoStore.$patch({ selectedImageIndex: index.value });

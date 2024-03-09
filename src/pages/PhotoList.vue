@@ -70,13 +70,7 @@
     </q-card>
     <div class="q-col-gutter-md row">
       <template v-if="photosInAlbum.length > 0">
-        <Photo
-          v-for="(photo, index) in photosInAlbum"
-          :key="photo.key"
-          :index="index"
-          :photo="photo"
-          :albumItem="albumItem"
-        />
+        <Photo v-for="(photo, index) in photosInAlbum" :key="photo.key" :index="index" :photo="photo" />
       </template>
     </div>
   </div>

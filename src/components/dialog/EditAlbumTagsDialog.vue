@@ -24,7 +24,7 @@
         <div class="text-h6">New tag</div>
       </q-card-section>
 
-      <q-form @submit="confirmCreateTag" @reset="onReset">
+      <q-form @submit.prevent.stop="confirmCreateTag" @reset.prevent.stop="onReset">
         <q-card-section class="q-pt-none">
           <q-input
             v-model="tagName"
@@ -33,7 +33,7 @@
             label="Tag"
             outlined
             stack-label
-            :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+            :rules="[(val: string) => (val && val.length > 0) || 'This field is required']"
           />
         </q-card-section>
 

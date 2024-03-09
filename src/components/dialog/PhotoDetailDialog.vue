@@ -59,7 +59,6 @@
                   v-if="isAdminUser"
                   :photo-key="selectedImage.key"
                   :album-item="albumItem"
-                  :is-album-cover="selectedImage.key === albumItem.albumCover"
                   @refreshPhotoList="$emit('refreshPhotoList')"
                 />
               </q-item>

@@ -32,6 +32,7 @@ export const photoStore = defineStore('photos', {
   getters: {
     findPhotoIndex: (state: PhotoStoreState) => (photoId: string) =>
       state.photoList.findIndex((photo) => photo.key === `${state.selectedAlbumItem.id}/${photoId}`),
+    isAlbumCover: (state: PhotoStoreState) => (photoKey: string) => state.selectedAlbumItem.albumCover === photoKey,
   },
 
   actions: {
