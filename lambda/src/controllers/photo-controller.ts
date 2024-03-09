@@ -92,25 +92,32 @@ export default class PhotoController extends BaseController {
       photoKeys.forEach((photoKey) => {
         const sourcePhotoKey = `${albumId}/${photoKey}`;
 
-        const promise = new Promise(async (resolve, reject) => {
-          try {
-            const result = await s3Service.copy({
-              Bucket: bucketName,
+        const promise = new Promise((resolve, reject) => {
+          s3Service
+            .copy({
+              Bucket: process.env.AWS_S3_BUCKET_NAME,
               CopySource: `/${bucketName}/${sourcePhotoKey}`,
               Key: `${destinationAlbumId}/${photoKey}`,
-            });
-            if (result) {
-              const result2 = await deleteObjects([sourcePhotoKey]);
-              if (result2) {
-                console.log('##### Photo moved:', sourcePhotoKey);
-                resolve('Photo moved');
-              } else {
-                reject('Failed to delete photo');
+            })
+            .then((result) => {
+              if (result) {
+                deleteObjects([sourcePhotoKey])
+                  .then((result) => {
+                    if (result) {
+                      console.log('##### Photo moved:', sourcePhotoKey);
+                      resolve('Photo moved');
+                    } else {
+                      reject('Failed to delete photo');
+                    }
+                  })
+                  .catch((err: Error) => {
+                    reject(err);
+                  });
               }
-            }
-          } catch (error) {
-            reject(error);
-          }
+            })
+            .catch((err: Error) => {
+              reject(err);
+            });
         });
 
         promises.push(promise);
