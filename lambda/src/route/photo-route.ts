@@ -18,4 +18,6 @@ router.delete('', verifyJwtClaim, verifyUserPermission, controller.delete);
 
 router.put('', verifyJwtClaim, verifyUserPermission, controller.update);
 
+router.put('/rename', verifyJwtClaim, verifyUserPermission, controller.rename);
+
 router.post('/upload/:albumId', verifyJwtClaim, verifyUserPermission, upload.single('file'), controller.create);

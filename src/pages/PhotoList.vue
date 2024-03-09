@@ -4,7 +4,7 @@
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" to="/" unelevated />
       <div class="text-h4 q-py-md q-pl-md-sm" data-test-id="album-name">
         <q-btn v-if="albumItem?.place" icon="mdi-map" round size="md" unelevated>
-          <q-tooltip class="bg-transparent" style="width: 300px" :offset="[0, 0]" max-width="300px">
+          <q-tooltip :offset="[0, 0]" class="bg-transparent" max-width="300px" style="width: 300px">
             <q-card>
               <q-card-section class="text-h6 text-grey-7">
                 {{ albumItem.place.displayName }}
@@ -27,23 +27,23 @@
         {{ tag }}
       </q-chip>
     </div>
-    <q-card v-if="isAdminUser" flat bordered class="admin-panel q-mb-md flex items-center justify-between">
+    <q-card v-if="isAdminUser" bordered class="admin-panel q-mb-md flex items-center justify-between" flat>
       <div class="text-h6 flex items-center">
-        <q-btn icon="mdi-image-plus" round @click="setUploadPhotoDialogState(true)" flat>
-          <q-tooltip> Upload photos </q-tooltip>
+        <q-btn flat icon="mdi-image-plus" round @click="setUploadPhotoDialogState(true)">
+          <q-tooltip> Upload photos</q-tooltip>
         </q-btn>
-        <q-separator vertical inset />
+        <q-separator inset vertical />
         <q-btn
           v-if="getSelectedPhotoList.length !== photoAmount"
+          flat
           icon="mdi-check-all"
           round
           @click="setSelectedPhotosList(photoKeysList)"
-          flat
         >
-          <q-tooltip> Select all photos </q-tooltip>
+          <q-tooltip> Select all photos</q-tooltip>
         </q-btn>
         <q-btn v-if="getSelectedPhotoList.length > 0" flat icon="mdi-close" round @click="setSelectedPhotosList([])">
-          <q-tooltip> Unselect all photos </q-tooltip>
+          <q-tooltip> Unselect all photos</q-tooltip>
         </q-btn>
         <div v-if="getSelectedPhotoList.length > 0">{{ getSelectedPhotoList.length }} selected</div>
       </div>
@@ -55,7 +55,7 @@
           round
           @click="setDeletePhotoDialogState(true)"
         >
-          <q-tooltip> Delete selected photos </q-tooltip>
+          <q-tooltip> Delete selected photos</q-tooltip>
         </q-btn>
         <q-btn
           v-if="getSelectedPhotoList.length > 0"
@@ -64,42 +64,43 @@
           round
           @click="setMovePhotoDialogState(true)"
         >
-          <q-tooltip> Move selected photos to another album </q-tooltip>
+          <q-tooltip> Move selected photos to another album</q-tooltip>
         </q-btn>
       </div>
     </q-card>
     <div class="q-col-gutter-md row">
       <template v-if="photosInAlbum.length > 0">
-        <Photo
-          v-for="(photo, index) in photosInAlbum"
-          :key="photo.key"
-          :index="index"
-          :photo="photo"
-          :albumItem="albumItem"
-        />
+        <Photo v-for="(photo, index) in photosInAlbum" :key="photo.key" :index="index" :photo="photo" />
       </template>
     </div>
   </div>
   <MovePhotoDialog
     v-if="getMovePhotoDialogState"
     :album-id="albumItem?.id"
-    @refreshPhotoList="refreshPhotoList"
     @closePhotoDetailDialog="closePhotoDetailDialog"
+    @refreshPhotoList="refreshPhotoList"
   />
   <ConfirmDeletePhotosDialog
     v-if="getDeletePhotoDialogState"
     :album-id="albumItem?.id"
-    @refreshPhotoList="refreshPhotoList"
     @closePhotoDetailDialog="closePhotoDetailDialog"
+    @refreshPhotoList="refreshPhotoList"
   />
   <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem?.id" @refreshPhotoList="refreshPhotoList" />
   <PhotoDetailDialog v-if="photoId" @refreshPhotoList="refreshPhotoList" />
+  <RenamePhotoDialog
+    v-if="getRenamePhotoDialogState"
+    :album-id="albumItem?.id"
+    @closePhotoDetailDialog="closePhotoDetailDialog"
+    @refreshPhotoList="refreshPhotoList"
+  />
 </template>
 
 <script lang="ts" setup>
 import ConfirmDeletePhotosDialog from 'components/dialog/ConfirmDeletePhotosDialog.vue';
 import MovePhotoDialog from 'components/dialog/MovePhotosDialog.vue';
 import PhotoDetailDialog from 'components/dialog/PhotoDetailDialog.vue';
+import RenamePhotoDialog from 'components/dialog/RenamePhotoDialog.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
 import { Album, Photo as IPhoto } from 'components/models';
 import Photo from 'components/Photo.vue';
@@ -126,6 +127,7 @@ const {
   setDeletePhotoDialogState,
   getMovePhotoDialogState,
   setMovePhotoDialogState,
+  getRenamePhotoDialogState,
 } = DialogStateComposable();
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
@@ -178,6 +180,7 @@ watch(albumId, (newValue) => {
       border-radius: 8px 8px 0 0;
     }
   }
+
   .q-checkbox,
   .q-checkbox__inner--falsy {
     color: white !important;

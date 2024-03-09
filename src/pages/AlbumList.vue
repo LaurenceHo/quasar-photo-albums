@@ -4,18 +4,18 @@
       <div class="col-shrink q-mr-sm q-pb-sm">
         <q-btn-group outline>
           <q-btn
-            data-test-id="album-list-style-button"
             :outline="albumStyle === 'grid'"
             color="primary"
+            data-test-id="album-list-style-button"
             dense
             icon="mdi-format-list-bulleted-square"
             padding="sm"
             @click="setAlbumStyle('list')"
           />
           <q-btn
-            data-test-id="album-grid-style-button"
             :outline="albumStyle === 'list'"
             color="primary"
+            data-test-id="album-grid-style-button"
             dense
             icon="mdi-view-grid"
             padding="sm"
@@ -25,9 +25,9 @@
       </div>
       <div class="col-shrink q-mr-sm q-pb-sm">
         <q-btn
-          data-test-id="album-sort-order-button"
           :icon="sortIcon"
           color="primary"
+          data-test-id="album-sort-order-button"
           dense
           outline
           padding="sm"

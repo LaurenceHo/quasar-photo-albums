@@ -22,6 +22,11 @@ export default class PhotoService extends HttpRequestService {
     return this.perform('PUT', '', { albumId, destinationAlbumId, photoKeys });
   }
 
+  renamePhoto(albumId: string, newPhotoKey: string, currentPhotoKey: string): Promise<ResponseStatus> {
+    this.setDisplayingParameters(true, 'Photo renamed');
+    return this.perform('PUT', '/rename', { albumId, newPhotoKey, currentPhotoKey });
+  }
+
   deletePhotos(albumId: string, photoKeys: string[]): Promise<ResponseStatus> {
     this.setDisplayingParameters(true, 'Photos deleted');
     return this.perform('DELETE', '', { albumId, photoKeys });

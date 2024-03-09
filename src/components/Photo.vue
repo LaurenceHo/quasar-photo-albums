@@ -17,12 +17,10 @@
           color="positive"
           unchecked-icon="mdi-check-circle"
         >
-          <q-tooltip> Select photo </q-tooltip>
+          <q-tooltip> Select photo</q-tooltip>
         </q-checkbox>
         <EditPhotoButton
           v-if="isAdminUser"
-          :album-item="albumItem"
-          :is-album-cover="photo.key === albumItem?.albumCover"
           :photo-key="photo.key"
           color="white"
           @refreshPhotoList="$emit('refreshPhotoList')"
@@ -32,24 +30,18 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
-import { Album } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import { computed, onMounted, ref, toRefs } from 'vue';
-import { userStore } from 'stores/user-store';
 import { photoStore } from 'stores/photo-store';
+import { userStore } from 'stores/user-store';
+import { computed, onMounted, ref, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
 
 const props = defineProps({
   index: {
     type: Number,
     required: true,
-  },
-  albumItem: {
-    type: Object,
-    required: true,
-    default: () => ({ id: '', albumName: '', desc: '', tags: [], isPrivate: false, order: 0, place: null }) as Album,
   },
   photo: {
     type: Object,
@@ -64,6 +56,7 @@ const usePhotoStore = photoStore();
 const userPermissionStore = userStore();
 const { selectedPhotosList } = DialogStateComposable();
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
+
 const imageWidth = ref(document.getElementById('photo-image')?.clientWidth ?? 0);
 const goToPhotoDetail = () => {
   usePhotoStore.$patch({ selectedImageIndex: index.value });

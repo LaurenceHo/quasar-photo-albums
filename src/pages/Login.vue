@@ -2,12 +2,12 @@
   <q-page>
     <div class="container">
       <div class="center-screen">
-        <q-card flat bordered style="width: 300px">
+        <q-card bordered flat style="width: 300px">
           <q-card-section v-if="!userPermission.uid">
             <div class="text-h4 text-center q-pb-md">Login</div>
             <div class="relative-position">
               <div id="google-login-button" class="flex justify-center"></div>
-              <q-spinner v-if="loading" color="primary" size="2.5em" class="login-loading-spinner" />
+              <q-spinner v-if="loading" class="login-loading-spinner" color="primary" size="2.5em" />
               <div v-if="loading" class="login-button-overlap" />
             </div>
           </q-card-section>
@@ -21,7 +21,7 @@
   </q-page>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import isEmpty from 'lodash/isEmpty';
 import { LocalStorage, useQuasar } from 'quasar';
 import AuthService from 'src/services/auth-service';
@@ -82,7 +82,7 @@ const authService = new AuthService();
 const userPermissionStore = userStore();
 const userPermission = computed(() => userPermissionStore.userPermission);
 </script>
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .center-screen {
   display: flex;
   flex-direction: column;

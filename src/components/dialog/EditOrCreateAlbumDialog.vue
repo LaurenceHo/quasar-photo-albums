@@ -5,118 +5,121 @@
         <div class="text-h6">{{ getAlbumToBeUpdate.id ? 'Edit' : 'New' }} Album</div>
       </q-card-section>
 
-      <q-card-section class="q-pt-none">
-        <q-input
-          v-model="albumId"
-          autofocus
-          class="q-pb-lg"
-          label="Album id"
-          outlined
-          stack-label
-          counter
-          maxlength="50"
-          :hint="getAlbumToBeUpdate.id ? '' : 'Once album is created, album id cannot be changed.'"
-          :disable="getAlbumToBeUpdate.id !== ''"
-          :rules="[
-            (val: string) => !!val || 'Album id is required',
-            (val: string) => /^[A-Za-z0-9\s-]*$/.test(val) || 'Only alphanumeric, space and dash are allowed',
-          ]"
-        />
-        <q-input
-          v-model="albumName"
-          autofocus
-          class="q-pb-lg"
-          label="Album name"
-          outlined
-          stack-label
-          counter
-          maxlength="50"
-          :rules="[(val) => !!val || 'Album name is required']"
-        />
-        <q-input
-          v-model="albumDesc"
-          :disable="isProcessing"
-          autofocus
-          class="q-pb-lg"
-          label="Album description"
-          outlined
-          stack-label
-          counter
-          maxlength="200"
-          type="textarea"
-        />
-        <q-select
-          v-model="selectedAlbumTags"
-          :options="albumTags"
-          option-value="tag"
-          option-label="tag"
-          emit-value
-          clearable
-          input-debounce="0"
-          label="Category"
-          multiple
-          outlined
-          use-chips
-          use-input
-          @filter="filterTags"
-          stack-label
-        />
-        <q-toggle
-          v-model="privateAlbum"
-          :disable="isProcessing"
-          checked-icon="mdi-lock"
-          color="primary"
-          icon="mdi-lock-open"
-          label="Private album?"
-          left-label
-        />
+      <q-form @submit.prevent.stop="confirmUpdateAlbum">
+        <q-card-section class="q-pt-none">
+          <q-input
+            v-model="albumId"
+            :disable="getAlbumToBeUpdate.id !== ''"
+            :hint="getAlbumToBeUpdate.id ? '' : 'Once album is created, album id cannot be changed.'"
+            :rules="[
+              (val: string) => !!val || 'Album id is required',
+              (val: string) =>
+                /^[A-Za-z0-9\s-_]*$/.test(val) || 'Only alphanumeric, space, underscore and dash are allowed',
+            ]"
+            autofocus
+            class="q-pb-lg"
+            counter
+            label="Album id"
+            maxlength="30"
+            outlined
+            stack-label
+          />
+          <q-input
+            v-model="albumName"
+            :rules="[(val: string) => !!val || 'Album name is required']"
+            autofocus
+            class="q-pb-lg"
+            counter
+            label="Album name"
+            maxlength="50"
+            outlined
+            stack-label
+          />
+          <q-input
+            v-model="albumDesc"
+            :disable="isProcessing"
+            autofocus
+            class="q-pb-lg"
+            counter
+            label="Album description"
+            maxlength="200"
+            outlined
+            stack-label
+            type="textarea"
+          />
+          <q-select
+            v-model="selectedAlbumTags"
+            :options="albumTags"
+            clearable
+            emit-value
+            input-debounce="0"
+            label="Category"
+            multiple
+            option-label="tag"
+            option-value="tag"
+            outlined
+            stack-label
+            use-chips
+            use-input
+            @filter="filterTags"
+          />
+          <q-toggle
+            v-model="privateAlbum"
+            :disable="isProcessing"
+            checked-icon="mdi-lock"
+            color="primary"
+            icon="mdi-lock-open"
+            label="Private album?"
+            left-label
+          />
 
-        <q-select
-          v-model="selectedPlace"
-          :options="placeSuggestions"
-          @input-value="searchPlace"
-          option-label="displayName"
-          clearable
-          input-debounce="500"
-          label="Location"
-          outlined
-          use-input
-          :loading="isSearching"
-          stack-label
-        >
-          <template v-slot:option="place">
-            <q-item v-bind="place.itemProps">
-              <q-item-section>
-                <q-item-label>
-                  <div class="text-h6">{{ place.opt.displayName }}</div>
-                  <div class="text-caption">{{ place.opt.formattedAddress }}</div>
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </template>
-          <template v-slot:no-option>
-            <q-item>
-              <q-item-section class="text-italic text-grey"> No suggestion found </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
-      </q-card-section>
+          <q-select
+            v-model="selectedPlace"
+            :loading="isSearching"
+            :options="placeSuggestions"
+            clearable
+            input-debounce="500"
+            label="Location"
+            option-label="displayName"
+            outlined
+            stack-label
+            use-input
+            @input-value="searchPlace"
+          >
+            <template v-slot:option="place">
+              <q-item v-bind="place.itemProps">
+                <q-item-section>
+                  <q-item-label>
+                    <div class="text-h6">{{ place.opt.displayName }}</div>
+                    <div class="text-caption">{{ place.opt.formattedAddress }}</div>
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+            <template v-slot:no-option>
+              <q-item>
+                <q-item-section class="text-italic text-grey"> No suggestion found</q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+        </q-card-section>
 
-      <q-card-section v-if="selectedPlace" class="q-pt-none">
-        <PhotoLocationMap :latitude="locationLatitude" :longitude="locationLongitude" />
-      </q-card-section>
+        <q-card-section v-if="selectedPlace" class="q-pt-none">
+          <PhotoLocationMap :latitude="locationLatitude" :longitude="locationLongitude" />
+        </q-card-section>
 
-      <q-card-actions align="right" class="text-primary">
-        <q-btn :disable="isProcessing" flat label="Cancel" no-caps @click="resetAlbum" />
-        <q-btn
-          :loading="isProcessing"
-          :label="getAlbumToBeUpdate.id ? 'Update' : 'Create'"
-          no-caps
-          unelevated
-          color="primary"
-          @click="confirmUpdateAlbum"
-        />
-      </q-card-actions>
+        <q-card-actions align="right" class="text-primary">
+          <q-btn :disable="isProcessing" flat label="Cancel" no-caps @click="resetAlbum" />
+          <q-btn
+            :label="getAlbumToBeUpdate.id ? 'Update' : 'Create'"
+            :loading="isProcessing"
+            color="primary"
+            no-caps
+            type="submit"
+            unelevated
+          />
+        </q-card-actions>
+      </q-form>
     </q-card>
   </q-dialog>
 </template>
@@ -124,6 +127,7 @@
 <script lang="ts" setup>
 import { Album, Place } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
+import { isEmpty } from 'lodash';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
@@ -165,6 +169,15 @@ const searchPlace = async (searchText: string) => {
 };
 
 const confirmUpdateAlbum = async () => {
+  albumId.value = albumId.value.trim();
+  albumName.value = albumName.value.trim();
+
+  if (isEmpty(albumId.value) || isEmpty(albumName.value)) {
+    return;
+  }
+
+  albumDesc.value = albumDesc.value.trim();
+
   isProcessing.value = true;
 
   const albumToBeSubmitted: Album = {

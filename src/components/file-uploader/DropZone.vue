@@ -1,7 +1,7 @@
 <template>
   <div
-    class="drop-zone-container scroll-y"
     :data-active="active"
+    class="drop-zone-container scroll-y"
     @dragenter.prevent="setActive"
     @dragover.prevent="setActive"
     @dragleave.prevent="setInactive"

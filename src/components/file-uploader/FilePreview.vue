@@ -2,19 +2,19 @@
   <component :is="tag" class="file-preview">
     <button
       v-if="file.status !== true"
-      @click="$emit('remove', file)"
-      class="close-icon"
       :disabled="file.status === 'loading'"
+      class="close-icon"
+      @click="$emit('remove', file)"
     >
       &times;
     </button>
-    <img v-if="isImageFile" :src="file.url" :alt="file.file.name" :title="file.file.name" />
+    <img v-if="isImageFile" :alt="file.file.name" :src="file.url" :title="file.file.name" />
     <div v-else>
       This file is not allowed: <strong>{{ file.file.name }}</strong>
     </div>
-    <span class="status-indicator loading-indicator" v-show="file.status === 'loading'">In Progress</span>
-    <span class="status-indicator success-indicator" v-show="file.status === true">Uploaded</span>
-    <span class="status-indicator failure-indicator" v-show="file.status === false">Error</span>
+    <span v-show="file.status === 'loading'" class="status-indicator loading-indicator">In Progress</span>
+    <span v-show="file.status === true" class="status-indicator success-indicator">Uploaded</span>
+    <span v-show="file.status === false" class="status-indicator failure-indicator">Error</span>
   </component>
 </template>
 
@@ -31,7 +31,7 @@ const { file } = toRefs(props);
 const isImageFile = computed(() => file.value.id.includes('image'));
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .file-preview {
   width: 20%;
   margin: 1rem 2.5%;

@@ -1,5 +1,5 @@
-import HttpRequestService from 'src/services/http-request-service';
 import { ApiResponse, UserPermission } from 'components/models';
+import HttpRequestService from 'src/services/http-request-service';
 
 export default class AuthService extends HttpRequestService {
   constructor() {
