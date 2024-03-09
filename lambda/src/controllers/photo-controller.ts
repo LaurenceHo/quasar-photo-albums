@@ -1,5 +1,5 @@
 import { isEmpty, isUndefined } from 'lodash';
-import { Photo, PhotosRequest } from '../models';
+import { Photo, PhotosRequest, RenamePhotoRequest } from '../models';
 import AlbumService from '../services/album-service';
 import { S3Service } from '../services/s3-service';
 import { BaseController } from './base-controller';
@@ -77,8 +77,12 @@ export default class PhotoController extends BaseController {
    * Move photos to another album
    */
   update: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
-    const photos = req.body as PhotosRequest;
-    const { destinationAlbumId, albumId, photoKeys } = photos;
+    const { destinationAlbumId, albumId, photoKeys } = req.body as PhotosRequest;
+
+    if (isUndefined(albumId) || isEmpty(albumId)) {
+      return this.clientError(res, 'No album');
+    }
+
     if (isUndefined(destinationAlbumId) || isEmpty(destinationAlbumId)) {
       return this.clientError(res, 'No destination album');
     }
@@ -88,32 +92,25 @@ export default class PhotoController extends BaseController {
       photoKeys.forEach((photoKey) => {
         const sourcePhotoKey = `${albumId}/${photoKey}`;
 
-        const promise = new Promise((resolve, reject) => {
-          s3Service
-            .copy({
-              Bucket: process.env.AWS_S3_BUCKET_NAME,
+        const promise = new Promise(async (resolve, reject) => {
+          try {
+            const result = await s3Service.copy({
+              Bucket: bucketName,
               CopySource: `/${bucketName}/${sourcePhotoKey}`,
               Key: `${destinationAlbumId}/${photoKey}`,
-            })
-            .then((result) => {
-              if (result) {
-                deleteObjects([sourcePhotoKey])
-                  .then((result) => {
-                    if (result) {
-                      console.log('##### Photo moved:', sourcePhotoKey);
-                      resolve('Photo moved');
-                    } else {
-                      reject('Failed to delete photo');
-                    }
-                  })
-                  .catch((err: Error) => {
-                    reject(err);
-                  });
-              }
-            })
-            .catch((err: Error) => {
-              reject(err);
             });
+            if (result) {
+              const result2 = await deleteObjects([sourcePhotoKey]);
+              if (result2) {
+                console.log('##### Photo moved:', sourcePhotoKey);
+                resolve('Photo moved');
+              } else {
+                reject('Failed to delete photo');
+              }
+            }
+          } catch (error) {
+            reject(error);
+          }
         });
 
         promises.push(promise);
@@ -130,9 +127,46 @@ export default class PhotoController extends BaseController {
     return this.clientError(res, 'No photo needs to be moved');
   });
 
+  rename: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+    const { albumId, newPhotoKey, currentPhotoKey } = req.body as RenamePhotoRequest;
+
+    if (isUndefined(albumId) || isEmpty(albumId)) {
+      return this.clientError(res, 'No album');
+    }
+
+    if (
+      !isUndefined(newPhotoKey) &&
+      !isEmpty(newPhotoKey) &&
+      !isUndefined(currentPhotoKey) &&
+      !isEmpty(currentPhotoKey)
+    ) {
+      // Currently, the only way to rename an object using the SDK is to copy the object with a different name and
+      // then delete the original object.
+      try {
+        const result = await s3Service.copy({
+          Bucket: bucketName,
+          CopySource: `/${bucketName}/${albumId}/${currentPhotoKey}`,
+          Key: `${albumId}/${newPhotoKey}`,
+        });
+        if (result) {
+          await deleteObjects([`${albumId}/${currentPhotoKey}`]);
+          return this.ok(res, 'Photo renamed');
+        }
+        return this.fail(res, 'Failed to rename photo');
+      } catch (err: any) {
+        console.error('Failed to rename photo:', err);
+        return this.fail(res, 'Failed to rename photo');
+      }
+    }
+    return this.clientError(res, 'No photo needs to be renamed');
+  });
+
   delete: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
-    const photosRequest = req.body as PhotosRequest;
-    const { albumId, photoKeys } = photosRequest;
+    const { albumId, photoKeys } = req.body as PhotosRequest;
+
+    if (isUndefined(albumId) || isEmpty(albumId)) {
+      return this.clientError(res, 'No album');
+    }
 
     if (!isUndefined(photoKeys) && !isEmpty(photoKeys)) {
       const photoKeysArray = photoKeys.map((photoKey) => `${albumId}/${photoKey}`);

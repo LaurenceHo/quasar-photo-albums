@@ -73,6 +73,12 @@ export interface PhotosRequest {
   photoKeys: string[];
 }
 
+export interface RenamePhotoRequest {
+  albumId: string;
+  newPhotoKey: string;
+  currentPhotoKey: string;
+}
+
 export interface ResponseStatus {
   code?: number;
   status: string;
