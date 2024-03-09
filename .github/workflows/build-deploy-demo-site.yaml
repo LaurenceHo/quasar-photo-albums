@@ -40,7 +40,7 @@ jobs:
           STATIC_FILES_URL=https://demo-quasar-photo-albums.s3.amazonaws.com
           IMAGEKIT_CDN_URL=https://demo-quasar-photo-albums.s3.amazonaws.com
           MAPBOX_API_KEY=$MAPBOX_API_KEY
-          AWS_API_GATEWAY_URL=https://qg9ajep8e0.execute-api.us-east-1.amazonaws.com/dev/api
+          AWS_API_GATEWAY_URL=https://u0zxod4bck.execute-api.us-east-1.amazonaws.com/dev/api
           GOOGLE_CLIENT_ID=DEMO_GOOGLE_CLIENT_ID
           EOF
 
