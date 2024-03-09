@@ -50,7 +50,7 @@ jobs:
           npm run build
 
       - name: Clean up old files
-        uses: keithweaver/aws-s3-github-action@v1.0.0
+        uses: keithweaver/aws-s3-github-action@master
         with:
           command: rm
           source: s3://demo-quasar-photo-albums/assets/
@@ -60,9 +60,11 @@ jobs:
           flags: --recursive
 
       - name: Upload to S3
-        uses: reggionick/s3-deploy@v4
+        uses: keithweaver/aws-s3-github-action@master
         with:
-          folder: dist/spa
-          bucket: demo-quasar-photo-albums
-          bucket-region: us-east-1
-          no-cache: true
+          source: dist/spa
+          destination: s3://demo-quasar-photo-albums
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
+          aws_region: us-east-1
+          flags: --recursive
