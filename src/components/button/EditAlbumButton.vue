@@ -36,7 +36,7 @@
 
       <q-card-actions align="right">
         <q-btn v-close-popup :disable="isProcessing" color="primary" flat label="Cancel" no-caps />
-        <q-btn :loading="isProcessing" color="primary" unelevated label="Confirm" no-caps @click="confirmDeleteAlbum" />
+        <q-btn :loading="isProcessing" color="primary" label="Confirm" no-caps unelevated @click="confirmDeleteAlbum" />
       </q-card-actions>
     </q-card>
   </q-dialog>

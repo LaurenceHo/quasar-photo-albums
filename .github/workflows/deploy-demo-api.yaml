@@ -1,0 +1,67 @@
+name: Build and deploy API for demo app
+
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths:
+      - "lambda/**"
+  workflow_dispatch:
+    inputs:
+      buildManually:
+        description: 'Run build manually'
+        required: true
+        default: 'build'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+    defaults:
+      run:
+        working-directory: ./lambda
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
+      AWS_REGION_NAME: ${{ secrets.AWS_REGION_NAME }}
+      GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      ALBUM_URL: ${{ vars.ALBUM_URL }}
+      IMAGEKIT_CDN_URL: ${{ vars.IMAGEKIT_CDN_URL }}
+      AWS_S3_BUCKET_NAME: ${{ vars.AWS_S3_BUCKET_NAME }}
+      PHOTO_ALBUMS_TABLE_NAME: ${{ vars.PHOTO_ALBUMS_TABLE_NAME }}
+      PHOTO_ALBUM_TAGS_TABLE_NAME: ${{ vars.PHOTO_ALBUM_TAGS_TABLE_NAME }}
+      PHOTO_USER_PERMISSION_TABLE_NAME: ${{ vars.PHOTO_USER_PERMISSION_TABLE_NAME }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Write .env file
+        run: |
+          tee .env <<EOF
+          AWS_REGION_NAME=$AWS_REGION_NAME
+          GOOGLE_PLACES_API_KEY=$GOOGLE_PLACES_API_KEY
+          GOOGLE_CLIENT_ID=DEMO_GOOGLE_CLIENT_ID
+          JWT_SECRET=$JWT_SECRET
+          ALBUM_URL=$ALBUM_URL
+          IMAGEKIT_CDN_URL=$IMAGEKIT_CDN_URL
+          AWS_S3_BUCKET_NAME=$AWS_S3_BUCKET_NAME
+          PHOTO_ALBUMS_TABLE_NAME=$PHOTO_ALBUMS_TABLE_NAME
+          PHOTO_ALBUM_TAGS_TABLE_NAME=$PHOTO_ALBUM_TAGS_TABLE_NAME
+          PHOTO_USER_PERMISSION_TABLE_NAME=$PHOTO_USER_PERMISSION_TABLE_NAME
+          EOF
+
+      - name: Serverless deploy
+        uses: serverless/github-action@master
+        with:
+          args: -c "cd ./lambda && serverless deploy"
+          entrypoint: /bin/sh

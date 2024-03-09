@@ -26,19 +26,19 @@
       <q-card-actions align="right">
         <q-btn v-close-popup :disable="isProcessing" color="primary" flat label="Cancel" no-caps />
         <q-btn
+          :disable="!selectedAlbum"
           :loading="isProcessing"
           color="primary"
-          unelevated
           label="Move"
           no-caps
-          :disable="!selectedAlbum"
+          unelevated
           @click="confirmMovePhotos"
         />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';

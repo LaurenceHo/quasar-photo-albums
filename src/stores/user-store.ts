@@ -1,7 +1,7 @@
+import { UserPermission } from 'components/models';
 import { defineStore } from 'pinia';
 import { Loading } from 'quasar';
 import AuthService from 'src/services/auth-service';
-import { UserPermission } from 'components/models';
 
 export interface UserState {
   userPermission: UserPermission;

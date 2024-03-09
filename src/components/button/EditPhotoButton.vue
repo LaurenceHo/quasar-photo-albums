@@ -6,7 +6,7 @@
           <q-item-section avatar>
             <q-icon color="primary" name="mdi-link-variant" />
           </q-item-section>
-          <q-item-section>Copy Image Link</q-item-section>
+          <q-item-section>Copy Link</q-item-section>
         </q-item>
         <q-item v-close-popup clickable @click="deletePhoto">
           <q-item-section avatar>
@@ -20,6 +20,12 @@
           </q-item-section>
           <q-item-section>Move Photo</q-item-section>
         </q-item>
+        <q-item v-close-popup clickable @click="renamePhoto">
+          <q-item-section avatar>
+            <q-icon color="primary" name="mdi-rename" />
+          </q-item-section>
+          <q-item-section>Rename Photo</q-item-section>
+        </q-item>
         <q-item v-if="!isAlbumCover" v-close-popup clickable @click="makeCoverPhoto">
           <q-item-section avatar>
             <q-icon color="primary" name="mdi-folder-image" />
@@ -31,49 +37,50 @@
   </q-btn>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Album } from 'components/models';
 import { copyToClipboard, useQuasar } from 'quasar';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import { getStaticFileUrl } from 'src/helper';
 import AlbumService from 'src/services/album-service';
 import { albumStore } from 'stores/album-store';
-import { toRefs } from 'vue';
+import { photoStore } from 'stores/photo-store';
+import { computed, toRefs } from 'vue';
 
 const props = defineProps({
   color: {
     type: String,
     default: () => 'black',
   },
-  albumItem: {
-    type: Object,
-    required: true,
-    default: () =>
-      ({ id: '', albumName: '', description: '', tags: [], isPrivate: false, albumCover: '', order: 0 }) as Album,
-  },
   photoKey: {
     type: String,
     required: true,
   },
-  isAlbumCover: {
-    type: Boolean,
-    default: false,
-  },
 });
 
-const { photoKey, albumItem } = toRefs(props);
-
 const albumService = new AlbumService();
-const store = albumStore();
+const useAlbumStore = albumStore();
+const usePhotoStore = photoStore();
 const q = useQuasar();
 
-const { setSelectedPhotosList, setDeletePhotoDialogState, setMovePhotoDialogState } = DialogStateComposable();
+const { photoKey } = toRefs(props);
+
+const albumItem = computed(() => usePhotoStore.selectedAlbumItem);
+const isAlbumCover = computed(() => usePhotoStore.isAlbumCover(photoKey.value));
+
+const {
+  setSelectedPhotosList,
+  setDeletePhotoDialogState,
+  setMovePhotoDialogState,
+  setRenamePhotoDialogState,
+  setCurrentPhotoToBeRenamed,
+} = DialogStateComposable();
 
 const makeCoverPhoto = async () => {
   const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photoKey.value as string };
   const response = await albumService.updateAlbum(albumToBeSubmitted);
   if (response.code === 200) {
-    store.updateAlbumCover(albumToBeSubmitted);
+    useAlbumStore.updateAlbumCover(albumToBeSubmitted);
   }
 };
 
@@ -85,6 +92,11 @@ const deletePhoto = () => {
 const movePhoto = () => {
   setSelectedPhotosList([photoKey.value]);
   setMovePhotoDialogState(true);
+};
+
+const renamePhoto = () => {
+  setCurrentPhotoToBeRenamed(photoKey.value);
+  setRenamePhotoDialogState(true);
 };
 
 const copyPhotoLink = () => {

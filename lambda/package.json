@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc",
     "deploy:lambda": "serverless deploy",
+    "deploy:lambda:prod": "serverless deploy --stage prod",
     "lint": "eslint --ext .js,.ts .",
     "start:server": "rimraf dist && tsc && node dist/index.js",
     "type-check": "tsc --noEmit"
@@ -40,6 +41,7 @@
     "eslint-plugin-import": "^2.25.4",
     "rimraf": "^5.0.5",
     "serverless": "^3.38.0",
+    "serverless-dotenv-plugin": "^6.0.0",
     "serverless-plugin-typescript": "^2.1.5",
     "typescript": "^5.1.3"
   },

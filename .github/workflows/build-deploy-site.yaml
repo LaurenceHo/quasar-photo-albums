@@ -16,6 +16,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: prod
     env:
       ALBUM_APP_TITLE: ${{ secrets.ALBUM_APP_TITLE }}
       STATIC_FILES_URL: ${{ secrets.STATIC_FILES_URL }}
@@ -64,7 +65,7 @@ jobs:
           flags: --recursive
 
       - name: Upload assets to S3
-        uses: keithweaver/aws-s3-github-action@v1.0.0
+        uses: keithweaver/aws-s3-github-action@master
         with:
           source: dist/spa/assets
           destination: s3://${{ secrets.AWS_S3_BUCKET_FOR_GITHUB_DEPLOY }}/assets
@@ -74,10 +75,19 @@ jobs:
           flags: --recursive
 
       - name: Upload index to S3
-        uses: keithweaver/aws-s3-github-action@v1.0.0
+        uses: keithweaver/aws-s3-github-action@master
         with:
           source: dist/spa/index.html
           destination: s3://${{ secrets.AWS_S3_BUCKET_FOR_GITHUB_DEPLOY }}/index.html
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
           aws_region: us-east-1
+
+      - name: Invalidate CloudFront
+        uses: chetan/invalidate-cloudfront-action@master
+        env:
+          DISTRIBUTION: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          PATHS: /
+          AWS_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
