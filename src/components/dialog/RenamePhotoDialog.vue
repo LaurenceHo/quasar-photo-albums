@@ -49,7 +49,7 @@ import PhotoService from 'src/services/photo-service';
 import { photoStore } from 'stores/photo-store';
 import { computed, ref, toRefs, watch } from 'vue';
 
-const emits = defineEmits(['refreshPhotoList']);
+const emits = defineEmits(['refreshPhotoList', 'closePhotoDetailDialog']);
 const props = defineProps({
   albumId: {
     type: String,
@@ -84,6 +84,7 @@ const confirmRenamePhoto = async () => {
   );
   isProcessing.value = false;
   if (result.status === 'Success') {
+    emits('closePhotoDetailDialog');
     emits('refreshPhotoList');
   }
   setRenamePhotoDialogState(false);
