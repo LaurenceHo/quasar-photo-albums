@@ -94,12 +94,19 @@
   />
   <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem?.id" @refreshPhotoList="refreshPhotoList" />
   <PhotoDetailDialog v-if="photoId" @refreshPhotoList="refreshPhotoList" />
+  <RenamePhotoDialog
+    v-if="getRenamePhotoDialogState"
+    :album-id="albumItem?.id"
+    @refreshPhotoList="refreshPhotoList"
+    @closePhotoDetailDialog="closePhotoDetailDialog"
+  />
 </template>
 
 <script lang="ts" setup>
 import ConfirmDeletePhotosDialog from 'components/dialog/ConfirmDeletePhotosDialog.vue';
 import MovePhotoDialog from 'components/dialog/MovePhotosDialog.vue';
 import PhotoDetailDialog from 'components/dialog/PhotoDetailDialog.vue';
+import RenamePhotoDialog from 'components/dialog/RenamePhotoDialog.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
 import { Album, Photo as IPhoto } from 'components/models';
 import Photo from 'components/Photo.vue';
@@ -126,6 +133,7 @@ const {
   setDeletePhotoDialogState,
   getMovePhotoDialogState,
   setMovePhotoDialogState,
+  getRenamePhotoDialogState,
 } = DialogStateComposable();
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);

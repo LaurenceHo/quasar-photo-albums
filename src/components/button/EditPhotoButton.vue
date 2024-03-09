@@ -6,7 +6,7 @@
           <q-item-section avatar>
             <q-icon color="primary" name="mdi-link-variant" />
           </q-item-section>
-          <q-item-section>Copy Image Link</q-item-section>
+          <q-item-section>Copy Link</q-item-section>
         </q-item>
         <q-item v-close-popup clickable @click="deletePhoto">
           <q-item-section avatar>
@@ -19,6 +19,12 @@
             <q-icon color="primary" name="mdi-image-move" />
           </q-item-section>
           <q-item-section>Move Photo</q-item-section>
+        </q-item>
+        <q-item v-close-popup clickable @click="renamePhoto">
+          <q-item-section avatar>
+            <q-icon color="primary" name="mdi-rename" />
+          </q-item-section>
+          <q-item-section>Rename Photo</q-item-section>
         </q-item>
         <q-item v-if="!isAlbumCover" v-close-popup clickable @click="makeCoverPhoto">
           <q-item-section avatar>
@@ -67,7 +73,13 @@ const albumService = new AlbumService();
 const store = albumStore();
 const q = useQuasar();
 
-const { setSelectedPhotosList, setDeletePhotoDialogState, setMovePhotoDialogState } = DialogStateComposable();
+const {
+  setSelectedPhotosList,
+  setDeletePhotoDialogState,
+  setMovePhotoDialogState,
+  setRenamePhotoDialogState,
+  setCurrentPhotoToBeRenamed,
+} = DialogStateComposable();
 
 const makeCoverPhoto = async () => {
   const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photoKey.value as string };
@@ -85,6 +97,11 @@ const deletePhoto = () => {
 const movePhoto = () => {
   setSelectedPhotosList([photoKey.value]);
   setMovePhotoDialogState(true);
+};
+
+const renamePhoto = () => {
+  setCurrentPhotoToBeRenamed(photoKey.value);
+  setRenamePhotoDialogState(true);
 };
 
 const copyPhotoLink = () => {
