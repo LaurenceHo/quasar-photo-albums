@@ -37,7 +37,7 @@
   </q-btn>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Album } from 'components/models';
 import { copyToClipboard, useQuasar } from 'quasar';
 import DialogStateComposable from 'src/composables/dialog-state-composable';

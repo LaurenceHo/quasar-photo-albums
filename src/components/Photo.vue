@@ -17,7 +17,7 @@
           color="positive"
           unchecked-icon="mdi-check-circle"
         >
-          <q-tooltip> Select photo </q-tooltip>
+          <q-tooltip> Select photo</q-tooltip>
         </q-checkbox>
         <EditPhotoButton
           v-if="isAdminUser"
@@ -30,12 +30,12 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import { computed, onMounted, ref, toRefs } from 'vue';
-import { userStore } from 'stores/user-store';
 import { photoStore } from 'stores/photo-store';
+import { userStore } from 'stores/user-store';
+import { computed, onMounted, ref, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
 
 const props = defineProps({

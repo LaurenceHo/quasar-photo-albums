@@ -3,10 +3,10 @@
     v-model="pageNumber"
     :max="totalPages"
     :max-pages="5"
+    active-design="outline"
     boundary-links
     boundary-numbers
     direction-links
-    active-design="outline"
   />
   <q-select v-model="itemsPerPage" :options="[10, 20, 50]" dense outlined />
   ({{ totalItems }} albums)

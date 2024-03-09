@@ -2,10 +2,10 @@ import { isEmpty } from 'lodash-es';
 import { defineStore } from 'pinia';
 import { Loading, LocalStorage } from 'quasar';
 import { Album, AlbumTag } from 'src/components/models';
+import { compareDbUpdatedTime } from 'src/helper';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
 import { photoStore } from 'stores/photo-store';
-import { compareDbUpdatedTime } from 'src/helper';
 import { userStore } from 'stores/user-store';
 
 export interface AlbumState {

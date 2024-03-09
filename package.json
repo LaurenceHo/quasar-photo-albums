@@ -1,13 +1,13 @@
 {
   "name": "vue-quasar-s3-albums",
   "version": "1.0.0",
-  "description": "Quasar S3 photo album app",
-  "productName": "Quasar photo albums",
+  "description": "Quasar photo album app",
+  "productName": "Quasar photo album app",
   "author": "Laurence Ho <bluegray.he@aol.com>",
   "scripts": {
     "serve": "quasar dev",
     "build": "quasar build",
-    "lint": "eslint --ext ./src/**/*.{js,ts,vue} && prettier --write ./src/**/*.{js,ts,vue,scss}",
+    "lint": "eslint --ext ./src/**/*.{js,ts,vue} --fix && prettier --write ./src/**/*.{js,ts,vue,scss}",
     "test": "vitest run --coverage",
     "prepare": "husky"
   },
@@ -60,12 +60,5 @@
     "node": "^20",
     "npm": ">= 10",
     "yarn": ">= 4"
-  },
-  "prettier": {
-    "semi": true,
-    "printWidth": 120,
-    "singleQuote": true,
-    "trailingComma": "es5",
-    "useTabs": false
   }
 }

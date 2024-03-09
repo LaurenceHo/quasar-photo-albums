@@ -9,59 +9,59 @@
         <q-card-section class="q-pt-none">
           <q-input
             v-model="albumId"
-            autofocus
-            class="q-pb-lg"
-            label="Album id"
-            outlined
-            stack-label
-            counter
-            maxlength="30"
-            :hint="getAlbumToBeUpdate.id ? '' : 'Once album is created, album id cannot be changed.'"
             :disable="getAlbumToBeUpdate.id !== ''"
+            :hint="getAlbumToBeUpdate.id ? '' : 'Once album is created, album id cannot be changed.'"
             :rules="[
               (val: string) => !!val || 'Album id is required',
               (val: string) =>
                 /^[A-Za-z0-9\s-_]*$/.test(val) || 'Only alphanumeric, space, underscore and dash are allowed',
             ]"
+            autofocus
+            class="q-pb-lg"
+            counter
+            label="Album id"
+            maxlength="30"
+            outlined
+            stack-label
           />
           <q-input
             v-model="albumName"
+            :rules="[(val: string) => !!val || 'Album name is required']"
             autofocus
             class="q-pb-lg"
+            counter
             label="Album name"
+            maxlength="50"
             outlined
             stack-label
-            counter
-            maxlength="50"
-            :rules="[(val: string) => !!val || 'Album name is required']"
           />
           <q-input
             v-model="albumDesc"
             :disable="isProcessing"
             autofocus
             class="q-pb-lg"
+            counter
             label="Album description"
+            maxlength="200"
             outlined
             stack-label
-            counter
-            maxlength="200"
             type="textarea"
           />
           <q-select
             v-model="selectedAlbumTags"
             :options="albumTags"
-            option-value="tag"
-            option-label="tag"
-            emit-value
             clearable
+            emit-value
             input-debounce="0"
             label="Category"
             multiple
+            option-label="tag"
+            option-value="tag"
             outlined
+            stack-label
             use-chips
             use-input
             @filter="filterTags"
-            stack-label
           />
           <q-toggle
             v-model="privateAlbum"
@@ -75,16 +75,16 @@
 
           <q-select
             v-model="selectedPlace"
+            :loading="isSearching"
             :options="placeSuggestions"
-            @input-value="searchPlace"
-            option-label="displayName"
             clearable
             input-debounce="500"
             label="Location"
+            option-label="displayName"
             outlined
-            use-input
-            :loading="isSearching"
             stack-label
+            use-input
+            @input-value="searchPlace"
           >
             <template v-slot:option="place">
               <q-item v-bind="place.itemProps">
@@ -98,7 +98,7 @@
             </template>
             <template v-slot:no-option>
               <q-item>
-                <q-item-section class="text-italic text-grey"> No suggestion found </q-item-section>
+                <q-item-section class="text-italic text-grey"> No suggestion found</q-item-section>
               </q-item>
             </template>
           </q-select>
@@ -111,12 +111,12 @@
         <q-card-actions align="right" class="text-primary">
           <q-btn :disable="isProcessing" flat label="Cancel" no-caps @click="resetAlbum" />
           <q-btn
-            :loading="isProcessing"
             :label="getAlbumToBeUpdate.id ? 'Update' : 'Create'"
-            no-caps
-            unelevated
+            :loading="isProcessing"
             color="primary"
+            no-caps
             type="submit"
+            unelevated
           />
         </q-card-actions>
       </q-form>

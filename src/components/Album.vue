@@ -26,7 +26,7 @@
   <template v-else>
     <q-item clickable>
       <q-item-section avatar @click="goToAlbum">
-        <q-avatar rounded :size="`${thumbnailSize}px`" :class="{ 'no-album-cover-square': !albumItem.albumCover }">
+        <q-avatar :class="{ 'no-album-cover-square': !albumItem.albumCover }" :size="`${thumbnailSize}px`" rounded>
           <q-img
             v-if="albumItem?.albumCover"
             :ratio="1"

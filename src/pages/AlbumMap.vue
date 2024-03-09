@@ -2,7 +2,7 @@
   <div id="album-location-map" class="rounded-borders-lg"></div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Album as AlbumItem } from 'components/models';
 import mapboxgl from 'mapbox-gl';
 import { albumStore } from 'stores/album-store';
@@ -114,6 +114,7 @@ onMounted(() => {
 .mapboxgl-popup-content {
   text-align: center;
   padding: 10px;
+
   img {
     padding-top: 10px;
     width: 280px;

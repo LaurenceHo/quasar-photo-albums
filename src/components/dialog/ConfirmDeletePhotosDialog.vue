@@ -9,7 +9,7 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <div class="row" v-for="photoKey in photoKeysArray" :key="photoKey">{{ photoKey }}</div>
+        <div v-for="photoKey in photoKeysArray" :key="photoKey" class="row">{{ photoKey }}</div>
       </q-card-section>
 
       <q-card-actions align="right">
@@ -17,16 +17,16 @@
         <q-btn
           :loading="isProcessing"
           color="primary"
-          unelevated
           label="Confirm"
           no-caps
+          unelevated
           @click="confirmDeletePhotos"
         />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import PhotoService from 'src/services/photo-service';
 import { computed, ref, toRefs } from 'vue';

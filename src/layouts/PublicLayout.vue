@@ -3,9 +3,9 @@
     <q-header>
       <div class="q-pa-sm">
         <q-toolbar class="justify-between">
-          <q-btn class="text-h6" :ripple="false" flat no-caps stretch unelevated to="/">
+          <q-btn :ripple="false" class="text-h6" flat no-caps stretch to="/" unelevated>
             <q-avatar class="q-mr-sm">
-              <img src="/icons/favicon-128x128.png" />
+              <img src="/icons/favicon-128x128.png" alt="logo" />
             </q-avatar>
             {{ $q.screen.gt.xs === true ? albumAppName : '' }}
           </q-btn>
@@ -13,14 +13,14 @@
             <q-btn-toggle
               v-if="routeName !== 'Login'"
               v-model="buttonToggle"
-              no-caps
-              flat
-              stretch
-              toggle-color="accent"
               :options="[
                 { slot: 'photos', value: 'photos', to: '/' },
                 { slot: 'map', value: 'map', to: '/map' },
               ]"
+              flat
+              no-caps
+              stretch
+              toggle-color="accent"
             >
               <template v-slot:photos>
                 <div class="row items-center no-wrap">
@@ -36,7 +36,7 @@
                 </div>
               </template>
             </q-btn-toggle>
-            <q-input v-if="routeName === 'Albums'" v-model="searchKey" dense outlined color="accent">
+            <q-input v-if="routeName === 'Albums'" v-model="searchKey" color="accent" dense outlined>
               <template v-slot:prepend>
                 <q-icon name="mdi-magnify" />
               </template>

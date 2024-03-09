@@ -9,43 +9,43 @@
         <q-card-section class="q-pt-none">
           <q-input
             v-model="newPhotoNameWithoutExtension"
-            autofocus
-            label="Photo name"
-            outlined
-            stack-label
-            counter
-            maxlength="30"
             :error="isExistedPhotoKey"
             :error-message="isExistedPhotoKey ? 'Photo name already exists' : ''"
-            :suffix="fileType"
             :rules="[
               (val: string) => !!val || 'Photo name is required',
               (val: string) =>
                 /^[A-Za-z0-9\s.\-_]*$/.test(val) ||
                 'Only alphanumeric, space, full stop, underscore and dash are allowed',
             ]"
+            :suffix="fileType"
+            autofocus
+            counter
+            label="Photo name"
+            maxlength="30"
+            outlined
+            stack-label
           />
         </q-card-section>
 
         <q-card-actions align="right">
           <q-btn v-close-popup :disable="isProcessing" color="primary" flat label="Cancel" no-caps />
           <q-btn
-            type="submit"
-            :loading="isProcessing"
-            color="primary"
-            unelevated
-            label="Save"
-            no-caps
             :disable="
               !newPhotoId || isExistedPhotoKey || newPhotoNameWithoutExtension === currentFileNameWithoutExtension
             "
+            :loading="isProcessing"
+            color="primary"
+            label="Save"
+            no-caps
+            type="submit"
+            unelevated
           />
         </q-card-actions>
       </q-form>
     </q-card>
   </q-dialog>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import { isEmpty } from 'lodash';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';

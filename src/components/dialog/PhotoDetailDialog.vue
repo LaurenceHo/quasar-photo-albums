@@ -4,9 +4,9 @@
     maximized
     transition-hide="slide-down"
     transition-show="slide-up"
+    @escapeKey="closeDialog"
     @keydown.left="nextPhoto(-1)"
     @keydown.right="nextPhoto(1)"
-    @escapeKey="closeDialog"
   >
     <q-card>
       <q-card-section class="row items-center q-pb-none">
@@ -23,8 +23,8 @@
               <div class="flex justify-center items-center full-height">
                 <q-spinner v-show="loadImage" color="primary" size="4rem" />
                 <img
-                  :alt="photoFileName"
                   v-show="!loadImage"
+                  :alt="photoFileName"
                   :src="selectedImage.url"
                   class="rounded-borders-lg responsive-image"
                   style="margin: auto; display: block"
@@ -32,21 +32,21 @@
                 />
               </div>
               <q-btn
-                round
-                icon="mdi-chevron-right"
                 class="absolute-right"
                 color="primary"
-                unelevated
+                icon="mdi-chevron-right"
+                round
                 style="height: 42px"
+                unelevated
                 @click="nextPhoto(1)"
               />
               <q-btn
-                round
-                icon="mdi-chevron-left"
                 class="absolute-left"
                 color="primary"
-                unelevated
+                icon="mdi-chevron-left"
+                round
                 style="height: 42px"
+                unelevated
                 @click="nextPhoto(-1)"
               />
             </div>
@@ -57,8 +57,8 @@
                 <q-item-section class="text-h5"> Details</q-item-section>
                 <EditPhotoButton
                   v-if="isAdminUser"
-                  :photo-key="selectedImage.key"
                   :album-item="albumItem"
+                  :photo-key="selectedImage.key"
                   @refreshPhotoList="$emit('refreshPhotoList')"
                 />
               </q-item>
@@ -104,7 +104,7 @@
                   <q-item-label>
                     {{ exifTags.Make?.description }} {{ (exifTags.Model as StringArrayTag).value[0] }}
                   </q-item-label>
-                  <q-item-label caption v-if="exifTags.LensModel">
+                  <q-item-label v-if="exifTags.LensModel" caption>
                     {{ (exifTags.LensModel as StringArrayTag).value[0] }}
                   </q-item-label>
                 </q-item-section>

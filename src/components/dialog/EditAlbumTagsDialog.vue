@@ -3,14 +3,14 @@
     <q-card style="min-width: 400px">
       <q-card-section class="flex justify-between">
         <div class="text-h6">Album tags</div>
-        <q-btn icon="mdi-tag-plus" outline color="primary" text-color="primary" @click="createTagDialog = true" />
+        <q-btn color="primary" icon="mdi-tag-plus" outline text-color="primary" @click="createTagDialog = true" />
       </q-card-section>
-      <q-card-section style="max-height: 50vh" class="scroll">
+      <q-card-section class="scroll" style="max-height: 50vh">
         <q-list separator>
           <q-item v-for="albumTag in albumTags" :key="albumTag.tag">
             <q-item-section>{{ albumTag.tag }}</q-item-section>
             <q-item-section side>
-              <q-btn icon="mdi-delete" color="primary" dense flat @click="openDeleteDialog(albumTag.tag)" />
+              <q-btn color="primary" dense flat icon="mdi-delete" @click="openDeleteDialog(albumTag.tag)" />
             </q-item-section>
           </q-item>
         </q-list>
@@ -18,7 +18,7 @@
     </q-card>
   </q-dialog>
 
-  <q-dialog v-model="createTagDialog" persistent transition-show="scale" transition-hide="scale">
+  <q-dialog v-model="createTagDialog" persistent transition-hide="scale" transition-show="scale">
     <q-card style="width: 300px">
       <q-card-section>
         <div class="text-h6">New tag</div>
@@ -28,12 +28,12 @@
         <q-card-section class="q-pt-none">
           <q-input
             v-model="tagName"
+            :rules="[(val: string) => (val && val.length > 0) || 'This field is required']"
             autofocus
             class="q-pb-md"
             label="Tag"
             outlined
             stack-label
-            :rules="[(val: string) => (val && val.length > 0) || 'This field is required']"
           />
         </q-card-section>
 
@@ -44,10 +44,10 @@
             flat
             label="Cancel"
             no-caps
-            @click="createTagDialog = false"
             type="reset"
+            @click="createTagDialog = false"
           />
-          <q-btn :loading="isProcessing" color="primary" label="Confirm" no-caps unelevated type="submit" />
+          <q-btn :loading="isProcessing" color="primary" label="Confirm" no-caps type="submit" unelevated />
         </q-card-actions>
       </q-form>
     </q-card>
@@ -62,13 +62,13 @@
 
       <q-card-actions align="right">
         <q-btn v-close-popup :disable="isProcessing" color="primary" flat label="Cancel" no-caps />
-        <q-btn :loading="isProcessing" color="primary" unelevated label="Confirm" no-caps @click="confirmDeleteAlbum" />
+        <q-btn :loading="isProcessing" color="primary" label="Confirm" no-caps unelevated @click="confirmDeleteAlbum" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumTagService from 'src/services/album-tag-service';
 import { albumStore } from 'stores/album-store';
