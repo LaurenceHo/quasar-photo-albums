@@ -1,4 +1,4 @@
-name: Build and deploy demo web app to AWS S3
+name: Build and deploy demo web app
 
 on:
   pull_request:
@@ -36,7 +36,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm install
 
       - name: Write .env file
         run: |
