@@ -23,7 +23,7 @@
           v-if="isAdminUser"
           :photo-key="photo.key"
           color="white"
-          @refreshPhotoList="$emit('refreshPhotoList')"
+          @refresh-photo-list="$emit('refreshPhotoList')"
         />
       </div>
     </div>

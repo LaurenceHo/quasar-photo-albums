@@ -77,22 +77,26 @@
   <MovePhotoDialog
     v-if="getMovePhotoDialogState"
     :album-id="albumItem?.id"
-    @closePhotoDetailDialog="closePhotoDetailDialog"
-    @refreshPhotoList="refreshPhotoList"
+    @close-photo-detail-dialog="closePhotoDetailDialog"
+    @refresh-photo-list="refreshPhotoList"
   />
   <ConfirmDeletePhotosDialog
     v-if="getDeletePhotoDialogState"
     :album-id="albumItem?.id"
-    @closePhotoDetailDialog="closePhotoDetailDialog"
-    @refreshPhotoList="refreshPhotoList"
+    @close-photo-detail-dialog="closePhotoDetailDialog"
+    @refresh-photo-list="refreshPhotoList"
   />
-  <UploadPhotosDialog v-if="getUploadPhotoDialogState" :album-id="albumItem?.id" @refreshPhotoList="refreshPhotoList" />
-  <PhotoDetailDialog v-if="photoId" @refreshPhotoList="refreshPhotoList" />
+  <UploadPhotosDialog
+    v-if="getUploadPhotoDialogState"
+    :album-id="albumItem?.id"
+    @refresh-photo-list="refreshPhotoList"
+  />
+  <PhotoDetailDialog v-if="photoId" @refresh-photo-list="refreshPhotoList" />
   <RenamePhotoDialog
     v-if="getRenamePhotoDialogState"
     :album-id="albumItem?.id"
-    @closePhotoDetailDialog="closePhotoDetailDialog"
-    @refreshPhotoList="refreshPhotoList"
+    @close-photo-detail-dialog="closePhotoDetailDialog"
+    @refresh-photo-list="refreshPhotoList"
   />
 </template>
 

@@ -18,7 +18,7 @@
         </div>
         <div class="full-width" style="height: 80vh">
           <div id="file-upload-container">
-            <DropZone #default="{ dropZoneActive }" class="drop-area" @files-dropped="addFiles">
+            <DropZone v-slot="{ dropZoneActive }" class="drop-area" @files-dropped="addFiles">
               <label v-if="!isCompleteUploading" for="file-input">
                 <span v-if="dropZoneActive">
                   <span>Drop Them Here</span>

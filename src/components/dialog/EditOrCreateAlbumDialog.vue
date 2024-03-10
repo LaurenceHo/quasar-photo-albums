@@ -86,7 +86,7 @@
             use-input
             @input-value="searchPlace"
           >
-            <template v-slot:option="place">
+            <template #option="place">
               <q-item v-bind="place.itemProps">
                 <q-item-section>
                   <q-item-label>
@@ -96,7 +96,7 @@
                 </q-item-section>
               </q-item>
             </template>
-            <template v-slot:no-option>
+            <template #no-option>
               <q-item>
                 <q-item-section class="text-italic text-grey"> No suggestion found</q-item-section>
               </q-item>

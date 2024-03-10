@@ -22,14 +22,14 @@
               stretch
               toggle-color="accent"
             >
-              <template v-slot:photos>
+              <template #photos>
                 <div class="row items-center no-wrap">
                   <div v-if="$q.screen.gt.xs" class="q-mr-sm text-subtitle2">Photos</div>
                   <q-icon name="mdi-image-multiple" />
                 </div>
               </template>
 
-              <template v-slot:map>
+              <template #map>
                 <div class="row items-center no-wrap">
                   <div v-if="$q.screen.gt.xs" class="q-mr-sm text-subtitle2">Map</div>
                   <q-icon name="mdi-map" />
@@ -37,10 +37,10 @@
               </template>
             </q-btn-toggle>
             <q-input v-if="routeName === 'Albums'" v-model="searchKey" color="accent" dense outlined>
-              <template v-slot:prepend>
+              <template #prepend>
                 <q-icon name="mdi-magnify" />
               </template>
-              <template v-slot:append>
+              <template #append>
                 <q-icon class="cursor-pointer" name="mdi-close" @click="searchKey = ''" />
               </template>
             </q-input>
