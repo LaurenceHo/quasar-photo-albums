@@ -191,7 +191,7 @@ export default class PhotoController extends BaseController {
     return this.clientError(res, 'No photo needs to be deleted');
   });
 
-  findOne: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  findOne: RequestHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 }

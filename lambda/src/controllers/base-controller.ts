@@ -14,7 +14,7 @@ export abstract class BaseController implements IBaseController {
   abstract delete: RequestHandler;
 
   public ok<T>(res: Response, message = '', data?: T) {
-    if (!!data) {
+    if (data) {
       return new JsonResponse<T>().success(res, message, data);
     } else {
       return new JsonResponse().success(res, message);

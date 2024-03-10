@@ -112,7 +112,7 @@ export default class AlbumController extends BaseController {
     }
   });
 
-  findOne: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  findOne: RequestHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 }
