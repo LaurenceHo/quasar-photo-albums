@@ -7,7 +7,7 @@
   "scripts": {
     "serve": "quasar dev",
     "build": "quasar build",
-    "lint": "eslint --ext ./src/**/*.{js,ts,vue} --fix && prettier --write ./src/**/*.{js,ts,vue,scss}",
+    "lint": "eslint --ext .vue,.ts src/** --ignore-pattern src/css/** --ignore-pattern src/assets/** --fix && prettier --write src/** --ignore-unknown",
     "test": "vitest run --coverage",
     "prepare": "husky"
   },
@@ -23,7 +23,7 @@
     "@pinia/testing": "^0.1.1",
     "@quasar/app-vite": "^1.0.0",
     "@quasar/extras": "^1.14.0",
-    "@quasar/quasar-app-extension-testing-unit-vitest": "^0.4.0",
+    "@quasar/quasar-app-extension-testing-unit-vitest": "^1.0.0",
     "@types/lodash": "^4.14.178",
     "@types/lodash-es": "^4.17.12",
     "@types/mapbox-gl": "^3.1.0",

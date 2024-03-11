@@ -31,7 +31,7 @@ export default class JsonResponse<T> {
 
   success = (res: Response, message: string, data?: T) => {
     this._status = STATUS_SUCCESS;
-    if (!!data) {
+    if (data) {
       return res.status(this.code).json({
         code: this.code,
         status: this._status,

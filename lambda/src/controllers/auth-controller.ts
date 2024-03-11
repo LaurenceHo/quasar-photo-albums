@@ -81,19 +81,19 @@ export default class AuthController extends BaseController {
     }
   });
 
-  findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  findAll: RequestHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 
-  create: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  create: RequestHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 
-  update: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  update: RequestHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 
-  delete: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  delete: RequestHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 }
