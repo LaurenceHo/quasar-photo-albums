@@ -59,7 +59,7 @@
           :page-number-props="pageNumber"
           :total-items="totalItems"
           :total-pages="totalPages"
-          @setPageParams="setPageParams"
+          @set-page-params="setPageParams"
         />
       </div>
     </div>
@@ -74,12 +74,12 @@
     />
     <template v-if="chunkAlbumList.length">
       <div v-if="albumStyle === 'grid'" class="q-col-gutter-md row">
-        <Album v-for="album in chunkAlbumList" :key="album.id" :albumItem="album" :albumStyle="albumStyle" />
+        <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
       </div>
       <div v-else class="justify-center row">
         <div class="col-12 col-xl-6 col-lg-8 col-md-8 column">
           <q-list bordered class="rounded-borders" separator>
-            <Album v-for="album in chunkAlbumList" :key="album.id" :albumItem="album" :albumStyle="albumStyle" />
+            <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
           </q-list>
         </div>
       </div>
@@ -89,7 +89,7 @@
           :page-number-props="pageNumber"
           :total-items="totalItems"
           :total-pages="totalPages"
-          @setPageParams="setPageParams"
+          @set-page-params="setPageParams"
         />
       </div>
     </template>

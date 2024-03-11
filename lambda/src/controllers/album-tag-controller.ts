@@ -51,11 +51,11 @@ export default class AlbumTagController extends BaseController {
     }
   });
 
-  findOne: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  findOne: RequestHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 
-  update: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  update: RequestHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 }

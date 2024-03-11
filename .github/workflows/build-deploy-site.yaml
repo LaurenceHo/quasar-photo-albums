@@ -1,4 +1,4 @@
-name: Build and deploy web app to AWS S3
+name: Build and deploy web app
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm install
 
       - name: Write .env file
         run: |
@@ -55,7 +55,7 @@ jobs:
           npm run build
 
       - name: Clean up old files
-        uses: keithweaver/aws-s3-github-action@v1.0.0
+        uses: keithweaver/aws-s3-github-action@master
         with:
           command: rm
           source: s3://${{ secrets.AWS_S3_BUCKET_FOR_GITHUB_DEPLOY }}/assets/

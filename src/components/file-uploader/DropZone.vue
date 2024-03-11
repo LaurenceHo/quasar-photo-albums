@@ -7,7 +7,7 @@
     @dragleave.prevent="setInactive"
     @drop.prevent="onDrop"
   >
-    <slot :dropZoneActive="active"></slot>
+    <slot :drop-zone-active="active"></slot>
   </div>
 </template>
 

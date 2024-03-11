@@ -4,7 +4,7 @@
     maximized
     transition-hide="slide-down"
     transition-show="slide-up"
-    @escapeKey="closeDialog"
+    @escape-key="closeDialog"
     @keydown.left="nextPhoto(-1)"
     @keydown.right="nextPhoto(1)"
   >
@@ -59,7 +59,7 @@
                   v-if="isAdminUser"
                   :album-item="albumItem"
                   :photo-key="selectedImage.key"
-                  @refreshPhotoList="$emit('refreshPhotoList')"
+                  @refresh-photo-list="$emit('refreshPhotoList')"
                 />
               </q-item>
               <q-item v-if="dateTime">
