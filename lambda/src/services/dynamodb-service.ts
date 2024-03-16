@@ -14,7 +14,7 @@ import get from 'lodash/get';
 import { BaseService as IBaseService } from '../models';
 import { ddbDocClient } from './dynamodb-client';
 
-export abstract class DynamoDbService<T> implements IBaseService<T> {
+export abstract class DynamodbService<T> implements IBaseService<T> {
   public readonly client: any = ddbDocClient;
   private _tableName: any;
 

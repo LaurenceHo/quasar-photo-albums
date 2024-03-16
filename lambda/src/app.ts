@@ -9,6 +9,7 @@ import { router as albumTagsRoute } from './route/album-tag-route';
 import { router as authRoute } from './route/auth-route';
 import { router as locationRoute } from './route/location-route';
 import { router as photoRoute } from './route/photo-route';
+import { initialiseDynamodbTables } from './services/initialise-dynamodb-tables';
 import { errorHandler } from './utils/error-handler';
 
 dotenv.config();
@@ -44,4 +45,6 @@ app.use('/api/albums', albumRoute);
 app.use('/api/albumTags', albumTagsRoute);
 app.use('/api/photos', photoRoute);
 app.use('/api/location', locationRoute);
+
+initialiseDynamodbTables().then(() => console.log('Finish verifying DynamoDB tables.'));
 export const handler = serverless(app);

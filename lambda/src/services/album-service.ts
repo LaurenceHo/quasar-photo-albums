@@ -1,7 +1,7 @@
 import { Album } from '../models';
-import { DynamoDbService } from './dynamo-db-service';
+import { DynamodbService } from './dynamodb-service';
 
-export default class AlbumService extends DynamoDbService<Album> {
+export default class AlbumService extends DynamodbService<Album> {
   constructor() {
     super();
     this.tableName = process.env.PHOTO_ALBUMS_TABLE_NAME;

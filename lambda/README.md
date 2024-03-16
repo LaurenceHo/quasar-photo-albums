@@ -27,7 +27,7 @@ You AWS user needs to have the following permissions:
         "dynamodb:Scan",
         "dynamodb:Query"
       ],
-      "Resource": "YOU_AWS_DYNAMODB_TABLE_ARN"
+      "Resource": ["YOU_AWS_DYNAMODB_TABLE_ARN"] // There should be 3 tables you created before
     },
     {
       "Effect": "Allow",
@@ -38,129 +38,17 @@ You AWS user needs to have the following permissions:
 }
 ```
 
-Once you create it, replace this properties `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` with
+Once you create it, download access key and replace this properties `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` with
 your real information in`.env.example` and modify file name to `.env`.
 
 ### AWS DynamoDB
 
-Before doing local development, you need to create 3 DynamoDB tables in total:
+Replace this properties `PHOTO_ALBUMS_TABLE_NAME`, `PHOTO_ALBUM_TAGS_TABLE_NAME`, `PHOTO_USER_PERMISSION_TABLE_NAME`
+with your real information in`.env.example` and modify file name to `.env`. When you run Express.js locally, it will use
+those environment variables to create table and insert mock into your DynamoDB, so you don't have to create tables manually.
+You can see the initial dynamodb table in [./src/services/initialise-dynamodb-tables.ts](./src/services/initialise-dynamodb-tables.ts).
 
-1. `Albums` table: store album information
-2. `AlbumTags` table: store album tags information
-3. `Users` table: store user information
-
-Once you create them, replace this properties `PHOTO_ALBUMS_TABLE_NAME`, `PHOTO_ALBUM_TAGS_TABLE_NAME`, `PHOTO_USER_PERMISSION_TABLE_NAME`
-with your real information in`.env.example` and modify file name to `.env`.
-
-The album object structure is as below:
-
-```
-id: string => it is the same as the folder name in s3
-albumName: string
-albumCover: string
-description: string
-tags: string[]
-isPrivate: boolean
-order: number
-Place: JSON object
-createdAt: string (Date time)
-updatedAt: string (Date time)
-createdBy: string (email)
-updatedBy: string (email)
-```
-
-Example:
-
-```json
-{
-  "id": {
-    "S": "demo-album1"
-  },
-  "albumCover": {
-    "S": "demo-album1/batch_berlin-8429780.jpg"
-  },
-  "albumName": {
-    "S": "demo-album 1"
-  },
-  "description": {
-    "S": "This is demo album 1"
-  },
-  "isPrivate": {
-    "BOOL": false
-  },
-  "order": {
-    "N": "1"
-  },
-  "place": {
-    "M": {
-      "displayName": {
-        "S": "Museum of New Zealand Te Papa Tongarewa"
-      },
-      "formattedAddress": {
-        "S": "55 Cable Street, Te Aro, Wellington 6011, New Zealand"
-      },
-      "location": {
-        "M": {
-          "latitude": {
-            "N": "-41.290456299999995"
-          },
-          "longitude": {
-            "N": "174.7820894"
-          }
-        }
-      }
-    }
-  },
-  "tags": {
-    "L": [
-      {
-        "S": "tag1"
-      }
-    ]
-  },
-  "createdAt": {
-    "S": "2023-08-20T08:11:13.171Z"
-  },
-  "createdBy": {
-    "S": "System"
-  },
-  "updatedAt": {
-    "S": "2023-12-28T05:18:54.372Z"
-  },
-  "updatedBy": {
-    "S": "System"
-  }
-}
-```
-
-Album tag:
-
-```json
-{
-  "tag": {
-    "S": "tag1"
-  }
-}
-```
-
-User permission:
-
-```json
-{
-  "uid": {
-    "S": "xxxxxxxxxxx"
-  },
-  "email": {
-    "S": "xxxxxxxxxx@gmail.com"
-  },
-  "displayName": {
-    "S": "UserName"
-  },
-  "role": {
-    "S": "admin"
-  }
-}
-```
+Once the tables are created, you can check them in AWS DynamoDB console.
 
 ### Get Google Places API key
 
@@ -378,55 +266,6 @@ Please check [here](https://docs.aws.amazon.com/apigateway/latest/developerguide
 If your API Gateway returns an HTTP 502 status code, you can enable API Gateway stage logging by updating stage setting to get more information.
 Please check [here](https://docs.aws.amazon.com/apigateway/latest/developerguide/stages.html#how-to-stage-settings-console) for the further information.
 
-### Serverless dashboard
-
-You can automate your deployment process by using [serverless dashboard](https://www.serverless.com/dashboard). It is free for personal use.
-By doing so, you will need to update `serverless.yml`:
-
-```yaml
-org: { YOUR_ORG_ON_SERVERLESS_DASHBOARD }
-app: { YOUR_APP_ON_SERVERLESS_DASHBOARD }
-service: my-serverless-app
-provider:
-  name: aws
-  runtime: nodejs18.x
-  stage: dev
-  region: us-east-1
-
-plugins:
-  - serverless-plugin-typescript #A Serverless Framework plugin to transpile TypeScript before deploying
-#  - serverless-dotenv-plugin #You don't need it anymore
-
-#useDotenv: true #You don't need it anymore
-
-functions:
-  app:
-    handler: src/app.handler
-    events:
-      - http: ANY /
-      - http: ANY /{proxy+}
-    environment:
-      AWS_REGION_NAME: ${self:provider.region}
-      GOOGLE_PLACES_API_KEY: ${param:GOOGLE_PLACES_API_KEY}
-      GOOGLE_CLIENT_ID: ${param:GOOGLE_CLIENT_ID}
-      ALBUM_URL: ${param:ALBUM_URL}
-      IMAGEKIT_CDN_URL: ${param:IMAGEKIT_CDN_URL}
-      AWS_S3_BUCKET_NAME: ${param:AWS_S3_BUCKET_NAME}
-      PHOTO_ALBUMS_TABLE_NAME: ${param:PHOTO_ALBUMS_TABLE_NAME}
-      PHOTO_ALBUM_TAGS_TABLE_NAME: ${param:PHOTO_ALBUM_TAGS_TABLE_NAME}
-      PHOTO_USER_PERMISSION_TABLE_NAME: ${param:PHOTO_USER_PERMISSION_TABLE_NAME}
-      JWT_SECRET: ${param:JWT_SECRET}
-# You don't need these anymore unless you want to push your env file to Github
-#custom:
-#  dotenv:
-#    exclude:
-#      - AWS_REGION_NAME
-#      - AWS_ACCESS_KEY_ID
-#      - AWS_SECRET_ACCESS_KEY
-```
-
-And set up [parameters](https://www.serverless.com/framework/docs/guides/parameters) in your serverless dashboard.
-
 ## API endpoint list
 
 ### Authentication
@@ -453,6 +292,7 @@ And set up [parameters](https://www.serverless.com/framework/docs/guides/paramet
 - /api/photos/:albumId - GET: Get photos by album ID
 - /api/photos - DELETE: Delete photos
 - /api/photos - PUT: Move photos to different folder
+- /api/photos/rename - PUT: Rename photo
 - /api/photos/upload/:albumId - POST: Upload photos to AWS S3 folder
 
 ### Location
