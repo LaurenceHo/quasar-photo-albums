@@ -25,9 +25,7 @@ export default class AlbumController extends BaseController {
 
       let params = {
         TableName: albumService.tableName,
-        IndexName: 'id-order-index',
-        ProjectionExpression: 'id, albumName, albumCover, description, tags, isPrivate, place, #Order',
-        ExpressionAttributeNames: { '#Order': 'order' },
+        ProjectionExpression: 'id, albumName, albumCover, description, tags, isPrivate, place',
         // TODO - Need to sort by order
       } as any;
       if (!isAdmin) {

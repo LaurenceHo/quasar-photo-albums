@@ -1,9 +1,9 @@
 import { UserPermission } from '../models';
-import { DynamoDbService } from './dynamo-db-service';
+import { DynamodbService } from './dynamodb-service';
 import { QueryCommand } from '@aws-sdk/lib-dynamodb';
 import get from 'lodash/get';
 
-export default class UserService extends DynamoDbService<UserPermission> {
+export default class UserService extends DynamodbService<UserPermission> {
   constructor() {
     super();
     this.tableName = process.env.PHOTO_USER_PERMISSION_TABLE_NAME;
