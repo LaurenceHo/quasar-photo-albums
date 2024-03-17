@@ -1,6 +1,11 @@
 name: Build and deploy API for demo app
 
 on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "lambda/**"
   pull_request:
     branches:
       - master
