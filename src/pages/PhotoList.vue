@@ -138,7 +138,7 @@ const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumId = computed(() => route.params.albumId as string);
 const albumItem = computed(() => useAlbumStore.getAlbumById(albumId.value) as Album);
 const photosInAlbum = computed(() => usePhotoStore.photoList as IPhoto[]);
-const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.key));
+const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.key).slice(0, 50)); // Max 50 photos
 const photoAmount = computed(() => photosInAlbum.value.length);
 const photoId = computed(() => route.query.photo as string);
 

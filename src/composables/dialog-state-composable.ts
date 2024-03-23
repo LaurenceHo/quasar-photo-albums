@@ -34,8 +34,6 @@ export default function DialogStateComposable() {
   };
 
   const setSelectedPhotosList = (photos: string[]) => {
-    // Max 50 photos
-    photos.slice(0, 50);
     selectedPhotosList.value = photos;
   };
 
