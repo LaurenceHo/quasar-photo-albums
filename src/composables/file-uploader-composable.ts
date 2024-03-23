@@ -1,4 +1,4 @@
-import { InternalFile } from 'components/models';
+import { UploadableFile } from 'components/models';
 import { Notify } from 'quasar';
 import PhotoService from 'src/services/photo-service';
 import { photoStore } from 'stores/photo-store';
@@ -14,12 +14,12 @@ export default function () {
     isCompleteUploading.value = state;
   };
 
-  const uploadFile = async (file: InternalFile, albumId: string) => {
+  const uploadFile = async (file: UploadableFile, albumId: string) => {
     file.exists = usePhotoStore.findPhotoIndex(file.file.name) !== -1;
     const photoService = new PhotoService();
     file.status = 'loading';
     let response;
-    if (file.file.type.startsWith('image/') && !file.exists) {
+    if (file.id.includes('image') && !file.exists) {
       response = await photoService.uploadPhotos(file.file, albumId);
       file.status = response.status === 'Success';
     } else {

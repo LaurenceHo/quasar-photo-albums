@@ -1,12 +1,5 @@
 import { ref } from 'vue';
-
-interface IUploadableFile {
-  file: any;
-  id: string;
-  url: string;
-  status: any;
-}
-
+import { UploadableFile as IUploadableFile } from 'components/models';
 export default function () {
   const files = ref<IUploadableFile[]>([]);
 
@@ -31,15 +24,17 @@ export default function () {
 }
 
 class UploadableFile implements IUploadableFile {
-  file: any;
   id: string;
+  file: File;
   url: string;
-  status: null;
+  status: 'loading' | boolean | null;
+  exists: boolean;
 
   constructor(file: any) {
     this.file = file;
     this.id = `${file.name}-${file.size}-${file.lastModified}-${file.type}`;
     this.url = URL.createObjectURL(file);
     this.status = null;
+    this.exists = false;
   }
 }

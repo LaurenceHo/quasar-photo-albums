@@ -1,5 +1,5 @@
 <template>
-  <component :is="tag" class="file-preview relative-position overflow-hidden q-ma-md">
+  <component :is="tag" class="file-preview relative-position overflow-hidden q-mx-lg q-my-md">
     <div class="relative-position">
       <q-img v-if="isValidImageFile" :alt="file.file.name" :src="file.url" :title="file.file.name" ratio="1" />
       <div v-else>
@@ -52,13 +52,13 @@ const { file } = toRefs(props);
 
 const isValidImageFile = computed(() => {
   const fileSize = file.value.file.size / 1024 / 1024;
-  return file.value.file.type.startsWith('image/') && fileSize < 10;
+  return file.value.id.includes('image') && fileSize < 10;
 });
 </script>
 
 <style lang="scss" scoped>
 .file-preview {
-  width: 21%;
+  width: 20%;
 
   button {
     top: 4px;

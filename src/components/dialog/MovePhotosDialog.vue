@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="movePhotoDialogState">
-    <q-card style="min-width: 400px">
+    <q-card>
       <q-card-section>
         <div class="text-h6">Move photo{{ getSelectedPhotoList.length > 1 ? 's' : '' }} to another album</div>
       </q-card-section>
@@ -21,6 +21,10 @@
           use-input
           @filter="filterAlbums"
         />
+      </q-card-section>
+
+      <q-card-section class="q-pt-none scroll" style="max-height: 50vh">
+        <div v-for="photoKey in photoKeysArray" :key="photoKey" class="row">{{ photoKey }}</div>
       </q-card-section>
 
       <q-card-actions align="right">

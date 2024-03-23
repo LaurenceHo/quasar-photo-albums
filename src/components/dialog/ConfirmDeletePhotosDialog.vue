@@ -8,7 +8,7 @@
         </span>
       </q-card-section>
 
-      <q-card-section class="q-pt-none">
+      <q-card-section class="q-pt-none scroll" style="max-height: 50vh">
         <div v-for="photoKey in photoKeysArray" :key="photoKey" class="row">{{ photoKey }}</div>
       </q-card-section>
 
