@@ -40,7 +40,7 @@
           round
           @click="setSelectedPhotosList(photoKeysList)"
         >
-          <q-tooltip> Select all photos</q-tooltip>
+          <q-tooltip> Select all photos (Max 50 photos)</q-tooltip>
         </q-btn>
         <q-btn v-if="getSelectedPhotoList.length > 0" flat icon="mdi-close" round @click="setSelectedPhotosList([])">
           <q-tooltip> Unselect all photos</q-tooltip>

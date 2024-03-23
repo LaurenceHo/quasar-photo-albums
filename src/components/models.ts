@@ -48,3 +48,10 @@ export interface ApiResponse<T> extends ResponseStatus {
 }
 
 export type ExifData = ExifTags & FileTags;
+
+export interface InternalFile {
+  id: string;
+  file: File;
+  status: 'loading' | boolean | null;
+  exists: boolean;
+}

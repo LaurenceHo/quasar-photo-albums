@@ -25,10 +25,12 @@
                   <span class="smaller">to add them</span>
                 </span>
                 <span v-else>
-                  <span>Drag Your Files Here</span>
+                  <span>Drag Your Photos Here</span>
                   <span class="smaller">
-                    or <strong><em>click here</em></strong> to select files
+                    or <strong><em>click here</em></strong> to select photos
                   </span>
+                  <span class="smaller"> Max file size: 10MB </span>
+                  <span class="smaller"> Only image files allowed </span>
                 </span>
                 <input id="file-input" accept="image/png, image/jpeg" multiple type="file" @change="onInputChange" />
               </label>

@@ -138,6 +138,7 @@ import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+defineEmits(['refreshPhotoList']);
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
 const q = useQuasar();
