@@ -1,5 +1,5 @@
 <template>
-  <div id="album-location-map" class="rounded-borders-lg"></div>
+  <div id="album-location-map"></div>
 </template>
 
 <script lang="ts" setup>

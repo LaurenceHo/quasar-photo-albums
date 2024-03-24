@@ -1,7 +1,11 @@
+import jwt from 'jsonwebtoken';
 import { isEmpty, isUndefined } from 'lodash';
-import { Photo, PhotosRequest, RenamePhotoRequest } from '../models';
+import get from 'lodash/get';
+import { Photo, PhotosRequest, RenamePhotoRequest, UserPermission } from '../models';
+import { cleanCookie } from '../route/auth-middleware';
 import AlbumService from '../services/album-service';
 import { S3Service } from '../services/s3-service';
+import JsonResponse from '../utils/json-response';
 import { BaseController } from './base-controller';
 import { deleteObjects, updatePhotoAlbum, uploadObject } from './helpers';
 import { Request, RequestHandler, Response } from 'express';
@@ -20,6 +24,28 @@ export default class PhotoController extends BaseController {
 
     try {
       const album = await albumService.findOne({ id: albumId });
+      if (album.isPrivate) {
+        const token = get(req, 'cookies.jwt', null);
+        if (token) {
+          try {
+            jwt.verify(token, process.env.JWT_SECRET as string, async (err: any, payload: any) => {
+              if (err) {
+                cleanCookie(res, 'Authentication failed. Please login.');
+              }
+
+              const user: UserPermission = payload;
+              if (user?.role !== 'admin') {
+                return new JsonResponse(403).unauthorized(res, 'Unauthorized action');
+              }
+              return;
+            });
+          } catch (error) {
+            cleanCookie(res, 'Authentication failed. Please login.');
+          }
+        } else {
+          return new JsonResponse(403).unauthorized(res, 'No auth token provided. Please login.');
+        }
+      }
       const folderNameKey = decodeURIComponent(albumId) + '/';
       const photos = await s3Service.findPhotosByAlbumId({
         Prefix: folderNameKey,

@@ -1,14 +1,16 @@
 <template>
-  <div
-    :data-active="active"
-    class="drop-zone-container scroll-y"
-    @dragenter.prevent="setActive"
-    @dragover.prevent="setActive"
-    @dragleave.prevent="setInactive"
-    @drop.prevent="onDrop"
-  >
-    <slot :drop-zone-active="active"></slot>
-  </div>
+  <q-card :flat="!active" bordered style="max-width: 1080px" class="full-width scroll">
+    <q-card-section>
+      <div
+        @dragenter.prevent="setActive"
+        @dragover.prevent="setActive"
+        @dragleave.prevent="setInactive"
+        @drop.prevent="onDrop"
+      >
+        <slot :drop-zone-active="active"></slot>
+      </div>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script lang="ts" setup>

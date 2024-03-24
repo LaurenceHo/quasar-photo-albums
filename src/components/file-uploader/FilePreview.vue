@@ -1,20 +1,42 @@
 <template>
-  <component :is="tag" class="file-preview">
-    <button
-      v-if="file.status !== true"
-      :disabled="file.status === 'loading'"
-      class="close-icon"
-      @click="$emit('remove', file)"
-    >
-      &times;
-    </button>
-    <img v-if="isImageFile" :alt="file.file.name" :src="file.url" :title="file.file.name" />
-    <div v-else>
-      This file is not allowed: <strong>{{ file.file.name }}</strong>
+  <component :is="tag" class="file-preview relative-position overflow-hidden q-mx-lg q-my-md">
+    <div class="relative-position">
+      <q-img v-if="isValidImageFile" :alt="file.file.name" :src="file.url" :title="file.file.name" ratio="1" />
+      <div v-else>
+        This file is not allowed <strong>{{ file.file.name }}</strong>
+      </div>
+      <q-btn
+        v-if="file.status !== true && !file.exists"
+        :disabled="file.status === 'loading'"
+        round
+        dense
+        size="xs"
+        color="negative"
+        icon="mdi-close"
+        class="absolute-top-right"
+        @click="$emit('remove', file)"
+      />
+      <div class="absolute-bottom-right">
+        <q-chip v-if="file.status === 'loading'" dense icon="mdi-progress-upload" class="loading-indicator">
+          Uploading
+        </q-chip>
+        <q-chip v-else-if="file.status === true" dense color="positive" icon="mdi-check" text-color="white">
+          Uploaded
+        </q-chip>
+        <q-chip
+          v-else-if="file.status === false && !file.exists"
+          dense
+          color="negative"
+          icon="mdi-alert-circle"
+          text-color="white"
+        >
+          Error
+        </q-chip>
+        <q-chip v-else-if="file.status === false && file.exists" dense icon="mdi-file-alert" color="warning">
+          File exists
+        </q-chip>
+      </div>
     </div>
-    <span v-show="file.status === 'loading'" class="status-indicator loading-indicator">In Progress</span>
-    <span v-show="file.status === true" class="status-indicator success-indicator">Uploaded</span>
-    <span v-show="file.status === false" class="status-indicator failure-indicator">Error</span>
   </component>
 </template>
 
@@ -28,66 +50,24 @@ const props = defineProps({
 });
 const { file } = toRefs(props);
 
-const isImageFile = computed(() => file.value.id.includes('image'));
+const isValidImageFile = computed(() => {
+  const fileSize = file.value.file.size / 1024 / 1024;
+  return file.value.id.includes('image') && fileSize < 10;
+});
 </script>
 
 <style lang="scss" scoped>
 .file-preview {
   width: 20%;
-  margin: 1rem 2.5%;
-  position: relative;
-  aspect-ratio: 1/1;
-  overflow: hidden;
 
-  img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-  }
-
-  .close-icon,
-  .status-indicator {
-    --size: 20px;
-    position: absolute;
-    line-height: var(--size);
-    height: var(--size);
-    border-radius: var(--size);
-    box-shadow: 0 0 5px currentColor;
-    right: 0.25rem;
-    appearance: none;
-    border: 0;
-    padding: 0;
-  }
-
-  .close-icon {
-    width: var(--size);
-    font-size: var(--size);
-    background: #c10015;
-    color: #fff;
-    top: 0.25rem;
-    cursor: pointer;
-  }
-
-  .status-indicator {
-    font-size: calc(0.75 * var(--size));
-    bottom: 0.25rem;
-    padding: 0 10px;
+  button {
+    top: 4px;
+    right: 4px;
   }
 
   .loading-indicator {
     animation: pulse 1.5s linear 0s infinite;
     color: #000;
-  }
-
-  .success-indicator {
-    background: #21ba45;
-    color: #040;
-  }
-
-  .failure-indicator {
-    background: #c10015;
-    color: #fff;
   }
 }
 

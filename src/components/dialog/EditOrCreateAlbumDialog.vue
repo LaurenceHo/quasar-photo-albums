@@ -6,7 +6,7 @@
       </q-card-section>
 
       <q-form @submit.prevent.stop="confirmUpdateAlbum">
-        <q-card-section class="q-pt-none">
+        <q-card-section class="q-pt-none scroll" style="max-height: 50vh">
           <q-input
             v-model="albumId"
             :disable="getAlbumToBeUpdate.id !== ''"
@@ -102,10 +102,10 @@
               </q-item>
             </template>
           </q-select>
-        </q-card-section>
 
-        <q-card-section v-if="selectedPlace" class="q-pt-none">
-          <PhotoLocationMap :latitude="locationLatitude" :longitude="locationLongitude" />
+          <div class="q-pt-md">
+            <PhotoLocationMap v-if="selectedPlace" :latitude="locationLatitude" :longitude="locationLongitude" />
+          </div>
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
