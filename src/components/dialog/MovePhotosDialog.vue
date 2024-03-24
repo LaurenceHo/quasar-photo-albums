@@ -2,10 +2,10 @@
   <q-dialog v-model="movePhotoDialogState">
     <q-card>
       <q-card-section>
-        <div class="text-h6" v-if="duplicatedPhotoKeys.length === 0">
+        <div v-if="duplicatedPhotoKeys.length === 0" class="text-h6">
           Move photo{{ getSelectedPhotoList.length > 1 ? 's' : '' }} to another album
         </div>
-        <div class="text-h6" v-else>
+        <div v-else class="text-h6">
           <q-icon name="mdi-file-alert" color="warning" /> Photo{{ duplicatedPhotoKeys.length > 1 ? 's' : '' }} exist{{
             duplicatedPhotoKeys.length < 2 ? 's' : ''
           }}
@@ -13,7 +13,7 @@
         </div>
       </q-card-section>
 
-      <q-card-section class="q-pt-none" v-if="duplicatedPhotoKeys.length === 0">
+      <q-card-section v-if="duplicatedPhotoKeys.length === 0" class="q-pt-none">
         Select another album for {{ getSelectedPhotoList.length > 1 ? 'these' : 'this' }} photo{{
           getSelectedPhotoList.length > 1 ? 's' : ''
         }}.
@@ -55,8 +55,8 @@
           no-caps
         />
         <q-btn
-          data-test-id="move-photos-button"
           v-if="duplicatedPhotoKeys.length === 0"
+          data-test-id="move-photos-button"
           :disable="!selectedAlbum || isProcessing || photoKeysArray.length === 0"
           :loading="isProcessing"
           color="primary"
