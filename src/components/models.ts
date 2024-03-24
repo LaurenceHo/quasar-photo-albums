@@ -37,7 +37,7 @@ export interface Place {
 }
 
 export interface ResponseStatus {
-  code?: number;
+  code: number;
   status: string;
   message?: string;
   data?: any;

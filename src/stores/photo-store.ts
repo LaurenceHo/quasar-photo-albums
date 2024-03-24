@@ -1,6 +1,6 @@
 import { Album, Photo } from 'components/models';
 import { defineStore } from 'pinia';
-import { Notify } from 'quasar';
+import { LocalStorage, Notify } from 'quasar';
 import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';
 import { useRouter } from 'vue-router';
@@ -37,9 +37,8 @@ export const photoStore = defineStore('photos', {
 
   actions: {
     async getPhotos(albumId: string, refreshPhotosList?: boolean) {
-      const store = albumStore();
-      const router = useRouter();
-      const albumItem = store.getAlbumById(albumId) as Album;
+      const useAlbumStore = albumStore();
+      const albumItem = useAlbumStore.getAlbumById(albumId);
       if (albumItem?.id) {
         // Only fetch photos when album id is updated
         if (albumId !== this.selectedAlbumItem.id || refreshPhotosList) {
@@ -47,8 +46,23 @@ export const photoStore = defineStore('photos', {
           if (!refreshPhotosList) {
             this.photoList = [];
           }
-          const { data } = await photoService.getPhotosByAlbumId(albumId);
+          const { data, code } = await photoService.getPhotosByAlbumId(albumId);
           this.photoList = data ?? [];
+          if (code && code !== 200) {
+            if (code > 400 && code < 500) {
+              LocalStorage.remove('ALL_ALBUMS');
+              await useAlbumStore.getAllAlbumInformation();
+            }
+
+            Notify.create({
+              timeout: 2000,
+              progress: true,
+              color: 'negative',
+              icon: 'mdi-alert-circle',
+              message: 'Ooops, something wrong. You will be redirected to the home page in 3 seconds',
+            });
+            setTimeout(() => window.location.assign('/'), 3000);
+          }
         }
       } else {
         Notify.create({
@@ -58,7 +72,7 @@ export const photoStore = defineStore('photos', {
           icon: 'mdi-alert-circle',
           message: "Album doesn't exist. You will be redirected to the home page in 3 seconds",
         });
-        setTimeout(() => router.push('/'), 3000);
+        setTimeout(() => window.location.assign('/'), 3000);
       }
     },
   },

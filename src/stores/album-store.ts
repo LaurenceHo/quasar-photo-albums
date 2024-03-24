@@ -31,7 +31,10 @@ export const albumStore = defineStore('albums', {
       refreshAlbumList: false,
     }) as AlbumState,
   getters: {
-    getAlbumById: (state: AlbumState) => (id: string) => state.allAlbumList.find((album) => album.id === id),
+    getAlbumById:
+      (state: AlbumState) =>
+      (id: string): Album | undefined =>
+        state.allAlbumList.find((album) => album.id === id),
 
     chunkAlbumList:
       (state: AlbumState) =>

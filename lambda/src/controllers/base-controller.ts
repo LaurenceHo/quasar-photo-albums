@@ -15,9 +15,9 @@ export abstract class BaseController implements IBaseController {
 
   public ok<T>(res: Response, message = '', data?: T) {
     if (data) {
-      return new JsonResponse<T>().success(res, message, data);
+      return new JsonResponse<T>(200).success(res, message, data);
     } else {
-      return new JsonResponse().success(res, message);
+      return new JsonResponse(200).success(res, message);
     }
   }
 
