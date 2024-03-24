@@ -2,10 +2,18 @@
   <q-dialog v-model="movePhotoDialogState">
     <q-card>
       <q-card-section>
-        <div class="text-h6">Move photo{{ getSelectedPhotoList.length > 1 ? 's' : '' }} to another album</div>
+        <div class="text-h6" v-if="duplicatedPhotoKeys.length === 0">
+          Move photo{{ getSelectedPhotoList.length > 1 ? 's' : '' }} to another album
+        </div>
+        <div class="text-h6" v-else>
+          <q-icon name="mdi-file-alert" color="warning" /> Photo{{ duplicatedPhotoKeys.length > 1 ? 's' : '' }} exist{{
+            duplicatedPhotoKeys.length < 2 ? 's' : ''
+          }}
+          in {{ selectedAlbum }}
+        </div>
       </q-card-section>
 
-      <q-card-section class="q-pt-none">
+      <q-card-section class="q-pt-none" v-if="duplicatedPhotoKeys.length === 0">
         Select another album for {{ getSelectedPhotoList.length > 1 ? 'these' : 'this' }} photo{{
           getSelectedPhotoList.length > 1 ? 's' : ''
         }}.
@@ -32,21 +40,24 @@
           </div>
         </template>
 
-        <template v-if="duplicatedPhotoKeys.length > 0 && !isProcessing">
-          <div>
-            <q-icon name="mdi-file-alert" color="warning" /> Photo{{
-              duplicatedPhotoKeys.length > 1 ? 's' : ''
-            }}
-            exist{{ duplicatedPhotoKeys.length < 2 ? 's' : '' }} in {{ selectedAlbum }}:
-          </div>
+        <template v-else>
           <div v-for="photoKey in duplicatedPhotoKeys" :key="photoKey" class="row">{{ photoKey }}</div>
         </template>
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn v-close-popup :disable="isProcessing" color="primary" flat label="Cancel" no-caps />
         <q-btn
-          :disable="!selectedAlbum || isProcessing"
+          v-close-popup
+          :disable="isProcessing"
+          color="primary"
+          flat
+          :label="duplicatedPhotoKeys.length === 0 ? 'Cancel' : 'Close'"
+          no-caps
+        />
+        <q-btn
+          data-test-id="move-photos-button"
+          v-if="duplicatedPhotoKeys.length === 0"
+          :disable="!selectedAlbum || isProcessing || photoKeysArray.length === 0"
           :loading="isProcessing"
           color="primary"
           label="Move"
@@ -107,23 +118,26 @@ const filterAlbums = (input: string, update: any) => {
 const confirmMovePhotos = async () => {
   isProcessing.value = true;
   const photosInSelectedAlbum = await photoService.getPhotosByAlbumId(selectedAlbum.value);
-  duplicatedPhotoKeys.value =
+  const tempDuplicatedPhotoKeys =
     photosInSelectedAlbum.data
       ?.filter((photo) => photoKeysArray.value.includes(photo.key.split('/')[1]))
       .map((photo) => photo.key.split('/')[1]) ?? [];
 
   let filteredPhotoKeys = photoKeysArray.value;
   // Remove duplicated photos from the list
-  if (duplicatedPhotoKeys.value.length > 0) {
-    filteredPhotoKeys = photoKeysArray.value.filter((photoKey) => !duplicatedPhotoKeys.value.includes(photoKey));
+  if (tempDuplicatedPhotoKeys.length > 0) {
+    filteredPhotoKeys = photoKeysArray.value.filter((photoKey) => !tempDuplicatedPhotoKeys.includes(photoKey));
   }
   if (filteredPhotoKeys.length === 0) {
+    duplicatedPhotoKeys.value = tempDuplicatedPhotoKeys;
     isProcessing.value = false;
     return;
   }
 
   const result = await photoService.movePhotos(albumId?.value, selectedAlbum.value, filteredPhotoKeys);
   isProcessing.value = false;
+  duplicatedPhotoKeys.value = tempDuplicatedPhotoKeys;
+
   if (result.status === 'Success') {
     emits('closePhotoDetailDialog');
     emits('refreshPhotoList');

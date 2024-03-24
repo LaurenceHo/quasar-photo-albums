@@ -4,12 +4,12 @@ import PhotoService from 'src/services/photo-service';
 import { photoStore } from 'stores/photo-store';
 import { ref } from 'vue';
 
-const usePhotoStore = photoStore();
-
 const isUploading = ref(false);
 const isCompleteUploading = ref(false);
 
 export default function () {
+  const usePhotoStore = photoStore();
+
   const setIsCompleteUploading = (state: boolean) => {
     isCompleteUploading.value = state;
   };

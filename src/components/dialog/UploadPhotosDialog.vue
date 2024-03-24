@@ -47,7 +47,7 @@
           :disable="isUploading || files.length === 0"
           class="q-mr-md"
           color="primary"
-          data-test-id="clear-button"
+          data-test-id="clear-file-button"
           outline
           padding="sm xl"
           size="lg"
@@ -60,7 +60,7 @@
           v-if="!isCompleteUploading"
           :disable="isUploading || files.length === 0"
           color="primary"
-          data-test-id="upload-button"
+          data-test-id="upload-file-button"
           padding="sm xl"
           size="lg"
           unelevated
