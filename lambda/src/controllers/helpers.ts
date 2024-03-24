@@ -14,7 +14,6 @@ export const updatePhotoAlbum = async (album: Album) => {
     Key: {
       id: album.id,
     },
-    ExpressionAttributeNames: { '#Order': 'order' },
     UpdateExpression:
       'SET albumName = :albumName, ' +
       'albumCover = :albumCover, ' +
@@ -22,7 +21,6 @@ export const updatePhotoAlbum = async (album: Album) => {
       'tags = :tags, ' +
       'isPrivate = :isPrivate, ' +
       'place = :place, ' +
-      '#Order = :order,' +
       'updatedAt = :updatedAt, ' +
       'updatedBy = :updatedBy',
     ExpressionAttributeValues: {
@@ -32,7 +30,6 @@ export const updatePhotoAlbum = async (album: Album) => {
       ':tags': album.tags,
       ':isPrivate': album.isPrivate,
       ':place': album.place ?? null,
-      ':order': album.order,
       ':updatedAt': album.updatedAt,
       ':updatedBy': album.updatedBy,
     },

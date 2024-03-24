@@ -15,15 +15,12 @@ vi.mock('../../../../src/services/photo-service', () => ({
       Promise.resolve({
         data: [
           {
-            url: 'https://ik.imagekit.io/oeqc5vsr3tf/2020-02-15/batch_2019-08-24%2010.32.31.jpg',
             key: '2020-02-15/batch_2019-08-24 10.32.31.jpg',
           },
           {
-            url: 'https://ik.imagekit.io/oeqc5vsr3tf/2020-02-15/batch_2019-08-24%2010.38.09.jpg',
             key: '2020-02-15/batch_2019-08-24 10.38.09.jpg',
           },
           {
-            url: 'https://ik.imagekit.io/oeqc5vsr3tf/2020-02-15/batch_2019-08-24%2010.39.21.jpg',
             key: '2020-02-15/batch_2019-08-24 10.39.21.jpg',
           },
         ],

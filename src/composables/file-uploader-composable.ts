@@ -1,20 +1,25 @@
+import { UploadableFile } from 'components/models';
 import { Notify } from 'quasar';
 import PhotoService from 'src/services/photo-service';
+import { photoStore } from 'stores/photo-store';
 import { ref } from 'vue';
 
 const isUploading = ref(false);
 const isCompleteUploading = ref(false);
 
 export default function () {
+  const usePhotoStore = photoStore();
+
   const setIsCompleteUploading = (state: boolean) => {
     isCompleteUploading.value = state;
   };
 
-  const uploadFile = async (file: any, albumId: string) => {
+  const uploadFile = async (file: UploadableFile, albumId: string) => {
+    file.exists = usePhotoStore.findPhotoIndex(file.file.name) !== -1;
     const photoService = new PhotoService();
     file.status = 'loading';
     let response;
-    if (file.id.includes('image')) {
+    if (file.id.includes('image') && !file.exists) {
       response = await photoService.uploadPhotos(file.file, albumId);
       file.status = response.status === 'Success';
     } else {

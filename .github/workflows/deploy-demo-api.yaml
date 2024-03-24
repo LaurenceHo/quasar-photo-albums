@@ -5,13 +5,13 @@ on:
     branches:
       - develop
     paths:
-      - "lambda/**"
+      - "lambda/src/**"
   pull_request:
     branches:
       - master
       - develop
     paths:
-      - "lambda/**"
+      - "lambda/src/**"
   workflow_dispatch:
     inputs:
       buildManually:

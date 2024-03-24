@@ -25,7 +25,7 @@
       </q-card-section>
 
       <q-form @submit.prevent.stop="confirmCreateTag" @reset.prevent.stop="onReset">
-        <q-card-section class="q-pt-none">
+        <q-card-section class="q-pt-none scroll" style="max-height: 50vh">
           <q-input
             v-model="tagName"
             :rules="[(val: string) => (val && val.length > 0) || 'This field is required']"

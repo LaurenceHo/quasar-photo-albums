@@ -37,7 +37,7 @@ export interface Place {
 }
 
 export interface ResponseStatus {
-  code?: number;
+  code: number;
   status: string;
   message?: string;
   data?: any;
@@ -48,3 +48,11 @@ export interface ApiResponse<T> extends ResponseStatus {
 }
 
 export type ExifData = ExifTags & FileTags;
+
+export interface UploadableFile {
+  id: string;
+  file: File;
+  url: string;
+  status: 'loading' | boolean | null;
+  exists: boolean;
+}

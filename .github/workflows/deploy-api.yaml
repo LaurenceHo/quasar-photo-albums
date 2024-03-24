@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - "lambda/**"
+      - "lambda/src/**"
   workflow_dispatch:
     inputs:
       buildManually:

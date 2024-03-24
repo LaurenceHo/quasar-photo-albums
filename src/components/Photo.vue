@@ -2,10 +2,11 @@
   <div class="photo-item col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6" data-test-id="photo-item">
     <div class="relative-position">
       <q-img
-        id="photo-image"
+        :id="`photo-image-${photo.key}`"
         :ratio="1"
         :src="`${photo.url}?tr=w-${imageWidth},h-${imageWidth}`"
         class="rounded-borders-lg cursor-pointer"
+        :alt="`photo image ${photo.key}`"
         @click="goToPhotoDetail()"
       />
       <div class="absolute-top flex justify-between photo-top-button-container">
@@ -38,6 +39,7 @@ import { userStore } from 'stores/user-store';
 import { computed, onMounted, ref, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
 
+defineEmits(['refreshPhotoList']);
 const props = defineProps({
   index: {
     type: Number,
