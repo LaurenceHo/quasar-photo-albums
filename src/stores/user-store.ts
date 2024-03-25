@@ -10,17 +10,18 @@ export interface UserState {
 
 const authService = new AuthService();
 
+const initialState: UserState = {
+  userPermission: {
+    uid: '',
+    email: '',
+    role: '',
+    displayName: '',
+  },
+  isCheckingUserPermission: true,
+};
+
 export const userStore = defineStore('user-permission', {
-  state: () =>
-    ({
-      userPermission: {
-        uid: '',
-        email: '',
-        role: '',
-        displayName: '',
-      },
-      isCheckingUserPermission: true,
-    }) as UserState,
+  state: () => initialState,
   getters: {
     isAdminUser: (state: UserState) => state.userPermission.role === 'admin',
   },

@@ -34,7 +34,6 @@
 <script lang="ts" setup>
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
 import { computed, onMounted, ref, toRefs } from 'vue';
 import { useRouter } from 'vue-router';

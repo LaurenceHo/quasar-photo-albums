@@ -1,5 +1,5 @@
-import { isEmpty } from 'radash';
 import { LoadingBar, Notify } from 'quasar';
+import { isEmpty } from 'radash';
 
 export default class HttpRequestService {
   baseUrl = process.env.NODE_ENV === 'production' ? process.env.AWS_API_GATEWAY_URL : 'http://localhost:3000/api';

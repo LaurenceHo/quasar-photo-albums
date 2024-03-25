@@ -1,5 +1,5 @@
 <template>
-  <q-btn :color="color" flat icon="mdi-dots-vertical" round>
+  <q-btn :color="color" flat icon="mdi-dots-vertical" round data-test-id="edit-photo-button">
     <q-menu>
       <q-list style="min-width: 100px">
         <q-item v-close-popup clickable @click="copyPhotoLink">

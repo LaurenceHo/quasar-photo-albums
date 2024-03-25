@@ -57,7 +57,6 @@
                 <q-item-section class="text-h5"> Details</q-item-section>
                 <EditPhotoButton
                   v-if="isAdminUser && selectedImage"
-                  :album-item="albumItem"
                   :photo-key="selectedImage?.key"
                   @refresh-photo-list="$emit('refreshPhotoList')"
                 />
@@ -131,9 +130,8 @@ import { ExifData } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import * as ExifReader from 'exifreader';
 import { NumberTag, StringArrayTag } from 'exifreader';
-import { isEmpty } from 'radash';
 import { useQuasar } from 'quasar';
-import { albumStore } from 'stores/album-store';
+import { isEmpty } from 'radash';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
@@ -142,7 +140,6 @@ import { useRoute, useRouter } from 'vue-router';
 defineEmits(['refreshPhotoList']);
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
-const useAlbumStore = albumStore();
 
 const q = useQuasar();
 const router = useRouter();
@@ -156,7 +153,6 @@ const loadImage = ref(false);
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const selectedImage = computed(() => usePhotoStore.findPhotoByIndex(selectedImageIndex.value));
 const photoList = computed(() => usePhotoStore.photoList);
-const albumItem = computed(() => useAlbumStore.selectedAlbumItem);
 const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
 
 const albumId = computed(() => route.params.albumId as string);

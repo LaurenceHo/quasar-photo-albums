@@ -1,6 +1,6 @@
-import { isEmpty } from 'radash';
 import { Notify } from 'quasar';
 import { route } from 'quasar/wrappers';
+import { isEmpty } from 'radash';
 import { userStore } from 'stores/user-store';
 import { createMemoryHistory, createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 import routes from './routes';

@@ -22,8 +22,8 @@
 </template>
 
 <script lang="ts" setup>
-import { isEmpty } from 'radash';
 import { LocalStorage, useQuasar } from 'quasar';
+import { isEmpty } from 'radash';
 import AuthService from 'src/services/auth-service';
 import { userStore } from 'src/stores/user-store';
 import { computed, onMounted, ref } from 'vue';

@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QDialog } from 'quasar';
 import MovePhotosDialog from '../../../../../src/components/dialog/MovePhotosDialog.vue';
 import DialogStateComposable from '../../../../../src/composables/dialog-state-composable';
-import { mockAlbumList } from '../../mock-data';
+import { mockAlbumList, mockPhotoList } from '../../mock-data';
 
 installQuasarPlugin({ components: { QDialog } });
 
@@ -13,17 +13,7 @@ vi.mock('../../../../../src/services/photo-service', () => ({
   default: vi.fn().mockImplementation(() => ({
     getPhotosByAlbumId: () =>
       Promise.resolve({
-        data: [
-          {
-            key: '2020-02-15/batch_2019-08-24 10.32.31.jpg',
-          },
-          {
-            key: '2020-02-15/batch_2019-08-24 10.38.09.jpg',
-          },
-          {
-            key: '2020-02-15/batch_2019-08-24 10.39.21.jpg',
-          },
-        ],
+        data: mockPhotoList,
       }),
     movePhotos: () => Promise.resolve({ status: 'Success' }),
   })),
@@ -86,27 +76,15 @@ describe('MovePhotosDialog.vue', () => {
     await vm.$nextTick();
 
     const { setSelectedPhotosList } = DialogStateComposable();
-    setSelectedPhotosList([
-      '2020-02-15/batch_2019-08-24 10.32.31.jpg',
-      '2020-02-15/batch_2019-08-24 10.38.09.jpg',
-      '2020-02-15/batch_2019-08-24 10.39.21.jpg',
-    ]);
+    setSelectedPhotosList(['album-1/photo1.jpg', 'album-1/photo2.jpg', 'album-1/photo3.jpg']);
     await vm.$nextTick();
     // Check photo keys array
-    expect(vm.photoKeysArray).toEqual([
-      'batch_2019-08-24 10.32.31.jpg',
-      'batch_2019-08-24 10.38.09.jpg',
-      'batch_2019-08-24 10.39.21.jpg',
-    ]);
-
+    expect(vm.photoKeysArray).toEqual(['photo1.jpg', 'photo2.jpg', 'photo3.jpg']);
+    expect(vm.duplicatedPhotoKeys).toEqual([]);
     // Click upload button
     await wrapper.findComponent('[data-test-id="move-photos-button"]').trigger('click');
     await vm.$nextTick();
-    expect(vm.duplicatedPhotoKeys).toEqual([
-      'batch_2019-08-24 10.32.31.jpg',
-      'batch_2019-08-24 10.38.09.jpg',
-      'batch_2019-08-24 10.39.21.jpg',
-    ]);
+    expect(vm.duplicatedPhotoKeys).toEqual(['photo1.jpg', 'photo2.jpg', 'photo3.jpg']);
     // Check emit event
     expect(wrapper.emitted().closePhotoDetailDialog).toBeUndefined();
     expect(wrapper.emitted().refreshPhotoList).toBeUndefined();

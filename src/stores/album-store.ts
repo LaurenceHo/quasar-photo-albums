@@ -1,10 +1,10 @@
-import { isEmpty } from 'radash';
 import { defineStore } from 'pinia';
 import { Loading, LocalStorage } from 'quasar';
+import { isEmpty } from 'radash';
 import { Album, AlbumTag } from 'src/components/models';
-import { compareDbUpdatedTime } from 'src/utils/helper';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
+import { compareDbUpdatedTime, sortByKey } from 'src/utils/helper';
 import { userStore } from 'stores/user-store';
 
 export interface AlbumState {
@@ -129,13 +129,9 @@ export const albumStore = defineStore('albums', {
         if (!isAdminUser) {
           tempList = tempList.filter((album) => !album.isPrivate);
         }
-        this.allAlbumList = tempList.sort((a, b) => {
-          if (this.sortOrder === 'asc') {
-            return a.albumName.localeCompare(b.albumName);
-          } else {
-            return b.albumName.localeCompare(a.albumName);
-          }
-        });
+
+        this.allAlbumList = sortByKey(tempList, 'albumName', this.sortOrder);
+
         // Get album tags from local storage again
         const albumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
         const tempAlbumTags: { tag: string }[] = !isEmpty(albumTagsString) ? JSON.parse(albumTagsString) : [];
