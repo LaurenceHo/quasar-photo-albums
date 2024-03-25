@@ -104,15 +104,15 @@ export default class PhotoController extends BaseController {
   update: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const { destinationAlbumId, albumId, photoKeys } = req.body as PhotosRequest;
 
-    if (albumId === undefined || isEmpty(albumId)) {
+    if (isEmpty(albumId)) {
       return this.clientError(res, 'No album');
     }
 
-    if (destinationAlbumId === undefined || isEmpty(destinationAlbumId)) {
+    if (isEmpty(destinationAlbumId)) {
       return this.clientError(res, 'No destination album');
     }
 
-    if (photoKeys !== undefined && !isEmpty(photoKeys)) {
+    if (!isEmpty(photoKeys)) {
       const promises: Promise<any>[] = [];
       photoKeys.forEach((photoKey) => {
         const sourcePhotoKey = `${albumId}/${photoKey}`;
@@ -162,16 +162,11 @@ export default class PhotoController extends BaseController {
   rename: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const { albumId, newPhotoKey, currentPhotoKey } = req.body as RenamePhotoRequest;
 
-    if (albumId === undefined || isEmpty(albumId)) {
+    if (isEmpty(albumId)) {
       return this.clientError(res, 'No album');
     }
 
-    if (
-      !newPhotoKey !== undefined &&
-      !isEmpty(newPhotoKey) &&
-      !currentPhotoKey !== undefined &&
-      !isEmpty(currentPhotoKey)
-    ) {
+    if (!isEmpty(newPhotoKey) && !isEmpty(currentPhotoKey)) {
       // Currently, the only way to rename an object using the SDK is to copy the object with a different name and
       // then delete the original object.
       try {
@@ -196,11 +191,11 @@ export default class PhotoController extends BaseController {
   delete: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const { albumId, photoKeys } = req.body as PhotosRequest;
 
-    if (albumId === undefined || isEmpty(albumId)) {
+    if (isEmpty(albumId)) {
       return this.clientError(res, 'No album');
     }
 
-    if (photoKeys !== undefined && !isEmpty(photoKeys)) {
+    if (!isEmpty(photoKeys)) {
       const photoKeysArray = photoKeys.map((photoKey) => `${albumId}/${photoKey}`);
       try {
         const result = await deleteObjects(photoKeysArray);
