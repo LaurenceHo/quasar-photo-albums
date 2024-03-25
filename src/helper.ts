@@ -15,3 +15,17 @@ export const compareDbUpdatedTime = async () => {
     time,
   };
 };
+
+export const sortByKey = (array: any[], key: string, sorting: 'asc' | 'desc') => {
+  return array.sort((a, b) => {
+    if (typeof a[key] === 'string') {
+      return sorting === 'asc' ? a[key].localeCompare(b[key]) : b[key].localeCompare(a[key]);
+    }
+
+    if (typeof a[key] === 'number') {
+      return sorting === 'asc' ? a[key] - b[key] : b[key] - a[key];
+    }
+
+    return 0;
+  });
+};

@@ -1,4 +1,4 @@
-import { isEmpty } from 'lodash-es';
+import { isEmpty } from 'radash';
 import { LoadingBar, Notify } from 'quasar';
 
 export default class HttpRequestService {

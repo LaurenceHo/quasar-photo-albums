@@ -1,4 +1,5 @@
 import {
+  _Object,
   CopyObjectCommand,
   CopyObjectCommandInput,
   DeleteObjectsCommand,
@@ -10,7 +11,7 @@ import {
   PutObjectCommandInput,
   S3Client,
 } from '@aws-sdk/client-s3';
-import get from 'lodash/get';
+import { get } from 'radash';
 import { BaseService, Photo } from '../models';
 import { configuration } from './config';
 
@@ -20,7 +21,7 @@ export class S3Service implements BaseService<Photo> {
 
   async findPhotosByAlbumId(params: ListObjectsV2CommandInput): Promise<Photo[]> {
     const response = await this.s3Client.send(new ListObjectsV2Command(params));
-    const s3ObjectContents = get(response, 'Contents', []);
+    const s3ObjectContents: _Object[] = get(response, 'Contents', []);
 
     // Compose photos array from s3ObjectContents
     const photos: Photo[] = s3ObjectContents.map((photo) => {

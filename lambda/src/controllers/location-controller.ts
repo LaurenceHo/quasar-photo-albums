@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from 'express';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'radash';
 import { Place } from '../models';
 import { asyncHandler } from '../utils/async-handler';
 import { BaseController } from './base-controller';
