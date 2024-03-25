@@ -127,7 +127,7 @@
 <script lang="ts" setup>
 import { Album, Place } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
-import { isEmpty } from 'lodash';
+import { isEmpty } from 'radash';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';

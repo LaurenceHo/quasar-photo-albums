@@ -1,4 +1,4 @@
-import { Response, RequestHandler } from 'express';
+import { RequestHandler, Response } from 'express';
 import { BaseController as IBaseController } from '../models';
 import JsonResponse from '../utils/json-response';
 

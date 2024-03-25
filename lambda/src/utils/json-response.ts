@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import { ApiResponse, ResponseStatus } from '../models';
 import { STATUS_ERROR, STATUS_SUCCESS, STATUS_UNAUTHORIZED } from '../constants';
+import { ApiResponse, ResponseStatus } from '../models';
 
 export default class JsonResponse<T> {
   private readonly code: number;

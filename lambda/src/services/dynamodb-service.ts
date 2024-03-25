@@ -1,16 +1,16 @@
 import {
-  GetCommand,
-  GetCommandInput,
-  ScanCommand,
-  ScanCommandInput,
-  PutCommandInput,
-  PutCommand,
-  UpdateCommand,
-  UpdateCommandInput,
   DeleteCommand,
   DeleteCommandInput,
+  GetCommand,
+  GetCommandInput,
+  PutCommand,
+  PutCommandInput,
+  ScanCommand,
+  ScanCommandInput,
+  UpdateCommand,
+  UpdateCommandInput,
 } from '@aws-sdk/lib-dynamodb';
-import get from 'lodash/get';
+import { get } from 'radash';
 import { BaseService as IBaseService } from '../models';
 import { ddbDocClient } from './dynamodb-client';
 
@@ -37,7 +37,7 @@ export abstract class DynamodbService<T> implements IBaseService<T> {
       Key: objectKey,
     };
     const response = await this.client.send(new GetCommand(params));
-    return get(response, 'Item', {});
+    return get(response, 'Item', {} as T);
   }
 
   async create(item: T): Promise<boolean> {

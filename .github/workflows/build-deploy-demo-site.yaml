@@ -1,6 +1,11 @@
 name: Build and deploy demo web app
 
 on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "src/**"
   pull_request:
     branches:
       - master
