@@ -126,11 +126,11 @@ export default class HttpRequestService {
     }
   };
 
-  private parseResponse = (response: Response) => {
+  private parseResponse = async (response: Response) => {
     return response
       .json()
       .then((data) => data)
-      .catch(() => {
+      .catch(async () => {
         return response
           .text()
           .then((data) => data)

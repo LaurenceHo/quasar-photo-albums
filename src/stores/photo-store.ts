@@ -1,4 +1,4 @@
-import { Album, Photo } from 'components/models';
+import { Photo } from 'components/models';
 import { defineStore } from 'pinia';
 import { LocalStorage } from 'quasar';
 import PhotoService from 'src/services/photo-service';
@@ -6,7 +6,6 @@ import { notifyError } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
 
 export interface PhotoStoreState {
-  selectedAlbumItem: Album;
   photoList: Photo[];
   fetchingPhotos: boolean;
 }
@@ -14,15 +13,6 @@ export interface PhotoStoreState {
 const photoService = new PhotoService();
 
 const initialState: PhotoStoreState = {
-  selectedAlbumItem: {
-    id: '',
-    albumName: '',
-    albumCover: '',
-    description: '',
-    tags: [],
-    isPrivate: false,
-    order: 0,
-  },
   photoList: [],
   fetchingPhotos: false,
 };
@@ -33,15 +23,16 @@ export const photoStore = defineStore('photos', {
   getters: {
     findPhotoIndex:
       (state: PhotoStoreState) =>
-      (photoId: string): number =>
-        state.photoList.findIndex((photo) => photo.key === `${state.selectedAlbumItem.id}/${photoId}`),
+      (photoId: string): number => {
+        const useAlbumStore = albumStore();
+
+        return state.photoList.findIndex((photo) => photo.key === `${useAlbumStore.selectedAlbumItem.id}/${photoId}`);
+      },
 
     findPhotoByIndex:
       (state: PhotoStoreState) =>
       (index: number): Photo | undefined =>
         state.photoList[index],
-
-    isAlbumCover: (state: PhotoStoreState) => (photoKey: string) => state.selectedAlbumItem.albumCover === photoKey,
   },
 
   actions: {
@@ -50,8 +41,9 @@ export const photoStore = defineStore('photos', {
       const albumItem = useAlbumStore.getAlbumById(albumId);
       if (albumItem?.id) {
         // Only fetch photos when album id is updated
-        if (albumId !== this.selectedAlbumItem.id || refreshPhotosList) {
-          this.selectedAlbumItem = albumItem;
+        if (albumId !== useAlbumStore.selectedAlbumItem.id || refreshPhotosList) {
+          useAlbumStore.selectedAlbumItem = albumItem;
+
           if (!refreshPhotosList) {
             this.photoList = [];
           }

@@ -41,10 +41,9 @@
 import { Album } from 'components/models';
 import { copyToClipboard, useQuasar } from 'quasar';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import { getStaticFileUrl } from 'src/utils/helper';
 import AlbumService from 'src/services/album-service';
+import { getStaticFileUrl } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
-import { photoStore } from 'stores/photo-store';
 import { computed, toRefs } from 'vue';
 
 const props = defineProps({
@@ -60,13 +59,12 @@ const props = defineProps({
 
 const albumService = new AlbumService();
 const useAlbumStore = albumStore();
-const usePhotoStore = photoStore();
 const q = useQuasar();
 
 const { photoKey } = toRefs(props);
 
-const albumItem = computed(() => usePhotoStore.selectedAlbumItem);
-const isAlbumCover = computed(() => usePhotoStore.isAlbumCover(photoKey.value));
+const albumItem = computed(() => useAlbumStore.selectedAlbumItem);
+const isAlbumCover = computed(() => useAlbumStore.isAlbumCover(photoKey.value));
 
 const {
   setSelectedPhotosList,
