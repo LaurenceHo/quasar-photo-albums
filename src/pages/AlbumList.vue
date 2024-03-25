@@ -102,10 +102,10 @@
 <script lang="ts" setup>
 import Album from 'components/Album.vue';
 import Pagination from 'components/Pagination.vue';
-import isEmpty from 'lodash/isEmpty';
-import orderBy from 'lodash/orderBy';
+import { isEmpty } from 'radash';
 import { Album as AlbumItem } from 'src/components/models';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
+import { sortByKey } from 'src/helper';
 import { albumStore } from 'src/stores/album-store';
 import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
@@ -164,7 +164,7 @@ const updateSortOrder = () => store.$patch({ sortOrder: sortOrder.value === 'des
 
 // Only update the order of album list when user click sort button in order to prevent sorting multiple times
 watch(sortOrder, (newValue) => {
-  store.$patch({ allAlbumList: orderBy(store.allAlbumList, 'albumName', newValue) });
+  store.$patch({ allAlbumList: sortByKey(store.allAlbumList, 'albumName', newValue) });
   getFilteredAlbumList();
 });
 

@@ -131,7 +131,7 @@ import { ExifData, Photo } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import * as ExifReader from 'exifreader';
 import { NumberTag, StringArrayTag } from 'exifreader';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'radash';
 import { useQuasar } from 'quasar';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';

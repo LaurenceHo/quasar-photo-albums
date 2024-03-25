@@ -46,7 +46,7 @@
   </q-dialog>
 </template>
 <script lang="ts" setup>
-import { isEmpty } from 'lodash';
+import { isEmpty } from 'radash';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumService from 'src/services/album-service';
 import PhotoService from 'src/services/photo-service';

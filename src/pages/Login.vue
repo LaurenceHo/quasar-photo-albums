@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts" setup>
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'radash';
 import { LocalStorage, useQuasar } from 'quasar';
 import AuthService from 'src/services/auth-service';
 import { userStore } from 'src/stores/user-store';
@@ -35,7 +35,7 @@ onMounted(() => {
       loading.value = true;
       const { data: userPermission } = await authService.verifyIdToken(response.credential);
 
-      if (!isEmpty(userPermission)) {
+      if (!isEmpty(userPermission) && userPermission !== undefined) {
         userPermissionStore.setUserPermission(userPermission);
         q.notify({
           color: 'positive',

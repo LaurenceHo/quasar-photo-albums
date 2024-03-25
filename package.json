@@ -13,9 +13,9 @@
   },
   "dependencies": {
     "exifreader": "^4.3.1",
-    "lodash-es": "^4.17.21",
     "pinia": "^2.0.14",
     "quasar": "^2.7.0",
+    "radash": "^12.1.0",
     "vue": "^3.2.35",
     "vue-router": "^4.0.15"
   },
@@ -24,8 +24,6 @@
     "@quasar/app-vite": "^1.0.0",
     "@quasar/extras": "^1.14.0",
     "@quasar/quasar-app-extension-testing-unit-vitest": "^1.0.0",
-    "@types/lodash": "^4.14.178",
-    "@types/lodash-es": "^4.17.12",
     "@types/mapbox-gl": "^3.1.0",
     "@types/node": "^20.4.1",
     "@typescript-eslint/eslint-plugin": "^7.0.2",

@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { isEmpty, isUndefined } from 'lodash';
-import get from 'lodash/get';
+import { isEmpty, get } from 'radash';
 import { Photo, PhotosRequest, RenamePhotoRequest, UserPermission } from '../models';
 import { cleanCookie } from '../route/auth-middleware';
 import AlbumService from '../services/album-service';
@@ -105,15 +104,15 @@ export default class PhotoController extends BaseController {
   update: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const { destinationAlbumId, albumId, photoKeys } = req.body as PhotosRequest;
 
-    if (isUndefined(albumId) || isEmpty(albumId)) {
+    if (albumId === undefined || isEmpty(albumId)) {
       return this.clientError(res, 'No album');
     }
 
-    if (isUndefined(destinationAlbumId) || isEmpty(destinationAlbumId)) {
+    if (destinationAlbumId === undefined || isEmpty(destinationAlbumId)) {
       return this.clientError(res, 'No destination album');
     }
 
-    if (!isUndefined(photoKeys) && !isEmpty(photoKeys)) {
+    if (photoKeys !== undefined && !isEmpty(photoKeys)) {
       const promises: Promise<any>[] = [];
       photoKeys.forEach((photoKey) => {
         const sourcePhotoKey = `${albumId}/${photoKey}`;
@@ -163,14 +162,14 @@ export default class PhotoController extends BaseController {
   rename: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const { albumId, newPhotoKey, currentPhotoKey } = req.body as RenamePhotoRequest;
 
-    if (isUndefined(albumId) || isEmpty(albumId)) {
+    if (albumId === undefined || isEmpty(albumId)) {
       return this.clientError(res, 'No album');
     }
 
     if (
-      !isUndefined(newPhotoKey) &&
+      !newPhotoKey !== undefined &&
       !isEmpty(newPhotoKey) &&
-      !isUndefined(currentPhotoKey) &&
+      !currentPhotoKey !== undefined &&
       !isEmpty(currentPhotoKey)
     ) {
       // Currently, the only way to rename an object using the SDK is to copy the object with a different name and
@@ -197,11 +196,11 @@ export default class PhotoController extends BaseController {
   delete: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const { albumId, photoKeys } = req.body as PhotosRequest;
 
-    if (isUndefined(albumId) || isEmpty(albumId)) {
+    if (albumId === undefined || isEmpty(albumId)) {
       return this.clientError(res, 'No album');
     }
 
-    if (!isUndefined(photoKeys) && !isEmpty(photoKeys)) {
+    if (photoKeys !== undefined && !isEmpty(photoKeys)) {
       const photoKeysArray = photoKeys.map((photoKey) => `${albumId}/${photoKey}`);
       try {
         const result = await deleteObjects(photoKeysArray);

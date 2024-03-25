@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { CookieOptions } from 'express-serve-static-core';
 import jwt from 'jsonwebtoken';
-import get from 'lodash/get';
+import { get } from 'radash';
 import { RequestWithUser } from '../models';
 import JsonResponse from '../utils/json-response';
 

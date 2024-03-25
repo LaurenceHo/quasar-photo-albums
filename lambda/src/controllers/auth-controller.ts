@@ -1,7 +1,7 @@
 import { Request, RequestHandler, Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
-import get from 'lodash/get';
+import { get } from 'radash';
 import { RequestWithUser, UserPermission } from '../models';
 import { cleanCookie, setCookies } from '../route/auth-middleware';
 import UserService from '../services/user-service';

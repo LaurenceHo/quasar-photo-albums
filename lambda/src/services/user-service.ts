@@ -1,7 +1,7 @@
 import { UserPermission } from '../models';
 import { DynamodbService } from './dynamodb-service';
 import { QueryCommand } from '@aws-sdk/lib-dynamodb';
-import get from 'lodash/get';
+import { get } from 'radash';
 
 export default class UserService extends DynamodbService<UserPermission> {
   constructor() {
