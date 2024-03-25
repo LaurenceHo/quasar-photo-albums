@@ -41,7 +41,7 @@
 import { Album } from 'components/models';
 import { copyToClipboard, useQuasar } from 'quasar';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
-import { getStaticFileUrl } from 'src/helper';
+import { getStaticFileUrl } from 'src/utils/helper';
 import AlbumService from 'src/services/album-service';
 import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';

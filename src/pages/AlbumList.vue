@@ -105,7 +105,7 @@ import Pagination from 'components/Pagination.vue';
 import { isEmpty } from 'radash';
 import { Album as AlbumItem } from 'src/components/models';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
-import { sortByKey } from 'src/helper';
+import { sortByKey } from 'src/utils/helper';
 import { albumStore } from 'src/stores/album-store';
 import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';

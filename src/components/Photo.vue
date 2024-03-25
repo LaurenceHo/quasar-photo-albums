@@ -41,10 +41,6 @@ import { useRouter } from 'vue-router';
 
 defineEmits(['refreshPhotoList']);
 const props = defineProps({
-  index: {
-    type: Number,
-    required: true,
-  },
   photo: {
     type: Object,
     required: true,
@@ -52,18 +48,17 @@ const props = defineProps({
   },
 });
 
-const { index, photo } = toRefs(props);
+const { photo } = toRefs(props);
 const router = useRouter();
-const usePhotoStore = photoStore();
 const userPermissionStore = userStore();
 const { selectedPhotosList } = DialogStateComposable();
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 
 const imageWidth = ref(document.getElementById('photo-image')?.clientWidth ?? 0);
+
 const goToPhotoDetail = () => {
-  usePhotoStore.$patch({ selectedImageIndex: index.value });
-  const photoKeyForUrl = photo.value.key.split('/')[1];
-  router.replace({ query: { photo: photoKeyForUrl } });
+  const photoIdForUrl = photo.value.key.split('/')[1];
+  router.replace({ query: { photo: photoIdForUrl } });
 };
 
 onMounted(() => {

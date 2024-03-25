@@ -2,7 +2,7 @@ import { isEmpty } from 'radash';
 import { defineStore } from 'pinia';
 import { Loading, LocalStorage } from 'quasar';
 import { Album, AlbumTag } from 'src/components/models';
-import { compareDbUpdatedTime } from 'src/helper';
+import { compareDbUpdatedTime } from 'src/utils/helper';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
 import { photoStore } from 'stores/photo-store';
