@@ -66,17 +66,19 @@ describe('AlbumList.vue', () => {
 
   it('Search album list by category', async () => {
     const { vm } = wrapper as any;
-    vm.selectedTags = ['sport'];
+    vm.selectedTags = ['food'];
     await vm.$nextTick();
     expect(vm.totalItems).toEqual(1);
-    expect(vm.chunkAlbumList[0]).toHaveProperty('albumName', 'Sport');
+    expect(vm.chunkAlbumList[0]).toHaveProperty('albumName', 'Food title');
   });
 
   it('Test sort order', async () => {
     const { vm } = wrapper as any;
     expect(vm.sortOrder).toEqual('desc');
+    expect(vm.chunkAlbumList[0]).toHaveProperty('albumName', 'Sport');
     await wrapper.findComponent('[data-test-id="album-sort-order-button"]').trigger('click');
     expect(vm.sortOrder).toEqual('asc');
+    expect(vm.chunkAlbumList[0]).toHaveProperty('albumName', 'Do something secret');
   });
 
   it('Refresh album list', async () => {
