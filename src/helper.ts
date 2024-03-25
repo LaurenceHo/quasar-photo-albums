@@ -18,12 +18,14 @@ export const compareDbUpdatedTime = async () => {
 
 export const sortByKey = (array: any[], key: string, sorting: 'asc' | 'desc') => {
   return array.sort((a, b) => {
-    if (a[key] instanceof String) {
+    if (typeof a[key] === 'string') {
       return sorting === 'asc' ? a[key].localeCompare(b[key]) : b[key].localeCompare(a[key]);
     }
 
-    if (a[key] instanceof Number) {
+    if (typeof a[key] === 'number') {
       return sorting === 'asc' ? a[key] - b[key] : b[key] - a[key];
     }
+
+    return 0;
   });
 };
