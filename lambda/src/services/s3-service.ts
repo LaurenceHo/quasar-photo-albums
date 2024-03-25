@@ -1,4 +1,5 @@
 import {
+  _Object,
   CopyObjectCommand,
   CopyObjectCommandInput,
   DeleteObjectsCommand,
@@ -9,7 +10,6 @@ import {
   PutObjectCommand,
   PutObjectCommandInput,
   S3Client,
-  _Object,
 } from '@aws-sdk/client-s3';
 import { get } from 'radash';
 import { BaseService, Photo } from '../models';

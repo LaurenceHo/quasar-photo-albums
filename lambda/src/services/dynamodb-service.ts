@@ -1,14 +1,14 @@
 import {
-  GetCommand,
-  GetCommandInput,
-  ScanCommand,
-  ScanCommandInput,
-  PutCommandInput,
-  PutCommand,
-  UpdateCommand,
-  UpdateCommandInput,
   DeleteCommand,
   DeleteCommandInput,
+  GetCommand,
+  GetCommandInput,
+  PutCommand,
+  PutCommandInput,
+  ScanCommand,
+  ScanCommandInput,
+  UpdateCommand,
+  UpdateCommandInput,
 } from '@aws-sdk/lib-dynamodb';
 import { get } from 'radash';
 import { BaseService as IBaseService } from '../models';

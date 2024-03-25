@@ -1,9 +1,9 @@
+import { Request, RequestHandler, Response } from 'express';
 import { AlbumTag } from '../models';
 import AlbumTagService from '../services/album-tag-service';
+import { asyncHandler } from '../utils/async-handler';
 import { BaseController } from './base-controller';
 import { uploadObject } from './helpers';
-import { Request, RequestHandler, Response } from 'express';
-import { asyncHandler } from '../utils/async-handler';
 
 const albumTagService = new AlbumTagService();
 
