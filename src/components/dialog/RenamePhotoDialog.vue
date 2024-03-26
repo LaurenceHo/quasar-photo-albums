@@ -75,8 +75,8 @@ const currentFileNameWithoutExtension = getCurrentPhotoToBeRenamed.value.slice(0
 
 const newPhotoNameWithoutExtension = ref(currentFileNameWithoutExtension || '');
 const newPhotoId = computed(() => `${newPhotoNameWithoutExtension.value || ''}${fileType}`);
-const isAlbumCover = computed(() => usePhotoStore.isAlbumCover(getCurrentPhotoToBeRenamed.value));
-const selectedAlbum = computed(() => usePhotoStore.selectedAlbumItem);
+const isAlbumCover = computed(() => useAlbumStore.isAlbumCover(getCurrentPhotoToBeRenamed.value));
+const selectedAlbum = computed(() => useAlbumStore.selectedAlbumItem);
 
 const isProcessing = ref(false);
 const isExistedPhotoKey = ref(false);

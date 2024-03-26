@@ -1,11 +1,10 @@
-import { isEmpty } from 'radash';
 import { defineStore } from 'pinia';
 import { Loading, LocalStorage } from 'quasar';
+import { isEmpty } from 'radash';
 import { Album, AlbumTag } from 'src/components/models';
-import { compareDbUpdatedTime } from 'src/helper';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
-import { photoStore } from 'stores/photo-store';
+import { compareDbUpdatedTime, sortByKey } from 'src/utils/helper';
 import { userStore } from 'stores/user-store';
 
 export interface AlbumState {
@@ -15,21 +14,32 @@ export interface AlbumState {
   searchKey: string;
   sortOrder: 'asc' | 'desc';
   refreshAlbumList: boolean;
+  selectedAlbumItem: Album;
 }
 
 const albumService = new AlbumService();
 const albumTagService = new AlbumTagService();
 
+const initialState: AlbumState = {
+  loadingAllAlbumInformation: true,
+  allAlbumList: [],
+  albumTags: [],
+  searchKey: '',
+  sortOrder: 'desc',
+  refreshAlbumList: false,
+  selectedAlbumItem: {
+    id: '',
+    albumName: '',
+    albumCover: '',
+    description: '',
+    tags: [],
+    isPrivate: false,
+    order: 0,
+  },
+};
 export const albumStore = defineStore('albums', {
-  state: () =>
-    ({
-      loadingAllAlbumInformation: true,
-      allAlbumList: [],
-      albumTags: [],
-      searchKey: '',
-      sortOrder: 'desc',
-      refreshAlbumList: false,
-    }) as AlbumState,
+  state: () => initialState,
+
   getters: {
     getAlbumById:
       (state: AlbumState) =>
@@ -77,7 +87,10 @@ export const albumStore = defineStore('albums', {
 
     albumsHaveLocation: (state: AlbumState) =>
       state.allAlbumList.filter((album) => album.place?.location?.latitude && album.place?.location?.longitude),
+
+    isAlbumCover: (state: AlbumState) => (photoKey: string) => state.selectedAlbumItem.albumCover === photoKey,
   },
+
   actions: {
     async getAllAlbumInformation() {
       // Check user permission
@@ -116,13 +129,9 @@ export const albumStore = defineStore('albums', {
         if (!isAdminUser) {
           tempList = tempList.filter((album) => !album.isPrivate);
         }
-        this.allAlbumList = tempList.sort((a, b) => {
-          if (this.sortOrder === 'asc') {
-            return a.albumName.localeCompare(b.albumName);
-          } else {
-            return b.albumName.localeCompare(a.albumName);
-          }
-        });
+
+        this.allAlbumList = sortByKey(tempList, 'albumName', this.sortOrder);
+
         // Get album tags from local storage again
         const albumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
         const tempAlbumTags: { tag: string }[] = !isEmpty(albumTagsString) ? JSON.parse(albumTagsString) : [];
@@ -136,9 +145,8 @@ export const albumStore = defineStore('albums', {
     updateAlbumCover(albumToBeUpdated: Album) {
       const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
       this.allAlbumList.splice(findIndex, 1, albumToBeUpdated);
-      // Update the selected album item in photo store so that the album cover is updated in the photo detail dialog
-      const store = photoStore();
-      store.selectedAlbumItem = albumToBeUpdated;
+      // Update the selected album item in the store so that the album cover is updated in the photo detail dialog
+      this.selectedAlbumItem = albumToBeUpdated;
       this.refreshAlbumList = true;
     },
 

@@ -23,11 +23,11 @@
               <div class="flex justify-center items-center full-height">
                 <q-spinner v-show="loadImage" color="primary" size="4rem" />
                 <img
-                  v-show="!loadImage"
+                  v-show="!loadImage && selectedImage"
                   :alt="photoFileName"
-                  :src="selectedImage.url"
+                  :src="selectedImage?.url"
                   class="rounded-borders-lg responsive-image"
-                  style="margin: auto; display: block"
+                  style="margin: auto; display: block; max-width: 1080px"
                   @load="loadImage = false"
                 />
               </div>
@@ -38,6 +38,7 @@
                 round
                 style="height: 42px"
                 unelevated
+                data-test-id="next-photo-button"
                 @click="nextPhoto(1)"
               />
               <q-btn
@@ -47,6 +48,7 @@
                 round
                 style="height: 42px"
                 unelevated
+                data-test-id="previous-photo-button"
                 @click="nextPhoto(-1)"
               />
             </div>
@@ -56,9 +58,8 @@
               <q-item>
                 <q-item-section class="text-h5"> Details</q-item-section>
                 <EditPhotoButton
-                  v-if="isAdminUser"
-                  :album-item="albumItem"
-                  :photo-key="selectedImage.key"
+                  v-if="isAdminUser && selectedImage"
+                  :photo-key="selectedImage?.key"
                   @refresh-photo-list="$emit('refreshPhotoList')"
                 />
               </q-item>
@@ -127,12 +128,12 @@
 
 <script lang="ts" setup>
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
-import { ExifData, Photo } from 'components/models';
+import { ExifData } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import * as ExifReader from 'exifreader';
 import { NumberTag, StringArrayTag } from 'exifreader';
-import { isEmpty } from 'radash';
 import { useQuasar } from 'quasar';
+import { isEmpty } from 'radash';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
@@ -141,23 +142,26 @@ import { useRoute, useRouter } from 'vue-router';
 defineEmits(['refreshPhotoList']);
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
+
 const q = useQuasar();
 const router = useRouter();
 const route = useRoute();
 
-const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const selectedImageIndex = computed(() => usePhotoStore.selectedImageIndex);
-const photoList = computed(() => usePhotoStore.photoList);
-const albumItem = computed(() => usePhotoStore.selectedAlbumItem);
-const albumId = computed(() => route.params.albumId as string);
-const photoId = computed(() => route.query.photo as string);
-const dialog = computed(() => !isEmpty(photoId.value));
-
-const selectedImage = ref({ url: '', key: '' } as Photo);
+const selectedImageIndex = ref(-1);
 const photoFileName = ref('');
 const exifTags = ref({} as ExifData);
 const loadImage = ref(false);
 
+const isAdminUser = computed(() => userPermissionStore.isAdminUser);
+const selectedImage = computed(() => usePhotoStore.findPhotoByIndex(selectedImageIndex.value));
+const photoList = computed(() => usePhotoStore.photoList);
+const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
+
+const albumId = computed(() => route.params.albumId as string);
+const photoId = computed(() => route.query.photo as string);
+const dialog = computed(() => !isEmpty(photoId.value));
+
+/** Photo EXIF data */
 const dateTime = computed(() => {
   if (exifTags.value.DateTime?.description) {
     const dateTime = exifTags.value.DateTime?.description.split(' ');
@@ -176,6 +180,7 @@ const latitude = computed(() => {
   }
   return -1000;
 });
+
 const longitude = computed(() => {
   if (exifTags.value.GPSLongitude?.description) {
     if (exifTags.value.GPSLongitudeRef?.value[0] === 'W') {
@@ -185,12 +190,15 @@ const longitude = computed(() => {
   }
   return -1000;
 });
+
 const exposureBias = computed(() => parseFloat(exifTags.value.ExposureBiasValue?.description ?? '0').toFixed(2));
+
 const aperture = computed(() =>
   parseFloat(exifTags.value.ApertureValue?.description ?? exifTags.value.MaxApertureValue?.description ?? '0').toFixed(
     1
   )
 );
+/** Photo EXIF data */
 
 // When opening photo detail URL directly (Not from album page)
 if (photoId.value && photoList.value.length === 0) {
@@ -203,25 +211,25 @@ const nextPhoto = (dir: number) => {
   q.loadingBar.start();
   exifTags.value = {};
 
-  const slideLength = photoList.value.length;
-  usePhotoStore.$patch({
-    selectedImageIndex: (selectedImageIndex.value + (dir % slideLength) + slideLength) % slideLength,
-  });
-  const nextPhoto = photoList.value[selectedImageIndex.value] as Photo;
-  if (nextPhoto) {
-    selectedImage.value = nextPhoto;
+  const photoListLength = photoList.value.length;
+  selectedImageIndex.value = (selectedImageIndex.value + (dir % photoListLength) + photoListLength) % photoListLength;
+
+  if (selectedImage.value) {
     const photoKeyForUrl = selectedImage.value.key.split('/')[1];
     router.replace({ query: { photo: photoKeyForUrl } });
   }
 };
 
-watch(photoList, (newValue) => {
-  if (newValue.length > 0) {
-    // Find selected photo index
-    const photoIndex = usePhotoStore.findPhotoIndex(photoId.value);
-    if (photoIndex > -1) {
-      usePhotoStore.$patch({ selectedImageIndex: photoIndex });
-    } else {
+watch(
+  [photoId, photoList],
+  ([newId, newList]) => {
+    if (fetchingPhotos.value) return;
+
+    if (newId && newList.length > 0) {
+      selectedImageIndex.value = usePhotoStore.findPhotoIndex(newId);
+    }
+
+    if (selectedImageIndex.value === -1) {
       q.notify({
         timeout: 2000,
         progress: true,
@@ -230,15 +238,6 @@ watch(photoList, (newValue) => {
         message: "Photo doesn't exist",
       });
       setTimeout(() => router.push(`/album/${albumId.value}`), 3000);
-    }
-  }
-});
-
-watch(
-  selectedImageIndex,
-  (newValue) => {
-    if (newValue > -1) {
-      selectedImage.value = photoList.value[newValue] as Photo;
     }
   },
   { deep: true, immediate: true }
@@ -249,7 +248,7 @@ watch(
   async (newValue) => {
     if (newValue?.key) {
       // Remove album id for displaying photo file name
-      photoFileName.value = selectedImage.value.key.split('/')[1];
+      photoFileName.value = newValue.key.split('/')[1];
       loadImage.value = true;
       try {
         // Read EXIF data

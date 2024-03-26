@@ -1,5 +1,6 @@
-import { ref } from 'vue';
 import { UploadableFile as IUploadableFile } from 'components/models';
+import { ref } from 'vue';
+
 export default function () {
   const files = ref<IUploadableFile[]>([]);
 

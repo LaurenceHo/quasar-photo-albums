@@ -1,4 +1,4 @@
-import { LocalStorage } from 'quasar';
+import { LocalStorage, Notify } from 'quasar';
 
 export const getStaticFileUrl = (objectKey: string): string => {
   return `${process.env.STATIC_FILES_URL}/${objectKey}`;
@@ -27,5 +27,32 @@ export const sortByKey = (array: any[], key: string, sorting: 'asc' | 'desc') =>
     }
 
     return 0;
+  });
+};
+
+type Position =
+  | 'top-left'
+  | 'top'
+  | 'top-right'
+  | 'left'
+  | 'center'
+  | 'right'
+  | 'bottom-left'
+  | 'bottom'
+  | 'bottom-right';
+
+export const notifyError = (
+  message: string,
+  progress: boolean = false,
+  position: Position = 'bottom',
+  timeout: number = 2000
+) => {
+  Notify.create({
+    progress,
+    message,
+    position,
+    timeout,
+    color: 'negative',
+    icon: 'mdi-alert-circle',
   });
 };
