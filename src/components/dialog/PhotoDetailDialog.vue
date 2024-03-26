@@ -39,6 +39,7 @@
                 style="height: 42px"
                 unelevated
                 @click="nextPhoto(1)"
+                data-test-id="next-photo-button"
               />
               <q-btn
                 class="absolute-left"
@@ -48,6 +49,7 @@
                 style="height: 42px"
                 unelevated
                 @click="nextPhoto(-1)"
+                data-test-id="previous-photo-button"
               />
             </div>
           </div>
@@ -225,7 +227,9 @@ watch(
 
     if (newId && newList.length > 0) {
       selectedImageIndex.value = usePhotoStore.findPhotoIndex(newId);
-    } else {
+    }
+
+    if (selectedImageIndex.value === -1) {
       q.notify({
         timeout: 2000,
         progress: true,
