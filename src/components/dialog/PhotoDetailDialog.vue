@@ -38,8 +38,8 @@
                 round
                 style="height: 42px"
                 unelevated
-                @click="nextPhoto(1)"
                 data-test-id="next-photo-button"
+                @click="nextPhoto(1)"
               />
               <q-btn
                 class="absolute-left"
@@ -48,8 +48,8 @@
                 round
                 style="height: 42px"
                 unelevated
-                @click="nextPhoto(-1)"
                 data-test-id="previous-photo-button"
+                @click="nextPhoto(-1)"
               />
             </div>
           </div>
