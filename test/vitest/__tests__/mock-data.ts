@@ -57,6 +57,15 @@ export const mockGetAlbumsResponse = {
   message: 'ok',
   data: [
     {
+      albumCover: 'album6/aaa.jpg',
+      isPrivate: false,
+      order: 141,
+      albumName: '6-album-6',
+      description: '',
+      id: 'album1',
+      tags: [],
+    },
+    {
       albumCover: 'album1/aaa.jpg',
       isPrivate: false,
       order: 141,
@@ -125,3 +134,22 @@ export const mockGetAlbumTagsResponse = {
 };
 
 export const mockGetUserPermissionResponse = { code: 401, status: 'Unauthorized', message: 'User is not logged-in' };
+
+export const mockPhotoList = [
+  {
+    url: 'https://example.com/album1/photo1.jpg',
+    key: 'album-1/photo1.jpg',
+  },
+  {
+    url: 'https://example.com/album1/photo2.jpg',
+    key: 'album-1/photo2.jpg',
+  },
+  {
+    url: 'https://example.com/album1/photo3.jpg',
+    key: 'album-1/photo3.jpg',
+  },
+  {
+    url: 'https://example.com/album1/photo3.jpg',
+    key: 'album-1/cover.jpg',
+  },
+];

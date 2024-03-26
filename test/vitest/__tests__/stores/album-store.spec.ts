@@ -1,5 +1,5 @@
 import { setActivePinia, createPinia } from 'pinia';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { afterEach, describe, it, expect, beforeEach, vi } from 'vitest';
 import { albumStore } from '../../../../src/stores/album-store';
 import {
   mockAlbumList,
@@ -9,8 +9,8 @@ import {
   mockGetUserPermissionResponse,
 } from '../mock-data';
 
-vi.mock('../../../../src/helper', async () => {
-  const actual: any = await vi.importActual('../../../../src/helper');
+vi.mock('../../../../src/utils/helper', async () => {
+  const actual: any = await vi.importActual('../../../../src/utils/helper');
   return {
     ...actual,
     compareDbUpdatedTime: vi
@@ -40,6 +40,11 @@ vi.mock('../../../../src/services/album-tag-service', () => ({
 describe('Album Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+  });
+
+  afterEach(() => {
+    const store = albumStore();
+    store.allAlbumList = [];
   });
 
   it('updateRefreshAlbumListFlag', () => {
@@ -185,7 +190,7 @@ describe('Album Store', () => {
   it('getAllAlbumInformation', async () => {
     const store = albumStore();
     await store.getAllAlbumInformation();
-    expect(store.allAlbumList.length).toEqual(5);
+    expect(store.allAlbumList.length).toEqual(6);
     expect(store.allAlbumList[0]).toEqual({
       albumCover: 'album5/aaa.jpg',
       isPrivate: false,

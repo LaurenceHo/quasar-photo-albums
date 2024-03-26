@@ -13,7 +13,7 @@ export interface Album {
 
 export interface Photo {
   url: string;
-  key: string;
+  key: string; // `${albumId}/${photoId}`
 }
 
 export interface AlbumTag {

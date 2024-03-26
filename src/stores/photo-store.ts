@@ -1,38 +1,38 @@
-import { Album, Photo } from 'components/models';
+import { Photo } from 'components/models';
 import { defineStore } from 'pinia';
-import { LocalStorage, Notify } from 'quasar';
+import { LocalStorage } from 'quasar';
 import PhotoService from 'src/services/photo-service';
+import { notifyError } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
-import { useRouter } from 'vue-router';
 
 export interface PhotoStoreState {
-  selectedAlbumItem: Album;
   photoList: Photo[];
-  selectedImageIndex: number;
+  fetchingPhotos: boolean;
 }
 
 const photoService = new PhotoService();
 
+const initialState: PhotoStoreState = {
+  photoList: [],
+  fetchingPhotos: false,
+};
+
 export const photoStore = defineStore('photos', {
-  state: () =>
-    ({
-      selectedAlbumItem: {
-        id: '',
-        albumName: '',
-        albumCover: '',
-        description: '',
-        tags: [],
-        isPrivate: false,
-        order: 0,
-      },
-      photoList: [],
-      selectedImageIndex: -1,
-    }) as PhotoStoreState,
+  state: () => initialState,
 
   getters: {
-    findPhotoIndex: (state: PhotoStoreState) => (photoId: string) =>
-      state.photoList.findIndex((photo) => photo.key === `${state.selectedAlbumItem.id}/${photoId}`),
-    isAlbumCover: (state: PhotoStoreState) => (photoKey: string) => state.selectedAlbumItem.albumCover === photoKey,
+    findPhotoIndex:
+      (state: PhotoStoreState) =>
+      (photoId: string): number => {
+        const useAlbumStore = albumStore();
+
+        return state.photoList.findIndex((photo) => photo.key === `${useAlbumStore.selectedAlbumItem.id}/${photoId}`);
+      },
+
+    findPhotoByIndex:
+      (state: PhotoStoreState) =>
+      (index: number): Photo | undefined =>
+        state.photoList[index],
   },
 
   actions: {
@@ -41,12 +41,17 @@ export const photoStore = defineStore('photos', {
       const albumItem = useAlbumStore.getAlbumById(albumId);
       if (albumItem?.id) {
         // Only fetch photos when album id is updated
-        if (albumId !== this.selectedAlbumItem.id || refreshPhotosList) {
-          this.selectedAlbumItem = albumItem;
+        if (albumId !== useAlbumStore.selectedAlbumItem.id || refreshPhotosList) {
+          useAlbumStore.selectedAlbumItem = albumItem;
+
           if (!refreshPhotosList) {
             this.photoList = [];
           }
+
+          this.fetchingPhotos = true;
           const { data, code } = await photoService.getPhotosByAlbumId(albumId);
+          this.fetchingPhotos = false;
+
           this.photoList = data ?? [];
           if (code && code !== 200) {
             if (code > 400 && code < 500) {
@@ -54,24 +59,12 @@ export const photoStore = defineStore('photos', {
               await useAlbumStore.getAllAlbumInformation();
             }
 
-            Notify.create({
-              timeout: 2000,
-              progress: true,
-              color: 'negative',
-              icon: 'mdi-alert-circle',
-              message: 'Ooops, something wrong. You will be redirected to the home page in 3 seconds',
-            });
+            notifyError('Oops, something wrong. You will be redirected to the home page in 3 seconds.', true);
             setTimeout(() => window.location.assign('/'), 3000);
           }
         }
       } else {
-        Notify.create({
-          timeout: 2000,
-          progress: true,
-          color: 'negative',
-          icon: 'mdi-alert-circle',
-          message: "Album doesn't exist. You will be redirected to the home page in 3 seconds",
-        });
+        notifyError("Album doesn't exist. You will be redirected to the home page in 3 seconds", true);
         setTimeout(() => window.location.assign('/'), 3000);
       }
     },
