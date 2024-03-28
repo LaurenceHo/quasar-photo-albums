@@ -1,8 +1,6 @@
 import {
   DeleteCommand,
   DeleteCommandInput,
-  GetCommand,
-  GetCommandInput,
   PutCommand,
   PutCommandInput,
   ScanCommand,
@@ -11,12 +9,13 @@ import {
   UpdateCommandInput,
 } from '@aws-sdk/lib-dynamodb';
 import { get } from 'radash';
-import { BaseService as IBaseService } from '../models';
+import { BaseService } from '../models';
 import { ddbDocClient } from './dynamodb-client';
 
-export abstract class DynamodbService<T> implements IBaseService<T> {
+export abstract class DynamodbService<T> implements BaseService<T> {
   public readonly client: any = ddbDocClient;
-  private _tableName: any;
+  private _tableName: string = '';
+  private _entity: any;
 
   get tableName(): any {
     return this._tableName;
@@ -26,18 +25,22 @@ export abstract class DynamodbService<T> implements IBaseService<T> {
     this._tableName = value;
   }
 
+  get entity(): any {
+    return this._entity;
+  }
+
+  set entity(value: any) {
+    this._entity = value;
+  }
+
   async findAll(params: ScanCommandInput): Promise<T[]> {
     const response = await this.client.send(new ScanCommand(params));
     return get(response, 'Items', []);
   }
 
   async findOne(objectKey: { [key: string]: string | number }): Promise<T> {
-    const params: GetCommandInput = {
-      TableName: this._tableName,
-      Key: objectKey,
-    };
-    const response = await this.client.send(new GetCommand(params));
-    return get(response, 'Item', {} as T);
+    const response = await this._entity.get(objectKey).go({ ignoreOwnership: true });
+    return get(response, 'data', {} as T);
   }
 
   async create(item: T): Promise<boolean> {

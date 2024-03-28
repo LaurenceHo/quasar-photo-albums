@@ -1,9 +1,11 @@
 import { Album } from '../models';
+import { AlbumEntity, albumTableName } from '../schemas/album';
 import { DynamodbService } from './dynamodb-service';
 
 export default class AlbumService extends DynamodbService<Album> {
   constructor() {
     super();
-    this.tableName = process.env.PHOTO_ALBUMS_TABLE_NAME;
+    this.tableName = albumTableName;
+    this.entity = AlbumEntity;
   }
 }
