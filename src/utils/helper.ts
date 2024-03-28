@@ -41,9 +41,10 @@ type Position =
   | 'bottom'
   | 'bottom-right';
 
-export const notifyError = (
+export const notify = (
+  status: 'negative' | 'positive' | 'info' | 'warning',
   message: string,
-  progress: boolean = false,
+  progress = false,
   position: Position = 'bottom',
   timeout: number = 2000
 ) => {
@@ -52,7 +53,14 @@ export const notifyError = (
     message,
     position,
     timeout,
-    color: 'negative',
-    icon: 'mdi-alert-circle',
+    color: status,
+    icon:
+      status === 'negative'
+        ? 'mdi-alert-circle'
+        : status === 'positive'
+          ? 'mdi-check-circle-outline'
+          : status === 'warning'
+            ? 'mdi-alert'
+            : 'mdi-information',
   });
 };
