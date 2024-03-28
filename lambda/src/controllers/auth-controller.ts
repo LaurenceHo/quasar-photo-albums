@@ -3,7 +3,7 @@ import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { get } from 'radash';
 import { RequestWithUser, UserPermission } from '../models';
-import { cleanCookie, setCookies } from '../route/auth-middleware';
+import { cleanCookie, setCookies } from '../routes/auth-middleware';
 import UserService from '../services/user-service';
 import { asyncHandler } from '../utils/async-handler';
 import { BaseController } from './base-controller';

@@ -22,6 +22,7 @@
     "body-parser": "^1.19.2",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.0",
+    "electrodb": "^2.13.1",
     "express": "^4.17.3",
     "google-auth-library": "^9.4.2",
     "helmet": "^7.0.0",
