@@ -1,10 +1,9 @@
-import { AlbumTag, AlbumTagEntity, albumTagsTableName } from '../schemas/album-tag';
+import { AlbumTag, AlbumTagEntity } from '../schemas/album-tag';
 import { DynamodbService } from './dynamodb-service';
 
 export default class AlbumTagService extends DynamodbService<AlbumTag> {
   constructor() {
     super();
-    this.tableName = albumTagsTableName;
     this.entity = AlbumTagEntity;
   }
 }

@@ -5,16 +5,7 @@ import { ddbDocClient } from './dynamodb-client';
 
 export abstract class DynamodbService<T> implements BaseService<T> {
   public readonly client: any = ddbDocClient;
-  private _tableName: string = '';
   private _entity: any;
-
-  get tableName(): any {
-    return this._tableName;
-  }
-
-  set tableName(value: any) {
-    this._tableName = value;
-  }
 
   get entity(): any {
     return this._entity;
