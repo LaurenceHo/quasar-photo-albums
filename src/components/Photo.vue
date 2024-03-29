@@ -56,8 +56,8 @@ const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const imageWidth = ref(document.getElementById('photo-image')?.clientWidth ?? 0);
 
 const goToPhotoDetail = () => {
-  const photoIdForUrl = photo.value.key.split('/')[1];
-  router.replace({ query: { photo: photoIdForUrl } });
+  const photoId = photo.value.key.split('/')[1];
+  router.replace({ query: { photo: photoId } });
 };
 
 onMounted(() => {

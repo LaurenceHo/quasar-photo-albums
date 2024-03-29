@@ -1,7 +1,8 @@
 import { Request, RequestHandler, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { get } from 'radash';
-import { Album, RequestWithUser } from '../models';
+import { RequestWithUser } from '../models';
+import { Album } from '../schemas/album';
 import AlbumService from '../services/album-service';
 import { asyncHandler } from '../utils/async-handler';
 import { BaseController } from './base-controller';
@@ -23,21 +24,15 @@ export default class AlbumController extends BaseController {
         });
       }
 
-      let params = {
-        TableName: albumService.tableName,
-        ProjectionExpression: 'id, albumName, albumCover, description, tags, isPrivate, place',
-        // TODO - Need to sort by order
-      } as any;
+      let query = null;
       if (!isAdmin) {
-        params = {
-          ...params,
-          ExpressionAttributeValues: {
-            ':val': false,
-          },
-          FilterExpression: 'isPrivate = :val',
-        };
+        query = ({ isPrivate }: any, { eq }: any) => `${eq(isPrivate, false)}`;
       }
-      const albumList = await albumService.findAll(params);
+      // TODO - Need to sort by order
+      const albumList = await albumService.findAll(
+        ['id', 'albumName', 'albumCover', 'description', 'tags', 'isPrivate', 'place', 'order'],
+        query
+      );
 
       return this.ok<Album[]>(res, 'ok', albumList);
     } catch (err: any) {
@@ -49,11 +44,11 @@ export default class AlbumController extends BaseController {
   create: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const album = req.body as Album;
     album.createdBy = (req as RequestWithUser).user?.email ?? 'unknown';
-    album.createdAt = new Date().toISOString();
-    album.updatedAt = new Date().toISOString();
+    album.updatedBy = (req as RequestWithUser).user?.email ?? 'unknown';
 
     try {
       const result = await albumService.create(album);
+
       if (result) {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
         // Create folder in S3

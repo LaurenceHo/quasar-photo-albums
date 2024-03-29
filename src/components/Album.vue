@@ -90,7 +90,6 @@ const props = defineProps({
         tags: [],
         isPrivate: true,
         order: 0,
-        place: null,
       }) as Album,
   },
 });

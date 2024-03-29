@@ -1,6 +1,5 @@
-import { ReturnValue } from '@aws-sdk/client-dynamodb';
 import { DeleteObjectsCommandInput, PutObjectCommandInput } from '@aws-sdk/client-s3';
-import { Album } from '../models';
+import { Album } from '../schemas/album';
 import AlbumService from '../services/album-service';
 import { S3Service } from '../services/s3-service';
 
@@ -9,35 +8,13 @@ const albumService = new AlbumService();
 const s3Service = new S3Service();
 
 export const updatePhotoAlbum = async (album: Album) => {
-  const params = {
-    TableName: albumService.tableName,
-    Key: {
-      id: album.id,
-    },
-    UpdateExpression:
-      'SET albumName = :albumName, ' +
-      'albumCover = :albumCover, ' +
-      'description = :description, ' +
-      'tags = :tags, ' +
-      'isPrivate = :isPrivate, ' +
-      'place = :place, ' +
-      'updatedAt = :updatedAt, ' +
-      'updatedBy = :updatedBy',
-    ExpressionAttributeValues: {
-      ':albumName': album.albumName,
-      ':albumCover': album.albumCover,
-      ':description': album.description,
-      ':tags': album.tags,
-      ':isPrivate': album.isPrivate,
-      ':place': album.place ?? null,
-      ':updatedAt': album.updatedAt,
-      ':updatedBy': album.updatedBy,
-    },
-    ReturnValues: ReturnValue.ALL_NEW,
-  };
-
   try {
-    const result = await albumService.update(params);
+    const cloneAlbum: any = { ...album };
+    delete cloneAlbum.id;
+    delete cloneAlbum.createdAt;
+    delete cloneAlbum.createdBy;
+
+    const result = await albumService.update({ id: album.id }, cloneAlbum);
 
     if (result) {
       console.log('##### Album updated:', album.id);

@@ -2,7 +2,7 @@ import { Photo } from 'components/models';
 import { defineStore } from 'pinia';
 import { LocalStorage } from 'quasar';
 import PhotoService from 'src/services/photo-service';
-import { notifyError } from 'src/utils/helper';
+import { notify } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
 
 export interface PhotoStoreState {
@@ -58,13 +58,11 @@ export const photoStore = defineStore('photos', {
               LocalStorage.remove('ALL_ALBUMS');
               await useAlbumStore.getAllAlbumInformation();
             }
-
-            notifyError('Oops, something wrong. You will be redirected to the home page in 3 seconds.', true);
             setTimeout(() => window.location.assign('/'), 3000);
           }
         }
       } else {
-        notifyError("Album doesn't exist. You will be redirected to the home page in 3 seconds", true);
+        notify('negative', "Album doesn't exist. You will be redirected to the home page in 3 seconds", true);
         setTimeout(() => window.location.assign('/'), 3000);
       }
     },

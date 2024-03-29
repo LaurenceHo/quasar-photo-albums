@@ -1,6 +1,6 @@
-import { Notify } from 'quasar';
 import { route } from 'quasar/wrappers';
 import { isEmpty } from 'radash';
+import { notify } from 'src/utils/helper';
 import { userStore } from 'stores/user-store';
 import { createMemoryHistory, createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 import routes from './routes';
@@ -40,11 +40,7 @@ export default route(function (/* { store, ssrContext } */) {
       if (!isEmpty(userPermissionStore.userPermission)) {
         next();
       } else {
-        Notify.create({
-          color: 'negative',
-          icon: 'mdi-alert-circle',
-          message: "You don't have permission.",
-        });
+        notify('negative', "You don't have permission.");
         next('/');
       }
     } else {

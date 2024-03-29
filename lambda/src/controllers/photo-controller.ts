@@ -1,8 +1,9 @@
 import { Request, RequestHandler, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { get, isEmpty } from 'radash';
-import { Photo, PhotosRequest, RenamePhotoRequest, UserPermission } from '../models';
-import { cleanCookie } from '../route/auth-middleware';
+import { Photo, PhotosRequest, RenamePhotoRequest } from '../models';
+import { cleanCookie } from '../routes/auth-middleware';
+import { UserPermission } from '../schemas/user-permission';
 import AlbumService from '../services/album-service';
 import { S3Service } from '../services/s3-service';
 import { asyncHandler } from '../utils/async-handler';
@@ -23,56 +24,60 @@ export default class PhotoController extends BaseController {
 
     try {
       const album = await albumService.findOne({ id: albumId });
-      if (album.isPrivate) {
-        const token = get(req, 'cookies.jwt', null);
-        if (token) {
-          try {
-            jwt.verify(token, process.env.JWT_SECRET as string, async (err: any, payload: any) => {
-              if (err) {
-                cleanCookie(res, 'Authentication failed. Please login.');
-              }
+      if (!isEmpty(album)) {
+        if (album.isPrivate) {
+          const token = get(req, 'cookies.jwt', null);
+          if (token) {
+            try {
+              jwt.verify(token, process.env.JWT_SECRET as string, async (err: any, payload: any) => {
+                if (err) {
+                  cleanCookie(res, 'Authentication failed. Please login.');
+                }
 
-              const user: UserPermission = payload;
-              if (user?.role !== 'admin') {
-                return new JsonResponse(403).unauthorized(res, 'Unauthorized action');
-              }
-              return;
+                const user: UserPermission = payload;
+                if (user?.role !== 'admin') {
+                  return new JsonResponse(403).unauthorized(res, 'Unauthorized action');
+                }
+                return;
+              });
+            } catch (error) {
+              cleanCookie(res, 'Authentication failed. Please login.');
+            }
+          } else {
+            return new JsonResponse(403).unauthorized(res, 'No auth token provided. Please login.');
+          }
+        }
+        const folderNameKey = decodeURIComponent(albumId) + '/';
+        const photos = await s3Service.findAll({
+          Prefix: folderNameKey,
+          Bucket: bucketName,
+          MaxKeys: 1000,
+          StartAfter: folderNameKey,
+        });
+
+        if (!isEmpty(photos)) {
+          if (isEmpty(album.albumCover)) {
+            await updatePhotoAlbum({
+              ...album,
+              albumCover: photos[0].key,
+              updatedBy: 'System',
+              updatedAt: new Date().toISOString(),
             });
-          } catch (error) {
-            cleanCookie(res, 'Authentication failed. Please login.');
           }
         } else {
-          return new JsonResponse(403).unauthorized(res, 'No auth token provided. Please login.');
+          // Remove album cover photo
+          if (!isEmpty(album.albumCover)) {
+            await updatePhotoAlbum({
+              ...album,
+              albumCover: '',
+              updatedBy: 'System',
+              updatedAt: new Date().toISOString(),
+            });
+          }
         }
+        return this.ok<Photo[]>(res, 'ok', photos);
       }
-      const folderNameKey = decodeURIComponent(albumId) + '/';
-      const photos = await s3Service.findPhotosByAlbumId({
-        Prefix: folderNameKey,
-        Bucket: bucketName,
-        MaxKeys: 1000,
-        StartAfter: folderNameKey,
-      });
-      if (!isEmpty(photos)) {
-        if (isEmpty(album.albumCover)) {
-          await updatePhotoAlbum({
-            ...album,
-            albumCover: photos[0].key,
-            updatedBy: 'System',
-            updatedAt: new Date().toISOString(),
-          });
-        }
-      } else {
-        // Remove album cover photo
-        if (!isEmpty(album.albumCover)) {
-          await updatePhotoAlbum({
-            ...album,
-            albumCover: '',
-            updatedBy: 'System',
-            updatedAt: new Date().toISOString(),
-          });
-        }
-      }
-      return this.ok<Photo[]>(res, 'ok', photos);
+      return this.fail(res, 'Album not found');
     } catch (err: any) {
       console.error('Failed to get photos:', err);
       return this.fail(res, 'Failed to get photos');

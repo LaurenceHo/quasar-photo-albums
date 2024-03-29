@@ -1,5 +1,6 @@
-import { LoadingBar, Notify } from 'quasar';
+import { LoadingBar } from 'quasar';
 import { isEmpty } from 'radash';
+import { notify } from 'src/utils/helper';
 
 export default class HttpRequestService {
   baseUrl = process.env.NODE_ENV === 'production' ? process.env.AWS_API_GATEWAY_URL : 'http://localhost:3000/api';
@@ -77,7 +78,7 @@ export default class HttpRequestService {
     const response = await fetch(urlPath, requestOptions);
     if (response.status >= 200 && response.status < 300) {
       if (this.customSuccessMessage) {
-        this.notifyMessage(false, this.customSuccessMessage);
+        notify('positive', this.customSuccessMessage);
       }
 
       const contentLength = response.headers.get('content-length');
@@ -96,15 +97,6 @@ export default class HttpRequestService {
     return data;
   }
 
-  notifyMessage = (error: boolean, message: string) => {
-    Notify.create({
-      color: error ? 'negative' : 'positive',
-      textColor: 'white',
-      icon: error ? 'mdi-alert-circle' : 'mdi-check-circle-outline',
-      message: message,
-    });
-  };
-
   private errorHandling = async (response: Response) => {
     // Catch error and handle it here. Don't throw it to UI.
     let errorJson: { status: string; message: string } = { status: '', message: '' };
@@ -112,14 +104,14 @@ export default class HttpRequestService {
       errorJson = await response.json();
       // If we can parse error response to JSON, display error message from JSON
       if (this.displayErrorNotification) {
-        this.notifyMessage(true, errorJson.message || errorJson.status || response.statusText);
+        notify('negative', errorJson.message || errorJson.status || response.statusText);
       }
       return errorJson;
     } catch (error) {
       // If we cannot parse error response to JSON (exception will occur),
       // display original response status text as warning message
       if (this.displayErrorNotification) {
-        this.notifyMessage(true, `Error: ${response.statusText}`);
+        notify('negative', `Error: ${response.statusText}`);
       }
     } finally {
       LoadingBar.stop();

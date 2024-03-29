@@ -186,10 +186,16 @@ const confirmUpdateAlbum = async () => {
     albumName: albumName.value,
     description: albumDesc.value,
     isPrivate: privateAlbum.value,
-    tags: selectedAlbumTags.value,
     order: getAlbumToBeUpdate.value.id ? getAlbumToBeUpdate.value.order : amountOfAllAlbums.value,
-    place: selectedPlace.value,
   };
+
+  if (!isEmpty(selectedAlbumTags.value)) {
+    albumToBeSubmitted.tags = selectedAlbumTags.value;
+  }
+
+  if (selectedPlace.value) {
+    albumToBeSubmitted.place = selectedPlace.value;
+  }
 
   let result;
   if (getAlbumToBeUpdate.value.id) {
@@ -215,7 +221,6 @@ const resetAlbum = () => {
     tags: [],
     isPrivate: true,
     order: 0,
-    place: null,
   });
   setUpdateAlbumDialogState(false);
 };

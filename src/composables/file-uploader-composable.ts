@@ -1,5 +1,5 @@
 import { UploadableFile } from 'components/models';
-import { Notify } from 'quasar';
+import { notify } from 'src/utils/helper';
 import PhotoService from 'src/services/photo-service';
 import { photoStore } from 'stores/photo-store';
 import { ref } from 'vue';
@@ -34,11 +34,7 @@ export default function () {
     return Promise.all(files.map((file: any) => uploadFile(file, albumId))).then(() => {
       isUploading.value = false;
       isCompleteUploading.value = true;
-      Notify.create({
-        color: 'positive',
-        message: 'Upload finished.',
-        icon: 'mdi-check-circle-outline',
-      });
+      notify('positive', 'Upload finished.');
     });
   };
 

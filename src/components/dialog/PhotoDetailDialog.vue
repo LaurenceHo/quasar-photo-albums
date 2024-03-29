@@ -27,7 +27,7 @@
                   :alt="photoFileName"
                   :src="selectedImage?.url"
                   class="rounded-borders-lg responsive-image"
-                  style="margin: auto; display: block; max-width: 1080px"
+                  style="margin: auto; display: block"
                   @load="loadImage = false"
                 />
               </div>
@@ -134,6 +134,7 @@ import * as ExifReader from 'exifreader';
 import { NumberTag, StringArrayTag } from 'exifreader';
 import { useQuasar } from 'quasar';
 import { isEmpty } from 'radash';
+import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
@@ -142,6 +143,7 @@ import { useRoute, useRouter } from 'vue-router';
 defineEmits(['refreshPhotoList']);
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
+const useAlbumStore = albumStore();
 
 const q = useQuasar();
 const router = useRouter();
@@ -159,7 +161,7 @@ const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
 
 const albumId = computed(() => route.params.albumId as string);
 const photoId = computed(() => route.query.photo as string);
-const dialog = computed(() => !isEmpty(photoId.value));
+const dialog = computed(() => !isEmpty(photoId.value) && selectedImageIndex.value !== -1);
 
 /** Photo EXIF data */
 const dateTime = computed(() => {
@@ -200,11 +202,6 @@ const aperture = computed(() =>
 );
 /** Photo EXIF data */
 
-// When opening photo detail URL directly (Not from album page)
-if (photoId.value && photoList.value.length === 0) {
-  usePhotoStore.getPhotos(albumId.value);
-}
-
 const closeDialog = async () => await router.replace({ query: undefined });
 
 const nextPhoto = (dir: number) => {
@@ -215,8 +212,8 @@ const nextPhoto = (dir: number) => {
   selectedImageIndex.value = (selectedImageIndex.value + (dir % photoListLength) + photoListLength) % photoListLength;
 
   if (selectedImage.value) {
-    const photoKeyForUrl = selectedImage.value.key.split('/')[1];
-    router.replace({ query: { photo: photoKeyForUrl } });
+    const photoId = selectedImage.value.key.split('/')[1];
+    router.replace({ query: { photo: photoId } });
   }
 };
 
@@ -229,7 +226,9 @@ watch(
       selectedImageIndex.value = usePhotoStore.findPhotoIndex(newId);
     }
 
-    if (selectedImageIndex.value === -1) {
+    const album = useAlbumStore.getAlbumById(albumId.value);
+
+    if (selectedImageIndex.value === -1 && album) {
       q.notify({
         timeout: 2000,
         progress: true,
