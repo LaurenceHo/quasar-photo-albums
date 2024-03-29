@@ -44,9 +44,7 @@ export default class AlbumController extends BaseController {
   create: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     const album = req.body as Album;
     album.createdBy = (req as RequestWithUser).user?.email ?? 'unknown';
-    album.createdAt = new Date().toISOString();
     album.updatedBy = (req as RequestWithUser).user?.email ?? 'unknown';
-    album.updatedAt = new Date().toISOString();
 
     try {
       const result = await albumService.create(album);

@@ -9,7 +9,10 @@ const s3Service = new S3Service();
 
 export const updatePhotoAlbum = async (album: Album) => {
   try {
-    const result = await albumService.update(album, ({ id }: any, { eq }: any) => `${eq(id, album.id)}`);
+    const cloneAlbum: any = { ...album };
+    delete cloneAlbum.id;
+
+    const result = await albumService.update({ id: album.id }, cloneAlbum);
 
     if (result) {
       console.log('##### Album updated:', album.id);

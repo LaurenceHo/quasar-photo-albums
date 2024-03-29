@@ -39,6 +39,7 @@ export const AlbumEntity = new Entity(
       id: {
         type: 'string',
         required: true,
+        readOnly: true,
       },
       albumName: {
         type: 'string',
@@ -83,14 +84,20 @@ export const AlbumEntity = new Entity(
       createdAt: {
         type: 'string',
         required: true,
+        readOnly: true,
+        default: () => new Date().toISOString(),
+        set: () => new Date().toISOString(),
       },
       createdBy: {
         type: 'string',
         required: true,
+        readOnly: true,
       },
       updatedAt: {
         type: 'string',
         required: true,
+        default: () => new Date().toISOString(),
+        set: () => new Date().toISOString(),
       },
       updatedBy: {
         type: 'string',
@@ -102,7 +109,7 @@ export const AlbumEntity = new Entity(
       },
     },
     indexes: {
-      byAlbumId: {
+      albums: {
         pk: {
           field: 'id',
           composite: ['id'],

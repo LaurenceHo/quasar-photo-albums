@@ -10,7 +10,7 @@ export interface Read<T> {
 
 export interface Write {
   create?(param: any): Promise<boolean>;
-  update?(param: any, whereClause?: any): Promise<boolean>;
+  update?(param: any, item?: any): Promise<boolean>;
   delete?(param: any): Promise<boolean>;
 }
 

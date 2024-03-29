@@ -55,15 +55,20 @@ export abstract class DynamodbService<T> implements BaseService<T> {
     return !!get(response, 'data');
   }
 
-  async update(item: T, whereClause: (_val1: any, _val2: any) => string): Promise<boolean> {
-    const response = await this._entity.patch(item).where(whereClause).go({
-      // ignoreOwnership: true,
-      // response: 'none',
+  async update(
+    objectKey: { [key: string]: string | number },
+    item: T,
+    whereClause?: (_val1: any, _val2: any) => string
+  ): Promise<boolean> {
+    const entity = this._entity.patch(objectKey).set(item);
+    if (whereClause) {
+      entity.where(whereClause);
+    }
+    const response = await entity.go({
+      ignoreOwnership: true,
     });
-    console.log('item', item);
-    console.log('response', response);
-    // return response.data === null;
-    return true;
+
+    return isEqual(response.data, objectKey);
   }
 
   async delete(objectKey: { [key: string]: string | number }): Promise<boolean> {
