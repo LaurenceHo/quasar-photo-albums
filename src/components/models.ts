@@ -6,7 +6,7 @@ export interface Album {
   albumCover?: string;
   description?: string;
   isPrivate: boolean;
-  tags: string[];
+  tags?: string[];
   order?: number;
   place?: Place | null;
 }

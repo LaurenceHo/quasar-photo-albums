@@ -23,6 +23,7 @@ export default class AlbumTagController extends BaseController {
     const tag: AlbumTag = req.body;
     try {
       const result = await albumTagService.create(tag);
+
       if (result) {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
         return this.ok(res, 'Album tag created');

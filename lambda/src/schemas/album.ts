@@ -1,8 +1,9 @@
 import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb';
 import { Entity, EntityRecord } from 'electrodb';
+import { Place } from '../models';
 import { ddbDocClient } from '../services/dynamodb-client';
 
-export type Album = EntityRecord<typeof AlbumEntity>;
+export type Album = EntityRecord<typeof AlbumEntity> & Place;
 
 export const albumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME || 'photo-albums';
 
@@ -53,35 +54,31 @@ export const AlbumEntity = new Entity(
         type: 'boolean',
         required: true,
       },
+      tags: {
+        type: 'set',
+        items: 'string',
+      },
       place: {
         type: 'map',
         properties: {
           displayName: {
             type: 'string',
-            required: true,
           },
           formattedAddress: {
             type: 'string',
-            required: true,
           },
           location: {
             type: 'map',
             properties: {
               latitude: {
                 type: 'number',
-                required: true,
               },
               longitude: {
                 type: 'number',
-                required: true,
               },
             },
           },
         },
-      },
-      tags: {
-        type: 'set',
-        items: 'string',
       },
       createdAt: {
         type: 'string',

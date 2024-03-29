@@ -50,6 +50,7 @@ export default class AlbumController extends BaseController {
 
     try {
       const result = await albumService.create(album);
+
       if (result) {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
         // Create folder in S3

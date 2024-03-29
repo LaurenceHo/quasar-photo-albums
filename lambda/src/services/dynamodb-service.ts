@@ -1,4 +1,3 @@
-import { UpdateCommand, UpdateCommandInput } from '@aws-sdk/lib-dynamodb';
 import { CreateEntityResponse, EntityIdentifiers, QueryOptions, QueryResponse } from 'electrodb';
 import { get, isEqual } from 'radash';
 import { BaseService } from '../models';
@@ -46,24 +45,30 @@ export abstract class DynamodbService<T> implements BaseService<T> {
     const response: QueryResponse<typeof this._entity> = await this._entity
       .get(objectKey)
       .go({ ignoreOwnership: true });
+
     return get(response, 'data', {} as T);
   }
 
   async create(item: T): Promise<boolean> {
-    const response: CreateEntityResponse<typeof this._entity> = await this._entity
-      .create(item)
-      .go({ response: 'none' });
+    const response: CreateEntityResponse<typeof this._entity> = await this._entity.create(item).go();
 
-    return response.data === null;
+    return !!get(response, 'data');
   }
 
-  async update(params: UpdateCommandInput): Promise<boolean> {
-    const response = await this.client.send(new UpdateCommand(params));
-    return response.$metadata.httpStatusCode === 200;
+  async update(item: T, whereClause: (_val1: any, _val2: any) => string): Promise<boolean> {
+    const response = await this._entity.patch(item).where(whereClause).go({
+      // ignoreOwnership: true,
+      // response: 'none',
+    });
+    console.log('item', item);
+    console.log('response', response);
+    // return response.data === null;
+    return true;
   }
 
   async delete(objectKey: { [key: string]: string | number }): Promise<boolean> {
     const response: EntityIdentifiers<typeof this._entity> = await this._entity.delete(objectKey).go();
+
     return isEqual(response.data, objectKey);
   }
 }

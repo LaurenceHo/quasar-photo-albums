@@ -4,13 +4,13 @@ import { UserPermission } from './schemas/user-permission';
 export type RequestWithUser = Request & { user: UserPermission | null };
 
 export interface Read<T> {
-  findAll?(param: any): Promise<T[]>;
+  findAll?(param: any, whereClause?: any): Promise<T[]>;
   findOne?(param: any): Promise<T>;
 }
 
 export interface Write {
   create?(param: any): Promise<boolean>;
-  update?(param: any): Promise<boolean>;
+  update?(param: any, whereClause?: any): Promise<boolean>;
   delete?(param: any): Promise<boolean>;
 }
 
