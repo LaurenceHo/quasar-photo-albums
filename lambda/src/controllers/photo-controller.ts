@@ -1,8 +1,9 @@
 import { Request, RequestHandler, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { get, isEmpty } from 'radash';
-import { Photo, PhotosRequest, RenamePhotoRequest, UserPermission } from '../models';
+import { Photo, PhotosRequest, RenamePhotoRequest } from '../models';
 import { cleanCookie } from '../routes/auth-middleware';
+import { UserPermission } from '../schemas/user-permission';
 import AlbumService from '../services/album-service';
 import { S3Service } from '../services/s3-service';
 import { asyncHandler } from '../utils/async-handler';

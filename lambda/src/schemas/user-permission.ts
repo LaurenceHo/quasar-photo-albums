@@ -1,6 +1,8 @@
 import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb';
-import { Entity } from 'electrodb';
+import { Entity, EntityRecord } from 'electrodb';
 import { ddbDocClient } from '../services/dynamodb-client';
+
+export type UserPermission = EntityRecord<typeof UserPermissionEntity>;
 
 export const userTableName = process.env.PHOTO_USER_PERMISSION_TABLE_NAME || 'user-permission';
 

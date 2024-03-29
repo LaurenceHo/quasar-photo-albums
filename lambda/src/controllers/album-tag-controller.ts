@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from 'express';
-import { AlbumTag } from '../models';
+import { AlbumTag } from '../schemas/album-tag';
 import AlbumTagService from '../services/album-tag-service';
 import { asyncHandler } from '../utils/async-handler';
 import { BaseController } from './base-controller';

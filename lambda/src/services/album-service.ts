@@ -1,5 +1,4 @@
-import { Album } from '../models';
-import { AlbumEntity, albumTableName } from '../schemas/album';
+import { Album, AlbumEntity, albumTableName } from '../schemas/album';
 import { DynamodbService } from './dynamodb-service';
 
 export default class AlbumService extends DynamodbService<Album> {

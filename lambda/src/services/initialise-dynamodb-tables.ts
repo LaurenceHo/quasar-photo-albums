@@ -1,8 +1,12 @@
 import { CreateTableCommand, DescribeTableCommand } from '@aws-sdk/client-dynamodb';
-import { Album, AlbumTag, UserPermission } from '../models';
-import { AlbumEntity, albumTableName, albumTableSchema } from '../schemas/album';
-import { AlbumTagEntity, albumTagsTableName, albumTagsTableSchema } from '../schemas/album-tag';
-import { UserPermissionEntity, userPermissionTableSchema, userTableName } from '../schemas/user-permission';
+import { Album, AlbumEntity, albumTableName, albumTableSchema } from '../schemas/album';
+import { AlbumTag, AlbumTagEntity, albumTagsTableName, albumTagsTableSchema } from '../schemas/album-tag';
+import {
+  UserPermission,
+  UserPermissionEntity,
+  userPermissionTableSchema,
+  userTableName,
+} from '../schemas/user-permission';
 import { ddbDocClient } from './dynamodb-client';
 
 const getTableStatus = async (tableName: string) => {
@@ -62,7 +66,7 @@ const initialiseAlbumTable = async () => {
             updatedAt: new Date().toISOString(),
             updatedBy: 'System',
             order: 1,
-          } as Album).go();
+          } as Album).go({ response: 'none' });
           console.log(`Mock data inserted into ${albumTableName} table.`);
         }
       });
@@ -91,7 +95,7 @@ const initialiseAlbumTagsTable = async () => {
           console.log(`Īnsert mock data into ${albumTagsTableName} table......`);
           await AlbumTagEntity.create({
             tag: 'test-tag-1',
-          } as AlbumTag).go();
+          } as AlbumTag).go({ response: 'none' });
           console.log(`Mock data inserted into ${albumTagsTableName} table.`);
         }
       });
@@ -123,7 +127,7 @@ const initialiseUserTable = async () => {
             email: 'test@example.com',
             displayName: 'Test User',
             role: 'admin',
-          } as UserPermission).go();
+          } as UserPermission).go({ response: 'none' });
           console.log(`Mock data inserted into ${userTableName} table.`);
         }
       });

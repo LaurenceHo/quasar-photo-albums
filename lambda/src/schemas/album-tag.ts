@@ -1,6 +1,8 @@
 import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb';
-import { Entity } from 'electrodb';
+import { Entity, EntityRecord } from 'electrodb';
 import { ddbDocClient } from '../services/dynamodb-client';
+
+export type AlbumTag = EntityRecord<typeof AlbumTagEntity>;
 
 export const albumTagsTableName = process.env.PHOTO_ALBUM_TAGS_TABLE_NAME || 'photo-album-tags';
 
@@ -29,7 +31,7 @@ export const AlbumTagEntity = new Entity(
     model: {
       entity: 'albumTag',
       version: '1',
-      service: 'albumTagService',
+      service: 'albumService',
     },
     attributes: {
       tag: {

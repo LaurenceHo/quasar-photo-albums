@@ -1,6 +1,8 @@
 import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb';
-import { Entity } from 'electrodb';
+import { Entity, EntityRecord } from 'electrodb';
 import { ddbDocClient } from '../services/dynamodb-client';
+
+export type Album = EntityRecord<typeof AlbumEntity>;
 
 export const albumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME || 'photo-albums';
 
@@ -32,6 +34,7 @@ export const AlbumEntity = new Entity(
       service: 'albumService',
     },
     attributes: {
+      // it is the same as the folder name in s3
       id: {
         type: 'string',
         required: true,
@@ -51,7 +54,30 @@ export const AlbumEntity = new Entity(
         required: true,
       },
       place: {
-        type: 'any',
+        type: 'map',
+        properties: {
+          displayName: {
+            type: 'string',
+            required: true,
+          },
+          formattedAddress: {
+            type: 'string',
+            required: true,
+          },
+          location: {
+            type: 'map',
+            properties: {
+              latitude: {
+                type: 'number',
+                required: true,
+              },
+              longitude: {
+                type: 'number',
+                required: true,
+              },
+            },
+          },
+        },
       },
       tags: {
         type: 'set',
@@ -59,15 +85,19 @@ export const AlbumEntity = new Entity(
       },
       createdAt: {
         type: 'string',
+        required: true,
       },
       createdBy: {
         type: 'string',
+        required: true,
       },
       updatedAt: {
         type: 'string',
+        required: true,
       },
       updatedBy: {
         type: 'string',
+        required: true,
       },
       order: {
         type: 'number',

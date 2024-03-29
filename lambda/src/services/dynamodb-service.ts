@@ -1,13 +1,12 @@
 import {
   DeleteCommand,
   DeleteCommandInput,
-  PutCommand,
-  PutCommandInput,
   ScanCommand,
   ScanCommandInput,
   UpdateCommand,
   UpdateCommandInput,
 } from '@aws-sdk/lib-dynamodb';
+import { CreateEntityResponse, QueryResponse } from 'electrodb';
 import { get } from 'radash';
 import { BaseService } from '../models';
 import { ddbDocClient } from './dynamodb-client';
@@ -39,17 +38,18 @@ export abstract class DynamodbService<T> implements BaseService<T> {
   }
 
   async findOne(objectKey: { [key: string]: string | number }): Promise<T> {
-    const response = await this._entity.get(objectKey).go({ ignoreOwnership: true });
+    const response: QueryResponse<typeof this._entity> = await this._entity
+      .get(objectKey)
+      .go({ ignoreOwnership: true });
     return get(response, 'data', {} as T);
   }
 
   async create(item: T): Promise<boolean> {
-    const params: PutCommandInput = {
-      TableName: this._tableName,
-      Item: item as Record<string, any>,
-    };
-    const response = await this.client.send(new PutCommand(params));
-    return response.$metadata.httpStatusCode === 200;
+    const response: CreateEntityResponse<typeof this._entity> = await this._entity
+      .create(item)
+      .go({ response: 'none' });
+
+    return response.data === null;
   }
 
   async update(params: UpdateCommandInput): Promise<boolean> {

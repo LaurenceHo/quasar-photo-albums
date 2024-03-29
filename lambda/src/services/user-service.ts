@@ -1,5 +1,4 @@
-import { UserPermission } from '../models';
-import { UserPermissionEntity, userTableName } from '../schemas/user-permission';
+import { UserPermission, UserPermissionEntity, userTableName } from '../schemas/user-permission';
 import { DynamodbService } from './dynamodb-service';
 
 export default class UserService extends DynamodbService<UserPermission> {

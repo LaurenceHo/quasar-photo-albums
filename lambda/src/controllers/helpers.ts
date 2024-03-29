@@ -1,6 +1,6 @@
 import { ReturnValue } from '@aws-sdk/client-dynamodb';
 import { DeleteObjectsCommandInput, PutObjectCommandInput } from '@aws-sdk/client-s3';
-import { Album } from '../models';
+import { Album } from '../schemas/album';
 import AlbumService from '../services/album-service';
 import { S3Service } from '../services/s3-service';
 

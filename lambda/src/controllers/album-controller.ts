@@ -1,7 +1,8 @@
 import { Request, RequestHandler, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { get } from 'radash';
-import { Album, RequestWithUser } from '../models';
+import { RequestWithUser } from '../models';
+import { Album } from '../schemas/album';
 import AlbumService from '../services/album-service';
 import { asyncHandler } from '../utils/async-handler';
 import { BaseController } from './base-controller';
