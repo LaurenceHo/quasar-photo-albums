@@ -4,7 +4,7 @@ import PhotoController from '../controllers/photo-controller';
 import { verifyJwtClaim, verifyUserPermission } from './auth-middleware';
 import { get } from 'radash';
 
-const ACCEPTED_MAX_FILE_SIZE = 10 * 1024 * 1024;
+const ACCEPTED_MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export const router = express.Router();
 

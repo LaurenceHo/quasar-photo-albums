@@ -34,8 +34,8 @@ const corsHeader = (req: Request, res: Response, next: any) => {
 };
 app.use(corsHeader);
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '500kb' }));
+app.use(bodyParser.urlencoded({ extended: false, limit: '500kb' }));
 app.use(helmet());
 app.use(errorHandler);
 

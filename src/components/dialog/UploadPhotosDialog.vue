@@ -32,7 +32,7 @@
                 or <strong><em>click here</em></strong> to select photos
               </span>
             </span>
-            <span class="block text-subtitle1"> Max file size: 10MB </span>
+            <span class="block text-subtitle1"> Max file size: 5MB </span>
             <span class="block text-subtitle1"> Only image files allowed </span>
             <input id="file-input" accept="image/png, image/jpeg" multiple type="file" @change="onInputChange" />
           </label>
