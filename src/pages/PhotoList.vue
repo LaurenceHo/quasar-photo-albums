@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="text-h6 text-grey-7 q-pb-md" data-test-id="album-desc">{{ albumItem?.description }}</div>
-    <div v-if="albumItem?.tags?.length > 0" class="flex q-pb-md">
+    <div v-if="albumItem?.tags?.length && albumItem?.tags?.length > 0" class="flex q-pb-md">
       <q-chip v-for="(tag, i) in albumItem.tags" :key="i" color="secondary" data-test-id="album-tag">
         {{ tag }}
       </q-chip>

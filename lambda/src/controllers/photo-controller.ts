@@ -1,8 +1,9 @@
 import { Request, RequestHandler, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { get, isEmpty } from 'radash';
-import { Photo, PhotosRequest, RenamePhotoRequest, UserPermission } from '../models';
-import { cleanCookie } from '../route/auth-middleware';
+import { Photo, PhotosRequest, RenamePhotoRequest } from '../models';
+import { cleanCookie } from '../routes/auth-middleware';
+import { UserPermission } from '../schemas/user-permission';
 import AlbumService from '../services/album-service';
 import { S3Service } from '../services/s3-service';
 import { asyncHandler } from '../utils/async-handler';
@@ -46,7 +47,7 @@ export default class PhotoController extends BaseController {
         }
       }
       const folderNameKey = decodeURIComponent(albumId) + '/';
-      const photos = await s3Service.findPhotosByAlbumId({
+      const photos = await s3Service.findAll({
         Prefix: folderNameKey,
         Bucket: bucketName,
         MaxKeys: 1000,

@@ -52,7 +52,7 @@ const { file } = toRefs(props);
 
 const isValidImageFile = computed(() => {
   const fileSize = file.value.file.size / 1024 / 1024;
-  return file.value.id.includes('image') && fileSize < 10;
+  return file.value.id.includes('image') && fileSize < 5;
 });
 </script>
 

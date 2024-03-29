@@ -1,15 +1,16 @@
 import { Request, RequestHandler } from 'express';
+import { UserPermission } from './schemas/user-permission';
 
 export type RequestWithUser = Request & { user: UserPermission | null };
 
 export interface Read<T> {
-  findAll?(param: any): Promise<T[]>;
+  findAll?(param: any, whereClause?: any): Promise<T[]>;
   findOne?(param: any): Promise<T>;
 }
 
 export interface Write {
   create?(param: any): Promise<boolean>;
-  update?(param: any): Promise<boolean>;
+  update?(param: any, item?: any): Promise<boolean>;
   delete?(param: any): Promise<boolean>;
 }
 
@@ -27,35 +28,9 @@ export interface BaseController {
   delete?: RequestHandler;
 }
 
-export interface Album {
-  id: string; // it is the same as the folder name in s3
-  albumName: string;
-  albumCover?: string;
-  description?: string;
-  tags?: string[];
-  isPrivate: boolean;
-  order: number;
-  place?: Place;
-  createdAt: string;
-  updatedAt: string;
-  createdBy: string;
-  updatedBy: string;
-}
-
 export interface Photo {
   url: string;
   key: string;
-}
-
-export interface AlbumTag {
-  tag: string;
-}
-
-export interface UserPermission {
-  uid: string;
-  email: string;
-  role: string;
-  displayName: string;
 }
 
 export interface Place {

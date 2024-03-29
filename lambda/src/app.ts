@@ -4,11 +4,11 @@ import dotenv from 'dotenv';
 import express, { Application, Request, Response } from 'express';
 import helmet from 'helmet';
 import serverless from 'serverless-http';
-import { router as albumRoute } from './route/album-route';
-import { router as albumTagsRoute } from './route/album-tag-route';
-import { router as authRoute } from './route/auth-route';
-import { router as locationRoute } from './route/location-route';
-import { router as photoRoute } from './route/photo-route';
+import { router as albumRoute } from './routes/album-route';
+import { router as albumTagsRoute } from './routes/album-tag-route';
+import { router as authRoute } from './routes/auth-route';
+import { router as locationRoute } from './routes/location-route';
+import { router as photoRoute } from './routes/photo-route';
 import { initialiseDynamodbTables } from './services/initialise-dynamodb-tables';
 import { errorHandler } from './utils/error-handler';
 
@@ -34,8 +34,8 @@ const corsHeader = (req: Request, res: Response, next: any) => {
 };
 app.use(corsHeader);
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '500kb' }));
+app.use(bodyParser.urlencoded({ extended: false, limit: '500kb' }));
 app.use(helmet());
 app.use(errorHandler);
 

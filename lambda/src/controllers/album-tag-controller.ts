@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from 'express';
-import { AlbumTag } from '../models';
+import { AlbumTag } from '../schemas/album-tag';
 import AlbumTagService from '../services/album-tag-service';
 import { asyncHandler } from '../utils/async-handler';
 import { BaseController } from './base-controller';
@@ -8,11 +8,9 @@ import { uploadObject } from './helpers';
 const albumTagService = new AlbumTagService();
 
 export default class AlbumTagController extends BaseController {
-  findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  findAll: RequestHandler = asyncHandler(async (_req: Request, res: Response) => {
     try {
-      const albumTags = await albumTagService.findAll({
-        TableName: albumTagService.tableName,
-      });
+      const albumTags = await albumTagService.findAll();
 
       return this.ok<AlbumTag[]>(res, 'ok', albumTags);
     } catch (err: any) {
@@ -25,6 +23,7 @@ export default class AlbumTagController extends BaseController {
     const tag: AlbumTag = req.body;
     try {
       const result = await albumTagService.create(tag);
+
       if (result) {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
         return this.ok(res, 'Album tag created');
