@@ -212,8 +212,8 @@ const nextPhoto = (dir: number) => {
   selectedImageIndex.value = (selectedImageIndex.value + (dir % photoListLength) + photoListLength) % photoListLength;
 
   if (selectedImage.value) {
-    const photoKeyForUrl = selectedImage.value.key.split('/')[1];
-    router.replace({ query: { photo: photoKeyForUrl } });
+    const photoId = selectedImage.value.key.split('/')[1];
+    router.replace({ query: { photo: photoId } });
   }
 };
 

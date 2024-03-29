@@ -2,13 +2,22 @@ import express from 'express';
 import multer from 'multer';
 import PhotoController from '../controllers/photo-controller';
 import { verifyJwtClaim, verifyUserPermission } from './auth-middleware';
+import { get } from 'radash';
+
+const ACCEPTED_MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export const router = express.Router();
+
 const controller = new PhotoController();
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024,
+    fileSize: ACCEPTED_MAX_FILE_SIZE,
+  },
+  fileFilter: (req, file, cb: any) => {
+    const shouldAccept = get(req, 'header["content-length"]', 0) <= ACCEPTED_MAX_FILE_SIZE;
+    shouldAccept ? cb(null, true) : cb(new Error('Payload is too large'), false);
   },
 });
 

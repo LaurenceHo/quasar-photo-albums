@@ -149,7 +149,7 @@ export const mockPhotoList = [
     key: 'album-1/photo3.jpg',
   },
   {
-    url: 'https://example.com/album1/photo3.jpg',
+    url: 'https://example.com/album1/cover.jpg',
     key: 'album-1/cover.jpg',
   },
 ];
