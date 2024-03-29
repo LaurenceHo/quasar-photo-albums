@@ -215,7 +215,6 @@ const resetAlbum = () => {
     tags: [],
     isPrivate: true,
     order: 0,
-    place: null,
   });
   setUpdateAlbumDialogState(false);
 };

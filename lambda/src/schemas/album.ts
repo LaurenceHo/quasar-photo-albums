@@ -101,6 +101,7 @@ export const AlbumEntity = new Entity(
       },
       order: {
         type: 'number',
+        default: 0,
       },
     },
     indexes: {

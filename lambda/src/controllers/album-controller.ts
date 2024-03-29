@@ -24,21 +24,15 @@ export default class AlbumController extends BaseController {
         });
       }
 
-      let params = {
-        TableName: albumService.tableName,
-        ProjectionExpression: 'id, albumName, albumCover, description, tags, isPrivate, place',
-        // TODO - Need to sort by order
-      } as any;
+      let query = null;
       if (!isAdmin) {
-        params = {
-          ...params,
-          ExpressionAttributeValues: {
-            ':val': false,
-          },
-          FilterExpression: 'isPrivate = :val',
-        };
+        query = ({ isPrivate }: any, { eq }: any) => `${eq(isPrivate, false)}`;
       }
-      const albumList = await albumService.findAll(params);
+      // TODO - Need to sort by order
+      const albumList = await albumService.findAll(
+        ['id', 'albumName', 'albumCover', 'description', 'tags', 'isPrivate', 'place', 'order'],
+        query
+      );
 
       return this.ok<Album[]>(res, 'ok', albumList);
     } catch (err: any) {
@@ -51,6 +45,7 @@ export default class AlbumController extends BaseController {
     const album = req.body as Album;
     album.createdBy = (req as RequestWithUser).user?.email ?? 'unknown';
     album.createdAt = new Date().toISOString();
+    album.updatedBy = (req as RequestWithUser).user?.email ?? 'unknown';
     album.updatedAt = new Date().toISOString();
 
     try {
