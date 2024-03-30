@@ -25,9 +25,9 @@
                 <img
                   v-show="!loadImage && selectedImage"
                   :alt="photoFileName"
-                  :src="`${selectedImage?.url}?tr=w-1080`"
+                  :src="selectedImage?.url"
                   class="rounded-borders-lg responsive-image"
-                  style="margin: auto; display: block; max-width: 1080px; max-height: 1080px"
+                  style="margin: auto; display: block"
                   @load="loadImage = false"
                 />
               </div>

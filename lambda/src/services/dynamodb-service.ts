@@ -37,7 +37,7 @@ export abstract class DynamodbService<T> implements BaseService<T> {
       .get(objectKey)
       .go({ ignoreOwnership: true });
 
-    return get(response, 'data', {} as T);
+    return get(response, 'data');
   }
 
   async create(item: T): Promise<boolean> {

@@ -11,6 +11,8 @@ export const updatePhotoAlbum = async (album: Album) => {
   try {
     const cloneAlbum: any = { ...album };
     delete cloneAlbum.id;
+    delete cloneAlbum.createdAt;
+    delete cloneAlbum.createdBy;
 
     const result = await albumService.update({ id: album.id }, cloneAlbum);
 

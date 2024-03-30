@@ -113,6 +113,7 @@ export const AlbumEntity = new Entity(
         pk: {
           field: 'id',
           composite: ['id'],
+          casing: 'none',
         },
       },
     },
