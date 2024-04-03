@@ -1,5 +1,5 @@
-import { setActivePinia, createPinia } from 'pinia';
-import { afterEach, describe, it, expect, beforeEach, vi } from 'vitest';
+import { createPinia, setActivePinia } from 'pinia';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { albumStore } from '../../../../src/stores/album-store';
 import {
   mockAlbumList,
@@ -62,13 +62,13 @@ describe('Album Store', () => {
       { id: 'Food', albumName: 'Food title', description: 'Food desc', tags: ['food', 'test'], isPrivate: false },
     ]);
     expect(store.chunkAlbumList(0, 2)).toEqual([
-      { id: 'Sport', albumName: 'Sport', description: 'Sport', tags: ['sport'], isPrivate: false },
+      { id: 'Sport', albumName: 'Sport', description: 'Sport desc', tags: ['sport'], isPrivate: false },
       { id: 'Food', albumName: 'Food title', description: 'Food desc', tags: ['food', 'test'], isPrivate: false },
     ]);
     // Filter private album
     expect(store.filteredAlbumList('', [], true)).toEqual([
       {
-        id: 'Do something secret',
+        id: 'do-something-secret',
         albumName: 'Do something secret',
         description: 'Do something secret',
         tags: ['secret'],
@@ -92,7 +92,7 @@ describe('Album Store', () => {
     store.allAlbumList = mockAlbumList;
     expect(store.albumsHaveLocation).toEqual([
       {
-        id: 'Do something secret',
+        id: 'do-something-secret',
         albumName: 'Do something secret',
         description: 'Do something secret',
         tags: ['secret'],
