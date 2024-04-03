@@ -130,6 +130,7 @@ import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import { isEmpty } from 'radash';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
+import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import AlbumService from 'src/services/album-service';
 import LocationService from 'src/services/location-service';
 import { albumStore } from 'stores/album-store';
@@ -139,8 +140,8 @@ const locationService = new LocationService();
 const albumService = new AlbumService();
 const store = albumStore();
 
-const { getUpdateAlbumDialogState, setUpdateAlbumDialogState, getAlbumToBeUpdate, setAlbumToBeUpdated } =
-  DialogStateComposable();
+const { getUpdateAlbumDialogState, setUpdateAlbumDialogState } = DialogStateComposable();
+const { getAlbumToBeUpdate, setAlbumToBeUpdated } = SelectedItemsComposable();
 const { albumTags, filterTags } = AlbumTagsFilterComposable();
 
 const albumId = ref('');

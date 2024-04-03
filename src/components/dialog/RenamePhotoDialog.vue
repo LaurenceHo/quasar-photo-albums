@@ -48,6 +48,7 @@
 <script lang="ts" setup>
 import { isEmpty } from 'radash';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
+import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import AlbumService from 'src/services/album-service';
 import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';
@@ -62,7 +63,9 @@ const props = defineProps({
   },
 });
 const { albumId } = toRefs(props);
-const { setRenamePhotoDialogState, renamePhotoDialogState, getCurrentPhotoToBeRenamed } = DialogStateComposable();
+const { setRenamePhotoDialogState, renamePhotoDialogState } = DialogStateComposable();
+const { getCurrentPhotoToBeRenamed } = SelectedItemsComposable();
+
 const albumService = new AlbumService();
 const photoService = new PhotoService();
 
@@ -73,13 +76,13 @@ const findFileTypeIndex = getCurrentPhotoToBeRenamed.value.lastIndexOf('.');
 const fileType = getCurrentPhotoToBeRenamed.value.slice(findFileTypeIndex);
 const currentFileNameWithoutExtension = getCurrentPhotoToBeRenamed.value.slice(0, findFileTypeIndex).split('/')[1];
 
+const isProcessing = ref(false);
+const isExistedPhotoKey = ref(false);
 const newPhotoNameWithoutExtension = ref(currentFileNameWithoutExtension || '');
+
 const newPhotoId = computed(() => `${newPhotoNameWithoutExtension.value || ''}${fileType}`);
 const isAlbumCover = computed(() => useAlbumStore.isAlbumCover(getCurrentPhotoToBeRenamed.value));
 const selectedAlbum = computed(() => useAlbumStore.selectedAlbumItem);
-
-const isProcessing = ref(false);
-const isExistedPhotoKey = ref(false);
 
 const confirmRenamePhoto = async () => {
   newPhotoNameWithoutExtension.value = newPhotoNameWithoutExtension.value.trim();

@@ -1,9 +1,9 @@
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { mount } from '@vue/test-utils';
-import { describe, it, expect, vi } from 'vitest';
+import { QDialog } from 'quasar';
+import { describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 import UploadPhotosDialog from '../../../../../src/components/dialog/UploadPhotosDialog.vue';
-import { QDialog } from 'quasar';
 
 installQuasarPlugin({ components: { QDialog } });
 

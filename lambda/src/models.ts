@@ -31,6 +31,8 @@ export interface BaseController {
 export interface Photo {
   url: string;
   key: string;
+  size?: number;
+  lastModified?: Date;
 }
 
 export interface Place {

@@ -17,6 +17,7 @@
       </q-card-section>
       <q-card-section class="flex column justify-center items-center" style="height: 80vh">
         <DropZone v-slot="{ dropZoneActive }" @files-dropped="addFiles">
+          <q-checkbox v-model="override" label="Override existing photos" />
           <label
             v-if="!isCompleteUploading"
             for="file-input"
@@ -32,8 +33,7 @@
                 or <strong><em>click here</em></strong> to select photos
               </span>
             </span>
-            <span class="block text-subtitle1"> Max file size: 5MB </span>
-            <span class="block text-subtitle1"> Only image files allowed </span>
+            <span class="block text-subtitle1"> Max file size: 5MB. Only image files allowed </span>
             <input id="file-input" accept="image/png, image/jpeg" multiple type="file" @change="onInputChange" />
           </label>
           <ul v-show="files.length" class="flex q-pa-none">
@@ -90,7 +90,7 @@ import DropZone from 'components/file-uploader/DropZone.vue';
 import FilePreview from 'components/file-uploader/FilePreview.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import useFileList from 'src/composables/file-list-composable';
-import fileUploader from 'src/composables/file-uploader-composable';
+import useFileUploader from 'src/composables/file-uploader-composable';
 import { toRefs, watch } from 'vue';
 
 const emits = defineEmits(['refreshPhotoList']);
@@ -105,7 +105,7 @@ const props = defineProps({
 const { albumId } = toRefs(props);
 const { getUploadPhotoDialogState, setUploadPhotoDialogState } = DialogStateComposable();
 const { files, addFiles, removeFile } = useFileList();
-const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading } = fileUploader();
+const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, override } = useFileUploader();
 const { uploadFiles } = createUploader(albumId.value);
 
 const onInputChange = (e: any) => {

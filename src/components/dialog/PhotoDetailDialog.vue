@@ -161,6 +161,7 @@ const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
 
 const albumId = computed(() => route.params.albumId as string);
 const photoId = computed(() => route.query.photo as string);
+// FIXME, we should not use computed for dialog, however, if we don't use it, when we go to next photo, the dialog will close
 const dialog = computed(() => !isEmpty(photoId.value) && selectedImageIndex.value !== -1);
 
 /** Photo EXIF data */
@@ -202,7 +203,7 @@ const aperture = computed(() =>
 );
 /** Photo EXIF data */
 
-const closeDialog = async () => await router.replace({ query: undefined });
+const closeDialog = async () => await router.replace({ query: { ...route.query, photo: undefined } });
 
 const nextPhoto = (dir: number) => {
   q.loadingBar.start();
