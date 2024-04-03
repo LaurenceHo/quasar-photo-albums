@@ -1,10 +1,10 @@
 import { createTestingPinia } from '@pinia/testing';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { mount } from '@vue/test-utils';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QDialog } from 'quasar';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MovePhotosDialog from '../../../../../src/components/dialog/MovePhotosDialog.vue';
-import DialogStateComposable from '../../../../../src/composables/dialog-state-composable';
+import SelectedItemsComposable from '../../../../../src/composables/selected-items-composaable';
 import { mockAlbumList, mockPhotoList } from '../../mock-data';
 
 installQuasarPlugin({ components: { QDialog } });
@@ -55,7 +55,7 @@ describe('MovePhotosDialog.vue', () => {
     await vm.setMovePhotoDialogState(true);
     await vm.$nextTick();
 
-    const { setSelectedPhotosList } = DialogStateComposable();
+    const { setSelectedPhotosList } = SelectedItemsComposable();
     setSelectedPhotosList(['album1/1.jpg', 'album1/2.jpg']);
     await vm.$nextTick();
     // Check photo keys array
@@ -75,7 +75,7 @@ describe('MovePhotosDialog.vue', () => {
     await vm.setMovePhotoDialogState(true);
     await vm.$nextTick();
 
-    const { setSelectedPhotosList } = DialogStateComposable();
+    const { setSelectedPhotosList } = SelectedItemsComposable();
     setSelectedPhotosList(['album-1/photo1.jpg', 'album-1/photo2.jpg', 'album-1/photo3.jpg']);
     await vm.$nextTick();
     // Check photo keys array

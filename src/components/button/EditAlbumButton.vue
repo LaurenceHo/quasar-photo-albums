@@ -45,6 +45,7 @@
 <script lang="ts" setup>
 import { Album } from 'components/models';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
+import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import AlbumService from 'src/services/album-service';
 import { albumStore } from 'stores/album-store';
 import { ref, toRefs } from 'vue';
@@ -64,7 +65,8 @@ const { albumItem } = toRefs(props);
 
 const albumService = new AlbumService();
 const store = albumStore();
-const { setUpdateAlbumDialogState, setAlbumToBeUpdated } = DialogStateComposable();
+const { setUpdateAlbumDialogState } = DialogStateComposable();
+const { setAlbumToBeUpdated } = SelectedItemsComposable();
 
 const deleteAlbum = ref(false);
 const albumName = ref(albumItem?.value?.albumName);

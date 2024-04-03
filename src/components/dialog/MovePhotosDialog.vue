@@ -71,6 +71,7 @@
 </template>
 <script lang="ts" setup>
 import DialogStateComposable from 'src/composables/dialog-state-composable';
+import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import PhotoService from 'src/services/photo-service';
 import { albumStore } from 'stores/album-store';
 import { computed, ref, toRefs } from 'vue';
@@ -82,12 +83,18 @@ const props = defineProps({
     required: true,
   },
 });
-const { albumId } = toRefs(props);
-const { getSelectedPhotoList, setMovePhotoDialogState, movePhotoDialogState } = DialogStateComposable();
+const { setMovePhotoDialogState, movePhotoDialogState } = DialogStateComposable();
+const { getSelectedPhotoList } = SelectedItemsComposable();
+
 const photoService = new PhotoService();
 const store = albumStore();
+
+const { albumId } = toRefs(props);
 const duplicatedPhotoKeys = ref<string[]>([]);
 const filteredAlbumsList = ref(store.allAlbumList.filter((album) => album.id !== albumId.value));
+const selectedAlbum = ref(filteredAlbumsList.value[0]?.id ?? '');
+const isProcessing = ref(false);
+
 const photoKeysArray = computed(
   () =>
     getSelectedPhotoList.value.map((photoKey: string) => {
@@ -95,9 +102,6 @@ const photoKeysArray = computed(
       return photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
     }) as string[]
 );
-
-const selectedAlbum = ref(filteredAlbumsList.value[0]?.id ?? '');
-const isProcessing = ref(false);
 
 const filterAlbums = (input: string, update: any) => {
   if (input === '') {

@@ -9,10 +9,10 @@
         :alt="`photo image ${photo.key}`"
         @click="goToPhotoDetail()"
       />
-      <div class="absolute-top flex justify-between photo-top-button-container">
+      <div v-if="isAdminUser" class="absolute-top flex justify-between photo-top-button-container">
         <q-checkbox
-          v-if="isAdminUser"
           v-model="selectedPhotosList"
+          data-test-id="select-photo-checkbox"
           :val="photo.key"
           checked-icon="mdi-check-circle"
           color="positive"
@@ -21,7 +21,7 @@
           <q-tooltip> Select photo</q-tooltip>
         </q-checkbox>
         <EditPhotoButton
-          v-if="isAdminUser"
+          data-test-id="edit-photo-button"
           :photo-key="photo.key"
           color="white"
           @refresh-photo-list="$emit('refreshPhotoList')"
@@ -33,7 +33,7 @@
 
 <script lang="ts" setup>
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
-import DialogStateComposable from 'src/composables/dialog-state-composable';
+import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import { userStore } from 'stores/user-store';
 import { computed, onMounted, ref, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
@@ -50,7 +50,7 @@ const props = defineProps({
 const { photo } = toRefs(props);
 const router = useRouter();
 const userPermissionStore = userStore();
-const { selectedPhotosList } = DialogStateComposable();
+const { selectedPhotosList } = SelectedItemsComposable();
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 
 const imageWidth = ref(document.getElementById('photo-image')?.clientWidth ?? 0);

@@ -3,7 +3,7 @@
     <div :key="photoId" class="row items-center">
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" to="/" unelevated />
       <div class="text-h4 q-py-md q-pl-md-sm" data-test-id="album-name">
-        <q-btn v-if="albumItem?.place" icon="mdi-map" round size="md" unelevated>
+        <q-btn v-if="albumItem?.place" icon="mdi-map" round size="md" unelevated data-test-id="album-map-button">
           <q-tooltip :offset="[0, 0]" class="bg-transparent" max-width="300px" style="width: 300px">
             <q-card>
               <q-card-section class="text-h6 text-grey-7">
@@ -27,22 +27,36 @@
         {{ tag }}
       </q-chip>
     </div>
-    <q-card v-if="isAdminUser" bordered class="admin-panel q-mb-md flex items-center justify-between" flat>
+    <q-card
+      v-if="isAdminUser"
+      bordered
+      class="admin-panel q-mb-md flex items-center justify-between"
+      flat
+      data-test-id="photo-manage-panel"
+    >
       <div class="text-h6 flex items-center">
         <q-btn flat icon="mdi-image-plus" round @click="setUploadPhotoDialogState(true)">
           <q-tooltip> Upload photos</q-tooltip>
         </q-btn>
         <q-separator inset vertical />
         <q-btn
-          v-if="getSelectedPhotoList.length !== photoAmount"
+          v-if="getSelectedPhotoList.length !== photoAmount && getSelectedPhotoList.length < 50"
           flat
           icon="mdi-check-all"
           round
+          data-test-id="select-all-photos-button"
           @click="setSelectedPhotosList(photoKeysList)"
         >
           <q-tooltip> Select all photos (Max 50 photos)</q-tooltip>
         </q-btn>
-        <q-btn v-if="getSelectedPhotoList.length > 0" flat icon="mdi-close" round @click="setSelectedPhotosList([])">
+        <q-btn
+          v-if="getSelectedPhotoList.length > 0"
+          flat
+          icon="mdi-close"
+          round
+          data-test-id="unselect-all-photos-button"
+          @click="setSelectedPhotosList([])"
+        >
           <q-tooltip> Unselect all photos</q-tooltip>
         </q-btn>
         <div v-if="getSelectedPhotoList.length > 0">{{ getSelectedPhotoList.length }} selected</div>
@@ -110,6 +124,7 @@ import { Album, Photo as IPhoto } from 'components/models';
 import Photo from 'components/Photo.vue';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
+import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
@@ -123,8 +138,6 @@ const useAlbumStore = albumStore();
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
 const {
-  getSelectedPhotoList,
-  setSelectedPhotosList,
   getUploadPhotoDialogState,
   setUploadPhotoDialogState,
   getDeletePhotoDialogState,
@@ -133,6 +146,7 @@ const {
   setMovePhotoDialogState,
   getRenamePhotoDialogState,
 } = DialogStateComposable();
+const { getSelectedPhotoList, setSelectedPhotosList } = SelectedItemsComposable();
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumId = computed(() => route.params.albumId as string);

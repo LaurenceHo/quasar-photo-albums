@@ -1,6 +1,6 @@
 import { UploadableFile } from 'components/models';
-import { notify } from 'src/utils/helper';
 import PhotoService from 'src/services/photo-service';
+import { notify } from 'src/utils/helper';
 import { photoStore } from 'stores/photo-store';
 import { ref } from 'vue';
 

@@ -90,7 +90,7 @@ import DropZone from 'components/file-uploader/DropZone.vue';
 import FilePreview from 'components/file-uploader/FilePreview.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import useFileList from 'src/composables/file-list-composable';
-import fileUploader from 'src/composables/file-uploader-composable';
+import usFileUploader from 'src/composables/file-uploader-composable';
 import { toRefs, watch } from 'vue';
 
 const emits = defineEmits(['refreshPhotoList']);
@@ -105,7 +105,7 @@ const props = defineProps({
 const { albumId } = toRefs(props);
 const { getUploadPhotoDialogState, setUploadPhotoDialogState } = DialogStateComposable();
 const { files, addFiles, removeFile } = useFileList();
-const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading } = fileUploader();
+const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading } = usFileUploader();
 const { uploadFiles } = createUploader(albumId.value);
 
 const onInputChange = (e: any) => {
