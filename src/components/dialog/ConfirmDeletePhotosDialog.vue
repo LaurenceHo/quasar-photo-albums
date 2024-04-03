@@ -28,6 +28,7 @@
 </template>
 <script lang="ts" setup>
 import DialogStateComposable from 'src/composables/dialog-state-composable';
+import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import PhotoService from 'src/services/photo-service';
 import { computed, ref, toRefs } from 'vue';
 
@@ -41,7 +42,8 @@ const props = defineProps({
 
 const { albumId } = toRefs(props);
 const photoService = new PhotoService();
-const { getSelectedPhotoList, deletePhotoDialogState, setDeletePhotoDialogState } = DialogStateComposable();
+const { deletePhotoDialogState, setDeletePhotoDialogState } = DialogStateComposable();
+const { getSelectedPhotoList } = SelectedItemsComposable();
 
 const photoKeysArray = computed(
   () =>

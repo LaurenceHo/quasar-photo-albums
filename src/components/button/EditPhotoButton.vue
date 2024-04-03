@@ -41,6 +41,7 @@
 import { Album } from 'components/models';
 import { copyToClipboard, useQuasar } from 'quasar';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
+import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import AlbumService from 'src/services/album-service';
 import { getStaticFileUrl } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
@@ -66,13 +67,8 @@ const { photoKey } = toRefs(props);
 const albumItem = computed(() => useAlbumStore.selectedAlbumItem);
 const isAlbumCover = computed(() => useAlbumStore.isAlbumCover(photoKey.value));
 
-const {
-  setSelectedPhotosList,
-  setDeletePhotoDialogState,
-  setMovePhotoDialogState,
-  setRenamePhotoDialogState,
-  setCurrentPhotoToBeRenamed,
-} = DialogStateComposable();
+const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } = DialogStateComposable();
+const { setSelectedPhotosList, setCurrentPhotoToBeRenamed } = SelectedItemsComposable();
 
 const makeCoverPhoto = async () => {
   const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photoKey.value as string };

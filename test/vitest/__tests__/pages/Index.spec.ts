@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
 import { createTestingPinia } from '@pinia/testing';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { mount } from '@vue/test-utils';
+import { describe, expect, it } from 'vitest';
 import Index from '../../../../src/pages/Index.vue';
 import { mockRouter as router } from '../mock-router';
 

@@ -72,7 +72,7 @@
       label="Only show private album"
       left-label
     />
-    <template v-if="chunkAlbumList.length">
+    <template v-if="chunkAlbumList.length > 0">
       <div v-if="albumStyle === 'grid'" class="q-col-gutter-md row">
         <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
       </div>
@@ -120,7 +120,7 @@ const { albumTags, filterTags } = AlbumTagsFilterComposable();
 
 const pageNumber = ref(1);
 const itemsPerPage = ref(20);
-const albumStyle = ref((route.query.albumStyle as string) || 'list');
+const albumStyle = ref((route.query.albumStyle as string) || 'list'); // List is default style
 const totalItems = ref(store.allAlbumList.length);
 const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
 const selectedTags = ref([]);
