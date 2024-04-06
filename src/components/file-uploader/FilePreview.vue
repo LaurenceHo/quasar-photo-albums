@@ -1,9 +1,11 @@
 <template>
   <component :is="tag" class="file-preview relative-position overflow-hidden q-mx-lg q-my-md">
+    <div>{{ fileSize }}</div>
     <div class="relative-position">
       <q-img v-if="isValidImageFile" :alt="file.file.name" :src="file.url" :title="file.file.name" ratio="1" />
       <div v-else>
-        This file is not allowed <strong>{{ file.file.name }}</strong>
+        <div>This file is not allowed:</div>
+        <strong>{{ file.file.name }}</strong>
       </div>
       <q-btn
         v-if="file.status !== true && !file.exists"
@@ -49,6 +51,10 @@ const props = defineProps({
   tag: { type: String, default: 'li' },
 });
 const { file } = toRefs(props);
+const fileSize = computed(() => {
+  const size = file.value.file.size / 1024;
+  return size < 1024 ? `${size.toFixed(2)} KB` : `${(size / 1024).toFixed(2)} MB`;
+});
 
 const isValidImageFile = computed(() => {
   const fileSize = file.value.file.size / 1024 / 1024;

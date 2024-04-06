@@ -6,6 +6,7 @@ import { ref } from 'vue';
 
 const isUploading = ref(false);
 const isCompleteUploading = ref(false);
+const override = ref(false);
 
 export default function () {
   const usePhotoStore = photoStore();
@@ -19,7 +20,7 @@ export default function () {
     const photoService = new PhotoService();
     file.status = 'loading';
     let response;
-    if (file.id.includes('image') && !file.exists) {
+    if (file.id.includes('image') && (override.value || (!override.value && !file.exists))) {
       response = await photoService.uploadPhotos(file.file, albumId);
       file.status = response.status === 'Success';
     } else {
@@ -43,5 +44,5 @@ export default function () {
     uploadFiles: (files: any) => uploadFiles(files, albumId),
   });
 
-  return { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading };
+  return { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, override };
 }

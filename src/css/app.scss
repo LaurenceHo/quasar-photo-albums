@@ -22,16 +22,6 @@ body {
   display: block;
 }
 
-.no-album-cover-square {
-  border: gray dashed 1px;
-
-  &:after {
-    content: '';
-    display: block;
-    padding-bottom: 100%;
-  }
-}
-
 // Quasar css override
 .q-field--outlined .q-field__control {
   background: #fff;

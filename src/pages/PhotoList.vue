@@ -1,8 +1,28 @@
 <template>
   <div class="q-pt-md">
     <div :key="photoId" class="row items-center">
-      <q-btn color="primary" icon="mdi-arrow-left" round size="md" to="/" unelevated />
-      <div class="text-h4 q-py-md q-pl-md-sm" data-test-id="album-name">
+      <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated @click="goBack()" />
+      <div class="text-h5 text-weight-medium q-py-md q-pl-md-sm" data-test-id="album-name">
+        <q-btn-group outline>
+          <q-btn
+            :outline="photoStyle === 'grid'"
+            color="primary"
+            data-test-id="photo-list-style-button"
+            dense
+            icon="mdi-format-list-bulleted-square"
+            padding="sm"
+            @click="setPhotoListStyle('detail')"
+          />
+          <q-btn
+            :outline="photoStyle === 'detail'"
+            color="primary"
+            data-test-id="photo-grid-style-button"
+            dense
+            icon="mdi-view-grid"
+            padding="sm"
+            @click="setPhotoListStyle('grid')"
+          />
+        </q-btn-group>
         <q-btn v-if="albumItem?.place" icon="mdi-map" round size="md" unelevated data-test-id="album-map-button">
           <q-tooltip :offset="[0, 0]" class="bg-transparent" max-width="300px" style="width: 300px">
             <q-card>
@@ -82,11 +102,17 @@
         </q-btn>
       </div>
     </q-card>
-    <div class="q-col-gutter-md row">
-      <template v-if="photosInAlbum.length > 0">
-        <Photo v-for="photo in photosInAlbum" :key="photo.key" :photo="photo" />
-      </template>
-    </div>
+    <template v-if="photosInAlbum.length > 0">
+      <div v-if="photoStyle === 'grid'" class="q-col-gutter-md row">
+        <Photo v-for="photo in photosInAlbum" :key="photo.key" :photo="photo" :photo-style="photoStyle" />
+      </div>
+      <div v-else class="row">
+        <Photo v-for="photo in photosInAlbum" :key="photo.key" :photo="photo" :photo-style="photoStyle" />
+      </div>
+    </template>
+    <template v-if="photosInAlbum.length === 0 && !fetchingPhotos">
+      <div class="text-h5 text-weight-medium">No results.</div>
+    </template>
   </div>
   <MovePhotoDialog
     v-if="getMovePhotoDialogState"
@@ -128,7 +154,7 @@ import SelectedItemsComposable from 'src/composables/selected-items-composaable'
 import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
@@ -149,16 +175,23 @@ const {
 const { getSelectedPhotoList, setSelectedPhotosList } = SelectedItemsComposable();
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
+const photoStyle = ref((route.query.photoStyle as string) || 'grid'); // Grid is default photo list style
 const albumId = computed(() => route.params.albumId as string);
 const albumItem = computed(() => useAlbumStore.getAlbumById(albumId.value) as Album);
 const photosInAlbum = computed(() => usePhotoStore.photoList as IPhoto[]);
+const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
 const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.key).slice(0, 50)); // Max 50 photos
 const photoAmount = computed(() => photosInAlbum.value.length);
 const photoId = computed(() => route.query.photo as string);
 
-const closePhotoDetailDialog = () => {
-  router.replace({ query: { photo: undefined } });
+const goBack = () => router.back();
+
+const setPhotoListStyle = (type: 'detail' | 'grid') => {
+  photoStyle.value = type;
+  router.replace({ query: { ...route.query, photoStyle: type } });
 };
+
+const closePhotoDetailDialog = async () => await router.replace({ query: { ...route.query, photo: undefined } });
 
 const refreshPhotoList = async () => {
   const isPrevAlbumEmpty = photosInAlbum.value.length === 0;
@@ -185,23 +218,3 @@ watch(albumId, (newValue) => {
   }
 });
 </script>
-<style lang="scss">
-.photo-item {
-  .photo-top-button-container {
-    &:hover {
-      cursor: pointer;
-      background: rgba(0, 0, 0, 0.2);
-      opacity: 1;
-      transition: all 0.5s;
-      -webkit-transition: all 0.5s;
-      -moz-transition: all 0.5s;
-      border-radius: 8px 8px 0 0;
-    }
-  }
-
-  .q-checkbox,
-  .q-checkbox__inner--falsy {
-    color: white !important;
-  }
-}
-</style>
