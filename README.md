@@ -145,6 +145,7 @@ with your Google account and see the admin page as below:
 ![web-capture2](doc-images/Web_capture_2.jpeg)
 ![web-capture3](doc-images/Web_capture_3.jpeg)
 ![web-capture4](doc-images/Web_capture_4.jpeg)
+![web-capture5](doc-images/Web_capture_5.jpeg)
 
 ### AWS Lambda Function
 
