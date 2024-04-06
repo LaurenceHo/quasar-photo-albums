@@ -14,6 +14,8 @@ export interface Album {
 export interface Photo {
   url: string;
   key: string; // `${albumId}/${photoId}`
+  size?: number;
+  lastModified?: Date;
 }
 
 export interface AlbumTag {

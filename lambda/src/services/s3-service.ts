@@ -27,11 +27,15 @@ export class S3Service implements BaseService<Photo> {
     const photos: Photo[] = s3ObjectContents.map((photo) => {
       let url = '';
       let key = '';
+      let size = 0;
+      let lastModified = new Date();
       if (photo && photo.Key) {
         url = `${this.cdnURL}/${encodeURI(photo.Key)}`;
         key = photo.Key;
+        size = photo.Size ?? 0;
+        lastModified = photo.LastModified ?? new Date();
       }
-      return { url, key };
+      return { url, key, size, lastModified };
     });
 
     return Promise.resolve(photos);
