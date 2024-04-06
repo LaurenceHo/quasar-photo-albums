@@ -1,5 +1,5 @@
 <template>
-  <div v-if="albumStyle === 'grid'" class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6">
+  <div v-if="albumStyle === 'grid'" class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6" data-test-id="grid-album-item">
     <div class="relative-position">
       <q-img
         v-if="albumItem?.albumCover"
@@ -8,11 +8,11 @@
         class="rounded-borders-lg cursor-pointer"
         @click="goToAlbum"
       />
-      <div v-else class="no-album-cover-square rounded-borders-lg cursor-pointer" @click="goToAlbum">
+      <div v-else class="no-album-cover-square rounded-borders-lg cursor-pointer" @click="goToAlbum()">
         <q-icon class="absolute-center" name="mdi-image" size="48px" />
       </div>
       <q-icon
-        v-if="albumItem.private"
+        v-if="albumItem.isPrivate"
         class="absolute"
         color="white"
         name="mdi-lock"
@@ -21,10 +21,10 @@
       />
       <EditAlbumButton v-if="isAdminUser" :album-item="albumItem" :album-style="albumStyle" />
     </div>
-    <div class="q-pt-sm text-h6 text-weight-medium">{{ albumItem.albumName }}</div>
+    <div class="q-pt-sm text-subtitle2 text-weight-medium">{{ albumItem.albumName }}</div>
   </div>
   <template v-else>
-    <q-item clickable>
+    <q-item clickable data-test-id="list-album-item">
       <q-item-section avatar @click="goToAlbum">
         <q-avatar :class="{ 'no-album-cover-square': !albumItem.albumCover }" :size="`${thumbnailSize}px`" rounded>
           <q-img
@@ -45,7 +45,7 @@
         </q-avatar>
       </q-item-section>
 
-      <q-item-section @click="goToAlbum">
+      <q-item-section @click="goToAlbum()">
         <q-item-label class="text-h6 text-weight-medium">{{ albumItem.albumName }}</q-item-label>
         <q-item-label v-if="albumItem.description" class="text-subtitle1 text-grey-7">
           {{ albumItem.description }}
@@ -103,3 +103,14 @@ const thumbnailSize = computed(() => (q.screen.lt.sm ? 60 : 90));
 
 const goToAlbum = () => router.push(`/album/${albumItem.value?.id}`);
 </script>
+<style lang="scss" scoped>
+.no-album-cover-square {
+  border: gray dashed 1px;
+
+  &:after {
+    content: '';
+    display: block;
+    padding-bottom: 100%;
+  }
+}
+</style>
