@@ -52,6 +52,7 @@ describe('PhotoList.vue', () => {
     await flushPromises();
     const { vm } = wrapper as any;
     await vm.$nextTick();
+
     expect(vm.photosInAlbum.length).toEqual(3);
     expect(wrapper.findAll('[data-test-id="photo-item"]').length).toEqual(3);
     expect(wrapper.findAll('[data-test-id="album-tag"]').length).toEqual(2);
@@ -59,9 +60,16 @@ describe('PhotoList.vue', () => {
     expect(wrapper.find('[data-test-id="album-desc"]').text()).toEqual('Food desc');
     expect(wrapper.find('[data-test-id="photo-manage-panel"]').exists()).toBe(false);
     expect(wrapper.find('[data-test-id="album-map-button"]').exists()).toBe(false);
+    expect(vm.photoStyle).toEqual('grid');
+
+    await wrapper.find('[data-test-id="photo-list-style-button"]').trigger('click');
+    await vm.$nextTick();
+    await router.isReady();
+    expect(vm.photoStyle).toEqual('detail');
   });
 
   it('Check photo list with manage panel', async () => {
+    const mockUpdateAlbumCover = vi.fn();
     await router.push('/album/do-something-secret');
     await router.isReady();
 
@@ -77,6 +85,7 @@ describe('PhotoList.vue', () => {
                   albumTags: ['sport', 'food', 'hiking', 'secret'],
                 },
                 getAlbumById: (id: string) => mockAlbumList.find((album) => album.id === id),
+                updateAlbumCover: mockUpdateAlbumCover,
               },
               photos: {
                 photoList: mockPhotoList,
@@ -110,5 +119,10 @@ describe('PhotoList.vue', () => {
     expect(vm.getSelectedPhotoList.length).toEqual(4);
     expect(wrapper.find('[data-test-id="unselect-all-photos-button"]').exists()).toBe(true);
     expect(wrapper.find('[data-test-id="photo-manage-panel"]').text()).toEqual('4 selected');
+    // Refresh photo list page
+    vm.refreshPhotoList();
+    await vm.$nextTick();
+    expect(mockUpdateAlbumCover).not.toHaveBeenCalled();
+    expect(vm.getSelectedPhotoList.length).toEqual(0);
   });
 });

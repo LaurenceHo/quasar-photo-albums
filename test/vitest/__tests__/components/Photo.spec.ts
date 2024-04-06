@@ -16,6 +16,7 @@ describe('Photo.vue', () => {
   beforeEach(async () => {
     wrapper = mount(Photo, {
       props: {
+        photoStyle: 'grid',
         photo: {
           key: 'photo1.jpg',
           url: 'album1/photo1.jpg',
@@ -45,5 +46,6 @@ describe('Photo.vue', () => {
     const { vm } = wrapper as any;
     await vm.$nextTick();
     expect(wrapper.find('[data-test-id="edit-photo-button"]').exists()).toBe(true);
+    expect(wrapper.find('[data-test-id="detail-photo-item"]').exists()).toBe(false);
   });
 });

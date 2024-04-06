@@ -72,7 +72,7 @@ import { useQuasar } from 'quasar';
 import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import { userStore } from 'stores/user-store';
 import { computed, onMounted, ref, toRefs } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 defineEmits(['refreshPhotoList']);
 const props = defineProps({
@@ -91,6 +91,7 @@ const { photo } = toRefs(props);
 const imageWidth = ref(document.getElementById('photo-image')?.clientWidth ?? 0);
 
 const q = useQuasar();
+const route = useRoute();
 const router = useRouter();
 const userPermissionStore = userStore();
 const { selectedPhotosList } = SelectedItemsComposable();
@@ -105,9 +106,7 @@ const fileSize = computed(() => {
 });
 const isPhotoSelected = computed(() => selectedPhotosList.value.includes(photo.value.key));
 
-const goToPhotoDetail = () => {
-  router.replace({ query: { photo: photoId.value } });
-};
+const goToPhotoDetail = async () => await router.replace({ query: { ...route.query, photo: photoId.value } });
 
 onMounted(() => {
   imageWidth.value = document.getElementById('photo-image')?.clientWidth ?? 250;

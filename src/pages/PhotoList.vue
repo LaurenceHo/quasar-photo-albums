@@ -184,18 +184,14 @@ const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.ke
 const photoAmount = computed(() => photosInAlbum.value.length);
 const photoId = computed(() => route.query.photo as string);
 
-const goBack = () => {
-  router.back();
-};
+const goBack = () => router.back();
 
 const setPhotoListStyle = (type: 'detail' | 'grid') => {
   photoStyle.value = type;
-  router.replace({ query: { photoStyle: type } });
+  router.replace({ query: { ...route.query, photoStyle: type } });
 };
 
-const closePhotoDetailDialog = () => {
-  router.replace({ query: { photo: undefined } });
-};
+const closePhotoDetailDialog = async () => await router.replace({ query: { ...route.query, photo: undefined } });
 
 const refreshPhotoList = async () => {
   const isPrevAlbumEmpty = photosInAlbum.value.length === 0;
