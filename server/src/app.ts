@@ -8,8 +8,8 @@ import dotenv from 'dotenv';
 import serverless from 'serverless-http';
 import { router as albumRoute } from './routes/album-route.js';
 import albumTagsRoute from './routes/album-tag-route.js';
-import { router as authRoute } from './routes/auth-route.js';
-import { router as locationRoute } from './routes/location-route.js';
+import authRoute from './routes/auth-route.js';
+import locationRoute from './routes/location-route.js';
 import { router as photoRoute } from './routes/photo-route.js';
 import { initialiseDynamodbTables } from './services/initialise-dynamodb-tables.js';
 
@@ -25,7 +25,6 @@ await app.register(cors, {
   methods: ['GET, POST, PUT, DELETE, OPTIONS'],
   optionsSuccessStatus: 200,
   origin: (origin, cb) => {
-    console.log('##### origin: ', origin);
     const allowedOrigins = ['http://localhost:9000', process.env.ALBUM_URL];
     if (origin === undefined || allowedOrigins.indexOf(origin) > -1) {
       cb(null, true);
@@ -36,7 +35,7 @@ await app.register(cors, {
   },
   preflightContinue: true,
 });
-await app.register(cookie);
+await app.register(cookie, { secret: process.env.JWT_SECRET as string });
 await app.register(helmet);
 await app.register(auth);
 
@@ -63,11 +62,11 @@ app.use(corsHeader);
 /** Temporary fix for the CORS issue**/
 
 // Route
-app.use('/api/auth', authRoute);
+app.register(authRoute);
 app.use('/api/albums', albumRoute);
 app.register(albumTagsRoute);
 app.use('/api/photos', photoRoute);
-app.use('/api/location', locationRoute);
+app.register(locationRoute);
 
 try {
   await app.listen({ port: 3000 });

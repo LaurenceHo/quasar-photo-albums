@@ -1,7 +1,13 @@
-import express from 'express';
+import { FastifyInstance, FastifyPluginCallback } from 'fastify';
+import fastifyPlugin from 'fastify-plugin';
 import LocationController from '../controllers/location-controller.js';
 
-export const router = express.Router();
 const controller = new LocationController();
 
-router.get('/search', controller.findAll);
+const locationRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
+  instance.get('/api/location/search', controller.findAll);
+
+  done();
+};
+
+export default fastifyPlugin(locationRoute);

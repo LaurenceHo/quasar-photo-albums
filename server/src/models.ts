@@ -3,7 +3,7 @@ import { FastifyRequest, RouteHandler } from 'fastify';
 import { UserPermission } from './schemas/user-permission.js';
 
 export type RequestWithUser = Request & { user: UserPermission | null };
-export type RequestWithUserV2 = FastifyRequest & { user: UserPermission | null };
+export type RequestWithUserV2 = FastifyRequest & { user?: UserPermission | null };
 
 export interface Read<T> {
   findAll?(param: any, whereClause?: any): Promise<T[]>;

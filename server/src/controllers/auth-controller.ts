@@ -1,13 +1,12 @@
-import { Request, RequestHandler, Response } from 'express';
+import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { get } from 'radash';
-import { RequestWithUser } from '../models.js';
-import { cleanCookie, setCookies } from '../routes/auth-middleware.js';
+import { cleanCookieV2, setCookies } from '../routes/auth-middleware.js';
 import { UserPermission } from '../schemas/user-permission.js';
 import UserService from '../services/user-service.js';
-import { asyncHandler } from '../utils/async-handler.js';
-import { BaseController } from './base-controller.js';
+import { asyncHandlerV2 } from '../utils/async-handler.js';
+import { BaseControllerV2 } from './base-controller.js';
 
 // Reference:
 // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
@@ -15,32 +14,38 @@ import { BaseController } from './base-controller.js';
 const userService = new UserService();
 const client = new OAuth2Client();
 
-export default class AuthController extends BaseController {
+export default class AuthController extends BaseControllerV2 {
   // Get user info from token
-  findOne: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  findOne: RouteHandler = asyncHandlerV2(async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const token = get(req, 'cookies.jwt', null);
-      if (!token) {
-        return this.ok(res, 'ok');
-      } else {
-        let decodedPayload: any = null;
-        jwt.verify(token, process.env.JWT_SECRET as string, (err: any, payload: any) => {
-          if (err) {
-            res.clearCookie('jwt');
-          }
-          decodedPayload = payload;
-        });
+      const token = get(request, 'cookies.jwt', '');
+      const result = reply.unsignCookie(token);
 
-        return this.ok<UserPermission>(res, 'ok', decodedPayload);
+      if (!token) {
+        return this.ok(reply, 'ok');
+      } else {
+        if (result.valid) {
+          let decodedPayload: any = null;
+          if (result.value != null) {
+            jwt.verify(result.value, process.env.JWT_SECRET as string, (err: any, payload: any) => {
+              if (err) {
+                reply.clearCookie('jwt');
+              }
+              decodedPayload = payload;
+            });
+            return this.ok<UserPermission>(reply, 'ok', decodedPayload);
+          }
+        }
+        return cleanCookieV2(reply, 'Authentication failed. Please login.');
       }
     } catch (error) {
       console.log(error);
-      return cleanCookie(res, 'Authentication failed. Please login.');
+      return cleanCookieV2(reply, 'Authentication failed. Please login.');
     }
   });
 
-  verifyIdToken: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
-    const token = req.body.token;
+  verifyIdToken: RouteHandler = asyncHandlerV2(async (request: FastifyRequest, reply: FastifyReply) => {
+    const token = (request.body as any).token;
 
     try {
       const payload = await _verifyIdToken(token);
@@ -56,45 +61,45 @@ export default class AuthController extends BaseController {
           // Sign JWT token
           const token = jwt.sign(userPermission, process.env.JWT_SECRET as string, { expiresIn: '7d' });
           // Set token as cookies
-          await setCookies(res, token);
-          return this.ok<UserPermission>(res, 'ok', userPermission);
+          await setCookies(reply, token);
+          return this.ok<UserPermission>(reply, 'ok', userPermission);
         } else {
           console.log(`User ${email} doesn't have permission`);
-          return this.unauthorized(res, `User ${email} doesn't have login permission`);
+          return this.unauthorized(reply, `User ${email} doesn't have login permission`);
         }
       } else {
-        return this.fail(res, 'Error while user login');
+        return this.fail(reply, 'Error while user login');
       }
     } catch (err) {
       console.error('Error while getting user permission:', err);
-      return this.fail(res, 'Error while user login');
+      return this.fail(reply, 'Error while user login');
     }
   });
 
-  logout: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  logout: RouteHandler = asyncHandlerV2(async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      res.clearCookie('jwt');
-      (req as RequestWithUser).user = null;
-      return this.ok(res);
+      reply.clearCookie('jwt');
+      (request as any).user = null;
+      return this.ok(reply);
     } catch (err) {
       console.error(err);
-      return this.fail(res, '');
+      return this.fail(reply, '');
     }
   });
 
-  findAll: RequestHandler = asyncHandler(async () => {
+  findAll: RouteHandler = asyncHandlerV2(async () => {
     throw new Error('Method not implemented.');
   });
 
-  create: RequestHandler = asyncHandler(async () => {
+  create: RouteHandler = asyncHandlerV2(async () => {
     throw new Error('Method not implemented.');
   });
 
-  update: RequestHandler = asyncHandler(async () => {
+  update: RouteHandler = asyncHandlerV2(async () => {
     throw new Error('Method not implemented.');
   });
 
-  delete: RequestHandler = asyncHandler(async () => {
+  delete: RouteHandler = asyncHandlerV2(async () => {
     throw new Error('Method not implemented.');
   });
 }

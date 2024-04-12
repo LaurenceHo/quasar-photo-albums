@@ -1,11 +1,17 @@
-import express from 'express';
+import { FastifyInstance, FastifyPluginCallback } from 'fastify';
+import fastifyPlugin from 'fastify-plugin';
 import AuthController from '../controllers/auth-controller.js';
 
-export const router = express.Router();
 const controller = new AuthController();
 
-router.get('/userInfo', controller.findOne);
+const authRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
+  instance.get('/api/auth/userInfo', controller.findOne);
 
-router.post('/verifyIdToken', controller.verifyIdToken);
+  instance.post('/api/auth/verifyIdToken', controller.verifyIdToken);
 
-router.post('/logout', controller.logout);
+  instance.post('/api/auth/logout', controller.logout);
+
+  done();
+};
+
+export default fastifyPlugin(authRoute);

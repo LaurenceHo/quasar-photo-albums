@@ -1,6 +1,6 @@
 import { FastifyAuthFunction } from '@fastify/auth';
+import { CookieSerializeOptions } from '@fastify/cookie';
 import { Request, Response } from 'express';
-import { CookieOptions } from 'express-serve-static-core';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { get } from 'radash';
@@ -8,15 +8,16 @@ import { RequestWithUser, RequestWithUserV2 } from '../models.js';
 import JsonResponse from '../utils/json-response.js';
 import JsonResponseV2 from '../utils/json-response-v2.js';
 
-export const setCookies = async (res: Response, token: any) => {
+export const setCookies = async (reply: FastifyReply, token: string) => {
   const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days
   const options = {
     maxAge: expiresIn,
     httpOnly: true,
     secure: true,
-  } as CookieOptions;
-  res.cookie('jwt', token, options);
-  res.setHeader('Cache-Control', 'private');
+    signed: true,
+  } satisfies CookieSerializeOptions;
+  reply.setCookie('jwt', token, options);
+  reply.header('Cache-Control', 'private');
 };
 
 /**
@@ -65,8 +66,9 @@ export const verifyJwtClaimV2: FastifyAuthFunction = async (
   reply: FastifyReply,
   done: any
 ) => {
-  const token = get(request, 'cookies.jwt', null);
-  if (token) {
+  const token = get(request, 'cookies.jwt', '');
+  const result = reply.unsignCookie(token);
+  if (result.valid) {
     try {
       jwt.verify(token, process.env.JWT_SECRET as string, async (err: any, payload: any) => {
         if (err) {
