@@ -55,6 +55,10 @@ await app.register(throttle, {
 });
 
 // Route
+app.addHook('onRequest', (request, reply, done) => {
+  console.log('##### Request: ', request.method, request.url);
+  done();
+});
 app.decorate('verifyJwtClaim', verifyJwtClaim).decorate('verifyUserPermission', verifyUserPermission);
 
 app.register(authRoute);

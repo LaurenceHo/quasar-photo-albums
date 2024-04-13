@@ -4,6 +4,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { get } from 'radash';
 import { RequestWithUser } from '../models.js';
+import { UserPermission } from '../schemas/user-permission';
 import JsonResponse from '../utils/json-response.js';
 
 export const setJwtCookies = async (reply: FastifyReply, token: string) => {
@@ -24,7 +25,7 @@ export const setJwtCookies = async (reply: FastifyReply, token: string) => {
  * @param reply
  * @param message
  */
-export const cleanCookie = (reply: FastifyReply, message: string) => {
+export const cleanJwtCookie = (reply: FastifyReply, message: string) => {
   reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
   return new JsonResponse(401).unauthorized(reply, message);
 };
@@ -38,32 +39,25 @@ export const cleanCookie = (reply: FastifyReply, message: string) => {
 export const verifyJwtClaim: FastifyAuthFunction = async (request: FastifyRequest, reply: FastifyReply, done: any) => {
   const token = get(request, 'cookies.jwt', '');
   const result = reply.unsignCookie(token);
-  if (result.valid) {
+  if (result.valid && result.value != null) {
     try {
-      jwt.verify(token, process.env.JWT_SECRET as string, async (err: any, payload: any) => {
-        if (err) {
-          cleanCookie(reply, 'Authentication failed. Please login.');
-        }
-
-        (request as RequestWithUser).user = payload;
-        done();
-      });
+      (request as RequestWithUser).user = jwt.verify(result.value, process.env.JWT_SECRET as string) as UserPermission;
     } catch (error) {
-      cleanCookie(reply, 'Authentication failed. Please login.');
+      reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
+      done(new Error());
     }
   } else {
-    new JsonResponse(403).unauthorized(reply, 'No auth token provided. Please login.');
+    reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
+    done(new Error());
   }
 };
 
 export const verifyUserPermission: FastifyAuthFunction = async (
   request: FastifyRequest,
-  reply: FastifyReply,
+  _reply: FastifyReply,
   done: any
 ) => {
   if ((request as RequestWithUser).user?.role !== 'admin') {
-    return new JsonResponse(403).unauthorized(reply, 'Unauthorized action');
-  } else {
-    done();
+    done(new Error());
   }
 };

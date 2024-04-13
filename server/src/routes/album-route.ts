@@ -12,27 +12,29 @@ const albumRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
     instance.route({
       method: 'POST',
       url: '/api/albums',
-      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
+      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission], {
+        relation: 'and',
+      }),
       handler: controller.create,
     });
   });
 
-  instance.after(() => {
-    instance.route({
-      method: 'PUT',
-      url: '/api/albums',
-      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
-      handler: controller.update,
-    });
+  instance.route({
+    method: 'PUT',
+    url: '/api/albums',
+    preHandler: instance.auth([verifyJwtClaim, verifyUserPermission], {
+      relation: 'and',
+    }),
+    handler: controller.update,
   });
 
-  instance.after(() => {
-    instance.route({
-      method: 'DELETE',
-      url: '/api/albums/:albumId',
-      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
-      handler: controller.delete,
-    });
+  instance.route({
+    method: 'DELETE',
+    url: '/api/albums/:albumId',
+    preHandler: instance.auth([verifyJwtClaim, verifyUserPermission], {
+      relation: 'and',
+    }),
+    handler: controller.delete,
   });
 
   done();

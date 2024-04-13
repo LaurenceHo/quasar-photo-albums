@@ -5,7 +5,6 @@ import { get } from 'radash';
 import { setJwtCookies } from '../routes/auth-middleware.js';
 import { UserPermission } from '../schemas/user-permission.js';
 import UserService from '../services/user-service.js';
-import { asyncHandler } from '../utils/async-handler.js';
 import { BaseController } from './base-controller.js';
 
 // Reference:
@@ -16,7 +15,7 @@ const client = new OAuth2Client();
 
 export default class AuthController extends BaseController {
   // Get user info from token
-  findOne: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  findOne: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const token = get(request, 'cookies.jwt', '');
       const result = reply.unsignCookie(token);
@@ -25,28 +24,27 @@ export default class AuthController extends BaseController {
         return this.ok(reply, 'ok');
       } else {
         if (result.valid && result.value != null) {
-          let decodedPayload: any = null;
-          jwt.verify(result.value, process.env.JWT_SECRET as string, (err: any, payload: any) => {
-            if (err) {
-              reply.clearCookie('jwt');
-            }
-            decodedPayload = payload;
-          });
-          return this.ok<UserPermission>(reply, 'ok', decodedPayload);
+          try {
+            const decodedPayload = jwt.verify(result.value, process.env.JWT_SECRET as string) as UserPermission;
+            return this.ok<UserPermission>(reply, 'ok', decodedPayload);
+          } catch (error) {
+            reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
+            return this.ok(reply, 'ok');
+          }
         }
 
-        reply.clearCookie('jwt');
+        reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
         return this.ok(reply, 'ok');
       }
     } catch (error) {
       console.log(error);
 
-      reply.clearCookie('jwt');
+      reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
       return this.ok(reply, 'ok');
     }
-  });
+  };
 
-  verifyIdToken: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  verifyIdToken: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const token = (request.body as any).token;
 
     try {
@@ -76,9 +74,9 @@ export default class AuthController extends BaseController {
       console.error('Error while getting user permission:', err);
       return this.fail(reply, 'Error while user login');
     }
-  });
+  };
 
-  logout: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  logout: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
       (request as any).user = null;
@@ -88,23 +86,23 @@ export default class AuthController extends BaseController {
       console.error(err);
       return this.fail(reply, '');
     }
-  });
+  };
 
-  findAll: RouteHandler = asyncHandler(async () => {
+  findAll: RouteHandler = async () => {
     throw new Error('Method not implemented.');
-  });
+  };
 
-  create: RouteHandler = asyncHandler(async () => {
+  create: RouteHandler = async () => {
     throw new Error('Method not implemented.');
-  });
+  };
 
-  update: RouteHandler = asyncHandler(async () => {
+  update: RouteHandler = async () => {
     throw new Error('Method not implemented.');
-  });
+  };
 
-  delete: RouteHandler = asyncHandler(async () => {
+  delete: RouteHandler = async () => {
     throw new Error('Method not implemented.');
-  });
+  };
 }
 
 const _verifyIdToken = async (token: string) => {

@@ -4,26 +4,25 @@ import { get } from 'radash';
 import { RequestWithUser } from '../models.js';
 import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
-import { asyncHandler } from '../utils/async-handler.js';
 import { BaseController } from './base-controller.js';
 import { emptyS3Folder, updatePhotoAlbum, uploadObject } from './helpers.js';
 
 const albumService = new AlbumService();
 
 export default class AlbumController extends BaseController {
-  findAll: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       let isAdmin = false;
       const token = get(request, 'cookies.jwt', '');
       const result = reply.unsignCookie(token);
 
       if (result.valid && result.value != null) {
-        jwt.verify(result.value, process.env.JWT_SECRET as string, (err: any, payload: any) => {
-          if (err) {
-            reply.clearCookie('jwt');
-          }
-          isAdmin = get(payload, 'role') === 'admin';
-        });
+        try {
+          const decodedPayload = jwt.verify(result.value, process.env.JWT_SECRET as string);
+          isAdmin = get(decodedPayload, 'role') === 'admin';
+        } catch (error) {
+          reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
+        }
       }
 
       let query = null;
@@ -41,9 +40,9 @@ export default class AlbumController extends BaseController {
       console.error(`Failed to query photo album: ${err}`);
       return this.fail(reply, 'Failed to query photo album');
     }
-  });
+  };
 
-  create: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  create: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const album = request.body as Album;
     album.createdBy = (request as RequestWithUser).user?.email ?? 'unknown';
     album.updatedBy = (request as RequestWithUser).user?.email ?? 'unknown';
@@ -62,9 +61,9 @@ export default class AlbumController extends BaseController {
       console.error(`Failed to insert photo album: ${err}`);
       return this.fail(reply, 'Failed to create photo album');
     }
-  });
+  };
 
-  update: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  update: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const album = request.body as Album;
       album.updatedBy = (request as RequestWithUser).user?.email ?? 'unknown';
@@ -79,9 +78,9 @@ export default class AlbumController extends BaseController {
     } catch (err: any) {
       return this.fail(reply, 'Failed to update photo album');
     }
-  });
+  };
 
-  delete: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const albumId = (request.params as any)['albumId'] as string;
 
     try {
@@ -105,9 +104,9 @@ export default class AlbumController extends BaseController {
       console.error(`Failed to delete photo album: ${err}`);
       return this.fail(reply, 'Failed to delete photo album');
     }
-  });
+  };
 
-  findOne: RouteHandler = asyncHandler(async () => {
+  findOne: RouteHandler = async () => {
     throw new Error('Method not implemented.');
-  });
+  };
 }

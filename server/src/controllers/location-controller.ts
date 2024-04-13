@@ -1,12 +1,11 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import { isEmpty } from 'radash';
 import { Place } from '../models.js';
-import { asyncHandler } from '../utils/async-handler.js';
 import { BaseController } from './base-controller.js';
 
 export default class LocationController extends BaseController {
   // Find places by keyword
-  findAll: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const { textQuery } = request.query as { textQuery: string };
     const response: any = await this.perform(
       'POST',
@@ -30,23 +29,23 @@ export default class LocationController extends BaseController {
     } else {
       return this.fail(reply, response.error.message);
     }
-  });
+  };
 
-  findOne: RouteHandler = asyncHandler(async () => {
+  findOne: RouteHandler = async () => {
     throw new Error('Method not implemented.');
-  });
+  };
 
-  create: RouteHandler = asyncHandler(async () => {
+  create: RouteHandler = async () => {
     throw new Error('Method not implemented.');
-  });
+  };
 
-  delete: RouteHandler = asyncHandler(async () => {
+  delete: RouteHandler = async () => {
     throw new Error('Method not implemented.');
-  });
+  };
 
-  update: RouteHandler = asyncHandler(async () => {
+  update: RouteHandler = async () => {
     throw new Error('Method not implemented.');
-  });
+  };
 
   perform = async (method: 'GET' | 'POST', urlPath: string, requestJsonBody?: any, maskFields?: string) => {
     const headers = new Headers({ Accept: '*/*' });

@@ -2,12 +2,9 @@ import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { get, isEmpty } from 'radash';
 import { Photo, PhotosRequest, RenamePhotoRequest } from '../models.js';
-import { cleanCookie } from '../routes/auth-middleware.js';
-import { UserPermission } from '../schemas/user-permission.js';
+import { cleanJwtCookie } from '../routes/auth-middleware.js';
 import AlbumService from '../services/album-service.js';
 import { S3Service } from '../services/s3-service.js';
-import { asyncHandler } from '../utils/async-handler.js';
-import JsonResponse from '../utils/json-response.js';
 import { BaseController } from './base-controller.js';
 import { deleteObjects, updatePhotoAlbum, uploadObject } from './helpers.js';
 
@@ -19,7 +16,7 @@ export default class PhotoController extends BaseController {
   /**
    * Get all photos from an album
    */
-  findAll: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const albumId = (request.params as any)['albumId'] as string;
 
     try {
@@ -30,22 +27,16 @@ export default class PhotoController extends BaseController {
           const result = reply.unsignCookie(token);
           if (result.valid && result.value != null) {
             try {
-              jwt.verify(result.value, process.env.JWT_SECRET as string, async (err: any, payload: any) => {
-                if (err) {
-                  cleanCookie(reply, 'Authentication failed. Please login.');
-                }
-
-                const user: UserPermission = payload;
-                if (user?.role !== 'admin') {
-                  return new JsonResponse(403).unauthorized(reply, 'Unauthorized action');
-                }
-                return;
-              });
+              const decodedPayload = jwt.verify(result.value, process.env.JWT_SECRET as string);
+              const isAdmin = get(decodedPayload, 'role') === 'admin';
+              if (!isAdmin) {
+                return cleanJwtCookie(reply, 'Unauthorized action.');
+              }
             } catch (error) {
-              cleanCookie(reply, 'Authentication failed. Please login.');
+              return cleanJwtCookie(reply, 'Unauthorized action.');
             }
           } else {
-            return new JsonResponse(403).unauthorized(reply, 'No auth token provided. Please login.');
+            return cleanJwtCookie(reply, 'Unauthorized action.');
           }
         }
         const folderNameKey = decodeURIComponent(albumId) + '/';
@@ -83,9 +74,9 @@ export default class PhotoController extends BaseController {
       console.error('Failed to get photos:', err);
       return this.fail(reply, 'Failed to get photos');
     }
-  });
+  };
 
-  create: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  create: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const albumId = (request.params as any)['albumId'] as string;
 
     try {
@@ -104,12 +95,12 @@ export default class PhotoController extends BaseController {
       console.error('Failed to upload photos:', err);
       return this.fail(reply, 'Failed to upload photos');
     }
-  });
+  };
 
   /**
    * Move photos to another album
    */
-  update: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  update: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const { destinationAlbumId, albumId, photoKeys } = request.body as PhotosRequest;
 
     if (isEmpty(albumId)) {
@@ -165,9 +156,9 @@ export default class PhotoController extends BaseController {
       }
     }
     return this.clientError(reply, 'No photo needs to be moved');
-  });
+  };
 
-  rename: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  rename: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const { albumId, newPhotoKey, currentPhotoKey } = request.body as RenamePhotoRequest;
 
     if (isEmpty(albumId)) {
@@ -194,9 +185,9 @@ export default class PhotoController extends BaseController {
       }
     }
     return this.clientError(reply, 'No photo needs to be renamed');
-  });
+  };
 
-  delete: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+  delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const { albumId, photoKeys } = request.body as PhotosRequest;
 
     if (isEmpty(albumId)) {
@@ -217,9 +208,9 @@ export default class PhotoController extends BaseController {
       }
     }
     return this.clientError(reply, 'No photo needs to be deleted');
-  });
+  };
 
-  findOne: RouteHandler = asyncHandler(async () => {
+  findOne: RouteHandler = async () => {
     throw new Error('Method not implemented.');
-  });
+  };
 }

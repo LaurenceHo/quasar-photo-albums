@@ -12,7 +12,9 @@ const photoRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
     instance.route({
       method: 'POST',
       url: '/api/upload/:albumId',
-      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
+      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission], {
+        relation: 'and',
+      }),
       handler: controller.create,
     });
   });
@@ -21,27 +23,29 @@ const photoRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
     instance.route({
       method: 'PUT',
       url: '/api/photos',
-      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
+      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission], {
+        relation: 'and',
+      }),
       handler: controller.update,
     });
   });
 
-  instance.after(() => {
-    instance.route({
-      method: 'PUT',
-      url: '/api/photos/rename',
-      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
-      handler: controller.rename,
-    });
+  instance.route({
+    method: 'PUT',
+    url: '/api/photos/rename',
+    preHandler: instance.auth([verifyJwtClaim, verifyUserPermission], {
+      relation: 'and',
+    }),
+    handler: controller.rename,
   });
 
-  instance.after(() => {
-    instance.route({
-      method: 'DELETE',
-      url: '/api/photos',
-      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
-      handler: controller.delete,
-    });
+  instance.route({
+    method: 'DELETE',
+    url: '/api/photos',
+    preHandler: instance.auth([verifyJwtClaim, verifyUserPermission], {
+      relation: 'and',
+    }),
+    handler: controller.delete,
   });
 
   done();
