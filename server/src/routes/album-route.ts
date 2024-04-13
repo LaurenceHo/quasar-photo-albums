@@ -1,14 +1,41 @@
-import express from 'express';
+import { FastifyInstance, FastifyPluginCallback } from 'fastify';
+import fastifyPlugin from 'fastify-plugin';
 import AlbumController from '../controllers/album-controller.js';
 import { verifyJwtClaim, verifyUserPermission } from './auth-middleware.js';
 
-export const router = express.Router();
 const controller = new AlbumController();
 
-router.get('', controller.findAll);
+const albumRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
+  instance.get('/api/albums', controller.findAll);
 
-router.post('', verifyJwtClaim, verifyUserPermission, controller.create);
+  instance.after(() => {
+    instance.route({
+      method: 'POST',
+      url: '/api/albums',
+      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
+      handler: controller.create,
+    });
+  });
 
-router.put('', verifyJwtClaim, verifyUserPermission, controller.update);
+  instance.after(() => {
+    instance.route({
+      method: 'PUT',
+      url: '/api/albums',
+      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
+      handler: controller.update,
+    });
+  });
 
-router.delete('/:albumId', verifyJwtClaim, verifyUserPermission, controller.delete);
+  instance.after(() => {
+    instance.route({
+      method: 'DELETE',
+      url: '/api/albums/:albumId',
+      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
+      handler: controller.delete,
+    });
+  });
+
+  done();
+};
+
+export default fastifyPlugin(albumRoute);

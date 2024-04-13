@@ -2,11 +2,11 @@ import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { get } from 'radash';
-import { cleanCookieV2, setCookies } from '../routes/auth-middleware.js';
+import { setJwtCookies } from '../routes/auth-middleware.js';
 import { UserPermission } from '../schemas/user-permission.js';
 import UserService from '../services/user-service.js';
-import { asyncHandlerV2 } from '../utils/async-handler.js';
-import { BaseControllerV2 } from './base-controller.js';
+import { asyncHandler } from '../utils/async-handler.js';
+import { BaseController } from './base-controller.js';
 
 // Reference:
 // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
@@ -14,9 +14,9 @@ import { BaseControllerV2 } from './base-controller.js';
 const userService = new UserService();
 const client = new OAuth2Client();
 
-export default class AuthController extends BaseControllerV2 {
+export default class AuthController extends BaseController {
   // Get user info from token
-  findOne: RouteHandler = asyncHandlerV2(async (request: FastifyRequest, reply: FastifyReply) => {
+  findOne: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const token = get(request, 'cookies.jwt', '');
       const result = reply.unsignCookie(token);
@@ -24,27 +24,29 @@ export default class AuthController extends BaseControllerV2 {
       if (!token) {
         return this.ok(reply, 'ok');
       } else {
-        if (result.valid) {
+        if (result.valid && result.value != null) {
           let decodedPayload: any = null;
-          if (result.value != null) {
-            jwt.verify(result.value, process.env.JWT_SECRET as string, (err: any, payload: any) => {
-              if (err) {
-                reply.clearCookie('jwt');
-              }
-              decodedPayload = payload;
-            });
-            return this.ok<UserPermission>(reply, 'ok', decodedPayload);
-          }
+          jwt.verify(result.value, process.env.JWT_SECRET as string, (err: any, payload: any) => {
+            if (err) {
+              reply.clearCookie('jwt');
+            }
+            decodedPayload = payload;
+          });
+          return this.ok<UserPermission>(reply, 'ok', decodedPayload);
         }
-        return cleanCookieV2(reply, 'Authentication failed. Please login.');
+
+        reply.clearCookie('jwt');
+        return this.ok(reply, 'ok');
       }
     } catch (error) {
       console.log(error);
-      return cleanCookieV2(reply, 'Authentication failed. Please login.');
+
+      reply.clearCookie('jwt');
+      return this.ok(reply, 'ok');
     }
   });
 
-  verifyIdToken: RouteHandler = asyncHandlerV2(async (request: FastifyRequest, reply: FastifyReply) => {
+  verifyIdToken: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
     const token = (request.body as any).token;
 
     try {
@@ -61,7 +63,7 @@ export default class AuthController extends BaseControllerV2 {
           // Sign JWT token
           const token = jwt.sign(userPermission, process.env.JWT_SECRET as string, { expiresIn: '7d' });
           // Set token as cookies
-          await setCookies(reply, token);
+          await setJwtCookies(reply, token);
           return this.ok<UserPermission>(reply, 'ok', userPermission);
         } else {
           console.log(`User ${email} doesn't have permission`);
@@ -76,10 +78,11 @@ export default class AuthController extends BaseControllerV2 {
     }
   });
 
-  logout: RouteHandler = asyncHandlerV2(async (request: FastifyRequest, reply: FastifyReply) => {
+  logout: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      reply.clearCookie('jwt');
+      reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
       (request as any).user = null;
+
       return this.ok(reply);
     } catch (err) {
       console.error(err);
@@ -87,19 +90,19 @@ export default class AuthController extends BaseControllerV2 {
     }
   });
 
-  findAll: RouteHandler = asyncHandlerV2(async () => {
+  findAll: RouteHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 
-  create: RouteHandler = asyncHandlerV2(async () => {
+  create: RouteHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 
-  update: RouteHandler = asyncHandlerV2(async () => {
+  update: RouteHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 
-  delete: RouteHandler = asyncHandlerV2(async () => {
+  delete: RouteHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 }

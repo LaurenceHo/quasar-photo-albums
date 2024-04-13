@@ -1,14 +1,14 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import { AlbumTag } from '../schemas/album-tag.js';
 import AlbumTagService from '../services/album-tag-service.js';
-import { asyncHandlerV2 } from '../utils/async-handler.js';
-import { BaseControllerV2 } from './base-controller.js';
+import { asyncHandler } from '../utils/async-handler.js';
+import { BaseController } from './base-controller.js';
 import { uploadObject } from './helpers.js';
 
 const albumTagService = new AlbumTagService();
 
-export default class AlbumTagController extends BaseControllerV2 {
-  findAll: RouteHandler = asyncHandlerV2(async (_request: FastifyRequest, reply: FastifyReply) => {
+export default class AlbumTagController extends BaseController {
+  findAll: RouteHandler = asyncHandler(async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
       const albumTags = await albumTagService.findAll();
 
@@ -19,7 +19,7 @@ export default class AlbumTagController extends BaseControllerV2 {
     }
   });
 
-  create: RouteHandler = asyncHandlerV2(async (request: FastifyRequest, reply: FastifyReply) => {
+  create: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
     const tag: AlbumTag = request.body as AlbumTag;
     try {
       const result = await albumTagService.create(tag);
@@ -35,7 +35,7 @@ export default class AlbumTagController extends BaseControllerV2 {
     }
   });
 
-  delete: RouteHandler = asyncHandlerV2(async (request: FastifyRequest, reply: FastifyReply) => {
+  delete: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
     const tag = (request.params as any)['tagId'] as string;
     try {
       const result = await albumTagService.delete({ tag });
@@ -50,11 +50,11 @@ export default class AlbumTagController extends BaseControllerV2 {
     }
   });
 
-  findOne: RouteHandler = asyncHandlerV2(async () => {
+  findOne: RouteHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 
-  update: RouteHandler = asyncHandlerV2(async () => {
+  update: RouteHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 }

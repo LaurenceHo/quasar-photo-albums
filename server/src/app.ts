@@ -1,23 +1,25 @@
-import Fastify, { FastifyInstance } from 'fastify';
 import auth from '@fastify/auth';
 import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
-import express from '@fastify/express';
 import helmet from '@fastify/helmet';
+import multipart from '@fastify/multipart';
+import throttle from '@fastify/throttle';
 import dotenv from 'dotenv';
+import Fastify, { FastifyInstance } from 'fastify';
 import serverless from 'serverless-http';
-import { router as albumRoute } from './routes/album-route.js';
+import albumRoute from './routes/album-route.js';
 import albumTagsRoute from './routes/album-tag-route.js';
+import { verifyJwtClaim, verifyUserPermission } from './routes/auth-middleware.js';
 import authRoute from './routes/auth-route.js';
 import locationRoute from './routes/location-route.js';
-import { router as photoRoute } from './routes/photo-route.js';
+import photoRoute from './routes/photo-route.js';
 import { initialiseDynamodbTables } from './services/initialise-dynamodb-tables.js';
+
+const ACCEPTED_MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 dotenv.config();
 
-export const app: FastifyInstance = Fastify({
-  logger: true,
-});
+export const app: FastifyInstance = Fastify();
 
 await app.register(cors, {
   allowedHeaders: ['Origin, Content-Type, Accept, Authorization, X-Requested-With'],
@@ -38,34 +40,27 @@ await app.register(cors, {
 await app.register(cookie, { secret: process.env.JWT_SECRET as string });
 await app.register(helmet);
 await app.register(auth);
-
-/** Temporary fix for the CORS issue**/
-await app.register(express);
-const corsHeader = (req: any, res: any, next: any) => {
-  console.log('##### Request API:', req.url, '| Method:', req.method);
-  const allowedOrigins = ['http://localhost:9000', process.env.ALBUM_URL];
-  const origin = req.headers.origin as string;
-  if (allowedOrigins.indexOf(origin) > -1) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization, X-Requested-With');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  if ('OPTIONS' === req.method) {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
-};
-app.use(corsHeader);
-/** Temporary fix for the CORS issue**/
+await app.register(multipart, {
+  limits: {
+    fieldSize: 256, // Max field value size in bytes
+    fields: 10, // Max number of non-file fields
+    fileSize: ACCEPTED_MAX_FILE_SIZE, // For multipart forms, the max file size in bytes
+    files: 1, // Max number of file fields
+    headerPairs: 1000, // Max number of header key=>value pairs
+    parts: 500, // For multipart forms, the max number of parts (fields + files)
+  },
+});
+await app.register(throttle, {
+  bytesPerSecond: 1024 * 128, // 128KB/s
+});
 
 // Route
+app.decorate('verifyJwtClaim', verifyJwtClaim).decorate('verifyUserPermission', verifyUserPermission);
+
 app.register(authRoute);
-app.use('/api/albums', albumRoute);
+app.register(albumRoute);
 app.register(albumTagsRoute);
-app.use('/api/photos', photoRoute);
+app.register(photoRoute);
 app.register(locationRoute);
 
 try {

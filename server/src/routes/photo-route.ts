@@ -1,32 +1,50 @@
-import express from 'express';
-import multer from 'multer';
-import { get } from 'radash';
+import { FastifyInstance, FastifyPluginCallback } from 'fastify';
+import fastifyPlugin from 'fastify-plugin';
 import PhotoController from '../controllers/photo-controller.js';
 import { verifyJwtClaim, verifyUserPermission } from './auth-middleware.js';
 
-const ACCEPTED_MAX_FILE_SIZE = 5 * 1024 * 1024;
-
-export const router = express.Router();
-
 const controller = new PhotoController();
 
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: ACCEPTED_MAX_FILE_SIZE,
-  },
-  fileFilter: (req, file, cb: any) => {
-    const shouldAccept = get(req, 'header["content-length"]', 0) <= ACCEPTED_MAX_FILE_SIZE;
-    shouldAccept ? cb(null, true) : cb(new Error('Payload is too large'), false);
-  },
-});
+const photoRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
+  instance.get('/api/photos/:albumId', controller.findAll);
 
-router.get('/:albumId', controller.findAll);
+  instance.after(() => {
+    instance.route({
+      method: 'POST',
+      url: '/api/upload/:albumId',
+      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
+      handler: controller.create,
+    });
+  });
 
-router.delete('', verifyJwtClaim, verifyUserPermission, controller.delete);
+  instance.after(() => {
+    instance.route({
+      method: 'PUT',
+      url: '/api/photos',
+      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
+      handler: controller.update,
+    });
+  });
 
-router.put('', verifyJwtClaim, verifyUserPermission, controller.update);
+  instance.after(() => {
+    instance.route({
+      method: 'PUT',
+      url: '/api/photos/rename',
+      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
+      handler: controller.rename,
+    });
+  });
 
-router.put('/rename', verifyJwtClaim, verifyUserPermission, controller.rename);
+  instance.after(() => {
+    instance.route({
+      method: 'DELETE',
+      url: '/api/photos',
+      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission]),
+      handler: controller.delete,
+    });
+  });
 
-router.post('/upload/:albumId', verifyJwtClaim, verifyUserPermission, upload.single('file'), controller.create);
+  done();
+};
+
+export default fastifyPlugin(photoRoute);

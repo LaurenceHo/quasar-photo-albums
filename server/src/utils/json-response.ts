@@ -1,6 +1,6 @@
-import { Response } from 'express';
+import { FastifyReply } from 'fastify';
 import { STATUS_ERROR, STATUS_SUCCESS, STATUS_UNAUTHORIZED } from '../constants.js';
-import { ApiResponse, ResponseStatus } from '../models.js';
+import { ResponseStatus } from '../models.js';
 
 export default class JsonResponse<T> {
   private readonly code: number;
@@ -11,41 +11,41 @@ export default class JsonResponse<T> {
     this._status = '';
   }
 
-  unauthorized = (res: Response, message: string) => {
+  unauthorized(reply: FastifyReply, message: string) {
     this._status = STATUS_UNAUTHORIZED;
-    return res.status(this.code).json({
+    return reply.code(this.code).send({
       code: this.code,
       status: this._status,
       message,
-    } as ResponseStatus);
-  };
+    } satisfies ResponseStatus);
+  }
 
-  error = (res: Response, message: string) => {
+  error(reply: FastifyReply, message: string) {
     this._status = STATUS_ERROR;
-    return res.status(this.code).json({
+    return reply.code(this.code).send({
       code: this.code,
       status: this._status,
       message,
-    } as ResponseStatus);
-  };
+    } satisfies ResponseStatus);
+  }
 
-  success = (res: Response, message: string, data?: T) => {
+  success(reply: FastifyReply, message: string, data?: T) {
     this._status = STATUS_SUCCESS;
     if (data) {
-      return res.status(this.code).json({
+      return reply.code(this.code).send({
         code: this.code,
         status: this._status,
         message,
         data,
-      } as ApiResponse<T>);
+      } satisfies ResponseStatus);
     } else {
-      return res.status(this.code).json({
+      return reply.code(this.code).send({
         code: this.code,
         status: this._status,
         message,
-      } as ResponseStatus);
+      } satisfies ResponseStatus);
     }
-  };
+  }
 
   setStatus(status: string) {
     this._status = status;

@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express';
+import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { get, isEmpty } from 'radash';
 import { Photo, PhotosRequest, RenamePhotoRequest } from '../models.js';
@@ -19,32 +19,33 @@ export default class PhotoController extends BaseController {
   /**
    * Get all photos from an album
    */
-  findAll: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
-    const albumId = req.params['albumId'];
+  findAll: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+    const albumId = (request.params as any)['albumId'] as string;
 
     try {
       const album = await albumService.findOne({ id: albumId });
       if (!isEmpty(album)) {
         if (album.isPrivate) {
-          const token = get(req, 'cookies.jwt', null);
-          if (token) {
+          const token = get(request, 'cookies.jwt', '');
+          const result = reply.unsignCookie(token);
+          if (result.valid && result.value != null) {
             try {
-              jwt.verify(token, process.env.JWT_SECRET as string, async (err: any, payload: any) => {
+              jwt.verify(result.value, process.env.JWT_SECRET as string, async (err: any, payload: any) => {
                 if (err) {
-                  cleanCookie(res, 'Authentication failed. Please login.');
+                  cleanCookie(reply, 'Authentication failed. Please login.');
                 }
 
                 const user: UserPermission = payload;
                 if (user?.role !== 'admin') {
-                  return new JsonResponse(403).unauthorized(res, 'Unauthorized action');
+                  return new JsonResponse(403).unauthorized(reply, 'Unauthorized action');
                 }
                 return;
               });
             } catch (error) {
-              cleanCookie(res, 'Authentication failed. Please login.');
+              cleanCookie(reply, 'Authentication failed. Please login.');
             }
           } else {
-            return new JsonResponse(403).unauthorized(res, 'No auth token provided. Please login.');
+            return new JsonResponse(403).unauthorized(reply, 'No auth token provided. Please login.');
           }
         }
         const folderNameKey = decodeURIComponent(albumId) + '/';
@@ -75,46 +76,48 @@ export default class PhotoController extends BaseController {
             });
           }
         }
-        return this.ok<Photo[]>(res, 'ok', photos);
+        return this.ok<Photo[]>(reply, 'ok', photos);
       }
-      return this.fail(res, 'Album not found');
+      return this.fail(reply, 'Album not found');
     } catch (err: any) {
       console.error('Failed to get photos:', err);
-      return this.fail(res, 'Failed to get photos');
+      return this.fail(reply, 'Failed to get photos');
     }
   });
 
-  create: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
-    const albumId = req.params['albumId'];
+  create: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+    const albumId = (request.params as any)['albumId'] as string;
 
     try {
-      const filename = req.file?.originalname;
-      const buffer = req.file?.buffer;
-      console.log(`##### Uploading file: ${filename}, mimeType: ${req.file?.mimetype}, file size: ${req.file?.size}`);
+      const data = await request.file();
+      const filename = data?.filename;
+      const mimeType = data?.mimetype;
+      const buffer = await data?.toBuffer();
+      console.log(`##### Uploading file: ${filename}, mimeType: ${mimeType}, file size: ${buffer?.length}`);
       const result = await uploadObject(`${albumId}/${filename}`, buffer);
       if (result) {
         console.log(`##### Photo uploaded: ${filename}`);
-        return this.ok(res, 'Photo uploaded');
+        return this.ok(reply, 'Photo uploaded');
       }
-      return this.fail(res, 'Failed to upload photos');
+      return this.fail(reply, 'Failed to upload photos');
     } catch (err: any) {
       console.error('Failed to upload photos:', err);
-      return this.fail(res, 'Failed to upload photos');
+      return this.fail(reply, 'Failed to upload photos');
     }
   });
 
   /**
    * Move photos to another album
    */
-  update: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
-    const { destinationAlbumId, albumId, photoKeys } = req.body as PhotosRequest;
+  update: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+    const { destinationAlbumId, albumId, photoKeys } = request.body as PhotosRequest;
 
     if (isEmpty(albumId)) {
-      return this.clientError(res, 'No album');
+      return this.clientError(reply, 'No album');
     }
 
     if (isEmpty(destinationAlbumId)) {
-      return this.clientError(res, 'No destination album');
+      return this.clientError(reply, 'No destination album');
     }
 
     if (!isEmpty(photoKeys)) {
@@ -155,20 +158,20 @@ export default class PhotoController extends BaseController {
 
       try {
         await Promise.all(promises);
-        return this.ok(res, 'Photo moved');
+        return this.ok(reply, 'Photo moved');
       } catch (err: any) {
         console.error('Failed to move photos:', err);
-        return this.fail(res, 'Failed to move photos');
+        return this.fail(reply, 'Failed to move photos');
       }
     }
-    return this.clientError(res, 'No photo needs to be moved');
+    return this.clientError(reply, 'No photo needs to be moved');
   });
 
-  rename: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
-    const { albumId, newPhotoKey, currentPhotoKey } = req.body as RenamePhotoRequest;
+  rename: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+    const { albumId, newPhotoKey, currentPhotoKey } = request.body as RenamePhotoRequest;
 
     if (isEmpty(albumId)) {
-      return this.clientError(res, 'No album');
+      return this.clientError(reply, 'No album');
     }
 
     if (!isEmpty(newPhotoKey) && !isEmpty(currentPhotoKey)) {
@@ -182,22 +185,22 @@ export default class PhotoController extends BaseController {
         });
         if (result) {
           await deleteObjects([`${albumId}/${currentPhotoKey}`]);
-          return this.ok(res, 'Photo renamed');
+          return this.ok(reply, 'Photo renamed');
         }
-        return this.fail(res, 'Failed to rename photo');
+        return this.fail(reply, 'Failed to rename photo');
       } catch (err: any) {
         console.error('Failed to rename photo:', err);
-        return this.fail(res, 'Failed to rename photo');
+        return this.fail(reply, 'Failed to rename photo');
       }
     }
-    return this.clientError(res, 'No photo needs to be renamed');
+    return this.clientError(reply, 'No photo needs to be renamed');
   });
 
-  delete: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
-    const { albumId, photoKeys } = req.body as PhotosRequest;
+  delete: RouteHandler = asyncHandler(async (request: FastifyRequest, reply: FastifyReply) => {
+    const { albumId, photoKeys } = request.body as PhotosRequest;
 
     if (isEmpty(albumId)) {
-      return this.clientError(res, 'No album');
+      return this.clientError(reply, 'No album');
     }
 
     if (!isEmpty(photoKeys)) {
@@ -205,18 +208,18 @@ export default class PhotoController extends BaseController {
       try {
         const result = await deleteObjects(photoKeysArray);
         if (result) {
-          return this.ok(res, 'Photo deleted');
+          return this.ok(reply, 'Photo deleted');
         }
-        return this.fail(res, 'Failed to delete photos');
+        return this.fail(reply, 'Failed to delete photos');
       } catch (err: any) {
         console.error('Failed to delete photos:', err);
-        return this.fail(res, 'Failed to delete photos');
+        return this.fail(reply, 'Failed to delete photos');
       }
     }
-    return this.clientError(res, 'No photo needs to be deleted');
+    return this.clientError(reply, 'No photo needs to be deleted');
   });
 
-  findOne: RequestHandler = asyncHandler(async () => {
+  findOne: RouteHandler = asyncHandler(async () => {
     throw new Error('Method not implemented.');
   });
 }

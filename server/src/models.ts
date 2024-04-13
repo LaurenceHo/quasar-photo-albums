@@ -1,9 +1,7 @@
-import { Request, RequestHandler } from 'express';
 import { FastifyRequest, RouteHandler } from 'fastify';
 import { UserPermission } from './schemas/user-permission.js';
 
-export type RequestWithUser = Request & { user: UserPermission | null };
-export type RequestWithUserV2 = FastifyRequest & { user?: UserPermission | null };
+export type RequestWithUser = FastifyRequest & { user?: UserPermission | null };
 
 export interface Read<T> {
   findAll?(param: any, whereClause?: any): Promise<T[]>;
@@ -19,18 +17,6 @@ export interface Write {
 export type BaseService<T> = Read<T> & Write;
 
 export interface BaseController {
-  findAll?: RequestHandler;
-
-  findOne?: RequestHandler;
-
-  create?: RequestHandler;
-
-  update?: RequestHandler;
-
-  delete?: RequestHandler;
-}
-
-export interface BaseControllerV2 {
   findAll?: RouteHandler;
 
   findOne?: RouteHandler;
