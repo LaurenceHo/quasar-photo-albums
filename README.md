@@ -33,11 +33,13 @@
 
 ## About The Project
 
-This is a fullstack photo album web app using Vue3, Quasar and AWS (including API Gateway, Lambda
+This is a fullstack photo album web app using Vue3, Quasar, Fastifys and AWS (including API Gateway, Lambda
 function, S3, CloudFront and dynamoDB). You can use this web app to display your photos in S3 bucket and manage your photos. This app
 is supposed to be used by a small group of people (e.g. family members) so it doesn't have any user management feature.
 
 For the detailed tutorial, you can check [here](https://dev.to/laurenceho/a-fullstack-vuejs-photo-album-app-part-1-2bgd).
+
+### Built With
 
 [![Quasar][quasar]][quasar-url][![Vue][Vue.js]][Vue-url][![TypeScript][typescript]][type-url][![Vite][vite]][vite-url][![AWS][aws]][aws-url]
 
@@ -67,7 +69,7 @@ Before you start, you need create an AWS S3 bucket. This bucket will be for your
 Once you create them, replace properties `STATIC_FILES_URL` and `IMAGEKIT_URL` with the bucket URL you created in`.env.example`
 and modify file name to `.env`. (the URL is like https://{YOUR_BUCKET_NAME}.s3.amazonaws.com)
 
-You will also need to replace `IMAGEKIT_CDN_URL` and `AWS_S3_BUCKET_NAME` in`.env.example` in [./lambda](./lambda) folder
+You will also need to replace `IMAGEKIT_CDN_URL` and `AWS_S3_BUCKET_NAME` in`.env.example` in [./server](./lambda) folder
 with the bucket you created.
 
 #### S3 bucket policy
@@ -115,7 +117,7 @@ is a cloud-based image CDN with real-time image optimization and transformation 
 optimized images across all devices[2]. You can follow this [documentation](https://imagekit.io/blog/image-optimization-resize-aws-s3-imagekit/)
 to create an account in the ImageKit. You will have 20GB bandwidth per month as a free user. Once you have your own ImageKit
 URL, replace this property `IMAGEKIT_URL` with your real information in`.env.example` and modify file name to `.env`. And
-use the same URL in the `lambda` folder.
+use the same URL in the `server` folder.
 
 #### Important
 
@@ -132,14 +134,14 @@ and modify file name to `.env`.
 Please check [here](https://developers.google.com/identity/protocols/oauth2) for further information. You will also need
 to set up OAuth consent screen. Please check [here](https://developers.google.com/identity/protocols/oauth2/openid-connect#consent-screen)
 Once you have Google OAuth 2.0 client ID, replace this property `GOOGLE_CLIENT_ID` with your real information in`.env.example`
-and modify file name to `.env`. And use the same client ID in the `lambda` folder.
+and modify file name to `.env`. And use the same client ID in the `server` folder.
 
 #### Login UI
 
 This project uses Google OAuth 2.0 to authenticate users. If you don't want to use Google OAuth 2.0, you will need to
 implement login UI and authentication process by yourself. Once you set up Google OAuth 2.0 client ID and OAuth consent
 screen, you can access login UI by going to `http://localhost:9000/login`. You will also need to add your Google account
-information in the [DynamoDB table](lambda/README.md#aws-dynamodb) you created. If every thing is set up correctly, you should be able to login
+information in the [DynamoDB table](server/README.md#aws-dynamodb) you created. If every thing is set up correctly, you should be able to login
 with your Google account and see the admin page as below:
 ![web-capture1](doc-images/Web_capture_1.jpeg)
 ![web-capture2](doc-images/Web_capture_2.jpeg)
@@ -150,7 +152,7 @@ with your Google account and see the admin page as below:
 ### AWS Lambda Function
 
 This project uses AWS Lambda Function to handle all APIs (as BFF, backend for frontend) and authentication process
-once it's deployed to AWS. Please check further information in the `lambda` folder. [here](lambda/README.md)
+once it's deployed to AWS. Please check further information in the `server` folder. [here](server/README.md)
 
 ## How to run locally
 
