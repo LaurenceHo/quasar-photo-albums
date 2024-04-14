@@ -5,13 +5,13 @@ on:
     branches:
       - develop
     paths:
-      - "lambda/src/**"
+      - "server/src/**"
   pull_request:
     branches:
       - master
       - develop
     paths:
-      - "lambda/src/**"
+      - "server/src/**"
   workflow_dispatch:
     inputs:
       buildManually:
@@ -25,7 +25,7 @@ jobs:
     environment: dev
     defaults:
       run:
-        working-directory: ./lambda
+        working-directory: ./server
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
@@ -68,5 +68,5 @@ jobs:
       - name: Serverless deploy
         uses: serverless/github-action@master
         with:
-          args: -c "cd ./lambda && serverless deploy --force --conceal"
+          args: -c "cd ./server && serverless deploy --force --conceal"
           entrypoint: /bin/sh

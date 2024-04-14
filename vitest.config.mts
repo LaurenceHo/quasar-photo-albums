@@ -9,16 +9,18 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reportsDirectory: 'test/vitest/coverage',
-      exclude:['**/**.js','**/**.d.ts','.quasar/**', '**/test/**']
+      exclude:['**/**.js','**/**.d.ts','.quasar/**','.eslintrc.mjs']
     },
     globals: true,
     setupFiles: './vitest-setup.ts',
     environment: 'jsdom',
     include: [
-      // Matches vitest tests in any subfolder of 'src' or into 'test/vitest/__tests__'
-      // Matches all files with extension 'js', 'jsx', 'ts' and 'tsx'
-      'src/**/*.vitest.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
-      'test/vitest/__tests__/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      // Matches vitest tests in any subfolder of 'src' or into 'test/vitest', or subfolder of 'server'
+      // Matches all files with extension 'ts' and 'tsx'
+      'server/**/*.{test,spec}.{ts,tsx}',
+      'test/**/*.{test,spec}.{ts,tsx}',
+      'src/**/*.vitest.{test,spec}.{ts,tsx}',
+      'test/vitest/**/*.{test,spec}.{ts,tsx}',
     ],
   },
   plugins: [
