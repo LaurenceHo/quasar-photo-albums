@@ -3,6 +3,7 @@ import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import multipart from '@fastify/multipart';
+import rateLimit from '@fastify/rate-limit';
 import throttle from '@fastify/throttle';
 import dotenv from 'dotenv';
 import Fastify, { FastifyInstance } from 'fastify';
@@ -37,9 +38,10 @@ await app.register(cors, {
   },
   preflightContinue: true,
 });
-await app.register(cookie, { secret: process.env.JWT_SECRET as string });
 await app.register(helmet);
+await app.register(rateLimit, { max: 100 });
 await app.register(auth);
+await app.register(cookie, { secret: process.env.JWT_SECRET as string });
 await app.register(multipart, {
   limits: {
     fieldSize: 256, // Max field value size in bytes
