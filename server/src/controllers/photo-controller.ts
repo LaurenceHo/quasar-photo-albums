@@ -21,7 +21,9 @@ export default class PhotoController extends BaseController {
 
     try {
       const album = await albumService.findOne({ id: albumId });
+      // Only fetch photos when album exists
       if (!isEmpty(album)) {
+        // If album is private, check if user has the admin permission
         if (album.isPrivate) {
           const token = get(request, 'cookies.jwt', '');
           const result = reply.unsignCookie(token);
@@ -47,25 +49,22 @@ export default class PhotoController extends BaseController {
           StartAfter: folderNameKey,
         });
 
-        if (!isEmpty(photos)) {
-          if (isEmpty(album.albumCover)) {
-            await updatePhotoAlbum({
-              ...album,
-              albumCover: photos[0].key,
-              updatedBy: 'System',
-              updatedAt: new Date().toISOString(),
-            });
-          }
-        } else {
-          // Remove album cover photo
-          if (!isEmpty(album.albumCover)) {
-            await updatePhotoAlbum({
-              ...album,
-              albumCover: '',
-              updatedBy: 'System',
-              updatedAt: new Date().toISOString(),
-            });
-          }
+        // If photo list is not empty and doesn't have album cover, set album cover
+        if (!isEmpty(photos) && isEmpty(album.albumCover)) {
+          await updatePhotoAlbum({
+            ...album,
+            albumCover: photos[0].key,
+            updatedBy: 'System',
+            updatedAt: new Date().toISOString(),
+          });
+          // Remove album cover photo when photo list is empty
+        } else if (isEmpty(photos) && !isEmpty(album.albumCover)) {
+          await updatePhotoAlbum({
+            ...album,
+            albumCover: '',
+            updatedBy: 'System',
+            updatedAt: new Date().toISOString(),
+          });
         }
         return this.ok<Photo[]>(reply, 'ok', photos);
       }
@@ -84,6 +83,7 @@ export default class PhotoController extends BaseController {
       const filename = data?.filename;
       const mimeType = data?.mimetype;
       const buffer = await data?.toBuffer();
+
       console.log(`##### Uploading file: ${filename}, mimeType: ${mimeType}, file size: ${buffer?.length} bytes`);
       const result = await uploadObject(`${albumId}/${filename}`, buffer);
       if (result) {

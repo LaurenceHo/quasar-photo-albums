@@ -29,7 +29,7 @@ export class S3Service implements BaseService<Photo> {
       let key = '';
       let size = 0;
       let lastModified = new Date();
-      if (photo && photo.Key) {
+      if (photo?.Key) {
         url = `${this.cdnURL}/${encodeURI(photo.Key)}`;
         key = photo.Key;
         size = photo.Size ?? 0;
