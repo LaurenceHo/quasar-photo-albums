@@ -1,11 +1,9 @@
 import { createTestingPinia } from '@pinia/testing';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
-import { flushPromises, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { Loading, LoadingBar, Notify } from 'quasar';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import Photo from '../../../../src/components/Photo.vue';
-import PhotoList from '../../../../src/pages/PhotoList.vue';
-import { mockAlbumList, mockPhotoList } from '../mock-data';
+import { beforeEach, describe, expect, it } from 'vitest';
+import Photo from '../../../src/components/Photo.vue';
 import { mockRouter as router } from '../mock-router';
 
 installQuasarPlugin({ plugins: { Loading, LoadingBar, Notify } });

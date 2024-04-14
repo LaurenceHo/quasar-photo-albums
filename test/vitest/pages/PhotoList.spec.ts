@@ -3,13 +3,13 @@ import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-v
 import { flushPromises, mount } from '@vue/test-utils';
 import { Loading, LoadingBar, Notify } from 'quasar';
 import { describe, expect, it, vi } from 'vitest';
-import PhotoList from '../../../../src/pages/PhotoList.vue';
+import PhotoList from '../../../src/pages/PhotoList.vue';
 import { mockAlbumList, mockPhotoList } from '../mock-data';
 import { mockRouter as router } from '../mock-router';
 
 installQuasarPlugin({ plugins: { Loading, LoadingBar, Notify } });
 
-vi.mock('../../../../src/services/photo-service', () => ({
+vi.mock('../../../src/services/photo-service', () => ({
   default: vi.fn().mockImplementation(() => ({
     getPhotosByAlbumId: () =>
       Promise.resolve({

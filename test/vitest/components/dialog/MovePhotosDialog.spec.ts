@@ -3,13 +3,13 @@ import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-v
 import { mount } from '@vue/test-utils';
 import { QDialog } from 'quasar';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import MovePhotosDialog from '../../../../../src/components/dialog/MovePhotosDialog.vue';
-import SelectedItemsComposable from '../../../../../src/composables/selected-items-composaable';
+import MovePhotosDialog from '../../../../src/components/dialog/MovePhotosDialog.vue';
+import SelectedItemsComposable from '../../../../src/composables/selected-items-composaable';
 import { mockAlbumList, mockPhotoList } from '../../mock-data';
 
 installQuasarPlugin({ components: { QDialog } });
 
-vi.mock('../../../../../src/services/photo-service', () => ({
+vi.mock('../../../../src/services/photo-service', () => ({
   default: vi.fn().mockImplementation(() => ({
     getPhotosByAlbumId: () =>
       Promise.resolve({

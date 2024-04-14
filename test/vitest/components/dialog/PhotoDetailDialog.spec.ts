@@ -3,8 +3,8 @@ import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-v
 import { mount } from '@vue/test-utils';
 import { LoadingBar, Notify, QDialog } from 'quasar';
 import { beforeEach, describe, expect, it } from 'vitest';
-import PhotoDetailDialog from '../../../../../src/components/dialog/PhotoDetailDialog.vue';
-import { userStore } from '../../../../../src/stores/user-store';
+import PhotoDetailDialog from '../../../../src/components/dialog/PhotoDetailDialog.vue';
+import { userStore } from '../../../../src/stores/user-store';
 import { mockPhotoList } from '../../mock-data';
 import { mockRouter as router } from '../../mock-router';
 

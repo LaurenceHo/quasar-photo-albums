@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import AlbumTagService from '../../../../src/services/album-tag-service';
-import HttpRequestService from '../../../../src/services/http-request-service';
+import AlbumTagService from '../../../src/services/album-tag-service';
+import HttpRequestService from '../../../src/services/http-request-service';
 
 const mockPerform = vi.spyOn(HttpRequestService.prototype, 'perform').mockImplementation(() => Promise.resolve());
 const mockSetDisplayingParameters = vi

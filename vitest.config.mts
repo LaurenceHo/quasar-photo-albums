@@ -15,10 +15,11 @@ export default defineConfig({
     setupFiles: './vitest-setup.ts',
     environment: 'jsdom',
     include: [
-      // Matches vitest tests in any subfolder of 'src' or into 'test/vitest/__tests__'
+      // Matches vitest tests in any subfolder of 'src' or into 'test/vitest'
       // Matches all files with extension 'js', 'jsx', 'ts' and 'tsx'
       'src/**/*.vitest.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
-      'test/vitest/__tests__/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      'test/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      'test/vitest/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
     ],
   },
   plugins: [

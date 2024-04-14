@@ -3,12 +3,12 @@ import { mount } from '@vue/test-utils';
 import { QDialog } from 'quasar';
 import { describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
-import UploadPhotosDialog from '../../../../../src/components/dialog/UploadPhotosDialog.vue';
+import UploadPhotosDialog from '../../../../src/components/dialog/UploadPhotosDialog.vue';
 
 installQuasarPlugin({ components: { QDialog } });
 
 const mockUploadFiles = vi.fn().mockImplementation(() => Promise.resolve());
-vi.mock('../../../../../src/composables/file-uploader-composable', () => ({
+vi.mock('../../../../src/composables/file-uploader-composable', () => ({
   default: vi.fn().mockImplementation(() => ({
     isUploading: ref(false),
     isCompleteUploading: ref(false),

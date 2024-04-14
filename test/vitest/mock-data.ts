@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { Album } from '../../../src/components/models';
+import { Album } from '../../src/components/models';
 
 export const mockFetch = () => {
   const mockFetchPromise = Promise.resolve({

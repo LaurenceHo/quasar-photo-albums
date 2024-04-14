@@ -1,6 +1,6 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { albumStore } from '../../../../src/stores/album-store';
+import { albumStore } from '../../../src/stores/album-store';
 import {
   mockAlbumList,
   mockAlbumTagList,
@@ -9,8 +9,8 @@ import {
   mockGetUserPermissionResponse,
 } from '../mock-data';
 
-vi.mock('../../../../src/utils/helper', async () => {
-  const actual: any = await vi.importActual('../../../../src/utils/helper');
+vi.mock('../../../src/utils/helper', async () => {
+  const actual: any = await vi.importActual('../../../src/utils/helper');
   return {
     ...actual,
     compareDbUpdatedTime: vi
@@ -19,19 +19,19 @@ vi.mock('../../../../src/utils/helper', async () => {
   };
 });
 
-vi.mock('../../../../src/services/auth-service', () => ({
+vi.mock('../../../src/services/auth-service', () => ({
   default: vi.fn().mockImplementation(() => ({
     getUserInfo: () => Promise.resolve(mockGetUserPermissionResponse),
   })),
 }));
 
-vi.mock('../../../../src/services/album-service', () => ({
+vi.mock('../../../src/services/album-service', () => ({
   default: vi.fn().mockImplementation(() => ({
     getAlbums: () => Promise.resolve(mockGetAlbumsResponse),
   })),
 }));
 
-vi.mock('../../../../src/services/album-tag-service', () => ({
+vi.mock('../../../src/services/album-tag-service', () => ({
   default: vi.fn().mockImplementation(() => ({
     getAlbumTags: () => Promise.resolve(mockGetAlbumTagsResponse),
   })),
