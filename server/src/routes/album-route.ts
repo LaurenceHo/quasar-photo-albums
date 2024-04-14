@@ -8,30 +8,22 @@ const controller = new AlbumController();
 const albumRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
   instance.get('/api/albums', controller.findAll);
 
-  instance.after(() => {
-    instance.route({
-      method: 'POST',
-      url: '/api/albums',
-      preHandler: instance.auth([verifyJwtClaim, verifyUserPermission], {
-        relation: 'and',
-      }),
-      handler: controller.create,
-    });
+  instance.post('/api/albums', {
+    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
+      relation: 'and',
+    }),
+    handler: controller.create,
   });
 
-  instance.route({
-    method: 'PUT',
-    url: '/api/albums',
-    preHandler: instance.auth([verifyJwtClaim, verifyUserPermission], {
+  instance.put('/api/albums', {
+    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
       relation: 'and',
     }),
     handler: controller.update,
   });
 
-  instance.route({
-    method: 'DELETE',
-    url: '/api/albums/:albumId',
-    preHandler: instance.auth([verifyJwtClaim, verifyUserPermission], {
+  instance.delete('/api/albums/:albumId', {
+    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
       relation: 'and',
     }),
     handler: controller.delete,

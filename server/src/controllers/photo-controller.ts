@@ -84,7 +84,7 @@ export default class PhotoController extends BaseController {
       const filename = data?.filename;
       const mimeType = data?.mimetype;
       const buffer = await data?.toBuffer();
-      console.log(`##### Uploading file: ${filename}, mimeType: ${mimeType}, file size: ${buffer?.length}`);
+      console.log(`##### Uploading file: ${filename}, mimeType: ${mimeType}, file size: ${buffer?.length} bytes`);
       const result = await uploadObject(`${albumId}/${filename}`, buffer);
       if (result) {
         console.log(`##### Photo uploaded: ${filename}`);

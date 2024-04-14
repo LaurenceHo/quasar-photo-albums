@@ -20,7 +20,6 @@ export default class AlbumTagController extends BaseController {
 
   create: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const tag: AlbumTag = request.body as AlbumTag;
-    console.log(tag);
     try {
       const result = await albumTagService.create(tag);
 

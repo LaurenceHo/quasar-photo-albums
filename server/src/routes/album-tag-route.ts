@@ -8,19 +8,15 @@ const controller = new AlbumTagController();
 const albumTagRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
   instance.get('/api/albumTags', controller.findAll);
 
-  instance.route({
-    method: 'POST',
-    url: '/api/albumTags',
-    preHandler: instance.auth([verifyJwtClaim, verifyUserPermission], {
+  instance.post('/api/albumTags', {
+    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
       relation: 'and',
     }),
     handler: controller.create,
   });
 
-  instance.route({
-    method: 'DELETE',
-    url: '/api/albumTags/:tagId',
-    preHandler: instance.auth([verifyJwtClaim, verifyUserPermission], {
+  instance.delete('/api/albumTags/:tagId', {
+    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
       relation: 'and',
     }),
     handler: controller.delete,
