@@ -1,4 +1,4 @@
-# AWS Lambda Functions With ExpressJS Routing and TypeScript
+# AWS Lambda Functions With Fastify and TypeScript
 
 ## Prerequisites
 
@@ -44,7 +44,7 @@ your real information in`.env.example` and modify file name to `.env`.
 ### AWS DynamoDB
 
 Replace this properties `PHOTO_ALBUMS_TABLE_NAME`, `PHOTO_ALBUM_TAGS_TABLE_NAME`, `PHOTO_USER_PERMISSION_TABLE_NAME`
-with your real information in`.env.example` and modify file name to `.env`. When you run Express.js locally, it will use
+with your real information in`.env.example` and modify file name to `.env`. When you run Fastify locally, it will use
 those environment variables to create table and insert mock into your DynamoDB, so you don't have to create tables manually.
 You can see the initial dynamodb table in [./src/services/initialise-dynamodb-tables.ts](./src/services/initialise-dynamodb-tables.ts).
 
@@ -64,15 +64,15 @@ replace this property `GOOGLE_PLACES_API_KEY` with your real information in`.env
 $ npm install
 ```
 
-### Run ExpressJS locally
+### Run Fastify locally
 
 ```bash
 $ npm run start:server
 ```
 
-## Use serverless-http to wrap Express.js app
+## Use serverless-http to wrap Fastify app
 
-Assume you already have an Express.js app, you can use `serverless-http` to wrap it and deploy to AWS Lambda and Api Gateway.
+Assume you already have a Fastify app, you can use `serverless-http` to wrap it and deploy to AWS Lambda and Api Gateway.
 
 Firstly, install serverless-http
 
@@ -86,37 +86,19 @@ Secondly, install serverless and serverless-plugin-typescript
 $ npm install -S -D serverless serverless-plugin-typescript
 ```
 
-Then, wrap your Express.js app with serverless-http
+Then, wrap your Fastify app with serverless-http
 
-```javascript
+```typescript
 // app.ts
+import Fastify, { FastifyInstance } from 'fastify';
 
-import bodyParser from 'body-parser';
-import serverless from 'serverless-http';
-import express from 'express';
+export const app: FastifyInstance = Fastify();
 
-export const app: Application = express();
+app.get('/', (request: FastifyRequest, reply: FastifyReply) => {
+  reply.send('Hello World!');
+});
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-app.get('/', function (req, res) {
-  res.send('Hello World!')
-})
-
-module.exports.handler = serverless(app);
-```
-
-We also need to export app object to index.ts, so you can run it locally.
-
-```javascript
-// index.ts
-
-import { app } from './app';
-
-const port = process.env.PORT || 3000;
-
-app.listen(port, () => console.log(`App is listening on port ${port}.`));
+export const handler = serverless(app as any);
 ```
 
 To get this application deployed, let's create a `serverless.yml` in our working directory. When we deploy to AWS
@@ -130,7 +112,7 @@ $ npm i -D serverless-dotenv-plugin
 Your `serverless.yaml` should look like as below:
 
 ```yaml
-service: my-express-application
+service: my-fastify-application
 provider:
   name: aws
   runtime: nodejs18.x
@@ -200,17 +182,17 @@ Typescript compiled.
 ... snip ...
 
 Service Information
-service: my-express-application
+service: my-fastify-application
 stage: dev
 region: us-east-1
-stack: my-express-application-dev
+stack: my-fastify-application-dev
 api keys:
   None
 endpoints:
   ANY - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/dev
   ANY - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/dev/{proxy+}
 functions:
-  app: my-express-application-dev-app
+  app: my-fastify-application-dev-app
 ```
 
 You can check your AWS Lambda function in AWS console. You should see a new Lambda function and API Gateway created.
