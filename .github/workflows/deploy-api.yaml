@@ -43,7 +43,9 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npm run test:server
 
       - name: Write .env file
         run: |
@@ -59,9 +61,6 @@ jobs:
           PHOTO_ALBUM_TAGS_TABLE_NAME=$PHOTO_ALBUM_TAGS_TABLE_NAME
           PHOTO_USER_PERMISSION_TABLE_NAME=$PHOTO_USER_PERMISSION_TABLE_NAME
           EOF
-
-      - name: Test
-        run: npm run test
 
       - name: Serverless deploy
         uses: serverless/github-action@master

@@ -48,7 +48,9 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npm run test:server
 
       - name: Write .env file
         run: |
@@ -66,7 +68,7 @@ jobs:
           EOF
 
       - name: Test
-        run: npm run test
+        run: npm run test:server
 
       - name: Serverless deploy
         uses: serverless/github-action@master

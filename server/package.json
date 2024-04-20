@@ -1,7 +1,7 @@
 {
   "name": "lambda-functions",
   "version": "1.0.0",
-  "main": "dist/src/index.js",
+  "main": "dist/app.js",
   "files": [
     "dist/**/*.*",
     "package.json"
@@ -13,7 +13,7 @@
     "deploy:lambda:prod": "serverless deploy --stage prod",
     "lint": "eslint --ext .js,.ts ./src --fix",
     "start:server": "rimraf dist && tsc && node dist/app.js",
-    "test": "vitest run --coverage",
+    "test:server": "vitest run --coverage",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
