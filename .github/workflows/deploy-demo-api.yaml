@@ -65,6 +65,9 @@ jobs:
           PHOTO_USER_PERMISSION_TABLE_NAME=$PHOTO_USER_PERMISSION_TABLE_NAME
           EOF
 
+      - name: Test
+        run: npm run test
+
       - name: Serverless deploy
         uses: serverless/github-action@master
         with:

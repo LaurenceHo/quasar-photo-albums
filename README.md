@@ -45,7 +45,7 @@ For the detailed tutorial, you can check [here](https://dev.to/laurenceho/a-full
 
 ### Architecture
 
-![Architecture](doc-images/AWS-Architecture.webp)
+![Architecture](doc-images/AWS-Architecture.png)
 
 ## Getting started
 
