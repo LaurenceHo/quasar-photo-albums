@@ -39,6 +39,7 @@ export default class AlbumTagController extends BaseController {
     const tag = (request.params as any)['tagId'] as string;
     try {
       const result = await albumTagService.delete({ tag });
+
       if (result) {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
         return this.ok(reply, 'Album tag deleted');

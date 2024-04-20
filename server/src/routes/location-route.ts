@@ -5,7 +5,20 @@ import LocationController from '../controllers/location-controller.js';
 const controller = new LocationController();
 
 const locationRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
-  instance.get('/api/location/search', controller.findAll);
+  instance.get('/api/location/search', {
+    handler: controller.findAll,
+    schema: {
+      querystring: {
+        type: 'object',
+        required: ['textQuery'],
+        properties: {
+          textQuery: {
+            type: 'string',
+          },
+        },
+      },
+    },
+  });
 
   done();
 };

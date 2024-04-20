@@ -74,7 +74,7 @@
     </q-header>
 
     <q-page-container>
-      <template v-if="!isCheckingUserPermission && !loadingAllAlbumInformation">
+      <template v-if="!isCheckingUserPermission">
         <router-view />
       </template>
     </q-page-container>
@@ -107,7 +107,6 @@ const albumAppName = computed(() => process.env.ALBUM_APP_TITLE);
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const isCheckingUserPermission = computed(() => userPermissionStore.isCheckingUserPermission);
-const loadingAllAlbumInformation = computed(() => store.loadingAllAlbumInformation);
 const buttonToggle = ref(
   routeName.value === 'Albums' || routeName.value === 'Photos' ? 'photos' : routeName.value === 'Map' ? 'map' : ''
 );

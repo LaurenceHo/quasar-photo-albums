@@ -4,7 +4,7 @@ import { get, isEmpty } from 'radash';
 import { Photo, PhotosRequest, RenamePhotoRequest } from '../models.js';
 import { cleanJwtCookie } from '../routes/auth-middleware.js';
 import AlbumService from '../services/album-service.js';
-import { S3Service } from '../services/s3-service.js';
+import S3Service from '../services/s3-service.js';
 import { BaseController } from './base-controller.js';
 import { deleteObjects, updatePhotoAlbum, uploadObject } from './helpers.js';
 
@@ -32,13 +32,13 @@ export default class PhotoController extends BaseController {
               const decodedPayload = jwt.verify(result.value, process.env.JWT_SECRET as string);
               const isAdmin = get(decodedPayload, 'role') === 'admin';
               if (!isAdmin) {
-                return cleanJwtCookie(reply, 'Unauthorized action.');
+                return cleanJwtCookie(reply, 'Unauthorized action.', 403);
               }
             } catch (error) {
-              return cleanJwtCookie(reply, 'Unauthorized action.');
+              return cleanJwtCookie(reply, 'Authentication failed.');
             }
           } else {
-            return cleanJwtCookie(reply, 'Unauthorized action.');
+            return cleanJwtCookie(reply, 'Authentication failed.');
           }
         }
         const folderNameKey = decodeURIComponent(albumId) + '/';
@@ -103,111 +103,86 @@ export default class PhotoController extends BaseController {
   update: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const { destinationAlbumId, albumId, photoKeys } = request.body as PhotosRequest;
 
-    if (isEmpty(albumId)) {
-      return this.clientError(reply, 'No album');
-    }
+    const promises: Promise<any>[] = [];
+    photoKeys.forEach((photoKey) => {
+      const sourcePhotoKey = `${albumId}/${photoKey}`;
 
-    if (isEmpty(destinationAlbumId)) {
-      return this.clientError(reply, 'No destination album');
-    }
-
-    if (!isEmpty(photoKeys)) {
-      const promises: Promise<any>[] = [];
-      photoKeys.forEach((photoKey) => {
-        const sourcePhotoKey = `${albumId}/${photoKey}`;
-
-        const promise = new Promise((resolve, reject) => {
-          s3Service
-            .copy({
-              Bucket: process.env.AWS_S3_BUCKET_NAME,
-              CopySource: `/${bucketName}/${sourcePhotoKey}`,
-              Key: `${destinationAlbumId}/${photoKey}`,
-            })
-            .then((result) => {
-              if (result) {
-                deleteObjects([sourcePhotoKey])
-                  .then((result) => {
-                    if (result) {
-                      console.log('##### Photo moved:', sourcePhotoKey);
-                      resolve('Photo moved');
-                    } else {
-                      reject('Failed to delete photo');
-                    }
-                  })
-                  .catch((err: Error) => {
-                    reject(err);
-                  });
-              }
-            })
-            .catch((err: Error) => {
-              reject(err);
-            });
-        });
-
-        promises.push(promise);
+      const promise = new Promise((resolve, reject) => {
+        s3Service
+          .copy({
+            Bucket: process.env.AWS_S3_BUCKET_NAME,
+            CopySource: `/${bucketName}/${sourcePhotoKey}`,
+            Key: `${destinationAlbumId}/${photoKey}`,
+          })
+          .then((result) => {
+            if (result) {
+              deleteObjects([sourcePhotoKey])
+                .then((result) => {
+                  if (result) {
+                    console.log('##### Photo moved:', sourcePhotoKey);
+                    resolve('Photo moved');
+                  } else {
+                    reject('Failed to delete photo');
+                  }
+                })
+                .catch((err: Error) => {
+                  reject(err);
+                });
+            }
+          })
+          .catch((err: Error) => {
+            reject(err);
+          });
       });
 
-      try {
-        await Promise.all(promises);
-        return this.ok(reply, 'Photo moved');
-      } catch (err: any) {
-        console.error('Failed to move photos:', err);
-        return this.fail(reply, 'Failed to move photos');
-      }
+      promises.push(promise);
+    });
+
+    try {
+      await Promise.all(promises);
+      return this.ok(reply, 'Photo moved');
+    } catch (err: any) {
+      console.error('Failed to move photos:', err);
+      return this.fail(reply, 'Failed to move photos');
     }
-    return this.clientError(reply, 'No photo needs to be moved');
   };
 
   rename: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const { albumId, newPhotoKey, currentPhotoKey } = request.body as RenamePhotoRequest;
 
-    if (isEmpty(albumId)) {
-      return this.clientError(reply, 'No album');
-    }
-
-    if (!isEmpty(newPhotoKey) && !isEmpty(currentPhotoKey)) {
-      // Currently, the only way to rename an object using the SDK is to copy the object with a different name and
-      // then delete the original object.
-      try {
-        const result = await s3Service.copy({
-          Bucket: bucketName,
-          CopySource: `/${bucketName}/${albumId}/${currentPhotoKey}`,
-          Key: `${albumId}/${newPhotoKey}`,
-        });
-        if (result) {
-          await deleteObjects([`${albumId}/${currentPhotoKey}`]);
-          return this.ok(reply, 'Photo renamed');
-        }
-        return this.fail(reply, 'Failed to rename photo');
-      } catch (err: any) {
-        console.error('Failed to rename photo:', err);
-        return this.fail(reply, 'Failed to rename photo');
+    // Currently, the only way to rename an object using the SDK is to copy the object with a different name and
+    // then delete the original object.
+    try {
+      const result = await s3Service.copy({
+        Bucket: bucketName,
+        CopySource: `/${bucketName}/${albumId}/${currentPhotoKey}`,
+        Key: `${albumId}/${newPhotoKey}`,
+      });
+      if (result) {
+        await deleteObjects([`${albumId}/${currentPhotoKey}`]);
+        return this.ok(reply, 'Photo renamed');
       }
+      return this.fail(reply, 'Failed to rename photo');
+    } catch (err: any) {
+      console.error('Failed to rename photo:', err);
+      return this.fail(reply, 'Failed to rename photo');
     }
-    return this.clientError(reply, 'No photo needs to be renamed');
   };
 
   delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const { albumId, photoKeys } = request.body as PhotosRequest;
 
-    if (isEmpty(albumId)) {
-      return this.clientError(reply, 'No album');
-    }
-
-    if (!isEmpty(photoKeys)) {
-      const photoKeysArray = photoKeys.map((photoKey) => `${albumId}/${photoKey}`);
-      try {
-        const result = await deleteObjects(photoKeysArray);
-        if (result) {
-          return this.ok(reply, 'Photo deleted');
-        }
-        return this.fail(reply, 'Failed to delete photos');
-      } catch (err: any) {
-        console.error('Failed to delete photos:', err);
-        return this.fail(reply, 'Failed to delete photos');
+    const photoKeysArray = photoKeys.map((photoKey) => `${albumId}/${photoKey}`);
+    try {
+      const result = await deleteObjects(photoKeysArray);
+      if (result) {
+        return this.ok(reply, 'Photo deleted');
       }
+      return this.fail(reply, 'Failed to delete photos');
+    } catch (err: any) {
+      console.error('Failed to delete photos:', err);
+      return this.fail(reply, 'Failed to delete photos');
     }
-    return this.clientError(reply, 'No photo needs to be deleted');
   };
 
   findOne: RouteHandler = async () => {

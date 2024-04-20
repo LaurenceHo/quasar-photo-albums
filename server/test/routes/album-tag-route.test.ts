@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { app } from '../src/app';
+import { app } from '../../src/app';
 
-vi.mock('../src/services/album-tag-service', () => ({
+vi.mock('../../src/services/album-tag-service', () => ({
   default: vi.fn().mockImplementation(() => ({
     findAll: () => Promise.resolve([{ tag: 'sport' }, { tag: 'food' }, { tag: 'hiking' }]),
   })),

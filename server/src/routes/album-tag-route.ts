@@ -13,6 +13,17 @@ const albumTagRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, d
       relation: 'and',
     }),
     handler: controller.create,
+    schema: {
+      body: {
+        type: 'object',
+        required: ['tag'],
+        properties: {
+          tag: {
+            type: 'string',
+          },
+        },
+      },
+    },
   });
 
   instance.delete('/api/albumTags/:tagId', {
@@ -20,6 +31,16 @@ const albumTagRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, d
       relation: 'and',
     }),
     handler: controller.delete,
+    schema: {
+      params: {
+        type: 'object',
+        properties: {
+          tagId: {
+            type: 'string',
+          },
+        },
+      },
+    },
   });
 
   done();
