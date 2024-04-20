@@ -88,7 +88,7 @@ const props = defineProps({
 });
 
 const { photo } = toRefs(props);
-const imageWidth = ref(document.getElementById('photo-image')?.clientWidth ?? 0);
+const imageWidth = ref(document.getElementById(`photo-image-${photo.value.key}`)?.clientWidth ?? 0);
 
 const q = useQuasar();
 const route = useRoute();
@@ -109,7 +109,7 @@ const isPhotoSelected = computed(() => selectedPhotosList.value.includes(photo.v
 const goToPhotoDetail = async () => await router.replace({ query: { ...route.query, photo: photoId.value } });
 
 onMounted(() => {
-  imageWidth.value = document.getElementById('photo-image')?.clientWidth ?? 250;
+  imageWidth.value = document.getElementById(`photo-image-${photo.value.key}`)?.clientWidth ?? 250;
 });
 </script>
 <style lang="scss">

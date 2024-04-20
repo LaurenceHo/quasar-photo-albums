@@ -24,41 +24,45 @@
     <div class="q-pt-sm text-subtitle2 text-weight-medium">{{ albumItem.albumName }}</div>
   </div>
   <template v-else>
-    <q-item clickable data-test-id="list-album-item">
-      <q-item-section avatar @click="goToAlbum">
-        <q-avatar :class="{ 'no-album-cover-square': !albumItem.albumCover }" :size="`${thumbnailSize}px`" rounded>
-          <q-img
-            v-if="albumItem?.albumCover"
-            :ratio="1"
-            :src="`${thumbnail}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
-            class="rounded-borders"
-          />
-          <q-icon v-else name="mdi-image" />
-          <q-icon
-            v-if="albumItem.isPrivate"
-            class="absolute"
-            color="white"
-            name="mdi-lock"
-            size="xs"
-            style="top: 8px; left: 8px"
-          />
-        </q-avatar>
-      </q-item-section>
+    <div class="col-xl-6 col-lg-7 col-md-8 col-sm-10 col-xs-12 q-pa-xs">
+      <q-card flat bordered data-test-id="list-album-item">
+        <q-item clickable class="q-px-sm">
+          <q-item-section avatar @click="goToAlbum">
+            <q-avatar :class="{ 'no-album-cover-square': !albumItem.albumCover }" :size="`${thumbnailSize}px`" rounded>
+              <q-img
+                v-if="albumItem?.albumCover"
+                :ratio="1"
+                :src="`${thumbnail}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
+                class="rounded-borders"
+              />
+              <q-icon v-else name="mdi-image" />
+              <q-icon
+                v-if="albumItem.isPrivate"
+                class="absolute"
+                color="white"
+                name="mdi-lock"
+                size="xs"
+                style="top: 8px; left: 8px"
+              />
+            </q-avatar>
+          </q-item-section>
 
-      <q-item-section @click="goToAlbum()">
-        <q-item-label class="text-h6 text-weight-medium">{{ albumItem.albumName }}</q-item-label>
-        <q-item-label v-if="albumItem.description" class="text-subtitle1 text-grey-7">
-          {{ albumItem.description }}
-        </q-item-label>
-        <div class="flex">
-          <q-chip v-for="tag in albumItem.tags" :key="tag" color="secondary" dense square>{{ tag }}</q-chip>
-        </div>
-      </q-item-section>
+          <q-item-section @click="goToAlbum()">
+            <q-item-label class="text-h6 text-weight-medium">{{ albumItem.albumName }}</q-item-label>
+            <q-item-label v-if="albumItem.description" class="text-subtitle1 text-grey-7">
+              {{ albumItem.description }}
+            </q-item-label>
+            <div class="flex">
+              <q-chip v-for="tag in albumItem.tags" :key="tag" color="secondary" dense square>{{ tag }}</q-chip>
+            </div>
+          </q-item-section>
 
-      <q-item-section v-if="isAdminUser" side>
-        <EditAlbumButton :album-item="albumItem" :album-style="albumStyle" />
-      </q-item-section>
-    </q-item>
+          <q-item-section v-if="isAdminUser" side>
+            <EditAlbumButton :album-item="albumItem" :album-style="albumStyle" />
+          </q-item-section>
+        </q-item>
+      </q-card>
+    </div>
   </template>
 </template>
 

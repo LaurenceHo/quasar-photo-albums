@@ -18,12 +18,22 @@
             </keep-alive>
           </router-view>
         </template>
+        <template v-else>
+          <template v-if="route.name === 'Albums'">
+            <skeleton-album-list />
+          </template>
+          <template v-else-if="route.name === 'Photos'">
+            <skeleton-photo-list />
+          </template>
+        </template>
       </div>
     </div>
   </q-page>
 </template>
 
 <script lang="ts" setup>
+import SkeletonAlbumList from 'pages/SkeletonAlbumList.vue';
+import SkeletonPhotoList from 'pages/SkeletonPhotoList.vue';
 import { albumStore } from 'src/stores/album-store';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';

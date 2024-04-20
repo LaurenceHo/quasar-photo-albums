@@ -76,12 +76,8 @@
       <div v-if="albumStyle === 'grid'" class="q-col-gutter-md row">
         <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
       </div>
-      <div v-else class="justify-center row">
-        <div class="col-12 col-xl-6 col-lg-8 col-md-8 column">
-          <q-list bordered class="rounded-borders" separator>
-            <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
-          </q-list>
-        </div>
+      <div v-else :class="`row ${$q.screen.lt.xl ? 'justify-center' : ''}`">
+        <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
       </div>
       <div class="col-12 col-xl-4 col-lg-5 col-md-5 flex justify-end items-center q-pt-md">
         <Pagination

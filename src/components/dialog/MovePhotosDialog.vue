@@ -142,7 +142,7 @@ const confirmMovePhotos = async () => {
   isProcessing.value = false;
   duplicatedPhotoKeys.value = tempDuplicatedPhotoKeys;
 
-  if (result.status === 'Success') {
+  if (result.code === 200) {
     emits('closePhotoDetailDialog');
     emits('refreshPhotoList');
   }

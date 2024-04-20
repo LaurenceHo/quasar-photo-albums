@@ -20,14 +20,16 @@
             <div class="text-subtitle1 text-grey-7">{{ photoFileName }}</div>
             <div class="text-subtitle1 text-grey-7 q-pb-md">({{ selectedImageIndex + 1 }}/{{ photoList.length }})</div>
             <div class="relative-position full-width image-container">
-              <div class="flex justify-center items-center full-height">
+              <div id="photo-image-detail" class="flex justify-center items-center full-height">
                 <q-spinner v-show="loadImage" color="primary" size="4rem" />
                 <img
                   v-show="!loadImage && selectedImage"
                   :alt="photoFileName"
                   :src="selectedImage?.url"
                   class="rounded-borders-lg responsive-image"
-                  style="margin: auto; display: block"
+                  style="margin: auto"
+                  :width="isPhotoLandscape || $q.screen.lt.sm ? `${imageDisplayWidth}px` : undefined"
+                  :height="!isPhotoLandscape && $q.screen.gt.xs ? `${imageDisplayHeight}px` : undefined"
                   @load="loadImage = false"
                 />
               </div>
@@ -82,7 +84,11 @@
 
                 <q-item-section>
                   <q-item-label>
-                    {{ exifTags['Image Width']?.value }} x {{ exifTags['Image Height']?.value }}
+                    {{
+                      isPhotoLandscape || exifTags.Orientation?.value === 0
+                        ? `${imageOriginalWidth} x ${imageOriginalHeight}`
+                        : `${imageOriginalHeight} x ${imageOriginalWidth}`
+                    }}
                   </q-item-label>
                   <q-item-label caption>
                     <span> f/{{ aperture }} </span>
@@ -154,6 +160,9 @@ const photoFileName = ref('');
 const exifTags = ref({} as ExifData);
 const loadImage = ref(false);
 
+const imageContainerWidth = ref(0);
+const imageContainerHeight = ref(0);
+
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const selectedImage = computed(() => usePhotoStore.findPhotoByIndex(selectedImageIndex.value));
 const photoList = computed(() => usePhotoStore.photoList);
@@ -201,7 +210,33 @@ const aperture = computed(() =>
     1
   )
 );
+
+const imageOriginalWidth = computed(() => Number(exifTags.value['Image Width']?.value ?? 0));
+const imageOriginalHeight = computed(() => Number(exifTags.value['Image Height']?.value ?? 0));
+const isPhotoLandscape = computed(
+  () =>
+    exifTags.value.Orientation?.value === 1 ||
+    exifTags.value.Orientation?.value === 3 ||
+    ((exifTags.value.Orientation?.value === 0 || !exifTags.value.Orientation) &&
+      imageOriginalWidth.value > imageOriginalHeight.value)
+);
 /** Photo EXIF data */
+
+const imageDisplayWidth = computed(() => {
+  if (imageOriginalWidth.value > 1080 && imageContainerWidth.value > 1080) {
+    return 1080;
+  } else if (imageOriginalWidth.value > 1080 && imageContainerWidth.value < 1080) {
+    return imageContainerWidth.value;
+  }
+  return imageOriginalWidth.value;
+});
+
+const imageDisplayHeight = computed(() => {
+  if (imageOriginalHeight.value > imageContainerHeight.value) {
+    return imageContainerHeight.value;
+  }
+  return imageOriginalHeight.value;
+});
 
 const closeDialog = async () => await router.replace({ query: { ...route.query, photo: undefined } });
 
@@ -217,6 +252,11 @@ const nextPhoto = (dir: number) => {
     router.replace({ query: { photo: photoId } });
   }
 };
+
+watch(loadImage, () => {
+  imageContainerWidth.value = document.getElementById('photo-image-detail')?.clientWidth ?? 0;
+  imageContainerHeight.value = document.getElementById('photo-image-detail')?.clientHeight ?? 0;
+});
 
 watch(
   [photoId, photoList],
@@ -268,6 +308,7 @@ watch(
 @media only screen and (max-width: 768px) {
   .image-container {
     height: inherit;
+    min-height: 300px;
   }
 }
 
