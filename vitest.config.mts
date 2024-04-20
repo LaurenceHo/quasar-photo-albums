@@ -9,7 +9,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reportsDirectory: 'test/vitest/coverage',
-      exclude:['**/**.js','**/**.d.ts','.quasar/**','.eslintrc.mjs']
+      exclude:['**/**.js','**/**.d.ts','.quasar/**','.eslintrc.mjs','server/**']
     },
     globals: true,
     setupFiles: './vitest-setup.ts',
@@ -17,8 +17,6 @@ export default defineConfig({
     include: [
       // Matches vitest tests in any subfolder of 'src' or into 'test/vitest', or subfolder of 'server'
       // Matches all files with extension 'ts' and 'tsx'
-      'server/**/*.{test,spec}.{ts,tsx}',
-      'test/**/*.{test,spec}.{ts,tsx}',
       'src/**/*.vitest.{test,spec}.{ts,tsx}',
       'test/vitest/**/*.{test,spec}.{ts,tsx}',
     ],

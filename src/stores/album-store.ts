@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { Loading, LocalStorage } from 'quasar';
+import { LocalStorage } from 'quasar';
 import { isEmpty } from 'radash';
 import { Album, AlbumTag } from 'src/components/models';
 import AlbumService from 'src/services/album-service';
@@ -105,7 +105,6 @@ export const albumStore = defineStore('albums', {
         // If updated time from localStorage is empty or different from S3, get albums from database
         const compareResult = await compareDbUpdatedTime();
         if (!compareResult.isLatest || isEmpty(tempAlbumsString) || isEmpty(tempAlbumTagsString)) {
-          Loading.show();
           this.loadingAllAlbumInformation = true;
 
           const { data: albums } = await albumService.getAlbums();
@@ -137,7 +136,6 @@ export const albumStore = defineStore('albums', {
         const tempAlbumTags: { tag: string }[] = !isEmpty(albumTagsString) ? JSON.parse(albumTagsString) : [];
         this.albumTags = tempAlbumTags.sort((a, b) => a.tag.localeCompare(b.tag));
 
-        Loading.hide();
         this.loadingAllAlbumInformation = false;
       }
     },
