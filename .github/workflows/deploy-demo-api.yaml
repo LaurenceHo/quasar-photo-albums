@@ -23,9 +23,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     environment: dev
-    defaults:
-      run:
-        working-directory: ./server
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
@@ -49,11 +46,13 @@ jobs:
 
       - name: Install dependencies
         run: |
+          cd ./server
           npm install
           npm run test:server
 
       - name: Write .env file
         run: |
+          cd ./server
           tee .env <<EOF
           AWS_REGION_NAME=$AWS_REGION_NAME
           GOOGLE_PLACES_API_KEY=$GOOGLE_PLACES_API_KEY
@@ -66,9 +65,6 @@ jobs:
           PHOTO_ALBUM_TAGS_TABLE_NAME=$PHOTO_ALBUM_TAGS_TABLE_NAME
           PHOTO_USER_PERMISSION_TABLE_NAME=$PHOTO_USER_PERMISSION_TABLE_NAME
           EOF
-
-      - name: Test
-        run: npm run test:server
 
       - name: Serverless deploy
         uses: serverless/github-action@master
