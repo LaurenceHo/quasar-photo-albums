@@ -42,11 +42,16 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install dependencies and test
+        run: |
+          npm install
+          cd ./server
+          npm install
+          npm run test:server
 
       - name: Write .env file
         run: |
+          cd ./server
           tee .env <<EOF
           AWS_REGION_NAME=$AWS_REGION_NAME
           GOOGLE_PLACES_API_KEY=$GOOGLE_PLACES_API_KEY
