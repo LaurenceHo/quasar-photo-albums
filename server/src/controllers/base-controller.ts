@@ -21,15 +21,19 @@ export abstract class BaseController implements IBaseController {
     }
   }
 
-  public fail(reply: FastifyReply, message: string) {
-    return new JsonResponse(500).error(reply, message);
+  public clientError(reply: FastifyReply, message = '') {
+    return new JsonResponse(400).error(reply, message);
   }
 
   public unauthorized(reply: FastifyReply, message = '') {
     return new JsonResponse(401).unauthorized(reply, message);
   }
 
-  public clientError(reply: FastifyReply, message = '') {
-    return new JsonResponse(400).error(reply, message);
+  public insufficientPermission(reply: FastifyReply, message = '') {
+    return new JsonResponse(403).unauthorized(reply, message);
+  }
+
+  public fail(reply: FastifyReply, message: string) {
+    return new JsonResponse(500).error(reply, message);
   }
 }

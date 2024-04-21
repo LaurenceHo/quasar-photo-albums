@@ -32,13 +32,13 @@ export default class PhotoController extends BaseController {
               const decodedPayload = jwt.verify(result.value, process.env.JWT_SECRET as string);
               const isAdmin = get(decodedPayload, 'role') === 'admin';
               if (!isAdmin) {
-                return cleanJwtCookie(reply, 'Unauthorized action.');
+                return cleanJwtCookie(reply, 'Unauthorized action.', 403);
               }
             } catch (error) {
-              return cleanJwtCookie(reply, 'Unauthorized action.');
+              return cleanJwtCookie(reply, 'Authentication failed.');
             }
           } else {
-            return cleanJwtCookie(reply, 'Unauthorized action.');
+            return cleanJwtCookie(reply, 'Authentication failed.');
           }
         }
         const folderNameKey = decodeURIComponent(albumId) + '/';

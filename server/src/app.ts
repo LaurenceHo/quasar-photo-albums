@@ -6,7 +6,7 @@ import multipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
 import throttle from '@fastify/throttle';
 import dotenv from 'dotenv';
-import Fastify, { FastifyInstance } from 'fastify';
+import Fastify, { FastifyError, FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import serverless from 'serverless-http';
 import albumRoute from './routes/album-route.js';
 import albumTagsRoute from './routes/album-tag-route.js';
@@ -15,6 +15,7 @@ import authRoute from './routes/auth-route.js';
 import locationRoute from './routes/location-route.js';
 import photoRoute from './routes/photo-route.js';
 import { initialiseDynamodbTables } from './services/initialise-dynamodb-tables.js';
+import JsonResponse from './utils/json-response.js';
 
 const ACCEPTED_MAX_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -61,6 +62,16 @@ app.addHook('onRequest', (request, reply, done) => {
   console.log('##### Request: ', request.method, request.url);
   done();
 });
+
+app.setErrorHandler((err: FastifyError, _req: FastifyRequest, reply: FastifyReply) => {
+  if (err.message.includes('Authentication failed')) {
+    return new JsonResponse(401).unauthorized(reply, err.message);
+  } else if (err.message === 'Unauthorized action') {
+    return new JsonResponse(403).unauthorized(reply, err.message);
+  }
+  return new JsonResponse(500).error(reply, err.message);
+});
+
 app.decorate('verifyJwtClaim', verifyJwtClaim).decorate('verifyUserPermission', verifyUserPermission);
 
 app.register(authRoute);

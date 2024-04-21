@@ -59,7 +59,7 @@ const confirmDeletePhotos = async () => {
   isProcessing.value = true;
   const result = await photoService.deletePhotos(albumId?.value, photoKeysArray.value);
   isProcessing.value = false;
-  if (result.status === 'Success') {
+  if (result.code === 200) {
     emits('closePhotoDetailDialog');
     emits('refreshPhotoList');
   }
