@@ -21,7 +21,7 @@ const ACCEPTED_MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 dotenv.config();
 
-export const app: FastifyInstance = Fastify();
+const app: FastifyInstance = Fastify();
 
 await app.register(cors, {
   allowedHeaders: ['Origin, Content-Type, Accept, Authorization, X-Requested-With'],
@@ -82,8 +82,9 @@ app.register(locationRoute);
 
 try {
   await app.listen({ port: 3000 });
+  console.log('App is listening on port 3000.');
 } catch (err) {
-  app.log.error(err);
+  console.error(err);
 }
 
 initialiseDynamodbTables().then(() => console.log('Finish verifying DynamoDB tables.'));
