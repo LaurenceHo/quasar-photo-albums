@@ -14,14 +14,13 @@ import { verifyJwtClaim, verifyUserPermission } from './routes/auth-middleware.j
 import authRoute from './routes/auth-route.js';
 import locationRoute from './routes/location-route.js';
 import photoRoute from './routes/photo-route.js';
-import { initialiseDynamodbTables } from './services/initialise-dynamodb-tables.js';
 import JsonResponse from './utils/json-response.js';
 
 const ACCEPTED_MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 dotenv.config();
 
-const app: FastifyInstance = Fastify();
+export const app: FastifyInstance = Fastify();
 
 await app.register(cors, {
   allowedHeaders: ['Origin, Content-Type, Accept, Authorization, X-Requested-With'],
@@ -85,12 +84,4 @@ app.register(albumTagsRoute);
 app.register(photoRoute);
 app.register(locationRoute);
 
-try {
-  await app.listen({ port: 3000 });
-  console.log('App is listening on port 3000.');
-} catch (err) {
-  console.error(err);
-}
-
-initialiseDynamodbTables().then(() => console.log('Finish verifying DynamoDB tables.'));
 export const handler = serverless(app as any);

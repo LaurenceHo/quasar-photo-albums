@@ -1,7 +1,7 @@
 {
-  "name": "lambda-functions",
+  "name": "fastify-server",
   "version": "1.0.0",
-  "main": "dist/app.js",
+  "main": "dist/index.js",
   "files": [
     "dist/**/*.*",
     "package.json"
@@ -12,7 +12,7 @@
     "deploy:lambda": "serverless deploy",
     "deploy:lambda:prod": "serverless deploy --stage prod",
     "lint": "eslint --ext .js,.ts ./src --fix",
-    "start:server": "rimraf dist && tsc && node dist/app.js",
+    "start:server": "rimraf dist && tsc && node dist/index.js",
     "test:server": "vitest run --coverage",
     "type-check": "tsc --noEmit"
   },

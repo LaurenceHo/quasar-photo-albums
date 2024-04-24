@@ -1,4 +1,5 @@
 import { DeleteObjectsCommandInput, PutObjectCommandInput } from '@aws-sdk/client-s3';
+import { isEmpty } from 'radash';
 import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
 import { S3Service } from '../services/s3-service.js';
@@ -85,4 +86,25 @@ export const emptyS3Folder = async (folderName: string) => {
     console.error(`Failed to empty S3 folder: ${err}`);
     throw Error('Error when emptying S3 folder');
   }
+};
+
+export const perform = async (method: 'GET' | 'POST', urlPath: string, requestJsonBody?: any, maskFields?: string) => {
+  const headers = new Headers({ Accept: '*/*' });
+  headers.append('X-Goog-Api-Key', process.env.GOOGLE_PLACES_API_KEY as string);
+  if (!isEmpty(maskFields)) {
+    headers.append('X-Goog-FieldMask', maskFields ?? '');
+  }
+
+  const requestOptions: any = {};
+
+  if (!isEmpty(requestJsonBody)) {
+    // JSON content
+    headers.append('Content-Type', 'application/json');
+    requestOptions.body = JSON.stringify(requestJsonBody);
+  }
+  requestOptions.method = method.toUpperCase();
+  requestOptions.headers = headers;
+
+  const response = await fetch(`https://places.googleapis.com/v1/places${urlPath}`, requestOptions);
+  return await response.json();
 };
