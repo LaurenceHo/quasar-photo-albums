@@ -24,5 +24,9 @@
       <q-skeleton type="QChip" class="q-mt-md" />
     </q-item-section>
   </q-item>
-  <q-skeleton size="250px" />
+  <div class="flex">
+    <q-skeleton size="250px" class="q-mr-md" />
+    <q-skeleton size="250px" />
+  </div>
 </template>
+<script setup lang="ts"></script>

@@ -22,7 +22,7 @@ export abstract class BaseController implements IBaseController {
   }
 
   public clientError(reply: FastifyReply, message = '') {
-    return new JsonResponse(400).error(reply, message);
+    return new JsonResponse(400).badRequest(reply, message);
   }
 
   public unauthorized(reply: FastifyReply, message = '') {

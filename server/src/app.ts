@@ -64,11 +64,16 @@ app.addHook('onRequest', (request, reply, done) => {
 });
 
 app.setErrorHandler((err: FastifyError, _req: FastifyRequest, reply: FastifyReply) => {
+  if (err.validation) {
+    return new JsonResponse(422).badRequest(reply, err.message);
+  }
+
   if (err.message.includes('Authentication failed')) {
     return new JsonResponse(401).unauthorized(reply, err.message);
   } else if (err.message === 'Unauthorized action') {
     return new JsonResponse(403).unauthorized(reply, err.message);
   }
+
   return new JsonResponse(500).error(reply, err.message);
 });
 
