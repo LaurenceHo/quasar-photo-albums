@@ -15,7 +15,7 @@ vi.mock('../../../../src/services/photo-service', () => ({
       Promise.resolve({
         data: mockPhotoList,
       }),
-    movePhotos: () => Promise.resolve({ status: 'Success' }),
+    movePhotos: () => Promise.resolve({ status: 'Success', code: 200 }),
   })),
 }));
 

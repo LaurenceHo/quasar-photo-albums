@@ -41,7 +41,7 @@ For the detailed tutorial, you can check [here](https://dev.to/laurenceho/a-full
 
 ### Built With
 
-[![Quasar][quasar]][quasar-url][![Vue][Vue.js]][Vue-url][![TypeScript][typescript]][type-url][![Vite][vite]][vite-url][![AWS][aws]][aws-url]
+[![Quasar][quasar]][quasar-url][![Vue][Vue.js]][Vue-url][![TypeScript][typescript]][type-url][![Vite][vite]][vite-url][![Fastify][fastify]][fastify-url][![AWS][aws]][aws-url]
 
 ### Architecture
 
@@ -219,3 +219,5 @@ See [Configuring quasar.conf.js](https://v2.quasar.dev/quasar-cli/quasar-conf-js
 [type-url]: https://www.typescriptlang.org/
 [vite]: https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E
 [vite-url]: https://vitejs.dev/
+[fastify]: https://img.shields.io/badge/fastify-202020?style=for-the-badge&logo=fastify&logoColor=white
+[fastify-url]: https://fastify.dev/

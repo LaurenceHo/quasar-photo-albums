@@ -206,7 +206,7 @@ const confirmUpdateAlbum = async () => {
   }
 
   isProcessing.value = false;
-  if (result.status !== 'Error') {
+  if (result.code === 200) {
     store.updateAlbum(albumToBeSubmitted, false);
     resetAlbum();
   }

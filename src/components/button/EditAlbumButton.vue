@@ -80,7 +80,7 @@ const setAlbum = () => {
 const confirmDeleteAlbum = async () => {
   isProcessing.value = true;
   const result = await albumService.deleteAlbum(albumItem?.value.id);
-  if (result.status === 'Success') {
+  if (result.code === 200) {
     store.updateAlbum(albumItem?.value as Album, true);
   }
   deleteAlbum.value = false;
