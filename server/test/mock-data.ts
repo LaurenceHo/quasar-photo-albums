@@ -28,7 +28,7 @@ export const mockAlbumList = [
     tags: ['tag1'],
   },
   {
-    albumCover: 'demo-album-4/village-8501168_640.jpg',
+    albumCover: '',
     isPrivate: true,
     order: 3,
     place: {
@@ -54,5 +54,26 @@ export const mockAlbumList = [
     description: 'This is demo album 3',
     id: 'demo-album3',
     tags: ['tag1'],
+  },
+];
+
+export const mockPhotoList = [
+  {
+    url: '/demo-album1/batch_berlin-8429780.jpg',
+    key: 'berlin-8429780.jpg',
+    size: 180940,
+    lastModified: '2023-12-29T00:18:28.000Z',
+  },
+  {
+    url: '/demo-album1/batch_bird-8360220.jpg',
+    key: 'bird-8360220.jpg',
+    size: 97523,
+    lastModified: '2023-12-29T00:18:29.000Z',
+  },
+  {
+    url: '/demo-album1/batch_castle-8033915.jpg',
+    key: 'castle-8033915.jpg',
+    size: 75139,
+    lastModified: '2023-12-29T00:18:30.000Z',
   },
 ];

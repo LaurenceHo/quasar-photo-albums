@@ -4,7 +4,7 @@ import { get, isEmpty } from 'radash';
 import { Photo, PhotosRequest, RenamePhotoRequest } from '../models.js';
 import { cleanJwtCookie } from '../routes/auth-middleware.js';
 import AlbumService from '../services/album-service.js';
-import { S3Service } from '../services/s3-service.js';
+import S3Service from '../services/s3-service.js';
 import { BaseController } from './base-controller.js';
 import { deleteObjects, updatePhotoAlbum, uploadObject } from './helpers.js';
 

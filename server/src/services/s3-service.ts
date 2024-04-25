@@ -15,7 +15,7 @@ import { get } from 'radash';
 import { BaseService, Photo } from '../models.js';
 import { configuration } from './config.js';
 
-export class S3Service implements BaseService<Photo> {
+export default class S3Service implements BaseService<Photo> {
   public readonly s3Client = new S3Client(configuration);
   public readonly cdnURL = process.env.IMAGEKIT_CDN_URL;
 
