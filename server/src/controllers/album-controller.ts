@@ -11,6 +11,8 @@ const albumService = new AlbumService();
 
 export default class AlbumController extends BaseController {
   findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+    const { year = 'n/a' } = request.query as { year: string };
+
     try {
       let isAdmin = false;
       const token = get(request, 'cookies.jwt', '');
@@ -31,6 +33,8 @@ export default class AlbumController extends BaseController {
       }
       // TODO - Need to sort by order
       const albumList = await albumService.findAll(
+        'query',
+        { indexName: 'byYear', key: { year } },
         ['year', 'id', 'albumName', 'albumCover', 'description', 'tags', 'isPrivate', 'place', 'order'],
         query
       );
