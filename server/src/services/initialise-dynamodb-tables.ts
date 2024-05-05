@@ -1,6 +1,6 @@
 import { CreateTableCommand, DescribeTableCommand } from '@aws-sdk/client-dynamodb';
-import { Album, AlbumEntity, albumTableName, albumTableSchema } from '../schemas/album.js';
 import { AlbumTag, AlbumTagEntity, albumTagsTableName, albumTagsTableSchema } from '../schemas/album-tag.js';
+import { Album, AlbumEntity, albumTableName, albumTableSchema } from '../schemas/album.js';
 import {
   UserPermission,
   UserPermissionEntity,
@@ -47,6 +47,7 @@ const initialiseAlbumTable = async () => {
         if (value) {
           console.log(`Īnsert mock data into ${albumTableName} table......`);
           await AlbumEntity.create({
+            year: 'n/a',
             id: 'test-album-1',
             albumName: 'Test Album 1',
             description: 'This is a test album 1',
@@ -61,9 +62,7 @@ const initialiseAlbumTable = async () => {
               },
             },
             tags: ['test-tag-1'],
-            createdAt: new Date().toISOString(),
             createdBy: 'System',
-            updatedAt: new Date().toISOString(),
             updatedBy: 'System',
             order: 1,
           } as Album).go({ response: 'none' });

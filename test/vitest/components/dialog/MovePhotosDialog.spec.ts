@@ -32,7 +32,7 @@ describe('MovePhotosDialog.vue', () => {
           createTestingPinia({
             initialState: {
               albums: {
-                allAlbumList: mockAlbumList,
+                albumList: mockAlbumList,
               },
             },
           }),

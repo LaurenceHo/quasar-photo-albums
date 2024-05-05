@@ -17,7 +17,7 @@ const initialState: UserState = {
     role: '',
     displayName: '',
   },
-  isCheckingUserPermission: true,
+  isCheckingUserPermission: false,
 };
 
 export const userStore = defineStore('user-permission', {

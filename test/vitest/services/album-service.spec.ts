@@ -19,7 +19,7 @@ describe('album-service.ts', () => {
 
     albumService.getAlbums();
     expect(mockSetDisplayingParameters).toHaveBeenCalledWith(false);
-    expect(mockPerform).toHaveBeenCalledWith('GET', '');
+    expect(mockPerform).toHaveBeenCalledWith('GET', '?year=n/a');
   });
 
   it('Call createAlbum API with correct parameters', () => {

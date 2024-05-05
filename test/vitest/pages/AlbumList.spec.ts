@@ -21,7 +21,7 @@ describe('AlbumList.vue', () => {
           createTestingPinia({
             initialState: {
               albums: {
-                allAlbumList: mockAlbumList,
+                albumList: mockAlbumList,
                 albumTags: ['sport', 'food', 'hiking', 'secret'],
               },
             },
@@ -62,6 +62,14 @@ describe('AlbumList.vue', () => {
     store.searchKey = '';
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.totalItems).toEqual(5);
+  });
+
+  it('Search album list by year', async () => {
+    const { vm } = wrapper as any;
+    const store = albumStore();
+    vm.selectedYear = '2024';
+    await vm.$nextTick();
+    expect(store.getAlbumsByYear).toHaveBeenCalledWith('2024');
   });
 
   it('Search album list by category', async () => {

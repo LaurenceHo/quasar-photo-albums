@@ -9,12 +9,13 @@ import { userStore } from 'stores/user-store';
 
 export interface AlbumState {
   loadingAllAlbumInformation: boolean;
-  allAlbumList: Album[];
+  albumList: Album[];
   albumTags: AlbumTag[];
   searchKey: string;
   sortOrder: 'asc' | 'desc';
   refreshAlbumList: boolean;
   selectedAlbumItem: Album;
+  selectedYear: string;
 }
 
 const albumService = new AlbumService();
@@ -22,12 +23,13 @@ const albumTagService = new AlbumTagService();
 
 const initialState: AlbumState = {
   loadingAllAlbumInformation: true,
-  allAlbumList: [],
+  albumList: [],
   albumTags: [],
   searchKey: '',
   sortOrder: 'desc',
   refreshAlbumList: false,
   selectedAlbumItem: {
+    year: 'n/a',
     id: '',
     albumName: '',
     albumCover: '',
@@ -36,6 +38,7 @@ const initialState: AlbumState = {
     isPrivate: false,
     order: 0,
   },
+  selectedYear: 'n/a',
 };
 export const albumStore = defineStore('albums', {
   state: () => initialState,
@@ -44,13 +47,13 @@ export const albumStore = defineStore('albums', {
     getAlbumById:
       (state: AlbumState) =>
       (id: string): Album | undefined =>
-        state.allAlbumList.find((album) => album.id === id),
+        state.albumList.find((album) => album.id === id),
 
     chunkAlbumList:
       (state: AlbumState) =>
       (firstIndex: number, lastIndex: number): Album[] => {
-        if (!isEmpty(state.allAlbumList)) {
-          return state.allAlbumList.slice(firstIndex, lastIndex);
+        if (!isEmpty(state.albumList)) {
+          return state.albumList.slice(firstIndex, lastIndex);
         } else {
           return [];
         }
@@ -59,7 +62,7 @@ export const albumStore = defineStore('albums', {
     filteredAlbumList:
       (state: AlbumState) =>
       (searchKey: string, selectedTags: string[], privateAlbum: boolean): Album[] => {
-        let filteredAlbumList = state.allAlbumList;
+        let filteredAlbumList = state.albumList;
         if (privateAlbum) {
           filteredAlbumList = filteredAlbumList.filter((album) => album.isPrivate);
         }
@@ -86,87 +89,92 @@ export const albumStore = defineStore('albums', {
       },
 
     albumsHaveLocation: (state: AlbumState) =>
-      state.allAlbumList.filter((album) => album.place?.location?.latitude && album.place?.location?.longitude),
+      state.albumList.filter((album) => album.place?.location?.latitude && album.place?.location?.longitude),
 
     isAlbumCover: (state: AlbumState) => (photoKey: string) => state.selectedAlbumItem.albumCover === photoKey,
   },
 
   actions: {
-    async getAllAlbumInformation() {
-      // Check user permission
-      const store = userStore();
-      await store.checkUserPermission();
-      const isAdminUser = store.isAdminUser;
+    async getAlbumsByYear(year?: string) {
+      const tempAlbumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
+      const tempAlbumsString = LocalStorage.getItem('FILTERED_ALBUMS_BY_YEAR');
+      const { year: yearForCompare }: { year: string; albums: Album[] } =
+        !isEmpty(tempAlbumsString) && typeof tempAlbumsString === 'string' ? JSON.parse(tempAlbumsString) : {};
 
-      if (this.allAlbumList.length === 0 || this.albumTags.length === 0) {
-        const tempAlbumsString = LocalStorage.getItem('ALL_ALBUMS');
-        const tempAlbumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
+      this.loadingAllAlbumInformation = true;
 
+      if (this.albumList.length === 0 || (year !== undefined && year !== yearForCompare)) {
         // If updated time from localStorage is empty or different from S3, get albums from database
         const compareResult = await compareDbUpdatedTime();
-        if (!compareResult.isLatest || isEmpty(tempAlbumsString) || isEmpty(tempAlbumTagsString)) {
-          this.loadingAllAlbumInformation = true;
-
-          const { data: albums } = await albumService.getAlbums();
+        if (
+          !compareResult.isLatest ||
+          isEmpty(tempAlbumsString) ||
+          (!isEmpty(tempAlbumsString) && year !== undefined && year !== yearForCompare)
+        ) {
+          const { data: albums } = await albumService.getAlbums(year);
           if (albums) {
-            const albumsString = JSON.stringify(albums);
-            LocalStorage.set('ALL_ALBUMS', albumsString);
+            const persistedAlbumData = {
+              year,
+              albums,
+            };
+            LocalStorage.set('FILTERED_ALBUMS_BY_YEAR', JSON.stringify(persistedAlbumData));
           }
 
-          const { data: tags } = await albumTagService.getAlbumTags();
-          if (tags) {
-            const albumTagsString = JSON.stringify(tags);
-            LocalStorage.set('ALBUM_TAGS', albumTagsString);
+          // Only fetch tags if it's empty
+          if (isEmpty(tempAlbumTagsString)) {
+            const { data: tags } = await albumTagService.getAlbumTags();
+            if (tags) {
+              const albumTagsString = JSON.stringify(tags);
+              LocalStorage.set('ALBUM_TAGS', albumTagsString);
+            }
           }
           // Set updated time in local storage
           LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
         }
 
         // Get albums from local storage again
-        const albumsString: string = LocalStorage.getItem('ALL_ALBUMS') || '';
-        let tempList: Album[] = !isEmpty(albumsString) ? JSON.parse(albumsString) : [];
-        if (!isAdminUser) {
-          tempList = tempList.filter((album) => !album.isPrivate);
-        }
+        const albumsString: string = LocalStorage.getItem('FILTERED_ALBUMS_BY_YEAR') || '';
+        const { year: parsedYear, albums }: { year: string; albums: Album[] } = JSON.parse(albumsString);
 
-        this.allAlbumList = sortByKey(tempList, 'albumName', this.sortOrder);
-
+        this.selectedYear = parsedYear;
+        this.albumList = sortByKey(albums, 'albumName', this.sortOrder);
         // Get album tags from local storage again
         const albumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
         const tempAlbumTags: { tag: string }[] = !isEmpty(albumTagsString) ? JSON.parse(albumTagsString) : [];
         this.albumTags = tempAlbumTags.sort((a, b) => a.tag.localeCompare(b.tag));
-
-        this.loadingAllAlbumInformation = false;
       }
+      this.loadingAllAlbumInformation = false;
     },
 
     updateAlbumCover(albumToBeUpdated: Album) {
-      const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
-      this.allAlbumList.splice(findIndex, 1, albumToBeUpdated);
+      const findIndex = this.albumList.findIndex((album) => album.id === albumToBeUpdated.id);
+      this.albumList.splice(findIndex, 1, albumToBeUpdated);
       // Update the selected album item in the store so that the album cover is updated in the photo detail dialog
       this.selectedAlbumItem = albumToBeUpdated;
       this.refreshAlbumList = true;
     },
 
     updateAlbum(albumToBeUpdated: Album, deleteAlbum: boolean) {
-      const findIndex = this.allAlbumList.findIndex((album) => album.id === albumToBeUpdated.id);
-      if (findIndex === -1) {
-        this.allAlbumList.push(albumToBeUpdated);
-        this.allAlbumList = this.allAlbumList.sort((a, b) => {
-          if (this.sortOrder === 'asc') {
-            return a.albumName.localeCompare(b.albumName);
-          } else {
-            return b.albumName.localeCompare(a.albumName);
-          }
-        });
-      } else {
-        if (deleteAlbum) {
-          this.allAlbumList.splice(findIndex, 1);
+      if (this.selectedYear === albumToBeUpdated.year) {
+        const findIndex = this.albumList.findIndex((album) => album.id === albumToBeUpdated.id);
+        if (findIndex === -1) {
+          this.albumList.push(albumToBeUpdated);
+          this.albumList = this.albumList.sort((a, b) => {
+            if (this.sortOrder === 'asc') {
+              return a.albumName.localeCompare(b.albumName);
+            } else {
+              return b.albumName.localeCompare(a.albumName);
+            }
+          });
         } else {
-          this.allAlbumList.splice(findIndex, 1, albumToBeUpdated);
+          if (deleteAlbum) {
+            this.albumList.splice(findIndex, 1);
+          } else {
+            this.albumList.splice(findIndex, 1, albumToBeUpdated);
+          }
         }
+        this.refreshAlbumList = true;
       }
-      this.refreshAlbumList = true;
     },
 
     updateRefreshAlbumListFlag() {
@@ -181,6 +189,14 @@ export const albumStore = defineStore('albums', {
         this.albumTags.push(albumTag);
       }
       this.albumTags = this.albumTags.sort((a, b) => a.tag.localeCompare(b.tag));
+    },
+
+    setSearchKey(searchKey: string) {
+      this.searchKey = searchKey;
+    },
+
+    setAlbumList(albums: Album[]) {
+      this.albumList = albums;
     },
   },
 });

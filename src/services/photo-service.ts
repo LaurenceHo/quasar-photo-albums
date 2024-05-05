@@ -7,9 +7,9 @@ export default class PhotoService extends HttpRequestService {
     this.baseUrl = this.baseUrl + '/photos';
   }
 
-  getPhotosByAlbumId(albumId: string): Promise<ApiResponse<Photo[]>> {
+  getPhotosByAlbumId(albumId: string, year: string): Promise<ApiResponse<Photo[]>> {
     this.setDisplayingParameters(true);
-    return this.perform('GET', `/${albumId}`);
+    return this.perform('GET', `/${year}/${albumId}`);
   }
 
   uploadPhotos(file: any, albumId: string): Promise<ResponseStatus> {

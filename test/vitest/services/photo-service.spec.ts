@@ -16,9 +16,9 @@ describe('photo-service.ts', () => {
   it('Call getPhotosByAlbumId API with correct parameters', () => {
     const photoService = new PhotoService();
 
-    photoService.getPhotosByAlbumId('test-album-id');
+    photoService.getPhotosByAlbumId('test-album-id', '2024');
     expect(mockSetDisplayingParameters).toHaveBeenCalledWith(true);
-    expect(mockPerform).toHaveBeenCalledWith('GET', '/test-album-id');
+    expect(mockPerform).toHaveBeenCalledWith('GET', '/test-album-id?year=2024');
   });
 
   it('Call uploadPhotos API with correct parameters', () => {
