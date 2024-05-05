@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { app } from '../../src/app';
 import { updatePhotoAlbum } from '../../src/controllers/helpers';
-import { mockAlbumList, mockPhotoList } from '../mock-data';
+import { mockAlbumList, mockPhotoList, mockSignedCookies } from '../mock-data';
 
 vi.mock('../../src/services/album-service', () => ({
   default: vi.fn().mockImplementation(() => ({
@@ -41,8 +41,7 @@ describe('private album route', () => {
       method: 'get',
       url: '/api/photos/test',
       headers: {
-        Cookie:
-          'jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ0ZXN0LXVpZCIsImVtYWlsIjoidGVzdC51c2VyQHRlc3QuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzE0MDEyMjE0LCJleHAiOjE3MTQ2MTcwMTR9.-cJBPNzoFzLOSJb-LDQY31vzejfqVPxfBQZPiBegpv0.dc5i6%2FxNGuN6cJrsj8VGx%2BQRrzm55bporpaiHxTgV8M',
+        Cookie: `jwt=${mockSignedCookies()}`,
       },
     });
     expect(updatePhotoAlbum).toBe(mocks.updatePhotoAlbum);

@@ -3,6 +3,7 @@
 ## Prerequisites
 
 For the detailed tutorial, you can also check [here](https://dev.to/laurenceho/deploy-app-to-aws-by-using-serverless-framework-2gen).
+You can also check how to migrate Express.js to Fastify [here](https://dev.to/laurenceho/from-expressjs-to-fastify-45d4).
 
 ### Create AWS user in IAM
 

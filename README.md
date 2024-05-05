@@ -33,7 +33,7 @@
 
 ## About The Project
 
-This is a fullstack photo album web app using Vue3, Quasar, Fastifys and AWS (including API Gateway, Lambda
+This is a fullstack photo album web app using Vue3, Quasar, Fastify and AWS (including API Gateway, Lambda
 function, S3, CloudFront and dynamoDB). You can use this web app to display your photos in S3 bucket and manage your photos. This app
 is supposed to be used by a small group of people (e.g. family members) so it doesn't have any user management feature.
 

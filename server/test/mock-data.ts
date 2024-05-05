@@ -1,3 +1,6 @@
+import jwt from 'jsonwebtoken';
+import signerFactory from '@fastify/cookie/signer';
+
 export const mockAlbumList = [
   {
     albumCover: 'demo-album2/batch_bird-8360220.jpg',
@@ -77,3 +80,16 @@ export const mockPhotoList = [
     lastModified: '2023-12-29T00:18:30.000Z',
   },
 ];
+
+const mockUserPermission = {
+  uid: 'test-123',
+  email: 'test-user@test.com',
+  role: 'admin',
+  displayName: 'test-user',
+};
+
+export const mockSignedCookies = () => {
+  const token = jwt.sign(mockUserPermission, process.env.JWT_SECRET as string, { expiresIn: '7d' });
+  const signer = signerFactory(process.env.JWT_SECRET);
+  return signer.sign(token);
+};

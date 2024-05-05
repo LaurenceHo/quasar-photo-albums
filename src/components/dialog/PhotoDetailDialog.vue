@@ -28,8 +28,8 @@
                   :src="selectedImage?.url"
                   class="rounded-borders-lg responsive-image"
                   style="margin: auto"
-                  :width="isPhotoLandscape || $q.screen.lt.md ? `${imageDisplayWidth}px` : undefined"
-                  :height="!isPhotoLandscape && $q.screen.gt.sm ? `${imageDisplayHeight}px` : undefined"
+                  :width="isPhotoLandscape || $q.screen.lt.sm ? `${imageDisplayWidth}px` : undefined"
+                  :height="!isPhotoLandscape && $q.screen.gt.xs ? `${imageDisplayHeight}px` : undefined"
                   @load="loadImage = false"
                 />
               </div>
