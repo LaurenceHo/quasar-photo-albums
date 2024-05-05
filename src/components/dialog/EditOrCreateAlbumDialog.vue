@@ -234,7 +234,7 @@ watch(
       albumName.value = getAlbumToBeUpdate.value.albumName;
       albumDesc.value = getAlbumToBeUpdate.value.description ?? '';
       privateAlbum.value = getAlbumToBeUpdate.value.isPrivate;
-      selectedAlbumTags.value = getAlbumToBeUpdate.value.tags;
+      selectedAlbumTags.value = getAlbumToBeUpdate.value.tags ?? [];
       selectedPlace.value = getAlbumToBeUpdate.value.place ?? null;
     }
   },

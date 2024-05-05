@@ -51,6 +51,11 @@ You can see the initial dynamodb table in [./src/services/initialise-dynamodb-ta
 
 Once the tables are created, you can check them in AWS DynamoDB console.
 
+#### ElectroDB
+
+The server uses [ElectroDB](https://electrodb.dev) to operate documentations in DynamoDB.
+ElectroDB eases the use of having multiple entities and complex hierarchical relationships in a single DynamoDB table.
+
 ### Get Google Places API key
 
 You need to create a Google Places API key, so you can find a location information and attach it to your album object in DynamoDB.

@@ -31,7 +31,7 @@ export default class AlbumController extends BaseController {
       }
       // TODO - Need to sort by order
       const albumList = await albumService.findAll(
-        ['id', 'albumName', 'albumCover', 'description', 'tags', 'isPrivate', 'place', 'order'],
+        ['year', 'id', 'albumName', 'albumCover', 'description', 'tags', 'isPrivate', 'place', 'order'],
         query
       );
 
