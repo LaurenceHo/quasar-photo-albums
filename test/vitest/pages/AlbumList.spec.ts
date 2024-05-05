@@ -64,6 +64,14 @@ describe('AlbumList.vue', () => {
     expect(wrapper.vm.totalItems).toEqual(5);
   });
 
+  it('Search album list by year', async () => {
+    const { vm } = wrapper as any;
+    const store = albumStore();
+    vm.selectedYear = '2024';
+    await vm.$nextTick();
+    expect(store.getAlbumsByYear).toHaveBeenCalledWith('2024');
+  });
+
   it('Search album list by category', async () => {
     const { vm } = wrapper as any;
     vm.selectedTags = ['food'];

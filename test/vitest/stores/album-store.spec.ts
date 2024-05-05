@@ -187,7 +187,7 @@ describe('Album Store', () => {
     expect(store.albumTags.length).toEqual(3);
   });
 
-  it('getAllAlbumInformation', async () => {
+  it('getAlbumsByYear', async () => {
     const store = albumStore();
     await store.getAlbumsByYear();
     expect(store.albumList.length).toEqual(6);

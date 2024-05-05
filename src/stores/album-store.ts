@@ -95,8 +95,9 @@ export const albumStore = defineStore('albums', {
 
   actions: {
     async getAlbumsByYear(year?: string) {
-      const tempAlbumsString: string = LocalStorage.getItem('FILTERED_ALBUMS_BY_YEAR') || '';
-      const { year: yearForCompare }: { year: string; albums: Album[] } = JSON.parse(tempAlbumsString);
+      const tempAlbumsString = LocalStorage.getItem('FILTERED_ALBUMS_BY_YEAR');
+      const { year: yearForCompare }: { year: string; albums: Album[] } =
+        !isEmpty(tempAlbumsString) && typeof tempAlbumsString === 'string' ? JSON.parse(tempAlbumsString) : {};
 
       this.loadingAllAlbumInformation = true;
       // Check user permission
