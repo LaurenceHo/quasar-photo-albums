@@ -7,6 +7,15 @@
 
       <q-form @submit.prevent.stop="confirmUpdateAlbum">
         <q-card-section class="q-pt-none scroll" style="max-height: 50vh">
+          <q-select
+            v-model="selectedYear"
+            class="q-pb-lg"
+            :options="yearOptions"
+            dense
+            label="Year"
+            outlined
+            :disable="getAlbumToBeUpdate.id !== ''"
+          />
           <q-input
             v-model="albumId"
             :disable="getAlbumToBeUpdate.id !== ''"
@@ -14,7 +23,7 @@
             :rules="[
               (val: string) => !!val || 'Album id is required',
               (val: string) =>
-                /^[A-Za-z0-9\s-_]*$/.test(val) || 'Only alphanumeric, space, underscore and dash are allowed',
+                /^[a-z0-9\s-_]*$/.test(val) || 'Only lowercase alphanumeric, space, underscore and dash are allowed',
             ]"
             autofocus
             class="q-pb-lg"
@@ -144,6 +153,7 @@ const { getUpdateAlbumDialogState, setUpdateAlbumDialogState } = DialogStateComp
 const { getAlbumToBeUpdate, setAlbumToBeUpdated } = SelectedItemsComposable();
 const { albumTags, filterTags } = AlbumTagsFilterComposable();
 
+const selectedYear = ref(String(new Date().getFullYear()));
 const albumId = ref('');
 const albumName = ref('');
 const albumDesc = ref('');
@@ -182,6 +192,7 @@ const confirmUpdateAlbum = async () => {
   isProcessing.value = true;
 
   const albumToBeSubmitted: Album = {
+    year: selectedYear.value,
     id: getAlbumToBeUpdate.value.id || albumId.value,
     albumCover: getAlbumToBeUpdate.value.albumCover,
     albumName: albumName.value,
@@ -215,6 +226,7 @@ const confirmUpdateAlbum = async () => {
 const resetAlbum = () => {
   selectedPlace.value = null;
   setAlbumToBeUpdated({
+    year: String(new Date().getFullYear()),
     id: '',
     albumName: '',
     albumCover: '',
@@ -226,10 +238,17 @@ const resetAlbum = () => {
   setUpdateAlbumDialogState(false);
 };
 
+const yearOptions = ['n/a'];
+const currentYear = new Date().getFullYear();
+for (let i = currentYear; 2000 <= i; i--) {
+  yearOptions.push(String(i));
+}
+
 watch(
   getUpdateAlbumDialogState,
   (newValue) => {
     if (newValue) {
+      selectedYear.value = getAlbumToBeUpdate.value.year ?? String(new Date().getFullYear());
       albumId.value = getAlbumToBeUpdate.value.id;
       albumName.value = getAlbumToBeUpdate.value.albumName;
       albumDesc.value = getAlbumToBeUpdate.value.description ?? '';

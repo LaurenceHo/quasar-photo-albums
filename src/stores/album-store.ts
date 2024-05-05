@@ -29,6 +29,7 @@ const initialState: AlbumState = {
   sortOrder: 'desc',
   refreshAlbumList: false,
   selectedAlbumItem: {
+    year: 'n/a',
     id: '',
     albumName: '',
     albumCover: '',
@@ -160,24 +161,26 @@ export const albumStore = defineStore('albums', {
     },
 
     updateAlbum(albumToBeUpdated: Album, deleteAlbum: boolean) {
-      const findIndex = this.albumList.findIndex((album) => album.id === albumToBeUpdated.id);
-      if (findIndex === -1) {
-        this.albumList.push(albumToBeUpdated);
-        this.albumList = this.albumList.sort((a, b) => {
-          if (this.sortOrder === 'asc') {
-            return a.albumName.localeCompare(b.albumName);
-          } else {
-            return b.albumName.localeCompare(a.albumName);
-          }
-        });
-      } else {
-        if (deleteAlbum) {
-          this.albumList.splice(findIndex, 1);
+      if (this.selectedYear === albumToBeUpdated.year) {
+        const findIndex = this.albumList.findIndex((album) => album.id === albumToBeUpdated.id);
+        if (findIndex === -1) {
+          this.albumList.push(albumToBeUpdated);
+          this.albumList = this.albumList.sort((a, b) => {
+            if (this.sortOrder === 'asc') {
+              return a.albumName.localeCompare(b.albumName);
+            } else {
+              return b.albumName.localeCompare(a.albumName);
+            }
+          });
         } else {
-          this.albumList.splice(findIndex, 1, albumToBeUpdated);
+          if (deleteAlbum) {
+            this.albumList.splice(findIndex, 1);
+          } else {
+            this.albumList.splice(findIndex, 1, albumToBeUpdated);
+          }
         }
+        this.refreshAlbumList = true;
       }
-      this.refreshAlbumList = true;
     },
 
     updateRefreshAlbumListFlag() {

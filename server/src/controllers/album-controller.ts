@@ -35,7 +35,7 @@ export default class AlbumController extends BaseController {
       const albumList = await albumService.findAll(
         'query',
         { indexName: 'byYear', key: { year } },
-        ['id', 'albumName', 'albumCover', 'description', 'tags', 'isPrivate', 'place', 'order'],
+        ['year', 'id', 'albumName', 'albumCover', 'description', 'tags', 'isPrivate', 'place', 'order'],
         query
       );
 
