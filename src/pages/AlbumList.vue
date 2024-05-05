@@ -34,7 +34,10 @@
           @click="updateSortOrder"
         />
       </div>
-      <div class="col-12 col-xl-3 col-lg-3 col-md-4 q-pb-sm">
+      <div class="col-12 col-xl-1 col-lg-1 col-md-2 col-sm-3 q-mr-sm q-pb-sm">
+        <q-select v-model="selectedYear" :options="yearOptions" dense label="Year" outlined />
+      </div>
+      <div class="col-12 col-xl-3 col-lg-3 col-md-4 col-sm-5 q-pb-sm">
         <q-select
           v-model="selectedTags"
           :options="albumTags"
@@ -117,10 +120,11 @@ const { albumTags, filterTags } = AlbumTagsFilterComposable();
 const pageNumber = ref(1);
 const itemsPerPage = ref(20);
 const albumStyle = ref((route.query.albumStyle as string) || 'list'); // List is default style
-const totalItems = ref(store.allAlbumList.length);
+const totalItems = ref(store.albumList.length);
 const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
 const selectedTags = ref([]);
 const privateAlbum = ref(false);
+const selectedYear = ref(store.selectedYear);
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const sortOrder = computed(() => store.sortOrder);
@@ -141,7 +145,7 @@ const getFilteredAlbumList = () => {
     totalItems.value = filteredAlbumList.length;
     chunkAlbumList.value = filteredAlbumList.slice(firstIndex.value, lastIndex.value);
   } else {
-    totalItems.value = store.allAlbumList.length;
+    totalItems.value = store.albumList.length;
     chunkAlbumList.value = store.chunkAlbumList(firstIndex.value, lastIndex.value);
   }
 };
@@ -158,9 +162,15 @@ const setPageParams = (params: { pageNumber: number; itemsPerPage: number }) => 
 
 const updateSortOrder = () => store.$patch({ sortOrder: sortOrder.value === 'desc' ? 'asc' : 'desc' });
 
+const yearOptions = ['n/a'];
+const currentYear = new Date().getFullYear();
+for (let i = currentYear; 2000 <= i; i--) {
+  yearOptions.push(String(i));
+}
+
 // Only update the order of album list when user click sort button in order to prevent sorting multiple times
 watch(sortOrder, (newValue) => {
-  store.$patch({ allAlbumList: sortByKey(store.allAlbumList, 'albumName', newValue) });
+  store.setAlbumList(sortByKey(store.albumList, 'albumName', newValue));
   getFilteredAlbumList();
 });
 
@@ -168,6 +178,12 @@ watch(refreshAlbumList, (newValue) => {
   if (newValue) {
     getFilteredAlbumList();
     store.updateRefreshAlbumListFlag();
+  }
+});
+
+watch(selectedYear, (newValue) => {
+  if (newValue) {
+    store.getAlbumsByYear(newValue);
   }
 });
 

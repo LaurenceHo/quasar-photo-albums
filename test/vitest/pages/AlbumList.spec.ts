@@ -21,7 +21,7 @@ describe('AlbumList.vue', () => {
           createTestingPinia({
             initialState: {
               albums: {
-                allAlbumList: mockAlbumList,
+                albumList: mockAlbumList,
                 albumTags: ['sport', 'food', 'hiking', 'secret'],
               },
             },

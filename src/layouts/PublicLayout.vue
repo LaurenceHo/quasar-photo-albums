@@ -111,7 +111,7 @@ const buttonToggle = ref(
   routeName.value === 'Albums' || routeName.value === 'Photos' ? 'photos' : routeName.value === 'Map' ? 'map' : ''
 );
 
-store.getAllAlbumInformation();
+store.getAlbumsByYear();
 
 const logout = () => {
   authService.logout().then(() => {
@@ -121,7 +121,7 @@ const logout = () => {
 };
 
 watch(searchKey, (newValue) => {
-  store.$patch({ searchKey: newValue });
+  store.setSearchKey(newValue);
 });
 
 watch(routeName, (newValue) => {

@@ -56,7 +56,7 @@ export const photoStore = defineStore('photos', {
           if (code && code !== 200) {
             if (code > 400 && code < 500) {
               LocalStorage.remove('ALL_ALBUMS');
-              await useAlbumStore.getAllAlbumInformation();
+              await useAlbumStore.getAlbumsByYear();
             }
             setTimeout(() => window.location.assign('/'), 3000);
           }

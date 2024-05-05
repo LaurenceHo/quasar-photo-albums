@@ -44,7 +44,7 @@ describe('Album Store', () => {
 
   afterEach(() => {
     const store = albumStore();
-    store.allAlbumList = [];
+    store.albumList = [];
   });
 
   it('updateRefreshAlbumListFlag', () => {
@@ -56,7 +56,7 @@ describe('Album Store', () => {
 
   it('filteredAlbumList', () => {
     const store = albumStore();
-    store.allAlbumList = mockAlbumList;
+    store.albumList = mockAlbumList;
     expect(store.filteredAlbumList('', [], false)).toEqual(mockAlbumList);
     expect(store.filteredAlbumList('food', [], false)).toEqual([
       { id: 'Food', albumName: 'Food title', description: 'Food desc', tags: ['food', 'test'], isPrivate: false },
@@ -83,13 +83,13 @@ describe('Album Store', () => {
         },
       },
     ]);
-    store.allAlbumList = [];
+    store.albumList = [];
     expect(store.chunkAlbumList(0, 2)).toEqual([]);
   });
 
   it('albumsHaveLocation', () => {
     const store = albumStore();
-    store.allAlbumList = mockAlbumList;
+    store.albumList = mockAlbumList;
     expect(store.albumsHaveLocation).toEqual([
       {
         id: 'do-something-secret',
@@ -111,7 +111,7 @@ describe('Album Store', () => {
 
   it('updateAlbumCover', () => {
     const store = albumStore();
-    store.allAlbumList = mockAlbumList;
+    store.albumList = mockAlbumList;
     store.updateAlbumCover({
       id: 'Sport',
       albumName: 'Sport Update',
@@ -119,12 +119,12 @@ describe('Album Store', () => {
       tags: ['sport'],
       isPrivate: false,
     });
-    expect(store.allAlbumList[0].albumName).toEqual('Sport Update');
+    expect(store.albumList[0].albumName).toEqual('Sport Update');
   });
 
   it('updateAlbum', () => {
     const store = albumStore();
-    store.allAlbumList = mockAlbumList;
+    store.albumList = mockAlbumList;
     // If album exists
     store.updateAlbum(
       {
@@ -136,8 +136,8 @@ describe('Album Store', () => {
       },
       false
     );
-    expect(store.allAlbumList[0].albumName).toEqual('Sport Update');
-    expect(store.allAlbumList.length).toEqual(5);
+    expect(store.albumList[0].albumName).toEqual('Sport Update');
+    expect(store.albumList.length).toEqual(5);
     // If album doesn't exist
     store.updateAlbum(
       {
@@ -149,8 +149,8 @@ describe('Album Store', () => {
       },
       false
     );
-    expect(store.allAlbumList.length).toEqual(6);
-    expect(store.allAlbumList.find((album) => album.id === 'Sport1')).not.toBeNull();
+    expect(store.albumList.length).toEqual(6);
+    expect(store.albumList.find((album) => album.id === 'Sport1')).not.toBeNull();
     // Delete album
     store.updateAlbum(
       {
@@ -162,7 +162,7 @@ describe('Album Store', () => {
       },
       true
     );
-    expect(store.allAlbumList.length).toEqual(5);
+    expect(store.albumList.length).toEqual(5);
   });
 
   it('updateAlbumTags', () => {
@@ -189,9 +189,9 @@ describe('Album Store', () => {
 
   it('getAllAlbumInformation', async () => {
     const store = albumStore();
-    await store.getAllAlbumInformation();
-    expect(store.allAlbumList.length).toEqual(6);
-    expect(store.allAlbumList[0]).toEqual({
+    await store.getAlbumsByYear();
+    expect(store.albumList.length).toEqual(6);
+    expect(store.albumList[0]).toEqual({
       albumCover: 'album5/aaa.jpg',
       isPrivate: false,
       order: 213,

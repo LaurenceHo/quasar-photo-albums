@@ -157,7 +157,7 @@ const isSearching = ref(false);
 const locationLatitude = computed(() => selectedPlace.value?.location?.latitude);
 const locationLongitude = computed(() => selectedPlace.value?.location?.longitude);
 
-const amountOfAllAlbums = computed(() => store.allAlbumList.length);
+const amountOfAlbums = computed(() => store.albumList.length);
 const searchPlace = async (searchText: string) => {
   if (searchText) {
     isSearching.value = true;
@@ -187,7 +187,7 @@ const confirmUpdateAlbum = async () => {
     albumName: albumName.value,
     description: albumDesc.value,
     isPrivate: privateAlbum.value,
-    order: getAlbumToBeUpdate.value.id ? getAlbumToBeUpdate.value.order : amountOfAllAlbums.value,
+    order: getAlbumToBeUpdate.value.id ? getAlbumToBeUpdate.value.order : amountOfAlbums.value,
   };
 
   if (!isEmpty(selectedAlbumTags.value)) {

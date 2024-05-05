@@ -91,7 +91,7 @@ const store = albumStore();
 
 const { albumId } = toRefs(props);
 const duplicatedPhotoKeys = ref<string[]>([]);
-const filteredAlbumsList = ref(store.allAlbumList.filter((album) => album.id !== albumId.value));
+const filteredAlbumsList = ref(store.albumList.filter((album) => album.id !== albumId.value));
 const selectedAlbum = ref(filteredAlbumsList.value[0]?.id ?? '');
 const isProcessing = ref(false);
 
@@ -106,14 +106,14 @@ const photoKeysArray = computed(
 const filterAlbums = (input: string, update: any) => {
   if (input === '') {
     update(() => {
-      filteredAlbumsList.value = store.allAlbumList.filter((album) => album.id !== albumId.value);
+      filteredAlbumsList.value = store.albumList.filter((album) => album.id !== albumId.value);
     });
     return;
   }
 
   update(() => {
     const needle = input.toLowerCase();
-    filteredAlbumsList.value = store.allAlbumList.filter(
+    filteredAlbumsList.value = store.albumList.filter(
       (album) => album.albumName.toLowerCase().indexOf(needle) > -1 && album.id !== albumId.value
     );
   });

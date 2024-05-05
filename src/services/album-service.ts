@@ -7,15 +7,9 @@ export default class AlbumService extends HttpRequestService {
     this.baseUrl = this.baseUrl + '/albums';
   }
 
-  public getAlbums(
-    sort?: string,
-    startIndex?: number,
-    endIndex?: number,
-    filter?: string
-  ): Promise<ApiResponse<Album[]>> {
-    // TODO: May need to apply filter in the feature. It only runs filter in the memory atm.
+  public getAlbums(filter = 'n/a'): Promise<ApiResponse<Album[]>> {
     this.setDisplayingParameters(false);
-    return this.perform('GET', '');
+    return this.perform('GET', `?year=${filter}`);
   }
 
   public createAlbum(album: Album): Promise<ResponseStatus> {
