@@ -267,7 +267,7 @@ Please check [here](https://docs.aws.amazon.com/apigateway/latest/developerguide
 - /api/albums - GET: Get all albums
 - /api/albums - POST: Create a new album
 - /api/albums - PUT: Update an album
-- /api/albums/:albumId - DELETE: Delete an album
+- /api/albums - DELETE: Delete an album
 
 ### Album tags
 

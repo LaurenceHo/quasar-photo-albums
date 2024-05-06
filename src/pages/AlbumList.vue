@@ -107,7 +107,7 @@ import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composa
 import { albumStore } from 'src/stores/album-store';
 import { sortByKey } from 'src/utils/helper';
 import { userStore } from 'stores/user-store';
-import { computed, ref, watch } from 'vue';
+import { computed, onBeforeMount, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
@@ -124,7 +124,7 @@ const totalItems = ref(store.albumList.length);
 const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
 const selectedTags = ref([]);
 const privateAlbum = ref(false);
-const selectedYear = ref(store.selectedYear);
+const selectedYear = ref((route.query.year as string) || store.selectedYear || 'n/a');
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const sortOrder = computed(() => store.sortOrder);
@@ -139,6 +139,10 @@ const sortIcon = computed(() =>
   sortOrder.value === 'desc' ? 'mdi-sort-alphabetical-descending' : 'mdi-sort-alphabetical-ascending'
 );
 
+onBeforeMount(() => {
+  store.getAlbumsByYear(route.query.year as string);
+});
+
 const getFilteredAlbumList = () => {
   if (!isEmpty(searchKey.value) || !isEmpty(selectedTags.value) || privateAlbum.value) {
     const filteredAlbumList = store.filteredAlbumList(searchKey.value, selectedTags.value, privateAlbum.value);
@@ -152,7 +156,7 @@ const getFilteredAlbumList = () => {
 
 const setAlbumStyle = (type: 'list' | 'grid') => {
   albumStyle.value = type;
-  router.replace({ query: { albumStyle: type } });
+  router.replace({ query: { ...route.query, albumStyle: type } });
 };
 
 const setPageParams = (params: { pageNumber: number; itemsPerPage: number }) => {
@@ -184,6 +188,7 @@ watch(refreshAlbumList, (newValue) => {
 watch(selectedYear, (newValue) => {
   if (newValue) {
     store.getAlbumsByYear(newValue);
+    router.replace({ query: { ...route.query, year: newValue } });
   }
 });
 

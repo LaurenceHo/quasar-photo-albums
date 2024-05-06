@@ -85,16 +85,15 @@ export default class AlbumController extends BaseController {
   };
 
   delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const albumId = (request.params as any)['albumId'] as string;
-
     try {
-      console.log('##### Delete album:', albumId);
+      const requestBody = request.body as { id: string; year: string };
+      console.log('##### Delete album:', requestBody.id);
       // Empty S3 folder
-      const result = await emptyS3Folder(albumId);
+      const result = await emptyS3Folder(requestBody.id);
 
       if (result) {
         // Delete album from database
-        const result = await albumService.delete({ id: albumId });
+        const result = await albumService.delete(requestBody);
 
         if (result) {
           await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));

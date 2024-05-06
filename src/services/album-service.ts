@@ -22,8 +22,8 @@ export default class AlbumService extends HttpRequestService {
     return this.perform('PUT', '', album);
   }
 
-  public deleteAlbum(albumId: string): Promise<ResponseStatus> {
+  public deleteAlbum(albumId: string, year: string): Promise<ResponseStatus> {
     this.setDisplayingParameters(true, 'Album deleted');
-    return this.perform('DELETE', `/${albumId}`);
+    return this.perform('DELETE', '', { id: albumId, year });
   }
 }

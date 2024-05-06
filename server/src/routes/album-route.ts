@@ -7,8 +7,11 @@ const controller = new AlbumController();
 
 const albumSchema = {
   type: 'object',
-  required: ['id', 'albumName', 'isPrivate'],
+  required: ['year', 'id', 'albumName', 'isPrivate'],
   properties: {
+    year: {
+      type: 'string',
+    },
     id: {
       type: 'string',
     },
@@ -80,16 +83,20 @@ const albumRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
     },
   });
 
-  instance.delete('/api/albums/:albumId', {
+  instance.delete('/api/albums', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
       relation: 'and',
     }),
     handler: controller.delete,
     schema: {
-      params: {
+      body: {
         type: 'object',
+        required: ['year', 'id'],
         properties: {
-          albumId: {
+          year: {
+            type: 'string',
+          },
+          id: {
             type: 'string',
           },
         },

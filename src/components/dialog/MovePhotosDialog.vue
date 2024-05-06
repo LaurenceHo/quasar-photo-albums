@@ -121,7 +121,7 @@ const filterAlbums = (input: string, update: any) => {
 
 const confirmMovePhotos = async () => {
   isProcessing.value = true;
-  const photosInSelectedAlbum = await photoService.getPhotosByAlbumId(selectedAlbum.value);
+  const photosInSelectedAlbum = await photoService.getPhotosByAlbumId(selectedAlbum.value, store.selectedYear);
   const tempDuplicatedPhotoKeys =
     photosInSelectedAlbum.data
       ?.filter((photo) => photoKeysArray.value.includes(photo.key.split('/')[1]))

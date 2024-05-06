@@ -96,15 +96,12 @@ export const albumStore = defineStore('albums', {
 
   actions: {
     async getAlbumsByYear(year?: string) {
+      const tempAlbumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
       const tempAlbumsString = LocalStorage.getItem('FILTERED_ALBUMS_BY_YEAR');
       const { year: yearForCompare }: { year: string; albums: Album[] } =
         !isEmpty(tempAlbumsString) && typeof tempAlbumsString === 'string' ? JSON.parse(tempAlbumsString) : {};
 
       this.loadingAllAlbumInformation = true;
-      // Check user permission
-      const store = userStore();
-      await store.checkUserPermission();
-      const isAdminUser = store.isAdminUser;
 
       if (this.albumList.length === 0 || (year !== undefined && year !== yearForCompare)) {
         // If updated time from localStorage is empty or different from S3, get albums from database
@@ -123,10 +120,13 @@ export const albumStore = defineStore('albums', {
             LocalStorage.set('FILTERED_ALBUMS_BY_YEAR', JSON.stringify(persistedAlbumData));
           }
 
-          const { data: tags } = await albumTagService.getAlbumTags();
-          if (tags) {
-            const albumTagsString = JSON.stringify(tags);
-            LocalStorage.set('ALBUM_TAGS', albumTagsString);
+          // Only fetch tags if it's empty
+          if (isEmpty(tempAlbumTagsString)) {
+            const { data: tags } = await albumTagService.getAlbumTags();
+            if (tags) {
+              const albumTagsString = JSON.stringify(tags);
+              LocalStorage.set('ALBUM_TAGS', albumTagsString);
+            }
           }
           // Set updated time in local storage
           LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
@@ -135,21 +135,15 @@ export const albumStore = defineStore('albums', {
         // Get albums from local storage again
         const albumsString: string = LocalStorage.getItem('FILTERED_ALBUMS_BY_YEAR') || '';
         const { year: parsedYear, albums }: { year: string; albums: Album[] } = JSON.parse(albumsString);
-        let tempList: Album[] = albums ?? [];
-        if (!isAdminUser) {
-          tempList = tempList.filter((album) => !album.isPrivate);
-        }
 
         this.selectedYear = parsedYear;
-        this.albumList = sortByKey(tempList, 'albumName', this.sortOrder);
-
+        this.albumList = sortByKey(albums, 'albumName', this.sortOrder);
         // Get album tags from local storage again
         const albumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
         const tempAlbumTags: { tag: string }[] = !isEmpty(albumTagsString) ? JSON.parse(albumTagsString) : [];
         this.albumTags = tempAlbumTags.sort((a, b) => a.tag.localeCompare(b.tag));
-
-        this.loadingAllAlbumInformation = false;
       }
+      this.loadingAllAlbumInformation = false;
     },
 
     updateAlbumCover(albumToBeUpdated: Album) {

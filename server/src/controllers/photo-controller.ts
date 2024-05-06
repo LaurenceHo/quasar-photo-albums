@@ -17,10 +17,11 @@ export default class PhotoController extends BaseController {
    * Get all photos from an album
    */
   findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+    const { year = 'n/a' } = request.query as { year: string };
     const albumId = (request.params as any)['albumId'] as string;
 
     try {
-      const album = await albumService.findOne({ id: albumId });
+      const album = await albumService.findOne({ id: albumId, year });
       // Only fetch photos when album exists
       if (!isEmpty(album)) {
         // If album is private, check if user has the admin permission

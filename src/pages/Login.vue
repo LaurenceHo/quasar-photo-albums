@@ -43,7 +43,7 @@ onMounted(() => {
           message: `Welcome, ${userPermission.displayName}`,
           timeout: 2000,
         });
-        LocalStorage.remove('ALL_ALBUMS');
+        LocalStorage.remove('FILTERED_ALBUMS_BY_YEAR');
         setTimeout(() => window.location.assign('/'), 1000);
       } else {
         q.notify({

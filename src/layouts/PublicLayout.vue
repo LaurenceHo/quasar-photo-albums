@@ -111,6 +111,7 @@ const buttonToggle = ref(
   routeName.value === 'Albums' || routeName.value === 'Photos' ? 'photos' : routeName.value === 'Map' ? 'map' : ''
 );
 
+userPermissionStore.checkUserPermission();
 store.getAlbumsByYear();
 
 const logout = () => {
