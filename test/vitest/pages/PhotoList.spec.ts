@@ -80,10 +80,6 @@ describe('PhotoList.vue', () => {
           createTestingPinia({
             initialState: {
               albums: {
-                albums: {
-                  albumList: mockAlbumList,
-                  albumTags: ['sport', 'food', 'hiking', 'secret'],
-                },
                 getAlbumById: (id: string) => mockAlbumList.find((album) => album.id === id),
                 updateAlbumCover: mockUpdateAlbumCover,
               },
@@ -99,7 +95,6 @@ describe('PhotoList.vue', () => {
                 },
               },
             },
-            stubActions: true,
           }),
         ],
       },

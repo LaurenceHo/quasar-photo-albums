@@ -61,13 +61,13 @@ describe('PhotoDetailDialog.vue', () => {
     expect(vm.selectedImageIndex).toBe(1);
 
     // Click next button
-    wrapper.findComponent('[data-test-id="next-photo-button"]').trigger('click');
+    await wrapper.findComponent('[data-test-id="next-photo-button"]').trigger('click');
     await vm.$nextTick();
     expect(vm.selectedImageIndex).toBe(2);
     expect(vm.photoFileName).toEqual('photo3.jpg');
 
     // Click next button again
-    wrapper.findComponent('[data-test-id="next-photo-button"]').trigger('click');
+    await wrapper.findComponent('[data-test-id="next-photo-button"]').trigger('click');
     await vm.$nextTick();
     expect(vm.selectedImageIndex).toBe(3);
     expect(vm.photoFileName).toEqual('cover.jpg');
