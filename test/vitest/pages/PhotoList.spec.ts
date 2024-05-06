@@ -29,7 +29,7 @@ vi.mock('../../../src/services/photo-service', () => ({
 }));
 describe('PhotoList.vue', () => {
   it('Check photo list', async () => {
-    await router.push('/album/Food');
+    await router.push('/album/2024/food');
     await router.isReady();
 
     const wrapper = mount(PhotoList, {
@@ -70,7 +70,7 @@ describe('PhotoList.vue', () => {
 
   it('Check photo list with manage panel', async () => {
     const mockUpdateAlbumCover = vi.fn();
-    await router.push('/album/do-something-secret');
+    await router.push('/album/2024/do-something-secret');
     await router.isReady();
 
     const wrapper = mount(PhotoList, {
@@ -99,6 +99,7 @@ describe('PhotoList.vue', () => {
                 },
               },
             },
+            stubActions: true,
           }),
         ],
       },

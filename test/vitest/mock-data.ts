@@ -16,16 +16,25 @@ export const mockFetch = () => {
 export const mockAlbumTagList = [{ tag: 'sport' }, { tag: 'food' }, { tag: 'hiking' }];
 export const mockAlbumList: Album[] = [
   {
-    id: 'Sport',
+    year: '2024',
+    id: 'sport',
     albumName: 'Sport',
     description: 'Sport desc',
     tags: ['sport'],
     isPrivate: false,
   },
-  { id: 'Food', albumName: 'Food title', description: 'Food desc', tags: ['food', 'test'], isPrivate: false },
-  { id: 'Hiking', albumName: 'Hiking', description: 'Hiking desc', tags: ['hiking'], isPrivate: false },
-  { id: 'Shoes', albumName: 'Shoes', description: 'Shoes desc', tags: [], isPrivate: false },
   {
+    year: '2024',
+    id: 'food',
+    albumName: 'Food title',
+    description: 'Food desc',
+    tags: ['food', 'test'],
+    isPrivate: false,
+  },
+  { year: '2024', id: 'hiking', albumName: 'Hiking', description: 'Hiking desc', tags: ['hiking'], isPrivate: false },
+  { year: '2024', id: 'shoes', albumName: 'Shoes', description: 'Shoes desc', tags: [], isPrivate: false },
+  {
+    year: '2024',
     id: 'do-something-secret',
     albumName: 'Do something secret',
     description: 'Do something secret',
@@ -43,12 +52,13 @@ export const mockAlbumList: Album[] = [
 ];
 
 export const mockAlbum = {
-  id: 'Sport',
+  id: 'sport',
   albumName: 'Sport',
   desc: 'Sport',
   tags: ['sport'],
   private: false,
   albumCover: 'thisIsAlbumCover',
+  year: '2024',
 };
 
 export const mockGetAlbumsResponse = {
@@ -64,6 +74,7 @@ export const mockGetAlbumsResponse = {
       description: '',
       id: 'album1',
       tags: [],
+      year: '2024',
     },
     {
       albumCover: 'album1/aaa.jpg',
@@ -73,6 +84,7 @@ export const mockGetAlbumsResponse = {
       description: '',
       id: 'album1',
       tags: [],
+      year: '2024',
     },
     {
       albumCover: 'album2/bbb.jpg',
@@ -82,6 +94,7 @@ export const mockGetAlbumsResponse = {
       description: '',
       id: 'album2',
       tags: [],
+      year: '2024',
     },
     {
       albumCover: 'album3/ccc.jpg',
@@ -91,6 +104,7 @@ export const mockGetAlbumsResponse = {
       description: 'description',
       id: 'album3',
       tags: ['tag1', 'tag2', 'tag3'],
+      year: '2024',
     },
     {
       albumCover: 'album4/ccc.jpg',
@@ -100,6 +114,7 @@ export const mockGetAlbumsResponse = {
       description: 'description',
       id: 'album4',
       tags: ['tag1', 'tag2'],
+      year: '2024',
     },
     {
       albumCover: 'album5/aaa.jpg',
@@ -109,6 +124,7 @@ export const mockGetAlbumsResponse = {
       description: 'description',
       id: 'album5',
       tags: ['tag1'],
+      year: '2024',
     },
   ],
 };

@@ -25,7 +25,7 @@ describe('MovePhotosDialog.vue', () => {
   beforeEach(() => {
     wrapper = mount(MovePhotosDialog, {
       props: {
-        albumId: 'Sport',
+        albumId: 'sport',
       },
       global: {
         plugins: [
@@ -46,7 +46,7 @@ describe('MovePhotosDialog.vue', () => {
     await vm.setMovePhotoDialogState(true);
     await vm.$nextTick();
 
-    expect(vm.selectedAlbum).toEqual('Food');
+    expect(vm.selectedAlbum).toEqual('food');
     expect(wrapper.findComponent('[data-test-id="move-photos-button"]').classes()).toContain('disabled');
   });
 
