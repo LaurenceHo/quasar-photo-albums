@@ -7,12 +7,12 @@ export default class AlbumService extends HttpRequestService {
     this.baseUrl = this.baseUrl + '/albums';
   }
 
-  public getAlbums(filter = 'na'): Promise<ApiResponse<Album[]>> {
-    if (filter === 'n/a') {
-      filter = 'na';
+  public getAlbumsByYear(year = 'na'): Promise<ApiResponse<Album[]>> {
+    if (year === 'n/a') {
+      year = 'na';
     }
     this.setDisplayingParameters(false);
-    return this.perform('GET', `/${filter}`);
+    return this.perform('GET', `/${year}`);
   }
 
   public createAlbum(album: Album): Promise<ResponseStatus> {

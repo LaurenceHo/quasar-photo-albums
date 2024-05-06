@@ -69,6 +69,7 @@
     <q-toggle
       v-if="isAdminUser"
       v-model="privateAlbum"
+      data-test-id="album-private-toggle"
       checked-icon="mdi-lock"
       color="primary"
       icon="mdi-lock-open"
@@ -105,7 +106,7 @@ import { isEmpty } from 'radash';
 import { Album as AlbumItem } from 'src/components/models';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import { albumStore } from 'src/stores/album-store';
-import { sortByKey } from 'src/utils/helper';
+import { getYearOptions, sortByKey } from 'src/utils/helper';
 import { userStore } from 'stores/user-store';
 import { computed, onBeforeMount, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -166,11 +167,7 @@ const setPageParams = (params: { pageNumber: number; itemsPerPage: number }) => 
 
 const updateSortOrder = () => store.$patch({ sortOrder: sortOrder.value === 'desc' ? 'asc' : 'desc' });
 
-const yearOptions = ['n/a'];
-const currentYear = new Date().getFullYear();
-for (let i = currentYear; 2000 <= i; i--) {
-  yearOptions.push(String(i));
-}
+const yearOptions = getYearOptions();
 
 // Only update the order of album list when user click sort button in order to prevent sorting multiple times
 watch(sortOrder, (newValue) => {

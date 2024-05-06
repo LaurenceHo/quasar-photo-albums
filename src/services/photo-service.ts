@@ -17,6 +17,12 @@ export default class PhotoService extends HttpRequestService {
     return this.perform('POST', `/upload/${albumId}`, null, null, { file });
   }
 
+  /**
+   * Move photos from one album to another
+   * @param albumId Original album ID
+   * @param destinationAlbumId Destination album ID
+   * @param photoKeys Keys of photos to be moved
+   */
   movePhotos(albumId: string, destinationAlbumId: string, photoKeys: string[]): Promise<ResponseStatus> {
     this.setDisplayingParameters(true, 'Photos moved');
     return this.perform('PUT', '', { albumId, destinationAlbumId, photoKeys });

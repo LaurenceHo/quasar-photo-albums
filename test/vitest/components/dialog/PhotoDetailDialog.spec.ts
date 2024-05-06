@@ -5,7 +5,7 @@ import { LoadingBar, Notify, QDialog } from 'quasar';
 import { beforeEach, describe, expect, it } from 'vitest';
 import PhotoDetailDialog from '../../../../src/components/dialog/PhotoDetailDialog.vue';
 import { userStore } from '../../../../src/stores/user-store';
-import { mockPhotoList } from '../../mock-data';
+import { mockAlbum, mockPhotoList } from '../../mock-data';
 import { mockRouter as router } from '../../mock-router';
 
 installQuasarPlugin({ components: { QDialog }, plugins: { LoadingBar, Notify } });
@@ -21,14 +21,7 @@ describe('PhotoDetailDialog.vue', () => {
           createTestingPinia({
             initialState: {
               albums: {
-                selectedAlbumItem: {
-                  id: 'album-1',
-                  albumName: 'test album 1',
-                  albumCover: 'album1/cover.jpg',
-                  description: '',
-                  tags: [],
-                  isPrivate: false,
-                },
+                selectedAlbumItem: mockAlbum,
               },
               photos: {
                 photoList: mockPhotoList,
@@ -47,7 +40,7 @@ describe('PhotoDetailDialog.vue', () => {
       },
     });
 
-    await router.push(`/album/album-1?photo=photo2.jpg`);
+    await router.push(`/album/2024/album-1?photo=photo2.jpg`);
     await router.isReady();
   });
 
@@ -86,6 +79,6 @@ describe('PhotoDetailDialog.vue', () => {
     await router.isReady();
     await vm.$nextTick();
     expect(vm.selectedImageIndex).toBe(3);
-    expect(vm.selectedImage).toHaveProperty('url', 'https://example.com/album1/cover.jpg');
+    expect(vm.selectedImage).toHaveProperty('url', 'https://example.com/sport/cover.jpg');
   });
 });

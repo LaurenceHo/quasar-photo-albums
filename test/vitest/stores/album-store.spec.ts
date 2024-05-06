@@ -27,7 +27,7 @@ vi.mock('../../../src/services/auth-service', () => ({
 
 vi.mock('../../../src/services/album-service', () => ({
   default: vi.fn().mockImplementation(() => ({
-    getAlbums: () => Promise.resolve(mockGetAlbumsResponse),
+    getAlbumsByYear: () => Promise.resolve(mockGetAlbumsResponse),
   })),
 }));
 
@@ -69,7 +69,15 @@ describe('Album Store', () => {
       },
     ]);
     expect(store.chunkAlbumList(0, 2)).toEqual([
-      { id: 'sport', albumName: 'Sport', description: 'Sport desc', tags: ['sport'], isPrivate: false, year: '2024' },
+      {
+        id: 'sport',
+        albumName: 'Sport',
+        description: 'Sport desc',
+        tags: ['sport'],
+        isPrivate: false,
+        year: '2024',
+        albumCover: 'thisIsAlbumCover/aaa.jpg',
+      },
       {
         id: 'food',
         albumName: 'Food title',
@@ -156,7 +164,7 @@ describe('Album Store', () => {
       false
     );
     expect(store.albumList[0].albumName).toEqual('Sport Update 2');
-    expect(store.albumList.length).toEqual(5);
+    expect(store.albumList.length).toEqual(11);
     // If album doesn't exist
     store.updateAlbum(
       {
@@ -169,7 +177,7 @@ describe('Album Store', () => {
       },
       false
     );
-    expect(store.albumList.length).toEqual(6);
+    expect(store.albumList.length).toEqual(12);
     expect(store.albumList.find((album) => album.id === 'sport123')).not.toBeNull();
     // Delete album
     store.updateAlbum(
@@ -183,7 +191,7 @@ describe('Album Store', () => {
       },
       true
     );
-    expect(store.albumList.length).toEqual(5);
+    expect(store.albumList.length).toEqual(11);
   });
 
   it('updateAlbumTags', () => {
@@ -211,15 +219,23 @@ describe('Album Store', () => {
   it('getAlbumsByYear', async () => {
     const store = albumStore();
     await store.getAlbumsByYear();
-    expect(store.albumList.length).toEqual(6);
-    expect(store.albumList[0]).toEqual({
-      albumCover: 'album5/aaa.jpg',
+    expect(store.albumList.length).toEqual(11);
+    expect(store.albumList[1]).toEqual({
+      year: '2024',
+      id: 'shoes',
+      albumName: 'Shoes',
+      description: 'Shoes desc',
+      tags: [],
       isPrivate: false,
-      order: 213,
-      albumName: 'album5',
-      description: 'description',
-      id: 'album5',
-      tags: ['tag1'],
+    });
+    expect(store.albumList[10]).toEqual({
+      albumCover: 'album6/aaa.jpg',
+      isPrivate: false,
+      order: 141,
+      albumName: '6-album-6',
+      description: '',
+      id: 'album1',
+      tags: [],
       year: '2024',
     });
     expect(store.albumTags).toEqual(mockGetAlbumTagsResponse.data);

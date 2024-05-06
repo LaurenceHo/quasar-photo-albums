@@ -17,7 +17,7 @@ describe('album-service.ts', () => {
   it('Call getAlbums API with correct parameters', () => {
     const albumService = new AlbumService();
 
-    albumService.getAlbums();
+    albumService.getAlbumsByYear();
     expect(mockSetDisplayingParameters).toHaveBeenCalledWith(false);
     expect(mockPerform).toHaveBeenCalledWith('GET', '/na');
   });

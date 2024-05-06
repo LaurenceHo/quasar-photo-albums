@@ -142,6 +142,7 @@ import DialogStateComposable from 'src/composables/dialog-state-composable';
 import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import AlbumService from 'src/services/album-service';
 import LocationService from 'src/services/location-service';
+import { getYearOptions } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
 import { computed, ref, watch } from 'vue';
 
@@ -238,11 +239,7 @@ const resetAlbum = () => {
   setUpdateAlbumDialogState(false);
 };
 
-const yearOptions = ['n/a'];
-const currentYear = new Date().getFullYear();
-for (let i = currentYear; 2000 <= i; i--) {
-  yearOptions.push(String(i));
-}
+const yearOptions = getYearOptions();
 
 watch(
   getUpdateAlbumDialogState,

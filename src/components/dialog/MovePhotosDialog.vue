@@ -1,15 +1,14 @@
 <template>
   <q-dialog v-model="movePhotoDialogState">
-    <q-card>
+    <q-card style="min-width: 400px">
       <q-card-section>
         <div v-if="duplicatedPhotoKeys.length === 0" class="text-h6">
           Move photo{{ getSelectedPhotoList.length > 1 ? 's' : '' }} to another album
         </div>
         <div v-else class="text-h6">
-          <q-icon name="mdi-file-alert" color="warning" /> Photo{{ duplicatedPhotoKeys.length > 1 ? 's' : '' }} exist{{
-            duplicatedPhotoKeys.length < 2 ? 's' : ''
-          }}
-          in {{ selectedAlbum }}
+          <q-icon name="mdi-file-alert" color="warning" />
+          Photo{{ duplicatedPhotoKeys.length > 1 ? 's' : '' }} exist{{ duplicatedPhotoKeys.length < 2 ? 's' : '' }} in
+          {{ selectedAlbumModel }}
         </div>
       </q-card-section>
 
@@ -18,18 +17,26 @@
           getSelectedPhotoList.length > 1 ? 's' : ''
         }}.
         <q-select
-          v-model="selectedAlbum"
+          v-model="selectedYear"
+          class="q-pb-md"
+          :options="yearOptions"
+          dense
+          label="Year"
+          outlined
+          :disable="isLoadingAlbums"
+        />
+        <q-select
+          v-model="selectedAlbumModel"
           :options="filteredAlbumsList"
           clearable
           dense
-          emit-value
           input-debounce="0"
-          map-options
-          option-label="albumName"
-          option-value="id"
           outlined
           use-input
-          @filter="filterAlbums"
+          label="Album"
+          :disable="isLoadingAlbums"
+          :loading="isLoadingAlbums"
+          @filter="filterAlbumsFunction"
         />
       </q-card-section>
 
@@ -57,7 +64,7 @@
         <q-btn
           v-if="duplicatedPhotoKeys.length === 0"
           data-test-id="move-photos-button"
-          :disable="!selectedAlbum || isProcessing || photoKeysArray.length === 0"
+          :disable="!selectedAlbumModel || isProcessing || photoKeysArray.length === 0"
           :loading="isProcessing"
           color="primary"
           label="Move"
@@ -72,9 +79,12 @@
 <script lang="ts" setup>
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import SelectedItemsComposable from 'src/composables/selected-items-composaable';
+import AlbumService from 'src/services/album-service';
 import PhotoService from 'src/services/photo-service';
+import { getYearOptions } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
-import { computed, ref, toRefs } from 'vue';
+import { computed, ref, toRefs, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
 const emits = defineEmits(['refreshPhotoList', 'closePhotoDetailDialog']);
 const props = defineProps({
@@ -83,18 +93,22 @@ const props = defineProps({
     required: true,
   },
 });
+const { albumId } = toRefs(props);
+
 const { setMovePhotoDialogState, movePhotoDialogState } = DialogStateComposable();
 const { getSelectedPhotoList } = SelectedItemsComposable();
 
+const albumService = new AlbumService();
 const photoService = new PhotoService();
 const store = albumStore();
+const route = useRoute();
 
-const { albumId } = toRefs(props);
-const duplicatedPhotoKeys = ref<string[]>([]);
-const filteredAlbumsList = ref(store.albumList.filter((album) => album.id !== albumId.value));
-const selectedAlbum = ref(filteredAlbumsList.value[0]?.id ?? '');
-const isProcessing = ref(false);
-
+const paramAlbumYear = computed(() => {
+  if ((route.params.year as string) === 'na') {
+    return 'n/a';
+  }
+  return route.params.year as string;
+});
 const photoKeysArray = computed(
   () =>
     getSelectedPhotoList.value.map((photoKey: string) => {
@@ -102,26 +116,41 @@ const photoKeysArray = computed(
       return photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
     }) as string[]
 );
+let staticAlbums = store.albumList
+  .filter((album) => album.id !== albumId.value)
+  .map((album) => ({ label: album.albumName, value: album.id }));
 
-const filterAlbums = (input: string, update: any) => {
+const duplicatedPhotoKeys = ref<string[]>([]);
+const filteredAlbumsList = ref(staticAlbums);
+const selectedAlbumModel = ref(filteredAlbumsList.value[0] ?? { label: '', value: '' });
+const selectedYear = ref(paramAlbumYear.value || store.selectedYear || 'n/a');
+const isProcessing = ref(false);
+const isLoadingAlbums = ref(false);
+
+const yearOptions = getYearOptions();
+
+const filterAlbumsFunction = (input: string, update: any) => {
   if (input === '') {
     update(() => {
-      filteredAlbumsList.value = store.albumList.filter((album) => album.id !== albumId.value);
+      filteredAlbumsList.value = staticAlbums.filter((album) => album.value !== albumId.value);
     });
     return;
   }
 
   update(() => {
     const needle = input.toLowerCase();
-    filteredAlbumsList.value = store.albumList.filter(
-      (album) => album.albumName.toLowerCase().indexOf(needle) > -1 && album.id !== albumId.value
+    filteredAlbumsList.value = staticAlbums.filter(
+      (album) => album.label.toLowerCase().indexOf(needle) > -1 && album.value !== albumId.value
     );
   });
 };
 
 const confirmMovePhotos = async () => {
   isProcessing.value = true;
-  const photosInSelectedAlbum = await photoService.getPhotosByAlbumId(selectedAlbum.value, store.selectedYear);
+  const photosInSelectedAlbum = await photoService.getPhotosByAlbumId(
+    selectedAlbumModel.value.value,
+    store.selectedYear
+  );
   const tempDuplicatedPhotoKeys =
     photosInSelectedAlbum.data
       ?.filter((photo) => photoKeysArray.value.includes(photo.key.split('/')[1]))
@@ -138,7 +167,8 @@ const confirmMovePhotos = async () => {
     return;
   }
 
-  const result = await photoService.movePhotos(albumId?.value, selectedAlbum.value, filteredPhotoKeys);
+  // Only move photos that not exist in the selected album
+  const result = await photoService.movePhotos(albumId?.value, selectedAlbumModel.value.value, filteredPhotoKeys);
   isProcessing.value = false;
   duplicatedPhotoKeys.value = tempDuplicatedPhotoKeys;
 
@@ -150,4 +180,19 @@ const confirmMovePhotos = async () => {
     setMovePhotoDialogState(false);
   }
 };
+
+// Fetch albums when selected year changes
+watch(selectedYear, async (newValue) => {
+  if (newValue) {
+    isLoadingAlbums.value = true;
+    const { data } = await albumService.getAlbumsByYear(newValue);
+    if (data && data.length > 0) {
+      staticAlbums = data
+        .filter((album) => album.id !== albumId.value)
+        .map((album) => ({ label: album.albumName, value: album.id }));
+      selectedAlbumModel.value = staticAlbums[0] ?? { label: '', value: '' };
+    }
+    isLoadingAlbums.value = false;
+  }
+});
 </script>

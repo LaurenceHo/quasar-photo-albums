@@ -111,7 +111,7 @@ export const albumStore = defineStore('albums', {
           isEmpty(tempAlbumsString) ||
           (!isEmpty(tempAlbumsString) && year !== undefined && year !== yearForCompare)
         ) {
-          const { data: albums } = await albumService.getAlbums(year);
+          const { data: albums } = await albumService.getAlbumsByYear(year);
           if (albums) {
             const persistedAlbumData = {
               year,
