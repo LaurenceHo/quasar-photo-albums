@@ -25,6 +25,10 @@ export abstract class BaseController implements IBaseController {
     return new JsonResponse(400).badRequest(reply, message);
   }
 
+  public notFoundError(reply: FastifyReply, message = '') {
+    return new JsonResponse(404).badRequest(reply, message);
+  }
+
   public unauthorized(reply: FastifyReply, message = '') {
     return new JsonResponse(401).unauthorized(reply, message);
   }

@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { get, isEmpty } from 'radash';
-import { Photo, PhotosRequest, RenamePhotoRequest } from '../models.js';
+import { PhotoResponse, PhotosRequest, RenamePhotoRequest } from '../models.js';
 import { cleanJwtCookie } from '../routes/auth-middleware.js';
 import AlbumService from '../services/album-service.js';
 import S3Service from '../services/s3-service.js';
@@ -17,10 +17,11 @@ export default class PhotoController extends BaseController {
    * Get all photos from an album
    */
   findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+    const year = (request.params as any)['year'] as string;
     const albumId = (request.params as any)['albumId'] as string;
 
     try {
-      const album = await albumService.findOne({ id: albumId });
+      const album = await albumService.findOne({ id: albumId, year });
       // Only fetch photos when album exists
       if (!isEmpty(album)) {
         // If album is private, check if user has the admin permission
@@ -66,9 +67,9 @@ export default class PhotoController extends BaseController {
             updatedAt: new Date().toISOString(),
           });
         }
-        return this.ok<Photo[]>(reply, 'ok', photos);
+        return this.ok<PhotoResponse>(reply, 'ok', { album, photos });
       }
-      return this.fail(reply, 'Album not found');
+      return this.notFoundError(reply, 'Album does not exist');
     } catch (err: any) {
       console.error('Failed to get photos:', err);
       return this.fail(reply, 'Failed to get photos');

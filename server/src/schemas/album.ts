@@ -1,5 +1,5 @@
 import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb';
-import { Entity, EntityRecord } from 'electrodb';
+import { CustomAttributeType, Entity, EntityRecord } from 'electrodb';
 import { Place } from '../models.js';
 import { ddbDocClient } from '../services/dynamodb-client.js';
 
@@ -7,24 +7,55 @@ export type Album = EntityRecord<typeof AlbumEntity> & Place;
 
 export const albumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME || 'photo-albums';
 
+type PlaceAttributes =
+  | {
+      displayName: {
+        type: 'string';
+      };
+      formattedAddress: {
+        type: 'string';
+      };
+      location: {
+        type: 'map';
+        properties: {
+          latitude: {
+            type: 'number';
+          };
+          longitude: {
+            type: 'number';
+          };
+        };
+      };
+    }
+  | null
+  | undefined;
+
 export const albumTableSchema: CreateTableCommandInput = {
-  AttributeDefinitions: [
-    {
-      AttributeName: 'id',
-      AttributeType: 'S',
-    },
-  ],
+  TableName: albumTableName,
   KeySchema: [
     {
-      AttributeName: 'id',
+      AttributeName: 'pk',
       KeyType: 'HASH',
+    },
+    {
+      AttributeName: 'sk',
+      KeyType: 'RANGE',
+    },
+  ],
+  AttributeDefinitions: [
+    {
+      AttributeName: 'pk',
+      AttributeType: 'S',
+    },
+    {
+      AttributeName: 'sk',
+      AttributeType: 'S',
     },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 1,
     WriteCapacityUnits: 1,
   },
-  TableName: albumTableName,
 };
 
 export const AlbumEntity = new Entity(
@@ -35,6 +66,11 @@ export const AlbumEntity = new Entity(
       service: 'albumService',
     },
     attributes: {
+      year: {
+        type: 'string',
+        required: true,
+        readOnly: true,
+      },
       // it is the same as the folder name in s3
       id: {
         type: 'string',
@@ -55,31 +91,18 @@ export const AlbumEntity = new Entity(
         type: 'boolean',
         required: true,
       },
+      isFeatured: {
+        type: 'boolean',
+      },
       tags: {
-        type: 'set',
-        items: 'string',
+        // Ideally it should be a set of strings, but we are using a list for now because set cannot be empty in DynamoDB
+        type: 'list',
+        items: {
+          type: 'string',
+        },
       },
       place: {
-        type: 'map',
-        properties: {
-          displayName: {
-            type: 'string',
-          },
-          formattedAddress: {
-            type: 'string',
-          },
-          location: {
-            type: 'map',
-            properties: {
-              latitude: {
-                type: 'number',
-              },
-              longitude: {
-                type: 'number',
-              },
-            },
-          },
-        },
+        type: CustomAttributeType<PlaceAttributes>('any'),
       },
       createdAt: {
         type: 'string',
@@ -103,17 +126,16 @@ export const AlbumEntity = new Entity(
         type: 'string',
         required: true,
       },
-      order: {
-        type: 'number',
-        default: 0,
-      },
     },
     indexes: {
-      albums: {
+      byYear: {
         pk: {
-          field: 'id',
+          field: 'pk',
+          composite: ['year'],
+        },
+        sk: {
+          field: 'sk',
           composite: ['id'],
-          casing: 'none',
         },
       },
     },

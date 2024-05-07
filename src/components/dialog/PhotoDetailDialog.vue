@@ -169,6 +169,7 @@ const photoList = computed(() => usePhotoStore.photoList);
 const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
 
 const albumId = computed(() => route.params.albumId as string);
+const albumYear = computed(() => route.params.year as string);
 const photoId = computed(() => route.query.photo as string);
 // FIXME, we should not use computed for dialog, however, if we don't use it, when we go to next photo, the dialog will close
 const dialog = computed(() => !isEmpty(photoId.value) && selectedImageIndex.value !== -1);
@@ -259,25 +260,23 @@ watch(loadImage, () => {
 });
 
 watch(
-  [photoId, photoList],
-  ([newId, newList]) => {
+  photoId,
+  (newId) => {
     if (fetchingPhotos.value) return;
 
-    if (newId && newList.length > 0) {
+    if (newId) {
       selectedImageIndex.value = usePhotoStore.findPhotoIndex(newId);
     }
 
-    const album = useAlbumStore.getAlbumById(albumId.value);
-
-    if (selectedImageIndex.value === -1 && album) {
+    if (selectedImageIndex.value === -1) {
       q.notify({
         timeout: 2000,
         progress: true,
         color: 'negative',
         icon: 'mdi-alert-circle',
-        message: "Photo doesn't exist",
+        message: 'Photo does not exist',
       });
-      setTimeout(() => router.push(`/album/${albumId.value}`), 3000);
+      setTimeout(() => router.push(`/album/${albumYear.value}/${albumId.value}`), 3000);
     }
   },
   { deep: true, immediate: true }

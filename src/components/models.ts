@@ -1,13 +1,14 @@
 import { ExifTags, FileTags } from 'exifreader';
 
 export interface Album {
+  year: string;
   id: string;
   albumName: string;
   albumCover?: string;
   description?: string;
   isPrivate: boolean;
+  isFeatured?: boolean;
   tags?: string[];
-  order?: number;
   place?: Place | null;
 }
 

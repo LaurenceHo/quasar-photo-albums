@@ -7,15 +7,9 @@ export default class AlbumService extends HttpRequestService {
     this.baseUrl = this.baseUrl + '/albums';
   }
 
-  public getAlbums(
-    sort?: string,
-    startIndex?: number,
-    endIndex?: number,
-    filter?: string
-  ): Promise<ApiResponse<Album[]>> {
-    // TODO: May need to apply filter in the feature. It only runs filter in the memory atm.
+  public getAlbumsByYear(year = 'na'): Promise<ApiResponse<Album[]>> {
     this.setDisplayingParameters(false);
-    return this.perform('GET', '');
+    return this.perform('GET', `/${year}`);
   }
 
   public createAlbum(album: Album): Promise<ResponseStatus> {
@@ -28,8 +22,8 @@ export default class AlbumService extends HttpRequestService {
     return this.perform('PUT', '', album);
   }
 
-  public deleteAlbum(albumId: string): Promise<ResponseStatus> {
+  public deleteAlbum(albumId: string, year: string): Promise<ResponseStatus> {
     this.setDisplayingParameters(true, 'Album deleted');
-    return this.perform('DELETE', `/${albumId}`);
+    return this.perform('DELETE', '', { id: albumId, year });
   }
 }

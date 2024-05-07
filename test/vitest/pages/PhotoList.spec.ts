@@ -13,23 +13,26 @@ vi.mock('../../../src/services/photo-service', () => ({
   default: vi.fn().mockImplementation(() => ({
     getPhotosByAlbumId: () =>
       Promise.resolve({
-        data: [
-          {
-            key: '2020-02-15/batch_2019-08-24 10.32.31.jpg',
-          },
-          {
-            key: '2020-02-15/batch_2019-08-24 10.38.09.jpg',
-          },
-          {
-            key: '2020-02-15/batch_2019-08-24 10.39.21.jpg',
-          },
-        ],
+        data: {
+          album: mockAlbumList[1],
+          photos: [
+            {
+              key: '2020-02-15/batch_2019-08-24 10.32.31.jpg',
+            },
+            {
+              key: '2020-02-15/batch_2019-08-24 10.38.09.jpg',
+            },
+            {
+              key: '2020-02-15/batch_2019-08-24 10.39.21.jpg',
+            },
+          ],
+        },
       }),
   })),
 }));
 describe('PhotoList.vue', () => {
   it('Check photo list', async () => {
-    await router.push('/album/Food');
+    await router.push('/album/2024/food');
     await router.isReady();
 
     const wrapper = mount(PhotoList, {
@@ -39,7 +42,7 @@ describe('PhotoList.vue', () => {
           createTestingPinia({
             initialState: {
               albums: {
-                allAlbumList: mockAlbumList,
+                albumList: mockAlbumList,
                 albumTags: ['sport', 'food', 'hiking', 'secret'],
               },
             },
@@ -70,7 +73,7 @@ describe('PhotoList.vue', () => {
 
   it('Check photo list with manage panel', async () => {
     const mockUpdateAlbumCover = vi.fn();
-    await router.push('/album/do-something-secret');
+    await router.push('/album/2024/do-something-secret');
     await router.isReady();
 
     const wrapper = mount(PhotoList, {
@@ -80,11 +83,7 @@ describe('PhotoList.vue', () => {
           createTestingPinia({
             initialState: {
               albums: {
-                albums: {
-                  allAlbumList: mockAlbumList,
-                  albumTags: ['sport', 'food', 'hiking', 'secret'],
-                },
-                getAlbumById: (id: string) => mockAlbumList.find((album) => album.id === id),
+                selectedAlbumItem: mockAlbumList[4],
                 updateAlbumCover: mockUpdateAlbumCover,
               },
               photos: {

@@ -39,7 +39,7 @@ describe('private album route', () => {
   it('should return correct photos', async () => {
     const response = await app.inject({
       method: 'get',
-      url: '/api/photos/test',
+      url: '/api/photos/2024/test',
       headers: {
         Cookie: `jwt=${mockSignedCookies()}`,
       },
@@ -52,7 +52,10 @@ describe('private album route', () => {
         code: 200,
         status: 'Success',
         message: 'ok',
-        data: mockPhotoList,
+        data: {
+          album: mockAlbumList[2],
+          photos: mockPhotoList,
+        },
       })
     );
   });
@@ -60,7 +63,7 @@ describe('private album route', () => {
   it('should return 401', async () => {
     const response = await app.inject({
       method: 'get',
-      url: '/api/photos/test',
+      url: '/api/photos/2024/test',
     });
     expect(response.statusCode).toBe(401);
   });

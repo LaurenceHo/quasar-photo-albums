@@ -6,12 +6,15 @@ import { verifyJwtClaim, verifyUserPermission } from './auth-middleware.js';
 const controller = new PhotoController();
 
 const photoRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
-  instance.get('/api/photos/:albumId', {
+  instance.get('/api/photos/:year/:albumId', {
     handler: controller.findAll,
     schema: {
       params: {
         type: 'object',
         properties: {
+          year: {
+            type: 'string',
+          },
           albumId: {
             type: 'string',
           },

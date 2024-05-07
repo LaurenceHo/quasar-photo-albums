@@ -10,7 +10,6 @@ export const mockAlbumList = [
       formattedAddress: 'Honolulu, HI, USA',
       location: { latitude: 21.3098845, longitude: -157.85814009999999 },
     },
-    order: 2,
     albumName: 'demo-album 2',
     description: 'This is demo album 2',
     id: 'demo-album2',
@@ -24,7 +23,6 @@ export const mockAlbumList = [
       formattedAddress: '55 Cable Street, Te Aro, Wellington 6011, New Zealand',
       location: { latitude: -41.290456299999995, longitude: 174.7820894 },
     },
-    order: 1,
     albumName: '1 demo-album 1',
     description: 'This is demo album 1',
     id: 'demo-album1',
@@ -33,7 +31,6 @@ export const mockAlbumList = [
   {
     albumCover: '',
     isPrivate: true,
-    order: 3,
     place: {
       displayName: 'Sydney',
       formattedAddress: 'Sydney NSW, Australia',
@@ -47,7 +44,6 @@ export const mockAlbumList = [
   {
     albumCover: 'demo-album3/batch_elks-8430545.jpg',
     isPrivate: false,
-    order: 3,
     place: {
       displayName: 'George Town',
       formattedAddress: 'George Town, Penang, Malaysia',

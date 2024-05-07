@@ -17,9 +17,9 @@ describe('album-service.ts', () => {
   it('Call getAlbums API with correct parameters', () => {
     const albumService = new AlbumService();
 
-    albumService.getAlbums();
+    albumService.getAlbumsByYear();
     expect(mockSetDisplayingParameters).toHaveBeenCalledWith(false);
-    expect(mockPerform).toHaveBeenCalledWith('GET', '');
+    expect(mockPerform).toHaveBeenCalledWith('GET', '/na');
   });
 
   it('Call createAlbum API with correct parameters', () => {
@@ -41,8 +41,8 @@ describe('album-service.ts', () => {
   it('Call deleteAlbum API with correct parameters', () => {
     const albumService = new AlbumService();
 
-    albumService.deleteAlbum('testAlbumId');
+    albumService.deleteAlbum('testAlbumId', '2024');
     expect(mockSetDisplayingParameters).toHaveBeenCalledWith(true, 'Album deleted');
-    expect(mockPerform).toHaveBeenCalledWith('DELETE', '/testAlbumId');
+    expect(mockPerform).toHaveBeenCalledWith('DELETE', '', { id: 'testAlbumId', year: '2024' });
   });
 });

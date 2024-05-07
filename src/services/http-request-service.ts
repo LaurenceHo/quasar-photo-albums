@@ -104,7 +104,7 @@ export default class HttpRequestService {
       errorJson = await response.json();
       // If we can parse error response to JSON, display error message from JSON
       if (this.displayErrorNotification) {
-        notify('negative', errorJson.message || errorJson.status || response.statusText);
+        notify('negative', errorJson.message || errorJson.status || response.statusText, true);
       }
       return errorJson;
     } catch (error) {

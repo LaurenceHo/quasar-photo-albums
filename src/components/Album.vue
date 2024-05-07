@@ -21,7 +21,7 @@
       />
       <EditAlbumButton v-if="isAdminUser" :album-item="albumItem" :album-style="albumStyle" />
     </div>
-    <div class="q-pt-sm text-subtitle2 text-weight-medium">{{ albumItem.albumName }}</div>
+    <div class="q-pt-sm text-subtitle2">{{ albumItem.albumName }}</div>
   </div>
   <template v-else>
     <div class="col-xl-6 col-lg-7 col-md-8 col-sm-10 col-xs-12 q-pa-xs">
@@ -48,12 +48,12 @@
           </q-item-section>
 
           <q-item-section @click="goToAlbum()">
-            <q-item-label class="text-h6 text-weight-medium">{{ albumItem.albumName }}</q-item-label>
-            <q-item-label v-if="albumItem.description" class="text-subtitle1 text-grey-7">
+            <q-item-label class="text-subtitle2" lines="1">{{ albumItem.albumName }}</q-item-label>
+            <q-item-label v-if="albumItem.description" caption lines="1">
               {{ albumItem.description }}
             </q-item-label>
             <div class="flex">
-              <q-chip v-for="tag in albumItem.tags" :key="tag" color="secondary" dense square>{{ tag }}</q-chip>
+              <q-chip v-for="tag in tagsForDisplay" :key="tag" color="secondary" dense square>{{ tag }}</q-chip>{{albumItem?.tags?.length > 3 ? "...": ""}}
             </div>
           </q-item-section>
 
@@ -87,13 +87,13 @@ const props = defineProps({
     required: true,
     default: () =>
       ({
+        year: '',
         id: '',
         albumCover: '',
         albumName: '',
         description: '',
         tags: [],
         isPrivate: true,
-        order: 0,
       }) as Album,
   },
 });
@@ -104,8 +104,9 @@ const router = useRouter();
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.albumCover)}`);
 const thumbnailSize = computed(() => (q.screen.lt.sm ? 60 : 90));
+const tagsForDisplay = computed(() => albumItem.value?.tags ? albumItem.value?.tags.slice(0, 3) : []);
 
-const goToAlbum = () => router.push(`/album/${albumItem.value?.id}`);
+const goToAlbum = () => router.push(`/album/${albumItem.value?.year.replace('/', '')}/${albumItem.value?.id}`);
 </script>
 <style lang="scss" scoped>
 .no-album-cover-square {
