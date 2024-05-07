@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MovePhotosDialog from '../../../../src/components/dialog/MovePhotosDialog.vue';
 import SelectedItemsComposable from '../../../../src/composables/selected-items-composaable';
 import { mockAlbumList, mockPhotoList } from '../../mock-data';
+import { mockRouter as router } from '../../mock-router';
 
 installQuasarPlugin({ components: { QDialog } });
 
@@ -19,26 +20,58 @@ vi.mock('../../../../src/services/photo-service', () => ({
   })),
 }));
 
+vi.mock('../../../../src/services/album-service', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    getAlbumsByYear: () =>
+      Promise.resolve({
+        status: 'Success',
+        code: 200,
+        data: [
+          {
+            year: '2023',
+            id: 'hiking-123',
+            albumName: 'Hiking album name',
+            description: 'Hiking desc',
+            tags: ['hiking'],
+            isPrivate: false,
+          },
+          {
+            year: '2023',
+            id: 'shoes-123',
+            albumName: 'Shoes album name',
+            description: 'Shoes desc',
+            tags: [],
+            isPrivate: false,
+          },
+        ],
+      }),
+  })),
+}));
+
 describe('MovePhotosDialog.vue', () => {
   let wrapper: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     wrapper = mount(MovePhotosDialog, {
       props: {
-        albumId: 'Sport',
+        albumId: 'sport',
       },
       global: {
         plugins: [
+          router,
           createTestingPinia({
             initialState: {
               albums: {
-                allAlbumList: mockAlbumList,
+                albumList: mockAlbumList,
               },
             },
           }),
         ],
       },
     });
+
+    await router.push('/album/na/album-1');
+    await router.isReady();
   });
 
   it('check album select component', async () => {
@@ -46,7 +79,8 @@ describe('MovePhotosDialog.vue', () => {
     await vm.setMovePhotoDialogState(true);
     await vm.$nextTick();
 
-    expect(vm.selectedAlbum).toEqual('Food');
+    expect(vm.paramAlbumYear).toEqual('n/a');
+    expect(vm.selectedAlbumModel).toEqual({ label: 'Food title', value: 'food' });
     expect(wrapper.findComponent('[data-test-id="move-photos-button"]').classes()).toContain('disabled');
   });
 
@@ -61,7 +95,7 @@ describe('MovePhotosDialog.vue', () => {
     // Check photo keys array
     expect(vm.photoKeysArray).toEqual(['1.jpg', '2.jpg']);
 
-    // Click upload button
+    // Click move button
     await wrapper.findComponent('[data-test-id="move-photos-button"]').trigger('click');
     await vm.$nextTick();
     expect(vm.duplicatedPhotoKeys).toEqual([]);
@@ -81,12 +115,25 @@ describe('MovePhotosDialog.vue', () => {
     // Check photo keys array
     expect(vm.photoKeysArray).toEqual(['photo1.jpg', 'photo2.jpg', 'photo3.jpg']);
     expect(vm.duplicatedPhotoKeys).toEqual([]);
-    // Click upload button
+    // Click move button
     await wrapper.findComponent('[data-test-id="move-photos-button"]').trigger('click');
     await vm.$nextTick();
     expect(vm.duplicatedPhotoKeys).toEqual(['photo1.jpg', 'photo2.jpg', 'photo3.jpg']);
     // Check emit event
     expect(wrapper.emitted().closePhotoDetailDialog).toBeUndefined();
     expect(wrapper.emitted().refreshPhotoList).toBeUndefined();
+  });
+
+  it('select album with year', async () => {
+    const { vm } = wrapper as any;
+    await vm.setMovePhotoDialogState(true);
+    await vm.$nextTick();
+
+    const { setSelectedPhotosList } = SelectedItemsComposable();
+    setSelectedPhotosList(['album-1/photo1.jpg', 'album-1/photo2.jpg', 'album-1/photo3.jpg']);
+    await vm.$nextTick();
+    vm.selectedYear = '2023';
+    await vm.$nextTick();
+    expect(vm.selectedAlbumModel).toEqual({ label: 'Hiking album name', value: 'hiking-123' });
   });
 });

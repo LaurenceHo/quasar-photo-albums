@@ -21,8 +21,16 @@ describe('AlbumList.vue', () => {
           createTestingPinia({
             initialState: {
               albums: {
-                allAlbumList: mockAlbumList,
+                albumList: mockAlbumList,
                 albumTags: ['sport', 'food', 'hiking', 'secret'],
+              },
+              'user-permission': {
+                userPermission: {
+                  uid: 'test-uid',
+                  email: 'test@example.com',
+                  role: 'admin',
+                  displayName: 'test-user',
+                },
               },
             },
           }),
@@ -37,8 +45,8 @@ describe('AlbumList.vue', () => {
     await flushPromises();
 
     const { vm } = wrapper as any;
-    expect(vm.totalItems).toEqual(5);
-    expect(vm.chunkAlbumList).toHaveLength(5);
+    expect(vm.totalItems).toEqual(11);
+    expect(vm.chunkAlbumList).toHaveLength(11);
     expect(vm.totalPages).toEqual(1);
     expect(vm.albumStyle).toEqual('list');
 
@@ -61,7 +69,15 @@ describe('AlbumList.vue', () => {
 
     store.searchKey = '';
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.totalItems).toEqual(5);
+    expect(wrapper.vm.totalItems).toEqual(11);
+  });
+
+  it('Search album list by year', async () => {
+    const { vm } = wrapper as any;
+    const store = albumStore();
+    vm.selectedYear = '2024';
+    await vm.$nextTick();
+    expect(store.getAlbumsByYear).toHaveBeenCalledWith('2024');
   });
 
   it('Search album list by category', async () => {
@@ -78,7 +94,7 @@ describe('AlbumList.vue', () => {
     expect(vm.chunkAlbumList[0]).toHaveProperty('albumName', 'Sport');
     await wrapper.findComponent('[data-test-id="album-sort-order-button"]').trigger('click');
     expect(vm.sortOrder).toEqual('asc');
-    expect(vm.chunkAlbumList[0]).toHaveProperty('albumName', 'Do something secret');
+    expect(vm.chunkAlbumList[0]).toHaveProperty('albumName', '6-album-6');
   });
 
   it('Refresh album list', async () => {
@@ -87,5 +103,13 @@ describe('AlbumList.vue', () => {
     store.refreshAlbumList = true;
     await vm.$nextTick();
     expect(store.updateRefreshAlbumListFlag).toHaveBeenCalledOnce();
+  });
+
+  it('Filter private albums', async () => {
+    const { vm } = wrapper as any;
+    await wrapper.findComponent('[data-test-id="album-private-toggle"]').trigger('click');
+    await vm.$nextTick();
+    expect(vm.totalItems).toEqual(1);
+    expect(vm.chunkAlbumList[0]).toHaveProperty('albumName', 'Do something secret');
   });
 });

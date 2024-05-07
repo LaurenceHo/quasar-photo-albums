@@ -58,7 +58,8 @@ const props = defineProps({
   albumItem: {
     type: Object,
     required: true,
-    default: () => ({ id: '', albumName: '', desc: '', tags: [], isPrivate: false, order: 0, place: null }) as Album,
+    default: () =>
+      ({ year: '', id: '', albumName: '', desc: '', tags: [], isPrivate: false, order: 0, place: null }) as Album,
   },
 });
 const { albumItem } = toRefs(props);
@@ -79,7 +80,7 @@ const setAlbum = () => {
 
 const confirmDeleteAlbum = async () => {
   isProcessing.value = true;
-  const result = await albumService.deleteAlbum(albumItem?.value.id);
+  const result = await albumService.deleteAlbum(albumItem?.value.id, albumItem?.value.year);
   if (result.code === 200) {
     store.updateAlbum(albumItem?.value as Album, true);
   }

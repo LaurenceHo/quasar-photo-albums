@@ -4,6 +4,15 @@ export const getStaticFileUrl = (objectKey: string): string => {
   return `${process.env.STATIC_FILES_URL}/${objectKey}`;
 };
 
+export const getYearOptions = () => {
+  const yearOptions = ['n/a'];
+  const currentYear = new Date().getFullYear();
+  for (let i = currentYear; 2000 <= i; i--) {
+    yearOptions.push(String(i));
+  }
+  return yearOptions;
+};
+
 export const compareDbUpdatedTime = async () => {
   const response = await fetch(getStaticFileUrl('updateDatabaseAt.json'));
   const dbUpdatedTimeJSON = await response.json();

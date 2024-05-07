@@ -87,6 +87,7 @@ const props = defineProps({
     required: true,
     default: () =>
       ({
+        year: '',
         id: '',
         albumCover: '',
         albumName: '',
@@ -105,7 +106,7 @@ const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.albumCover)}`);
 const thumbnailSize = computed(() => (q.screen.lt.sm ? 60 : 90));
 
-const goToAlbum = () => router.push(`/album/${albumItem.value?.id}`);
+const goToAlbum = () => router.push(`/album/${albumItem.value?.year.replace('/', '')}/${albumItem.value?.id}`);
 </script>
 <style lang="scss" scoped>
 .no-album-cover-square {

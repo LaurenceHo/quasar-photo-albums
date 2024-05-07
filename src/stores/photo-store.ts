@@ -36,7 +36,7 @@ export const photoStore = defineStore('photos', {
   },
 
   actions: {
-    async getPhotos(albumId: string, refreshPhotosList?: boolean) {
+    async getPhotos(albumId: string, albumYear: string, refreshPhotosList?: boolean) {
       const useAlbumStore = albumStore();
       const albumItem = useAlbumStore.getAlbumById(albumId);
       if (albumItem?.id) {
@@ -49,14 +49,14 @@ export const photoStore = defineStore('photos', {
           }
 
           this.fetchingPhotos = true;
-          const { data, code } = await photoService.getPhotosByAlbumId(albumId);
+          const { data, code } = await photoService.getPhotosByAlbumId(albumId, albumYear);
           this.fetchingPhotos = false;
 
           this.photoList = data ?? [];
           if (code && code !== 200) {
             if (code > 400 && code < 500) {
-              LocalStorage.remove('ALL_ALBUMS');
-              await useAlbumStore.getAllAlbumInformation();
+              LocalStorage.remove('FILTERED_ALBUMS_BY_YEAR');
+              await useAlbumStore.getAlbumsByYear();
             }
             setTimeout(() => window.location.assign('/'), 3000);
           }

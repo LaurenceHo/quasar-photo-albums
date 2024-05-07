@@ -26,7 +26,13 @@
           </q-item-section>
           <q-item-section>Rename Photo</q-item-section>
         </q-item>
-        <q-item v-if="!isAlbumCover" v-close-popup clickable @click="makeCoverPhoto">
+        <q-item
+          v-if="!isAlbumCover"
+          v-close-popup
+          clickable
+          data-test-id="make-album-cover-button"
+          @click="makeCoverPhoto"
+        >
           <q-item-section avatar>
             <q-icon color="primary" name="mdi-folder-image" />
           </q-item-section>

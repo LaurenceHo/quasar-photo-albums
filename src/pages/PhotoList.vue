@@ -154,7 +154,7 @@ import SelectedItemsComposable from 'src/composables/selected-items-composaable'
 import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
@@ -177,6 +177,7 @@ const { getSelectedPhotoList, setSelectedPhotosList } = SelectedItemsComposable(
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const photoStyle = ref((route.query.photoStyle as string) || 'grid'); // Grid is default photo list style
 const albumId = computed(() => route.params.albumId as string);
+const albumYear = computed(() => route.params.year as string);
 const albumItem = computed(() => useAlbumStore.getAlbumById(albumId.value) as Album);
 const photosInAlbum = computed(() => usePhotoStore.photoList as IPhoto[]);
 const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
@@ -195,7 +196,7 @@ const closePhotoDetailDialog = async () => await router.replace({ query: { ...ro
 
 const refreshPhotoList = async () => {
   const isPrevAlbumEmpty = photosInAlbum.value.length === 0;
-  await usePhotoStore.getPhotos(albumId.value, true);
+  await usePhotoStore.getPhotos(albumId.value, albumYear.value, true);
   const isCurrentAlbumEmpty = photosInAlbum.value.length === 0;
   if (isPrevAlbumEmpty) {
     // If album is empty before uploading photos, set the first photo as album cover.
@@ -209,11 +210,13 @@ const refreshPhotoList = async () => {
   setSelectedPhotosList([]);
 };
 
-usePhotoStore.getPhotos(albumId.value);
+onMounted(() => {
+  usePhotoStore.getPhotos(albumId.value, albumYear.value);
+});
 
 watch(albumId, (newValue) => {
   if (newValue) {
-    usePhotoStore.getPhotos(newValue);
+    usePhotoStore.getPhotos(newValue, albumYear.value);
     setSelectedPhotosList([]);
   }
 });

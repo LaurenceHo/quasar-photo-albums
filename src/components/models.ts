@@ -1,6 +1,7 @@
 import { ExifTags, FileTags } from 'exifreader';
 
 export interface Album {
+  year: string;
   id: string;
   albumName: string;
   albumCover?: string;

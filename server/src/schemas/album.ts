@@ -8,23 +8,54 @@ export type Album = EntityRecord<typeof AlbumEntity> & Place;
 export const albumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME || 'photo-albums';
 
 export const albumTableSchema: CreateTableCommandInput = {
+  TableName: albumTableName,
+  KeySchema: [
+    {
+      AttributeName: 'pk',
+      KeyType: 'HASH',
+    },
+    {
+      AttributeName: 'sk',
+      KeyType: 'RANGE',
+    },
+  ],
   AttributeDefinitions: [
     {
-      AttributeName: 'id',
+      AttributeName: 'pk',
+      AttributeType: 'S',
+    },
+    {
+      AttributeName: 'sk',
+      AttributeType: 'S',
+    },
+    {
+      AttributeName: 'gsi1pk',
+      AttributeType: 'S',
+    },
+    {
+      AttributeName: 'gsi1sk',
       AttributeType: 'S',
     },
   ],
-  KeySchema: [
+  GlobalSecondaryIndexes: [
     {
-      AttributeName: 'id',
-      KeyType: 'HASH',
+      IndexName: 'gsi1pk-gsi1sk-index',
+      KeySchema: [
+        {
+          AttributeName: 'gsi1pk',
+          KeyType: 'HASH',
+        },
+        {
+          AttributeName: 'gsi1sk',
+          KeyType: 'RANGE',
+        },
+      ],
+      Projection: {
+        ProjectionType: 'ALL',
+      },
     },
   ],
-  ProvisionedThroughput: {
-    ReadCapacityUnits: 1,
-    WriteCapacityUnits: 1,
-  },
-  TableName: albumTableName,
+  BillingMode: 'PAY_PER_REQUEST',
 };
 
 export const AlbumEntity = new Entity(
@@ -35,6 +66,11 @@ export const AlbumEntity = new Entity(
       service: 'albumService',
     },
     attributes: {
+      year: {
+        type: 'string',
+        required: true,
+        readOnly: true,
+      },
       // it is the same as the folder name in s3
       id: {
         type: 'string',
@@ -105,15 +141,29 @@ export const AlbumEntity = new Entity(
       },
       order: {
         type: 'number',
-        default: 0,
+        default: 1,
       },
     },
     indexes: {
-      albums: {
+      byYear: {
         pk: {
-          field: 'id',
+          field: 'pk',
+          composite: ['year'],
+        },
+        sk: {
+          field: 'sk',
           composite: ['id'],
-          casing: 'none',
+        },
+      },
+      byOrder: {
+        index: 'gsi1pk-gsi1sk-index',
+        pk: {
+          field: 'gsi1pk',
+          composite: ['order'],
+        },
+        sk: {
+          field: 'gsi1sk',
+          composite: ['isPrivate'],
         },
       },
     },

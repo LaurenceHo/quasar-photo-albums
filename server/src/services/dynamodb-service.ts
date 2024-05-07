@@ -15,7 +15,12 @@ export abstract class DynamodbService<T> implements BaseService<T> {
     this._entity = value;
   }
 
-  async findAll(attributes?: Array<keyof T>, whereClause?: ((_val1: any, _val2: any) => string) | null): Promise<T[]> {
+  async findAll<K extends keyof T>(
+    method: 'scan' | 'query' = 'scan',
+    filter?: { indexName: string; key: { [P in K]?: T[P] } },
+    attributes?: Array<keyof T>,
+    whereClause?: ((_val1: any, _val2: any) => string) | null
+  ): Promise<T[]> {
     const options: QueryOptions & { attributes?: Array<keyof T> } = {
       ignoreOwnership: true,
     };
@@ -23,9 +28,13 @@ export abstract class DynamodbService<T> implements BaseService<T> {
       options['attributes'] = attributes;
     }
 
-    const entity = this._entity.scan;
+    let entity = { ...this._entity[method] };
+    if (filter) {
+      entity = entity[filter.indexName](filter.key);
+    }
+
     if (whereClause) {
-      entity.where(whereClause);
+      entity = entity.where(whereClause);
     }
     const response = await entity.go(options);
 

@@ -51,6 +51,11 @@ You can see the initial dynamodb table in [./src/services/initialise-dynamodb-ta
 
 Once the tables are created, you can check them in AWS DynamoDB console.
 
+#### ElectroDB
+
+The server uses [ElectroDB](https://electrodb.dev) to operate documentations in DynamoDB.
+ElectroDB eases the use of having multiple entities and complex hierarchical relationships in a single DynamoDB table.
+
 ### Get Google Places API key
 
 You need to create a Google Places API key, so you can find a location information and attach it to your album object in DynamoDB.
@@ -259,10 +264,10 @@ Please check [here](https://docs.aws.amazon.com/apigateway/latest/developerguide
 
 ### Album
 
-- /api/albums - GET: Get all albums
+- /api/albums/:year - GET: Get albums by year
 - /api/albums - POST: Create a new album
 - /api/albums - PUT: Update an album
-- /api/albums/:albumId - DELETE: Delete an album
+- /api/albums - DELETE: Delete an album
 
 ### Album tags
 
@@ -272,7 +277,7 @@ Please check [here](https://docs.aws.amazon.com/apigateway/latest/developerguide
 
 ### Photos
 
-- /api/photos/:albumId - GET: Get photos by album ID
+- /api/photos/:year/:albumId - GET: Get photos by album ID
 - /api/photos - DELETE: Delete photos
 - /api/photos - PUT: Move photos to different folder
 - /api/photos/rename - PUT: Rename photo

@@ -7,6 +7,15 @@
 
       <q-form @submit.prevent.stop="confirmUpdateAlbum">
         <q-card-section class="q-pt-none scroll" style="max-height: 50vh">
+          <q-select
+            v-model="selectedYear"
+            class="q-pb-lg"
+            :options="yearOptions"
+            dense
+            label="Year"
+            outlined
+            :disable="getAlbumToBeUpdate.id !== ''"
+          />
           <q-input
             v-model="albumId"
             :disable="getAlbumToBeUpdate.id !== ''"
@@ -14,7 +23,7 @@
             :rules="[
               (val: string) => !!val || 'Album id is required',
               (val: string) =>
-                /^[A-Za-z0-9\s-_]*$/.test(val) || 'Only alphanumeric, space, underscore and dash are allowed',
+                /^[a-z0-9\s-_]*$/.test(val) || 'Only lowercase alphanumeric, space, underscore and dash are allowed',
             ]"
             autofocus
             class="q-pb-lg"
@@ -133,6 +142,7 @@ import DialogStateComposable from 'src/composables/dialog-state-composable';
 import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import AlbumService from 'src/services/album-service';
 import LocationService from 'src/services/location-service';
+import { getYearOptions } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
 import { computed, ref, watch } from 'vue';
 
@@ -144,6 +154,7 @@ const { getUpdateAlbumDialogState, setUpdateAlbumDialogState } = DialogStateComp
 const { getAlbumToBeUpdate, setAlbumToBeUpdated } = SelectedItemsComposable();
 const { albumTags, filterTags } = AlbumTagsFilterComposable();
 
+const selectedYear = ref(String(new Date().getFullYear()));
 const albumId = ref('');
 const albumName = ref('');
 const albumDesc = ref('');
@@ -157,7 +168,7 @@ const isSearching = ref(false);
 const locationLatitude = computed(() => selectedPlace.value?.location?.latitude);
 const locationLongitude = computed(() => selectedPlace.value?.location?.longitude);
 
-const amountOfAllAlbums = computed(() => store.allAlbumList.length);
+const amountOfAlbums = computed(() => store.albumList.length);
 const searchPlace = async (searchText: string) => {
   if (searchText) {
     isSearching.value = true;
@@ -182,12 +193,13 @@ const confirmUpdateAlbum = async () => {
   isProcessing.value = true;
 
   const albumToBeSubmitted: Album = {
+    year: selectedYear.value,
     id: getAlbumToBeUpdate.value.id || albumId.value,
     albumCover: getAlbumToBeUpdate.value.albumCover,
     albumName: albumName.value,
     description: albumDesc.value,
     isPrivate: privateAlbum.value,
-    order: getAlbumToBeUpdate.value.id ? getAlbumToBeUpdate.value.order : amountOfAllAlbums.value,
+    order: getAlbumToBeUpdate.value.id ? getAlbumToBeUpdate.value.order : amountOfAlbums.value,
   };
 
   if (!isEmpty(selectedAlbumTags.value)) {
@@ -215,6 +227,7 @@ const confirmUpdateAlbum = async () => {
 const resetAlbum = () => {
   selectedPlace.value = null;
   setAlbumToBeUpdated({
+    year: String(new Date().getFullYear()),
     id: '',
     albumName: '',
     albumCover: '',
@@ -226,15 +239,18 @@ const resetAlbum = () => {
   setUpdateAlbumDialogState(false);
 };
 
+const yearOptions = getYearOptions();
+
 watch(
   getUpdateAlbumDialogState,
   (newValue) => {
     if (newValue) {
+      selectedYear.value = getAlbumToBeUpdate.value.year ?? String(new Date().getFullYear());
       albumId.value = getAlbumToBeUpdate.value.id;
       albumName.value = getAlbumToBeUpdate.value.albumName;
       albumDesc.value = getAlbumToBeUpdate.value.description ?? '';
       privateAlbum.value = getAlbumToBeUpdate.value.isPrivate;
-      selectedAlbumTags.value = getAlbumToBeUpdate.value.tags;
+      selectedAlbumTags.value = getAlbumToBeUpdate.value.tags ?? [];
       selectedPlace.value = getAlbumToBeUpdate.value.place ?? null;
     }
   },

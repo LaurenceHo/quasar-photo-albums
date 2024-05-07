@@ -28,7 +28,7 @@ describe('album route', () => {
   });
 
   it('should return correct albums', async () => {
-    const response = await app.inject({ method: 'get', url: '/api/albums' });
+    const response = await app.inject({ method: 'get', url: '/api/albums/2024' });
     expect(response.statusCode).toBe(200);
     expect(response.payload).toBe(
       JSON.stringify({
@@ -46,7 +46,8 @@ describe('album route', () => {
         method: 'post',
         url: '/api/albums',
         payload: {
-          id: 'Test-album',
+          year: '2024',
+          id: 'test-album',
           albumCover: '',
           albumName: 'Test album',
           description: '',
@@ -76,7 +77,8 @@ describe('album route', () => {
         method: 'put',
         url: '/api/albums',
         payload: {
-          id: 'Test-album',
+          year: '2024',
+          id: 'test-album',
           albumCover: '',
           albumName: 'Test album',
           description: '',
@@ -97,7 +99,14 @@ describe('album route', () => {
 
   describe('delete album', () => {
     it('should return 200', async () => {
-      const response = await app.inject({ method: 'delete', url: '/api/albums/test' });
+      const response = await app.inject({
+        method: 'delete',
+        url: '/api/albums',
+        payload: {
+          year: '2024',
+          id: 'test-album',
+        },
+      });
       expect(response.statusCode).toBe(200);
     });
   });
