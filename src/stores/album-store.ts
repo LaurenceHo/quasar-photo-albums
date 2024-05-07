@@ -4,7 +4,7 @@ import { isEmpty } from 'radash';
 import { Album, AlbumTag } from 'src/components/models';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
-import { compareDbUpdatedTime, sortByKey } from 'src/utils/helper';
+import { compareDbUpdatedTime, getStaticFileUrl, sortByKey } from 'src/utils/helper';
 import { userStore } from 'stores/user-store';
 
 export interface AlbumState {
@@ -96,6 +96,25 @@ export const albumStore = defineStore('albums', {
 
   actions: {
     async getAlbumsByYear(year?: string) {
+      let compareResult = { isLatest: true, time: '' };
+      if (year === undefined) {
+        // If updated time from localStorage is empty or different from S3, get albums from database
+        compareResult = await compareDbUpdatedTime();
+        // Set updated time in local storage
+        LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
+      }
+
+      const setAlbumToLocalStorage = async () => {
+        const { data: albums } = await albumService.getAlbumsByYear(year);
+        if (albums) {
+          const persistedAlbumData = {
+            year,
+            albums,
+          };
+          LocalStorage.set('FILTERED_ALBUMS_BY_YEAR', JSON.stringify(persistedAlbumData));
+        }
+      };
+
       const tempAlbumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
       const tempAlbumsString = LocalStorage.getItem('FILTERED_ALBUMS_BY_YEAR');
       const { year: yearForCompare }: { year: string; albums: Album[] } =
@@ -103,46 +122,35 @@ export const albumStore = defineStore('albums', {
 
       this.loadingAllAlbumInformation = true;
 
-      if (this.albumList.length === 0 || (year !== undefined && year !== yearForCompare)) {
-        // If updated time from localStorage is empty or different from S3, get albums from database
-        const compareResult = await compareDbUpdatedTime();
-        if (
-          !compareResult.isLatest ||
-          isEmpty(tempAlbumsString) ||
-          (!isEmpty(tempAlbumsString) && year !== undefined && year !== yearForCompare)
-        ) {
-          const { data: albums } = await albumService.getAlbumsByYear(year);
-          if (albums) {
-            const persistedAlbumData = {
-              year,
-              albums,
-            };
-            LocalStorage.set('FILTERED_ALBUMS_BY_YEAR', JSON.stringify(persistedAlbumData));
-          }
+      if (year !== undefined && year !== yearForCompare) {
+        await setAlbumToLocalStorage();
+      }
 
-          // Only fetch tags if it's empty
-          if (isEmpty(tempAlbumTagsString)) {
-            const { data: tags } = await albumTagService.getAlbumTags();
-            if (tags) {
-              const albumTagsString = JSON.stringify(tags);
-              LocalStorage.set('ALBUM_TAGS', albumTagsString);
-            }
-          }
-          // Set updated time in local storage
-          LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
+      if (this.albumList.length === 0 || this.albumTags.length === 0) {
+        if (!compareResult.isLatest || isEmpty(tempAlbumsString)) {
+          await setAlbumToLocalStorage();
         }
 
-        // Get albums from local storage again
-        const albumsString: string = LocalStorage.getItem('FILTERED_ALBUMS_BY_YEAR') || '';
-        const { year: parsedYear, albums }: { year: string; albums: Album[] } = JSON.parse(albumsString);
-
-        this.selectedYear = parsedYear;
-        this.albumList = sortByKey(albums, 'albumName', this.sortOrder);
-        // Get album tags from local storage again
-        const albumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
-        const tempAlbumTags: { tag: string }[] = !isEmpty(albumTagsString) ? JSON.parse(albumTagsString) : [];
-        this.albumTags = tempAlbumTags.sort((a, b) => a.tag.localeCompare(b.tag));
+        // Only fetch tags if it's empty
+        if (!compareResult.isLatest || isEmpty(tempAlbumTagsString)) {
+          const { data: tags } = await albumTagService.getAlbumTags();
+          if (tags) {
+            const albumTagsString = JSON.stringify(tags);
+            LocalStorage.set('ALBUM_TAGS', albumTagsString);
+          }
+        }
       }
+      // Get albums from local storage again
+      const albumsString: string = LocalStorage.getItem('FILTERED_ALBUMS_BY_YEAR') || '';
+      const { year: parsedYear, albums: parsedAlbum }: { year: string; albums: Album[] } = JSON.parse(albumsString);
+
+      this.selectedYear = parsedYear;
+      this.albumList = sortByKey(parsedAlbum, 'albumName', this.sortOrder);
+      // Get album tags from local storage again
+      const albumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
+      const tempAlbumTags: { tag: string }[] = !isEmpty(albumTagsString) ? JSON.parse(albumTagsString) : [];
+      this.albumTags = tempAlbumTags.sort((a, b) => a.tag.localeCompare(b.tag));
+
       this.loadingAllAlbumInformation = false;
     },
 
