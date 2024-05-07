@@ -7,7 +7,7 @@
             <q-avatar class="q-mr-sm">
               <img src="/icons/favicon-128x128.png" alt="logo" />
             </q-avatar>
-            {{ $q.screen.gt.xs === true ? albumAppName : '' }}
+            {{ $q.screen.gt.sm === true ? albumAppName : '' }}
           </q-btn>
           <div class="flex no-wrap">
             <q-btn-toggle
@@ -108,10 +108,11 @@ const userPermission = computed(() => userPermissionStore.userPermission as User
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const isCheckingUserPermission = computed(() => userPermissionStore.isCheckingUserPermission);
 const buttonToggle = ref(
-  routeName.value === 'Albums' || routeName.value === 'Photos' ? 'photos' : routeName.value === 'Map' ? 'map' : ''
+  routeName.value === 'AlbumsByYear' || routeName.value === 'Photos' ? 'photos' : routeName.value === 'Map' ? 'map' : ''
 );
 
-store.getAllAlbumInformation();
+userPermissionStore.checkUserPermission();
+store.getAlbumsByYear();
 
 const logout = () => {
   authService.logout().then(() => {
@@ -121,11 +122,11 @@ const logout = () => {
 };
 
 watch(searchKey, (newValue) => {
-  store.$patch({ searchKey: newValue });
+  store.setSearchKey(newValue);
 });
 
 watch(routeName, (newValue) => {
-  if (newValue === 'Albums' || newValue === 'Photos') {
+  if (newValue === 'AlbumsByYear' || newValue === 'Photos') {
     buttonToggle.value = 'photos';
   } else if (newValue === 'Map') {
     buttonToggle.value = 'map';

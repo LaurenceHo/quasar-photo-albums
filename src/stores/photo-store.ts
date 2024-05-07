@@ -2,7 +2,6 @@ import { Photo } from 'components/models';
 import { defineStore } from 'pinia';
 import { LocalStorage } from 'quasar';
 import PhotoService from 'src/services/photo-service';
-import { notify } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
 
 export interface PhotoStoreState {
@@ -36,34 +35,38 @@ export const photoStore = defineStore('photos', {
   },
 
   actions: {
-    async getPhotos(albumId: string, refreshPhotosList?: boolean) {
+    async getPhotos(albumId: string, albumYear: string, refreshPhotosList?: boolean) {
       const useAlbumStore = albumStore();
-      const albumItem = useAlbumStore.getAlbumById(albumId);
-      if (albumItem?.id) {
-        // Only fetch photos when album id is updated
-        if (albumId !== useAlbumStore.selectedAlbumItem.id || refreshPhotosList) {
-          useAlbumStore.selectedAlbumItem = albumItem;
+      // Only fetch photos when album id is updated
+      if (albumId !== useAlbumStore.selectedAlbumItem.id || refreshPhotosList) {
+        this.fetchingPhotos = true;
 
-          if (!refreshPhotosList) {
-            this.photoList = [];
-          }
-
-          this.fetchingPhotos = true;
-          const { data, code } = await photoService.getPhotosByAlbumId(albumId);
-          this.fetchingPhotos = false;
-
-          this.photoList = data ?? [];
-          if (code && code !== 200) {
-            if (code > 400 && code < 500) {
-              LocalStorage.remove('ALL_ALBUMS');
-              await useAlbumStore.getAllAlbumInformation();
-            }
-            setTimeout(() => window.location.assign('/'), 3000);
-          }
+        if (!refreshPhotosList) {
+          this.photoList = [];
         }
-      } else {
-        notify('negative', "Album doesn't exist. You will be redirected to the home page in 3 seconds", true);
-        setTimeout(() => window.location.assign('/'), 3000);
+
+        const { data, code } = await photoService.getPhotosByAlbumId(albumId, albumYear);
+
+        useAlbumStore.selectedAlbumItem = data?.album ?? {
+          year: 'na',
+          id: '',
+          albumName: '',
+          albumCover: '',
+          description: '',
+          tags: [],
+          isPrivate: false,
+        };
+        this.photoList = data?.photos ?? [];
+        this.fetchingPhotos = false;
+
+        if (code && code !== 200) {
+          if (code === 401 || code === 403) {
+            // Temporarily set selected album id to the album id from URL to avoid re-fetching photos
+            useAlbumStore.selectedAlbumItem.id = albumId;
+            LocalStorage.remove('FILTERED_ALBUMS_BY_YEAR');
+          }
+          setTimeout(() => window.location.assign('/'), 3000);
+        }
       }
     },
   },

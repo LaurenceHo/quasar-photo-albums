@@ -34,14 +34,17 @@ describe('photo route', () => {
   });
 
   it('should return correct photos', async () => {
-    const response = await app.inject({ method: 'get', url: '/api/photos/test' });
+    const response = await app.inject({ method: 'get', url: '/api/photos/2024/test' });
     expect(response.statusCode).toBe(200);
     expect(response.payload).toBe(
       JSON.stringify({
         code: 200,
         status: 'Success',
         message: 'ok',
-        data: mockPhotoList,
+        data: {
+          album: mockAlbumList[0],
+          photos: mockPhotoList,
+        },
       })
     );
   });

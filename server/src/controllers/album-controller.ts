@@ -11,6 +11,8 @@ const albumService = new AlbumService();
 
 export default class AlbumController extends BaseController {
   findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+    const year = (request.params as any)['year'] as string;
+
     try {
       let isAdmin = false;
       const token = get(request, 'cookies.jwt', '');
@@ -29,9 +31,10 @@ export default class AlbumController extends BaseController {
       if (!isAdmin) {
         query = ({ isPrivate }: any, { eq }: any) => `${eq(isPrivate, false)}`;
       }
-      // TODO - Need to sort by order
       const albumList = await albumService.findAll(
-        ['id', 'albumName', 'albumCover', 'description', 'tags', 'isPrivate', 'place', 'order'],
+        'query',
+        { indexName: 'byYear', key: { year } },
+        ['year', 'id', 'albumName', 'albumCover', 'description', 'tags', 'isPrivate', 'place', 'isFeatured'],
         query
       );
 
@@ -48,6 +51,16 @@ export default class AlbumController extends BaseController {
     album.updatedBy = (request as RequestWithUser).user?.email ?? 'unknown';
 
     try {
+      const exists = await albumService.findAll(
+        'scan',
+        null,
+        ['id'],
+        ({ id }: any, { eq }: any) => `${eq(id, album.id)}`
+      );
+      if (exists.length > 0) {
+        return this.clientError(reply, 'Album already exists');
+      }
+
       const result = await albumService.create(album);
 
       if (result) {
@@ -81,16 +94,15 @@ export default class AlbumController extends BaseController {
   };
 
   delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const albumId = (request.params as any)['albumId'] as string;
-
     try {
-      console.log('##### Delete album:', albumId);
+      const requestBody = request.body as { id: string; year: string };
+      console.log('##### Delete album:', requestBody.id);
       // Empty S3 folder
-      const result = await emptyS3Folder(albumId);
+      const result = await emptyS3Folder(requestBody.id);
 
       if (result) {
         // Delete album from database
-        const result = await albumService.delete({ id: albumId });
+        const result = await albumService.delete(requestBody);
 
         if (result) {
           await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));

@@ -7,8 +7,11 @@ const controller = new AlbumController();
 
 const albumSchema = {
   type: 'object',
-  required: ['id', 'albumName', 'isPrivate'],
+  required: ['year', 'id', 'albumName', 'isPrivate'],
   properties: {
+    year: {
+      type: 'string',
+    },
     id: {
       type: 'string',
     },
@@ -24,12 +27,15 @@ const albumSchema = {
     isPrivate: {
       type: 'boolean',
     },
+    isFeatured: {
+      type: 'boolean',
+    },
     tags: {
       type: 'array',
       items: { type: 'string' },
     },
     place: {
-      type: 'object',
+      type: ['object', 'null'],
       properties: {
         displayName: {
           type: 'string',
@@ -50,15 +56,23 @@ const albumSchema = {
         },
       },
     },
-    order: {
-      type: 'number',
-      default: 0,
-    },
   },
 };
 
 const albumRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
-  instance.get('/api/albums', controller.findAll);
+  instance.get('/api/albums/:year', {
+    handler: controller.findAll,
+    schema: {
+      params: {
+        type: 'object',
+        properties: {
+          year: {
+            type: 'string',
+          },
+        },
+      },
+    },
+  });
 
   instance.post('/api/albums', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
@@ -80,16 +94,20 @@ const albumRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
     },
   });
 
-  instance.delete('/api/albums/:albumId', {
+  instance.delete('/api/albums', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
       relation: 'and',
     }),
     handler: controller.delete,
     schema: {
-      params: {
+      body: {
         type: 'object',
+        required: ['year', 'id'],
         properties: {
-          albumId: {
+          year: {
+            type: 'string',
+          },
+          id: {
             type: 'string',
           },
         },

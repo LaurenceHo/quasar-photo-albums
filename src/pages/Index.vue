@@ -1,7 +1,7 @@
 <template>
   <q-page>
     <div class="container">
-      <div class="q-pa-md">
+      <div class="q-px-md q-pt-md q-pb-lg">
         <q-breadcrumbs>
           <q-breadcrumbs-el
             v-for="breadcrumb in breadcrumbs"
@@ -11,7 +11,7 @@
             :to="breadcrumb.to"
           />
         </q-breadcrumbs>
-        <template v-if="!loadingAllAlbumInformation">
+        <template v-if="!loadingAllAlbumInformation && !fetchingPhotos">
           <router-view v-slot="{ Component }">
             <keep-alive>
               <component :is="Component" />
@@ -35,14 +35,17 @@
 import SkeletonAlbumList from 'pages/SkeletonAlbumList.vue';
 import SkeletonPhotoList from 'pages/SkeletonPhotoList.vue';
 import { albumStore } from 'src/stores/album-store';
+import { photoStore } from 'stores/photo-store';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 const useAlbumStore = albumStore();
+const usePhotoStore = photoStore();
 const route = useRoute();
 
 const loadingAllAlbumInformation = computed(() => useAlbumStore.loadingAllAlbumInformation);
 const selectedAlbumItem = computed(() => useAlbumStore.selectedAlbumItem);
+const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
 
 const breadcrumbs = computed((): { label: string; icon: string; to?: any }[] => {
   const routes: { label: string; icon: string; to?: any }[] = [];
