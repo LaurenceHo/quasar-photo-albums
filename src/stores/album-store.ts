@@ -5,7 +5,6 @@ import { Album, AlbumTag } from 'src/components/models';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
 import { compareDbUpdatedTime, sortByKey } from 'src/utils/helper';
-import { userStore } from 'stores/user-store';
 
 export interface AlbumState {
   loadingAllAlbumInformation: boolean;
@@ -29,16 +28,15 @@ const initialState: AlbumState = {
   sortOrder: 'desc',
   refreshAlbumList: false,
   selectedAlbumItem: {
-    year: 'n/a',
+    year: 'na',
     id: '',
     albumName: '',
     albumCover: '',
     description: '',
     tags: [],
     isPrivate: false,
-    order: 0,
   },
-  selectedYear: 'n/a',
+  selectedYear: 'na',
 };
 export const albumStore = defineStore('albums', {
   state: () => initialState,

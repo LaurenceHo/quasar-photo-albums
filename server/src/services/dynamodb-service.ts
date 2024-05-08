@@ -17,7 +17,7 @@ export abstract class DynamodbService<T> implements BaseService<T> {
 
   async findAll<K extends keyof T>(
     method: 'scan' | 'query' = 'scan',
-    filter?: { indexName: string; key: { [P in K]?: T[P] } },
+    filter?: { indexName: string; key: { [P in K]?: T[P] } } | null,
     attributes?: Array<keyof T>,
     whereClause?: ((_val1: any, _val2: any) => string) | null
   ): Promise<T[]> {

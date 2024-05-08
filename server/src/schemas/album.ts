@@ -28,34 +28,11 @@ export const albumTableSchema: CreateTableCommandInput = {
       AttributeName: 'sk',
       AttributeType: 'S',
     },
-    {
-      AttributeName: 'gsi1pk',
-      AttributeType: 'S',
-    },
-    {
-      AttributeName: 'gsi1sk',
-      AttributeType: 'S',
-    },
   ],
-  GlobalSecondaryIndexes: [
-    {
-      IndexName: 'gsi1pk-gsi1sk-index',
-      KeySchema: [
-        {
-          AttributeName: 'gsi1pk',
-          KeyType: 'HASH',
-        },
-        {
-          AttributeName: 'gsi1sk',
-          KeyType: 'RANGE',
-        },
-      ],
-      Projection: {
-        ProjectionType: 'ALL',
-      },
-    },
-  ],
-  BillingMode: 'PAY_PER_REQUEST',
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 1,
+    WriteCapacityUnits: 1,
+  },
 };
 
 export const AlbumEntity = new Entity(
@@ -90,6 +67,9 @@ export const AlbumEntity = new Entity(
       isPrivate: {
         type: 'boolean',
         required: true,
+      },
+      isFeatured: {
+        type: 'boolean',
       },
       tags: {
         type: 'set',
@@ -139,10 +119,6 @@ export const AlbumEntity = new Entity(
         type: 'string',
         required: true,
       },
-      order: {
-        type: 'number',
-        default: 1,
-      },
     },
     indexes: {
       byYear: {
@@ -153,17 +129,6 @@ export const AlbumEntity = new Entity(
         sk: {
           field: 'sk',
           composite: ['id'],
-        },
-      },
-      byOrder: {
-        index: 'gsi1pk-gsi1sk-index',
-        pk: {
-          field: 'gsi1pk',
-          composite: ['order'],
-        },
-        sk: {
-          field: 'gsi1sk',
-          composite: ['isPrivate'],
         },
       },
     },

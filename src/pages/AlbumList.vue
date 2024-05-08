@@ -23,7 +23,7 @@
           />
         </q-btn-group>
       </div>
-      <div class="col-shrink q-mr-sm q-pb-sm">
+      <div class="col-shrink q-mr-xs-none q-mr-sm q-pb-sm">
         <q-btn
           :icon="sortIcon"
           color="primary"
@@ -125,7 +125,7 @@ const totalItems = ref(store.albumList.length);
 const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
 const selectedTags = ref([]);
 const privateAlbum = ref(false);
-const selectedYear = ref((route.query.year as string) || store.selectedYear || 'n/a');
+const selectedYear = ref((route.query.year as string) || store.selectedYear || 'na');
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const sortOrder = computed(() => store.sortOrder);

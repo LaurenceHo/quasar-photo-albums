@@ -68,7 +68,6 @@ describe('EditPhotoButton.vue', () => {
       isPrivate: false,
       albumCover: 'thisIsAlbumCover/photo1.jpg',
       year: '2024',
-      order: 0,
     });
   });
 });

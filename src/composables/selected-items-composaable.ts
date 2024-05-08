@@ -2,13 +2,13 @@ import { Album } from 'components/models';
 import { computed, ref } from 'vue';
 
 const albumToBeUpdate = ref({
+  year: '',
   id: '',
   albumCover: '',
   albumName: '',
   description: '',
   tags: [],
   isPrivate: true,
-  order: 0,
 } as Album);
 const selectedPhotosList = ref([] as string[]);
 const currentPhotoToBeRenamed = ref('');

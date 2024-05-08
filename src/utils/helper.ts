@@ -5,9 +5,9 @@ export const getStaticFileUrl = (objectKey: string): string => {
 };
 
 export const getYearOptions = () => {
-  const yearOptions = ['n/a'];
+  const yearOptions = ['na'];
   const currentYear = new Date().getFullYear();
-  for (let i = currentYear; 2000 <= i; i--) {
+  for (let i = currentYear; 2005 <= i; i--) {
     yearOptions.push(String(i));
   }
   return yearOptions;

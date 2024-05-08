@@ -7,8 +7,8 @@ export interface Album {
   albumCover?: string;
   description?: string;
   isPrivate: boolean;
+  isFeatured?: boolean;
   tags?: string[];
-  order?: number;
   place?: Place | null;
 }
 
