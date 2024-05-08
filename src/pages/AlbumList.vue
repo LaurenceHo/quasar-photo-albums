@@ -23,7 +23,7 @@
           />
         </q-btn-group>
       </div>
-      <div class="col-shrink q-mr-sm q-pb-sm">
+      <div class="col-shrink q-mr-xs-none q-mr-sm q-pb-sm">
         <q-btn
           :icon="sortIcon"
           color="primary"

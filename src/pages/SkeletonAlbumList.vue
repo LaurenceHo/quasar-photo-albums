@@ -2,7 +2,8 @@
   <div class="flex justify-between q-py-md" data-test-id="skeleton-album-list">
     <div class="flex">
       <q-skeleton type="QRange" width="150px" class="q-mr-md q-mb-sm" />
-      <q-skeleton type="QRange" width="150px" class="q-mb-sm" />
+      <q-skeleton type="QRange" width="150px" class="q-mr-md q-mb-sm" />
+      <q-skeleton type="QRange" width="100%" class="q-mr-md q-mb-sm" />
     </div>
     <q-skeleton type="QRange" width="250px" />
   </div>
@@ -51,3 +52,4 @@
     </div>
   </div>
 </template>
+<script setup lang="ts"></script>

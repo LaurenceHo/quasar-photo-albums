@@ -5,7 +5,6 @@ import { Album, AlbumTag } from 'src/components/models';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
 import { compareDbUpdatedTime, sortByKey } from 'src/utils/helper';
-import { userStore } from 'stores/user-store';
 
 export interface AlbumState {
   loadingAllAlbumInformation: boolean;
