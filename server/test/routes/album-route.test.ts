@@ -5,7 +5,13 @@ import { mockAlbumList } from '../mock-data';
 
 vi.mock('../../src/services/album-service', () => ({
   default: vi.fn().mockImplementation(() => ({
-    findAll: () => Promise.resolve(mockAlbumList),
+    findAll: (method?: string) => {
+      if (method === 'scan') {
+        return Promise.resolve([]);
+      } else {
+        return Promise.resolve(mockAlbumList);
+      }
+    },
     create: () => Promise.resolve(true),
     update: () => Promise.resolve(true),
     delete: () => Promise.resolve(true),
