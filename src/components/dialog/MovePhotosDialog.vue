@@ -103,12 +103,6 @@ const photoService = new PhotoService();
 const store = albumStore();
 const route = useRoute();
 
-const paramAlbumYear = computed(() => {
-  if ((route.params.year as string) === 'na') {
-    return 'n/a';
-  }
-  return route.params.year as string;
-});
 const photoKeysArray = computed(
   () =>
     getSelectedPhotoList.value.map((photoKey: string) => {
@@ -123,7 +117,7 @@ let staticAlbums = store.albumList
 const duplicatedPhotoKeys = ref<string[]>([]);
 const filteredAlbumsList = ref(staticAlbums);
 const selectedAlbumModel = ref(filteredAlbumsList.value[0] ?? { label: '', value: '' });
-const selectedYear = ref(paramAlbumYear.value || store.selectedYear || 'n/a');
+const selectedYear = ref((route.params.year as string) || store.selectedYear || 'na');
 const isProcessing = ref(false);
 const isLoadingAlbums = ref(false);
 

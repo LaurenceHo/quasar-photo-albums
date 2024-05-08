@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import { app } from '../../src/app';
+import { Album } from '../../src/schemas/album';
 import { mockAlbumList } from '../mock-data';
 
 vi.mock('../../src/services/album-service', () => ({
@@ -52,8 +53,7 @@ describe('album route', () => {
           albumName: 'Test album',
           description: '',
           isPrivate: true,
-          order: 4,
-        },
+        } as Album,
       });
       expect(response.statusCode).toBe(200);
       expect(response.payload).toBe(
@@ -83,8 +83,7 @@ describe('album route', () => {
           albumName: 'Test album',
           description: '',
           isPrivate: true,
-          order: 4,
-        },
+        } as Album,
       });
       expect(response.statusCode).toBe(200);
       expect(response.payload).toBe(

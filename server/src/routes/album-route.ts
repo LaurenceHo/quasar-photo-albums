@@ -27,6 +27,9 @@ const albumSchema = {
     isPrivate: {
       type: 'boolean',
     },
+    isFeatured: {
+      type: 'boolean',
+    },
     tags: {
       type: 'array',
       items: { type: 'string' },
@@ -52,10 +55,6 @@ const albumSchema = {
           },
         },
       },
-    },
-    order: {
-      type: 'number',
-      default: 0,
     },
   },
 };

@@ -231,7 +231,6 @@ describe('Album Store', () => {
     expect(store.albumList[10]).toEqual({
       albumCover: 'album6/aaa.jpg',
       isPrivate: false,
-      order: 141,
       albumName: '6-album-6',
       description: '',
       id: 'album1',

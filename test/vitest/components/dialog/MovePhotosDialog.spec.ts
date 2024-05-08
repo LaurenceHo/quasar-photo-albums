@@ -69,17 +69,16 @@ describe('MovePhotosDialog.vue', () => {
         ],
       },
     });
-
-    await router.push('/album/na/album-1');
-    await router.isReady();
   });
 
   it('check album select component', async () => {
+    await router.push('/album/2024/album-1');
+    await router.isReady();
+
     const { vm } = wrapper as any;
     await vm.setMovePhotoDialogState(true);
     await vm.$nextTick();
 
-    expect(vm.paramAlbumYear).toEqual('n/a');
     expect(vm.selectedAlbumModel).toEqual({ label: 'Food title', value: 'food' });
     expect(wrapper.findComponent('[data-test-id="move-photos-button"]').classes()).toContain('disabled');
   });

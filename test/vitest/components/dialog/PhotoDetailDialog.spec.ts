@@ -54,6 +54,7 @@ describe('PhotoDetailDialog.vue', () => {
     useUserPermissionStore.userPermission.role = 'admin';
     await vm.$nextTick();
     expect(wrapper.findComponent('[data-test-id="edit-photo-button"]').exists()).toBe(true);
+    expect(vm.photoId).toEqual('photo2.jpg');
   });
 
   it('navigation button should work correctly', async () => {

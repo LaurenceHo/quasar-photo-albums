@@ -21,7 +21,7 @@ export default class PhotoController extends BaseController {
     const albumId = (request.params as any)['albumId'] as string;
 
     try {
-      const album = await albumService.findOne({ id: albumId, year: year === 'na' ? 'n/a' : year });
+      const album = await albumService.findOne({ id: albumId, year });
       // Only fetch photos when album exists
       if (!isEmpty(album)) {
         // If album is private, check if user has the admin permission

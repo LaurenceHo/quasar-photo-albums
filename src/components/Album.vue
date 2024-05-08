@@ -94,7 +94,6 @@ const props = defineProps({
         description: '',
         tags: [],
         isPrivate: true,
-        order: 0,
       }) as Album,
   },
 });

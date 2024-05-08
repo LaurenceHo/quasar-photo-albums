@@ -47,7 +47,7 @@ const initialiseAlbumTable = async () => {
         if (value) {
           console.log(`Īnsert mock data into ${albumTableName} table......`);
           await AlbumEntity.create({
-            year: 'n/a',
+            year: 'na',
             id: 'test-album-1',
             albumName: 'Test Album 1',
             description: 'This is a test album 1',
@@ -64,7 +64,6 @@ const initialiseAlbumTable = async () => {
             tags: ['test-tag-1'],
             createdBy: 'System',
             updatedBy: 'System',
-            order: 1,
           } as Album).go({ response: 'none' });
           console.log(`Mock data inserted into ${albumTableName} table.`);
         }

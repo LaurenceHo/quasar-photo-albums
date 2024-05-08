@@ -29,16 +29,15 @@ const initialState: AlbumState = {
   sortOrder: 'desc',
   refreshAlbumList: false,
   selectedAlbumItem: {
-    year: 'n/a',
+    year: 'na',
     id: '',
     albumName: '',
     albumCover: '',
     description: '',
     tags: [],
     isPrivate: false,
-    order: 0,
   },
-  selectedYear: 'n/a',
+  selectedYear: 'na',
 };
 export const albumStore = defineStore('albums', {
   state: () => initialState,

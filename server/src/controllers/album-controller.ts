@@ -31,11 +31,10 @@ export default class AlbumController extends BaseController {
       if (!isAdmin) {
         query = ({ isPrivate }: any, { eq }: any) => `${eq(isPrivate, false)}`;
       }
-      // TODO - Need to sort by order
       const albumList = await albumService.findAll(
         'query',
-        { indexName: 'byYear', key: { year: year === 'na' ? 'n/a' : year } },
-        ['year', 'id', 'albumName', 'albumCover', 'description', 'tags', 'isPrivate', 'place', 'order'],
+        { indexName: 'byYear', key: { year } },
+        ['year', 'id', 'albumName', 'albumCover', 'description', 'tags', 'isPrivate', 'place', 'isFeatured'],
         query
       );
 
@@ -52,6 +51,16 @@ export default class AlbumController extends BaseController {
     album.updatedBy = (request as RequestWithUser).user?.email ?? 'unknown';
 
     try {
+      const exists = await albumService.findAll(
+        'scan',
+        null,
+        ['id'],
+        ({ id }: any, { eq }: any) => `${eq(id, album.id)}`
+      );
+      if (exists.length > 0) {
+        return this.fail(reply, 'Album already exists');
+      }
+
       const result = await albumService.create(album);
 
       if (result) {

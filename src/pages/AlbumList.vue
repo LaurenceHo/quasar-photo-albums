@@ -125,7 +125,7 @@ const totalItems = ref(store.albumList.length);
 const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
 const selectedTags = ref([]);
 const privateAlbum = ref(false);
-const selectedYear = ref((route.query.year as string) || store.selectedYear || 'n/a');
+const selectedYear = ref((route.query.year as string) || store.selectedYear || 'na');
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const sortOrder = computed(() => store.sortOrder);

@@ -4,6 +4,8 @@ import {
   CopyObjectCommandInput,
   DeleteObjectsCommand,
   DeleteObjectsCommandInput,
+  HeadObjectCommand,
+  HeadObjectCommandInput,
   ListObjectsV2Command,
   ListObjectsV2CommandInput,
   ListObjectsV2CommandOutput,
@@ -64,5 +66,14 @@ export default class S3Service implements BaseService<Photo> {
 
   async listObjects(params: ListObjectsV2CommandInput): Promise<ListObjectsV2CommandOutput> {
     return await this.s3Client.send(new ListObjectsV2Command(params));
+  }
+
+  async checkObject(params: HeadObjectCommandInput): Promise<boolean> {
+    try {
+      const response = await this.s3Client.send(new HeadObjectCommand(params));
+      return response.$metadata.httpStatusCode === 200;
+    } catch (error) {
+      return false;
+    }
   }
 }

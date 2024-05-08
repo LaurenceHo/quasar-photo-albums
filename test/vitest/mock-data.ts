@@ -53,7 +53,6 @@ export const mockAlbumList: Album[] = [
   {
     albumCover: 'album6/aaa.jpg',
     isPrivate: false,
-    order: 141,
     albumName: '6-album-6',
     description: '',
     id: 'album1',
@@ -63,7 +62,6 @@ export const mockAlbumList: Album[] = [
   {
     albumCover: 'album1/aaa.jpg',
     isPrivate: false,
-    order: 141,
     albumName: 'album1',
     description: '',
     id: 'album1',
@@ -73,7 +71,6 @@ export const mockAlbumList: Album[] = [
   {
     albumCover: 'album2/bbb.jpg',
     isPrivate: false,
-    order: 254,
     albumName: 'album2',
     description: '',
     id: 'album2',
@@ -83,7 +80,6 @@ export const mockAlbumList: Album[] = [
   {
     albumCover: 'album3/ccc.jpg',
     isPrivate: false,
-    order: 416,
     albumName: 'album3',
     description: 'description',
     id: 'album3',
@@ -93,7 +89,6 @@ export const mockAlbumList: Album[] = [
   {
     albumCover: 'album4/ccc.jpg',
     isPrivate: false,
-    order: 415,
     albumName: 'album4',
     description: 'description',
     id: 'album4',
@@ -103,7 +98,6 @@ export const mockAlbumList: Album[] = [
   {
     albumCover: 'album5/aaa.jpg',
     isPrivate: false,
-    order: 213,
     albumName: 'album5',
     description: 'description',
     id: 'album5',

@@ -8,9 +8,6 @@ export default class AlbumService extends HttpRequestService {
   }
 
   public getAlbumsByYear(year = 'na'): Promise<ApiResponse<Album[]>> {
-    if (year === 'n/a') {
-      year = 'na';
-    }
     this.setDisplayingParameters(false);
     return this.perform('GET', `/${year}`);
   }
