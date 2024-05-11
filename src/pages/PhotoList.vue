@@ -179,7 +179,7 @@ const { getSelectedPhotoList, setSelectedPhotosList } = SelectedItemsComposable(
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumId = computed(() => route.params.albumId as string);
 const albumYear = computed(() => route.params.year as string);
-const albumItem = computed(() => useAlbumStore.filterAlbumById(albumId.value) as Album);
+const albumItem = computed(() => useAlbumStore.selectedAlbumItem);
 const photosInAlbum = computed(() => usePhotoStore.photoList as IPhoto[]);
 const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
 const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.key).slice(0, 50)); // Max 50 photos
@@ -213,9 +213,7 @@ const refreshPhotoList = async () => {
   setSelectedPhotosList([]);
 };
 
-onMounted(() => {
-  usePhotoStore.getPhotos(albumId.value, albumYear.value);
-});
+usePhotoStore.getPhotos(albumId.value, albumYear.value);
 
 watch(albumId, (newValue) => {
   if (newValue) {

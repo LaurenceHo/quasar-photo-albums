@@ -1,4 +1,5 @@
 import { FastifyRequest, RouteHandler } from 'fastify';
+import { Album } from './schemas/album';
 import { UserPermission } from './schemas/user-permission.js';
 
 export type RequestWithUser = FastifyRequest & { user?: UserPermission | null };
@@ -42,6 +43,11 @@ export interface Place {
     latitude: number;
     longitude: number;
   };
+}
+
+export interface PhotoResponse {
+  photos: Photo[];
+  album: Album;
 }
 
 export interface PhotosRequest {

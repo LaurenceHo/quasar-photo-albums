@@ -260,23 +260,21 @@ watch(loadImage, () => {
 });
 
 watch(
-  [photoId, photoList],
-  ([newId, newList]) => {
+  photoId,
+  (newId) => {
     if (fetchingPhotos.value) return;
 
-    if (newId && newList.length > 0) {
+    if (newId) {
       selectedImageIndex.value = usePhotoStore.findPhotoIndex(newId);
     }
 
-    const album = useAlbumStore.filterAlbumById(albumId.value);
-
-    if (selectedImageIndex.value === -1 && album) {
+    if (selectedImageIndex.value === -1) {
       q.notify({
         timeout: 2000,
         progress: true,
         color: 'negative',
         icon: 'mdi-alert-circle',
-        message: "Photo doesn't exist",
+        message: 'Photo does not exist',
       });
       setTimeout(() => router.push(`/album/${albumYear.value}/${albumId.value}`), 3000);
     }

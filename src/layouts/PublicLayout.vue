@@ -7,7 +7,7 @@
             <q-avatar class="q-mr-sm">
               <img src="/icons/favicon-128x128.png" alt="logo" />
             </q-avatar>
-            {{ $q.screen.gt.xs === true ? albumAppName : '' }}
+            {{ $q.screen.gt.sm === true ? albumAppName : '' }}
           </q-btn>
           <div class="flex no-wrap">
             <q-btn-toggle
