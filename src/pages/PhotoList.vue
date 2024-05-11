@@ -2,46 +2,48 @@
   <div class="q-pt-md">
     <div :key="photoId" class="row items-center">
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated @click="goBack()" />
-      <div class="text-h5 text-weight-medium q-py-md q-pl-md-sm" data-test-id="album-name">
-        <q-btn-group outline>
-          <q-btn
-            :outline="photoStyle === 'grid'"
-            color="primary"
-            data-test-id="photo-list-style-button"
-            dense
-            icon="mdi-format-list-bulleted-square"
-            padding="sm"
-            @click="setPhotoListStyle('detail')"
-          />
-          <q-btn
-            :outline="photoStyle === 'detail'"
-            color="primary"
-            data-test-id="photo-grid-style-button"
-            dense
-            icon="mdi-view-grid"
-            padding="sm"
-            @click="setPhotoListStyle('grid')"
-          />
-        </q-btn-group>
-        <q-btn v-if="albumItem?.place" icon="mdi-map" round size="md" unelevated data-test-id="album-map-button">
-          <q-tooltip :offset="[0, 0]" class="bg-transparent" max-width="300px" style="width: 300px">
-            <q-card>
-              <q-card-section class="text-h6 text-grey-7">
-                {{ albumItem.place.displayName }}
-              </q-card-section>
-              <q-card-section>
-                <PhotoLocationMap
-                  :latitude="albumItem.place.location.latitude"
-                  :longitude="albumItem.place.location.longitude"
-                />
-              </q-card-section>
-            </q-card>
-          </q-tooltip>
-        </q-btn>
+      <q-btn-group outline class="q-pl-sm">
+        <q-btn
+          :outline="photoStyle === 'grid'"
+          color="primary"
+          data-test-id="photo-list-style-button"
+          dense
+          icon="mdi-format-list-bulleted-square"
+          padding="sm"
+          @click="setPhotoListStyle('detail')"
+        />
+        <q-btn
+          :outline="photoStyle === 'detail'"
+          color="primary"
+          data-test-id="photo-grid-style-button"
+          dense
+          icon="mdi-view-grid"
+          padding="sm"
+          @click="setPhotoListStyle('grid')"
+        />
+      </q-btn-group>
+      <q-btn v-if="albumItem?.place" icon="mdi-map" round size="md" unelevated data-test-id="album-map-button">
+        <q-tooltip :offset="[0, 0]" class="bg-transparent" max-width="300px" style="width: 300px">
+          <q-card>
+            <q-card-section class="text-h6 text-grey-7">
+              {{ albumItem.place.displayName }}
+            </q-card-section>
+            <q-card-section>
+              <PhotoLocationMap
+                :latitude="albumItem.place.location.latitude"
+                :longitude="albumItem.place.location.longitude"
+              />
+            </q-card-section>
+          </q-card>
+        </q-tooltip>
+      </q-btn>
+      <div class="text-h5 text-weight-medium q-py-md" data-test-id="album-name">
         {{ albumItem?.albumName }} {{ albumItem?.isPrivate ? '(private album)' : '' }}
       </div>
     </div>
-    <div class="text-h6 text-grey-7 q-pb-md" data-test-id="album-desc">{{ albumItem?.description }}</div>
+    <div v-if="albumItem?.description" class="text-h6 text-grey-7 q-pb-sm" data-test-id="album-desc">
+      {{ albumItem?.description }}
+    </div>
     <div v-if="albumItem?.tags?.length && albumItem?.tags?.length > 0" class="flex q-pb-md">
       <q-chip v-for="(tag, i) in albumItem.tags" :key="i" color="secondary" data-test-id="album-tag">
         {{ tag }}
@@ -175,15 +177,16 @@ const {
 const { getSelectedPhotoList, setSelectedPhotosList } = SelectedItemsComposable();
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const photoStyle = ref((route.query.photoStyle as string) || 'grid'); // Grid is default photo list style
 const albumId = computed(() => route.params.albumId as string);
 const albumYear = computed(() => route.params.year as string);
-const albumItem = computed(() => useAlbumStore.getAlbumById(albumId.value) as Album);
+const albumItem = computed(() => useAlbumStore.filterAlbumById(albumId.value) as Album);
 const photosInAlbum = computed(() => usePhotoStore.photoList as IPhoto[]);
 const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
 const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.key).slice(0, 50)); // Max 50 photos
 const photoAmount = computed(() => photosInAlbum.value.length);
 const photoId = computed(() => route.query.photo as string);
+
+const photoStyle = ref((route.query.photoStyle as string) || 'grid'); // Grid is default photo list style
 
 const goBack = () => router.back();
 

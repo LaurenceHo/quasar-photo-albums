@@ -38,7 +38,7 @@ export const photoStore = defineStore('photos', {
   actions: {
     async getPhotos(albumId: string, albumYear: string, refreshPhotosList?: boolean) {
       const useAlbumStore = albumStore();
-      const albumItem = useAlbumStore.getAlbumById(albumId);
+      const albumItem = useAlbumStore.filterAlbumById(albumId);
       if (albumItem?.id) {
         // Only fetch photos when album id is updated
         if (albumId !== useAlbumStore.selectedAlbumItem.id || refreshPhotosList) {

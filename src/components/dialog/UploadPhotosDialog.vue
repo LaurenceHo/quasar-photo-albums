@@ -116,6 +116,7 @@ const onInputChange = (e: any) => {
 const clearFiles = () => (files.value = []);
 
 const closeDialog = () => {
+  override.value = false;
   clearFiles();
   setIsCompleteUploading(false);
   setUploadPhotoDialogState(false);
