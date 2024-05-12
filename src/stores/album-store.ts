@@ -42,11 +42,6 @@ export const albumStore = defineStore('albums', {
   state: () => initialState,
 
   getters: {
-    filterAlbumById:
-      (state: AlbumState) =>
-      (id: string): Album | undefined =>
-        state.albumList.find((album) => album.id === id),
-
     chunkAlbumList:
       (state: AlbumState) =>
       (firstIndex: number, lastIndex: number): Album[] => {

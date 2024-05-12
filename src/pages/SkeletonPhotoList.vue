@@ -23,7 +23,7 @@
   </q-item>
   <div class="row q-col-gutter-md">
     <div v-for="n in 6" :key="n" class="col-xl-2 col-lg-2 col-md-3 col-sm-3 col-xs-6">
-      <q-skeleton :size="$q.screen.lt.md ? '150px' : '250px'" class="q-mr-md" />
+      <q-skeleton :size="$q.screen.lt.md ? '150px' : '220px'" class="q-mr-md" />
     </div>
   </div>
 </template>

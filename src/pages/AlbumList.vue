@@ -37,7 +37,7 @@
       <div class="col-12 col-xl-1 col-lg-1 col-md-2 col-sm-2 q-mr-sm q-pb-sm">
         <q-select v-model="selectedYear" :options="yearOptions" dense label="Year" outlined />
       </div>
-      <div class="col-12 col-xl-3 col-lg-3 col-md-3 col-sm-3 q-pb-sm">
+      <div class="col-12 col-xl-3 col-lg-3 col-md-3 col-sm-grow q-pb-sm">
         <q-select
           v-model="selectedTags"
           :options="albumTags"
@@ -56,7 +56,10 @@
         />
       </div>
       <q-space />
-      <div class="col-12 col-xl-4 col-lg-4 col-md-4 col-sm-4 flex justify-end items-center">
+      <div
+        class="col-12 col-xl-4 col-lg-4 col-md-4 col-sm-12 flex items-center"
+        :class="$q.screen.lt.md ? 'justify-start' : 'justify-end'"
+      >
         <Pagination
           :items-per-page-props="itemsPerPage"
           :page-number-props="pageNumber"
@@ -83,7 +86,10 @@
       <div v-else :class="`row ${$q.screen.lt.xl ? 'justify-center' : ''}`">
         <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
       </div>
-      <div class="col-12 col-xl-4 col-lg-5 col-md-5 flex justify-end items-center q-pt-md">
+      <div
+        class="col-12 col-xl-4 col-lg-4 col-md-4 col-sm-12 flex items-center q-pt-md"
+        :class="$q.screen.lt.md ? 'justify-start' : 'justify-end'"
+      >
         <Pagination
           :items-per-page-props="itemsPerPage"
           :page-number-props="pageNumber"

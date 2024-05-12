@@ -41,7 +41,10 @@ describe('photo route', () => {
         code: 200,
         status: 'Success',
         message: 'ok',
-        data: mockPhotoList,
+        data: {
+          album: mockAlbumList[0],
+          photos: mockPhotoList,
+        },
       })
     );
   });
