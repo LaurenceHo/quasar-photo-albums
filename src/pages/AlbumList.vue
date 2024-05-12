@@ -124,6 +124,12 @@ const userPermissionStore = userStore();
 
 const { albumTags, filterTags } = AlbumTagsFilterComposable();
 
+const paramsYear = computed(() => route.params.year as string);
+
+if (!paramsYear.value) {
+  router.push({ name: 'AlbumsByYear', params: { year: store.selectedYear || 'na' } });
+}
+
 const pageNumber = ref(1);
 const itemsPerPage = ref(20);
 const albumStyle = ref((route.query.albumStyle as string) || 'list'); // List is default style
@@ -131,7 +137,7 @@ const totalItems = ref(store.albumList.length);
 const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
 const selectedTags = ref([]);
 const privateAlbum = ref(false);
-const selectedYear = ref((route.query.year as string) || store.selectedYear || 'na');
+const selectedYear = ref((route.params.year as string) || store.selectedYear || 'na');
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const sortOrder = computed(() => store.sortOrder);
@@ -147,7 +153,7 @@ const sortIcon = computed(() =>
 );
 
 onBeforeMount(() => {
-  store.getAlbumsByYear(route.query.year as string);
+  store.getAlbumsByYear(paramsYear.value);
 });
 
 const getFilteredAlbumList = () => {
@@ -191,7 +197,7 @@ watch(refreshAlbumList, (newValue) => {
 watch(selectedYear, (newValue) => {
   if (newValue) {
     store.getAlbumsByYear(newValue);
-    router.replace({ query: { ...route.query, year: newValue } });
+    router.push({ name: 'AlbumsByYear', params: { year: newValue } });
   }
 });
 
