@@ -1,5 +1,11 @@
+import { Album } from 'app/server/src/schemas/album';
 import { ApiResponse, Photo, ResponseStatus } from 'components/models';
 import HttpRequestService from 'src/services/http-request-service';
+
+export interface PhotoResponse {
+  photos: Photo[];
+  album: Album;
+}
 
 export default class PhotoService extends HttpRequestService {
   constructor() {
@@ -7,7 +13,7 @@ export default class PhotoService extends HttpRequestService {
     this.baseUrl = this.baseUrl + '/photos';
   }
 
-  getPhotosByAlbumId(albumId: string, year: string): Promise<ApiResponse<Photo[]>> {
+  getPhotosByAlbumId(albumId: string, year: string): Promise<ApiResponse<PhotoResponse>> {
     this.setDisplayingParameters(true);
     return this.perform('GET', `/${year}/${albumId}`);
   }

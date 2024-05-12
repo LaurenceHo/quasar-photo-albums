@@ -52,7 +52,10 @@ describe('private album route', () => {
         code: 200,
         status: 'Success',
         message: 'ok',
-        data: mockPhotoList,
+        data: {
+          album: mockAlbumList[2],
+          photos: mockPhotoList,
+        },
       })
     );
   });

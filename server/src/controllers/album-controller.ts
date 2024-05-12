@@ -58,7 +58,7 @@ export default class AlbumController extends BaseController {
         ({ id }: any, { eq }: any) => `${eq(id, album.id)}`
       );
       if (exists.length > 0) {
-        return this.fail(reply, 'Album already exists');
+        return this.clientError(reply, 'Album already exists');
       }
 
       const result = await albumService.create(album);

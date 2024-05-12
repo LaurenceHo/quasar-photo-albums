@@ -41,10 +41,16 @@ export abstract class DynamodbService<T> implements BaseService<T> {
     return get(response, 'data', [] as T[]);
   }
 
-  async findOne(objectKey: { [key: string]: string | number }): Promise<T> {
-    const response: QueryResponse<typeof this._entity> = await this._entity
-      .get(objectKey)
-      .go({ ignoreOwnership: true });
+  async findOne(objectKey: { [key: string]: string | number }, attributes?: Array<keyof T>): Promise<T> {
+    const options: QueryOptions & { attributes?: Array<keyof T> } = {
+      ignoreOwnership: true,
+    };
+
+    if (attributes) {
+      options['attributes'] = attributes;
+    }
+
+    const response: QueryResponse<typeof this._entity> = await this._entity.get(objectKey).go(options);
 
     return get(response, 'data');
   }
