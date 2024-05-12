@@ -35,7 +35,7 @@ const albumSchema = {
       items: { type: 'string' },
     },
     place: {
-      type: 'object',
+      type: ['object', 'null'],
       properties: {
         displayName: {
           type: 'string',

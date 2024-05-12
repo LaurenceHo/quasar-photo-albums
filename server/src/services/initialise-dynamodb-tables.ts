@@ -60,7 +60,7 @@ const initialiseAlbumTable = async () => {
                 latitude: -33.8688,
                 longitude: 151.2093,
               },
-            },
+            } as any,
             tags: ['test-tag-1'],
             createdBy: 'System',
             updatedBy: 'System',

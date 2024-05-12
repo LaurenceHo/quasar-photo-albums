@@ -13,7 +13,12 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: '/albums',
-            name: 'Albums',
+            name: 'DefaultAlbums',
+            component: () => import('pages/AlbumList.vue'),
+          },
+          {
+            path: '/albums/:year',
+            name: 'AlbumsByYear',
             component: () => import('pages/AlbumList.vue'),
           },
           {
