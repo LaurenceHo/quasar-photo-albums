@@ -108,7 +108,7 @@ const userPermission = computed(() => userPermissionStore.userPermission as User
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const isCheckingUserPermission = computed(() => userPermissionStore.isCheckingUserPermission);
 const buttonToggle = ref(
-  routeName.value === 'Albums' || routeName.value === 'Photos' ? 'photos' : routeName.value === 'Map' ? 'map' : ''
+  routeName.value === 'AlbumsByYear' || routeName.value === 'Photos' ? 'photos' : routeName.value === 'Map' ? 'map' : ''
 );
 
 userPermissionStore.checkUserPermission();
@@ -126,7 +126,7 @@ watch(searchKey, (newValue) => {
 });
 
 watch(routeName, (newValue) => {
-  if (newValue === 'Albums' || newValue === 'Photos') {
+  if (newValue === 'AlbumsByYear' || newValue === 'Photos') {
     buttonToggle.value = 'photos';
   } else if (newValue === 'Map') {
     buttonToggle.value = 'map';

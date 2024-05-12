@@ -1,7 +1,7 @@
 <template>
   <q-page>
     <div class="container">
-      <div class="q-pa-md">
+      <div class="q-px-md q-pt-md q-pb-lg">
         <q-breadcrumbs>
           <q-breadcrumbs-el
             v-for="breadcrumb in breadcrumbs"

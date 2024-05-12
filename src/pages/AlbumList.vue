@@ -57,8 +57,8 @@
       </div>
       <q-space />
       <div
-        class="col-12 col-xl-4 col-lg-4 col-md-4 col-sm-12 flex items-center"
-        :class="$q.screen.lt.md ? 'justify-start' : 'justify-end'"
+        class="col-12 col-xl-4 col-lg-4 col-md-4 col-sm-grow flex items-center"
+        :class="$q.screen.lt.md ? 'justify-center' : 'justify-end'"
       >
         <Pagination
           :items-per-page-props="itemsPerPage"
@@ -87,8 +87,8 @@
         <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
       </div>
       <div
-        class="col-12 col-xl-4 col-lg-4 col-md-4 col-sm-12 flex items-center q-pt-md"
-        :class="$q.screen.lt.md ? 'justify-start' : 'justify-end'"
+        class="col-12 col-xl-4 col-lg-4 col-md-4 col-sm-grow flex items-center q-pt-md"
+        :class="$q.screen.lt.md ? 'justify-center' : 'justify-end'"
       >
         <Pagination
           :items-per-page-props="itemsPerPage"

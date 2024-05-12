@@ -9,7 +9,7 @@
     direction-links
   />
   <q-select v-model="itemsPerPage" :options="[10, 20, 50]" dense outlined />
-  ({{ totalItems }} albums)
+  ({{ totalItems }} album{{totalItems > 1 ? "s": ""}})
 </template>
 
 <script lang="ts" setup>
