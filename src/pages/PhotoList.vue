@@ -37,7 +37,11 @@
           </q-card>
         </q-tooltip>
       </q-btn>
-      <div class="text-h5 text-weight-medium q-py-md" data-test-id="album-name">
+      <div
+        class="text-h5 text-weight-medium q-py-md"
+        :class="albumItem?.place ? '' : 'q-pl-sm'"
+        data-test-id="album-name"
+      >
         {{ albumItem?.albumName }} {{ albumItem?.isPrivate ? '(private album)' : '' }}
       </div>
     </div>

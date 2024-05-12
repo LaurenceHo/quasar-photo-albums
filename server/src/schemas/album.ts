@@ -1,11 +1,34 @@
 import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb';
-import { Entity, EntityRecord } from 'electrodb';
+import { CustomAttributeType, Entity, EntityRecord } from 'electrodb';
 import { Place } from '../models.js';
 import { ddbDocClient } from '../services/dynamodb-client.js';
 
 export type Album = EntityRecord<typeof AlbumEntity> & Place;
 
 export const albumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME || 'photo-albums';
+
+type PlaceAttributes =
+  | {
+      displayName: {
+        type: 'string';
+      };
+      formattedAddress: {
+        type: 'string';
+      };
+      location: {
+        type: 'map';
+        properties: {
+          latitude: {
+            type: 'number';
+          };
+          longitude: {
+            type: 'number';
+          };
+        };
+      };
+    }
+  | null
+  | undefined;
 
 export const albumTableSchema: CreateTableCommandInput = {
   TableName: albumTableName,
@@ -72,30 +95,14 @@ export const AlbumEntity = new Entity(
         type: 'boolean',
       },
       tags: {
-        type: 'set',
-        items: 'string',
+        // Ideally it should be a set of strings, but we are using a list for now because set cannot be empty in DynamoDB
+        type: 'list',
+        items: {
+          type: 'string',
+        },
       },
       place: {
-        type: 'map',
-        properties: {
-          displayName: {
-            type: 'string',
-          },
-          formattedAddress: {
-            type: 'string',
-          },
-          location: {
-            type: 'map',
-            properties: {
-              latitude: {
-                type: 'number',
-              },
-              longitude: {
-                type: 'number',
-              },
-            },
-          },
-        },
+        type: CustomAttributeType<PlaceAttributes>('any'),
       },
       createdAt: {
         type: 'string',
