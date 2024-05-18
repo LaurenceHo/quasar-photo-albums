@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pt-md">
+  <div class="q-pt-md" id="alum-list-container">
     <div class="q-pb-md row justify-between items-center content-center">
       <div class="col-shrink q-mr-sm q-pb-sm">
         <q-btn-group outline>
@@ -86,23 +86,14 @@
       <div v-else :class="`row ${$q.screen.lt.xl ? 'justify-center' : ''}`">
         <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
       </div>
-      <div
-        class="col-12 col-xl-4 col-lg-4 col-md-4 col-sm-grow flex items-center q-pt-md"
-        :class="$q.screen.lt.md ? 'justify-center' : 'justify-end'"
-      >
-        <Pagination
-          :items-per-page-props="itemsPerPage"
-          :page-number-props="pageNumber"
-          :total-items="totalItems"
-          :total-pages="totalPages"
-          @set-page-params="setPageParams"
-        />
-      </div>
     </template>
     <template v-else>
       <div class="text-h5 text-weight-medium">No results.</div>
     </template>
   </div>
+  <q-page-sticky position="bottom-right" :offset="[18, 18]">
+    <q-btn round icon="mdi-arrow-up" color="accent" @click="scrollToTop" />
+  </q-page-sticky>
 </template>
 
 <script lang="ts" setup>
@@ -178,6 +169,11 @@ const setPageParams = (params: { pageNumber: number; itemsPerPage: number }) => 
 };
 
 const updateSortOrder = () => store.$patch({ sortOrder: sortOrder.value === 'desc' ? 'asc' : 'desc' });
+
+const scrollToTop = () => {
+  const container = document.getElementById('alum-list-container');
+  container?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+};
 
 const yearOptions = getYearOptions();
 

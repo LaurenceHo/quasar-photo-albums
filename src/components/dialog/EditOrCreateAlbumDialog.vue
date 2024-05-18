@@ -1,12 +1,21 @@
 ﻿<template>
   <q-dialog v-model="getUpdateAlbumDialogState" persistent>
-    <q-card style="min-width: 500px">
+    <q-card :style="$q.screen.gt.xs ? 'min-width: 500px' : 'min-width: 360px'">
       <q-card-section>
         <div class="text-h6">{{ getAlbumToBeUpdate.id ? 'Edit' : 'New' }} Album</div>
       </q-card-section>
 
       <q-form @submit.prevent.stop="confirmUpdateAlbum">
         <q-card-section class="q-pt-none scroll" style="max-height: 50vh">
+          <q-toggle
+            v-model="privateAlbum"
+            :disable="isProcessing"
+            checked-icon="mdi-lock"
+            color="primary"
+            icon="mdi-lock-open"
+            label="Private album?"
+            left-label
+          />
           <q-select
             v-model="selectedYear"
             class="q-pb-lg"
@@ -26,7 +35,7 @@
                 /^[a-z0-9\s-_]*$/.test(val) || 'Only lowercase alphanumeric, space, underscore and dash are allowed',
             ]"
             autofocus
-            class="q-pb-lg"
+            class="q-pb-xl"
             counter
             label="Album id"
             maxlength="30"
@@ -37,7 +46,7 @@
             v-model="albumName"
             :rules="[(val: string) => !!val || 'Album name is required']"
             autofocus
-            class="q-pb-lg"
+            class="q-pb-xl"
             counter
             label="Album name"
             maxlength="50"
@@ -48,7 +57,7 @@
             v-model="albumDesc"
             :disable="isProcessing"
             autofocus
-            class="q-pb-lg"
+            class="q-pb-xl"
             counter
             label="Album description"
             maxlength="200"
@@ -73,15 +82,15 @@
             @filter="filterTags"
           />
           <q-toggle
-            v-model="privateAlbum"
-            :disable="isProcessing"
+            v-model="featuredAlbum"
+            :disable="isProcessing || privateAlbum"
             checked-icon="mdi-lock"
             color="primary"
             icon="mdi-lock-open"
-            label="Private album?"
+            label="Featured album?"
             left-label
           />
-
+          <div v-if="privateAlbum" class="q-pb-lg text-grey-7">Cannot be featured album if album is private.</div>
           <q-select
             v-model="selectedPlace"
             :loading="isSearching"
@@ -107,7 +116,7 @@
             </template>
             <template #no-option>
               <q-item>
-                <q-item-section class="text-italic text-grey"> No suggestion found</q-item-section>
+                <q-item-section class="text-italic text-grey-7"> No suggestion found</q-item-section>
               </q-item>
             </template>
           </q-select>
@@ -159,6 +168,7 @@ const albumId = ref('');
 const albumName = ref('');
 const albumDesc = ref('');
 const privateAlbum = ref(false);
+const featuredAlbum = ref<boolean | null>(null);
 const selectedAlbumTags = ref([] as string[]);
 const isProcessing = ref(false);
 
@@ -198,6 +208,7 @@ const confirmUpdateAlbum = async () => {
     albumName: albumName.value,
     description: albumDesc.value,
     isPrivate: privateAlbum.value,
+    isFeatured: featuredAlbum.value ?? undefined,
     place: selectedPlace.value,
     tags: !isEmpty(selectedAlbumTags.value) ? selectedAlbumTags.value : [],
   };
@@ -211,7 +222,7 @@ const confirmUpdateAlbum = async () => {
 
   isProcessing.value = false;
   if (result.code === 200) {
-    store.updateAlbum(albumToBeSubmitted, false);
+    await store.updateAlbum(albumToBeSubmitted, false);
     resetAlbum();
   }
 };
@@ -241,6 +252,7 @@ watch(
       albumName.value = getAlbumToBeUpdate.value.albumName;
       albumDesc.value = getAlbumToBeUpdate.value.description ?? '';
       privateAlbum.value = getAlbumToBeUpdate.value.isPrivate;
+      featuredAlbum.value = getAlbumToBeUpdate.value.isFeatured ?? null;
       selectedAlbumTags.value = getAlbumToBeUpdate.value.tags ?? [];
       selectedPlace.value = getAlbumToBeUpdate.value.place ?? null;
     }

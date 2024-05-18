@@ -155,7 +155,7 @@ export const albumStore = defineStore('albums', {
       this.refreshAlbumList = true;
     },
 
-    updateAlbum(albumToBeUpdated: Album, deleteAlbum: boolean) {
+    async updateAlbum(albumToBeUpdated: Album, deleteAlbum: boolean) {
       if (this.selectedYear === albumToBeUpdated.year) {
         const findIndex = this.albumList.findIndex((album) => album.id === albumToBeUpdated.id);
         if (findIndex === -1) {
@@ -175,6 +175,8 @@ export const albumStore = defineStore('albums', {
           }
         }
         this.refreshAlbumList = true;
+      } else {
+        await this.getAlbumsByYear(this.selectedYear);
       }
     },
 

@@ -18,10 +18,10 @@
       <q-card-section class="flex column justify-center items-center" style="height: 80vh">
         <DropZone v-slot="{ dropZoneActive }" @files-dropped="addFiles">
           <q-checkbox v-model="override" label="Override existing photos" />
-          <label
+          <div
             v-if="!isCompleteUploading"
-            for="file-input"
-            class="text-h4 text-weight-bold cursor-pointer flex justify-center column items-center"
+            class="text-weight-bold flex justify-center column items-center"
+            :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'"
           >
             <span v-if="dropZoneActive" class="flex column items-center">
               <span class="block">Drop Them Here</span>
@@ -30,12 +30,13 @@
             <span v-else class="flex column items-center">
               <span class="block">Drag Your Photos Here</span>
               <span class="block text-subtitle1">
-                or <strong><em>click here</em></strong> to select photos
+                or
+                <input id="file-input" accept="image/png, image/jpeg" multiple type="file" @change="onInputChange" /> to
+                select photos
               </span>
             </span>
             <span class="block text-subtitle1"> Max file size: 5MB. Only image files allowed </span>
-            <input id="file-input" accept="image/png, image/jpeg" multiple type="file" @change="onInputChange" />
-          </label>
+          </div>
           <ul v-show="files.length" class="flex q-pa-none">
             <FilePreview v-for="file of files" :key="file.id" :file="file" tag="li" @remove="removeFile" />
           </ul>
@@ -134,15 +135,17 @@ watch(albumId, (newValue) => {
 });
 </script>
 <style lang="scss" scoped>
-input[type='file']:not(:focus-visible) {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+#file-input {
+  color: rgba(0, 0, 0, 0);
+  width: 110px;
+}
+
+#file-input::file-selector-button {
+  font-weight: 700;
+  font-style: italic;
+  border: 0;
+  padding: 0.2em 0.4em;
+  background-color: transparent;
+  width: 110px;
 }
 </style>
