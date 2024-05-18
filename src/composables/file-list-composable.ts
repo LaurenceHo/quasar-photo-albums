@@ -5,10 +5,8 @@ export default function () {
   const files = ref<IUploadableFile[]>([]);
 
   const addFiles = (newFiles: IUploadableFile[]) => {
-    const newUploadableFiles = [...newFiles]
-      .map((file) => new UploadableFile(file))
-      .filter((file) => !fileExists(file.id));
-    files.value = files.value.concat(newUploadableFiles);
+    const newUploadFiles = [...newFiles].map((file) => new UploadFile(file)).filter((file) => !fileExists(file.id));
+    files.value = files.value.concat(newUploadFiles);
   };
 
   const fileExists = (otherId: string) => files.value.some(({ id }) => id === otherId);
@@ -24,7 +22,7 @@ export default function () {
   return { files, addFiles, removeFile };
 }
 
-class UploadableFile implements IUploadableFile {
+class UploadFile implements IUploadableFile {
   id: string;
   file: File;
   url: string;

@@ -1,5 +1,4 @@
-import { Album } from 'app/server/src/schemas/album';
-import { ApiResponse, Photo, ResponseStatus } from 'components/models';
+import { Album, ApiResponse, Photo, ResponseStatus } from 'components/models';
 import HttpRequestService from 'src/services/http-request-service';
 
 export interface PhotoResponse {

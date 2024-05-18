@@ -76,7 +76,7 @@
           padding="sm xl"
           size="lg"
           unelevated
-          @click="closeDialog"
+          @click="finishUploadPhotos"
         >
           Done
         </q-btn>
@@ -109,11 +109,16 @@ const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading
 const { uploadFiles } = createUploader(albumId.value);
 
 const onInputChange = (e: any) => {
-  addFiles(e.target.files);
+  addFiles([...e.target.files]);
   e.target.value = null; // reset so that selecting the same file again will still cause it to fire this change
 };
 
 const clearFiles = () => (files.value = []);
+
+const finishUploadPhotos = () => {
+  emits('refreshPhotoList');
+  closeDialog();
+};
 
 const closeDialog = () => {
   override.value = false;
@@ -125,12 +130,6 @@ const closeDialog = () => {
 watch(albumId, (newValue) => {
   if (newValue) {
     clearFiles();
-  }
-});
-
-watch(isCompleteUploading, (newValue) => {
-  if (newValue) {
-    emits('refreshPhotoList');
   }
 });
 </script>
