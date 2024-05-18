@@ -220,11 +220,11 @@ const confirmUpdateAlbum = async () => {
     result = await albumService.createAlbum(albumToBeSubmitted);
   }
 
-  isProcessing.value = false;
   if (result.code === 200) {
-    await store.updateAlbum(albumToBeSubmitted, false);
     resetAlbum();
+    await store.updateAlbum();
   }
+  isProcessing.value = false;
 };
 
 const resetAlbum = () => {

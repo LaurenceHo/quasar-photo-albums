@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="movePhotoDialogState">
-    <q-card style="min-width: 400px">
+    <q-card :style="$q.screen.gt.xs ? 'min-width: 400px' : 'min-width: 360px'">
       <q-card-section>
         <div v-if="duplicatedPhotoKeys.length === 0" class="text-h6">
           Move photo{{ getSelectedPhotoList.length > 1 ? 's' : '' }} to another album
@@ -8,7 +8,7 @@
         <div v-else class="text-h6">
           <q-icon name="mdi-file-alert" color="warning" />
           Photo{{ duplicatedPhotoKeys.length > 1 ? 's' : '' }} exist{{ duplicatedPhotoKeys.length < 2 ? 's' : '' }} in
-          {{ selectedAlbumModel }}
+          {{ selectedAlbumModel.label }}
         </div>
       </q-card-section>
 
@@ -54,12 +54,12 @@
 
       <q-card-actions align="right">
         <q-btn
-          v-close-popup
           :disable="isProcessing"
           color="primary"
           flat
           :label="duplicatedPhotoKeys.length === 0 ? 'Cancel' : 'Close'"
           no-caps
+          @click="closeMovePhotoDialog"
         />
         <q-btn
           v-if="duplicatedPhotoKeys.length === 0"
@@ -120,6 +120,7 @@ const selectedAlbumModel = ref(filteredAlbumsList.value[0] ?? { label: '', value
 const selectedYear = ref((route.params.year as string) || store.selectedYear || 'na');
 const isProcessing = ref(false);
 const isLoadingAlbums = ref(false);
+const needToRefreshPhotoList = ref(false);
 
 const yearOptions = getYearOptions();
 
@@ -143,10 +144,10 @@ const confirmMovePhotos = async () => {
   isProcessing.value = true;
   const photosInSelectedAlbum = await photoService.getPhotosByAlbumId(
     selectedAlbumModel.value.value,
-    store.selectedYear
+    selectedYear.value
   );
   const tempDuplicatedPhotoKeys =
-    photosInSelectedAlbum.data
+    photosInSelectedAlbum.data?.photos
       ?.filter((photo) => photoKeysArray.value.includes(photo.key.split('/')[1]))
       .map((photo) => photo.key.split('/')[1]) ?? [];
 
@@ -167,14 +168,23 @@ const confirmMovePhotos = async () => {
   duplicatedPhotoKeys.value = tempDuplicatedPhotoKeys;
 
   if (result.code === 200) {
-    emits('closePhotoDetailDialog');
-    emits('refreshPhotoList');
-  }
-  if (duplicatedPhotoKeys.value.length === 0) {
-    setMovePhotoDialogState(false);
+    if (duplicatedPhotoKeys.value.length === 0) {
+      setMovePhotoDialogState(false);
+
+      emits('closePhotoDetailDialog');
+      emits('refreshPhotoList');
+    } else {
+      needToRefreshPhotoList.value = true;
+    }
   }
 };
 
+const closeMovePhotoDialog = () => {
+  if (needToRefreshPhotoList.value) {
+    emits('refreshPhotoList');
+  }
+  setMovePhotoDialogState(false);
+};
 // Fetch albums when selected year changes
 watch(selectedYear, async (newValue) => {
   if (newValue) {

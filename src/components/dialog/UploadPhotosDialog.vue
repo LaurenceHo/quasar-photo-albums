@@ -31,8 +31,7 @@
               <span class="block">Drag Your Photos Here</span>
               <span class="block text-subtitle1">
                 or
-                <input id="file-input" accept="image/png, image/jpeg" multiple type="file" @change="onInputChange" /> to
-                select photos
+                <input id="file-input" accept="image/png, image/jpeg" multiple type="file" @change="onInputChange" />
               </span>
             </span>
             <span class="block text-subtitle1"> Max file size: 5MB. Only image files allowed </span>

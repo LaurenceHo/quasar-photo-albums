@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pt-md" id="alum-list-container">
+  <div id="alum-list-container" class="q-pt-md">
     <div class="q-pb-md row justify-between items-center content-center">
       <div class="col-shrink q-mr-sm q-pb-sm">
         <q-btn-group outline>
