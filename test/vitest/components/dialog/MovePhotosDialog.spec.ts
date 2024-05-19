@@ -14,7 +14,9 @@ vi.mock('../../../../src/services/photo-service', () => ({
   default: vi.fn().mockImplementation(() => ({
     getPhotosByAlbumId: () =>
       Promise.resolve({
-        data: mockPhotoList,
+        data: {
+          photos: mockPhotoList,
+        },
       }),
     movePhotos: () => Promise.resolve({ status: 'Success', code: 200 }),
   })),

@@ -92,7 +92,9 @@
     </template>
   </div>
   <q-page-sticky position="bottom-right" :offset="[18, 18]">
-    <q-btn round icon="mdi-arrow-up" color="accent" @click="scrollToTop" />
+    <Transition>
+      <q-btn v-if="showScrollTopButton" round icon="mdi-arrow-up" color="accent" @click="scrollToTop" />
+    </Transition>
   </q-page-sticky>
 </template>
 
@@ -105,7 +107,7 @@ import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composa
 import { albumStore } from 'src/stores/album-store';
 import { getYearOptions, sortByKey } from 'src/utils/helper';
 import { userStore } from 'stores/user-store';
-import { computed, onBeforeMount, ref, watch } from 'vue';
+import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
@@ -121,6 +123,7 @@ if (!paramsYear.value) {
   router.push({ name: 'AlbumsByYear', params: { year: store.selectedYear || 'na' } });
 }
 
+const showScrollTopButton = ref(false);
 const pageNumber = ref(1);
 const itemsPerPage = ref(20);
 const albumStyle = ref((route.query.albumStyle as string) || 'list'); // List is default style
@@ -175,6 +178,18 @@ const scrollToTop = () => {
   container?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
 };
 
+const handleScrollToTopButton = () => {
+  showScrollTopButton.value = window.scrollY > 0;
+};
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScrollToTopButton);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScrollToTopButton);
+});
+
 const yearOptions = getYearOptions();
 
 // Only update the order of album list when user click sort button in order to prevent sorting multiple times
@@ -201,3 +216,14 @@ watch([pageNumber, itemsPerPage, searchKey, selectedTags, privateAlbum], () => {
   getFilteredAlbumList();
 });
 </script>
+<style lang="scss" scoped>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+</style>

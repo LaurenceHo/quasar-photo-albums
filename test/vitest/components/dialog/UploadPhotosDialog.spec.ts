@@ -101,11 +101,11 @@ describe('UploadPhotosDialog.vue', () => {
     expect(mockUploadFiles).toHaveBeenCalledOnce();
     vm.isCompleteUploading = true;
     await vm.$nextTick();
-    // After uploading files, emit refreshPhotoList event
-    expect(wrapper.emitted().refreshPhotoList[0]).toEqual([]);
     // Close dialog
     await wrapper.findComponent('[data-test-id="finish-button"]').trigger('click');
     await vm.$nextTick();
     expect(vm.files.length).toEqual(0);
+    // After uploading files and closing the dialog, emit refreshPhotoList event
+    expect(wrapper.emitted().refreshPhotoList[0]).toEqual([]);
   });
 });
