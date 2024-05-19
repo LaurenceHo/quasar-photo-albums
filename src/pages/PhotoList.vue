@@ -119,6 +119,7 @@
     <template v-if="photosInAlbum.length === 0 && !fetchingPhotos">
       <div class="text-h5 text-weight-medium">No results.</div>
     </template>
+    <ScrollToTopButton />
   </div>
   <MovePhotoDialog
     v-if="getMovePhotoDialogState"
@@ -147,6 +148,7 @@
 </template>
 
 <script lang="ts" setup>
+import ScrollToTopButton from 'components/button/ScrollToTopButton.vue';
 import ConfirmDeletePhotosDialog from 'components/dialog/ConfirmDeletePhotosDialog.vue';
 import MovePhotoDialog from 'components/dialog/MovePhotosDialog.vue';
 import PhotoDetailDialog from 'components/dialog/PhotoDetailDialog.vue';

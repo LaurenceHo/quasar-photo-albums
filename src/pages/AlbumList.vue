@@ -86,27 +86,17 @@
       <div v-else :class="`row ${$q.screen.lt.xl ? 'justify-center' : ''}`">
         <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
       </div>
-      <div
-        class="col-12 col-xl-4 col-lg-4 col-md-4 col-sm-grow flex items-center q-pt-md"
-        :class="$q.screen.lt.md ? 'justify-center' : 'justify-end'"
-      >
-        <Pagination
-          :items-per-page-props="itemsPerPage"
-          :page-number-props="pageNumber"
-          :total-items="totalItems"
-          :total-pages="totalPages"
-          @set-page-params="setPageParams"
-        />
-      </div>
     </template>
     <template v-else>
       <div class="text-h5 text-weight-medium">No results.</div>
     </template>
+    <ScrollToTopButton />
   </div>
 </template>
 
 <script lang="ts" setup>
 import Album from 'components/Album.vue';
+import ScrollToTopButton from 'components/button/ScrollToTopButton.vue';
 import Pagination from 'components/Pagination.vue';
 import { isEmpty } from 'radash';
 import { Album as AlbumItem } from 'src/components/models';

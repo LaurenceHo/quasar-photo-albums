@@ -1,8 +1,12 @@
 <template>
-  <component :is="tag" class="file-preview relative-position overflow-hidden q-mx-lg q-my-md">
+  <component
+    :is="tag"
+    class="file-preview relative-position overflow-hidden q-mx-lg q-my-md"
+    :style="$q.screen.lt.sm ? 'width: 100%' : 'width: 20%'"
+  >
     <div>{{ fileSize }}</div>
     <div class="relative-position">
-      <q-img v-if="isValidImageFile" :alt="file.file.name" :src="file.url" :title="file.file.name" ratio="1" />
+      <q-img v-if="isValidImageFile" :alt="file.file.name" :src="file.url" :title="file.file.name" />
       <div v-else>
         <div>This file is not allowed:</div>
         <strong>{{ file.file.name }}</strong>
@@ -64,8 +68,6 @@ const isValidImageFile = computed(() => {
 
 <style lang="scss" scoped>
 .file-preview {
-  width: 20%;
-
   button {
     top: 4px;
     right: 4px;

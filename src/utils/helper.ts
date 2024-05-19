@@ -16,8 +16,8 @@ export const getYearOptions = () => {
 export const compareDbUpdatedTime = async () => {
   const response = await fetch(getStaticFileUrl('updateDatabaseAt.json'));
   const dbUpdatedTimeJSON = await response.json();
-  // Updated time from s3
-  const { time } = dbUpdatedTimeJSON;
+  // Get updated time from s3
+  const time = dbUpdatedTimeJSON.time ?? Date.now();
   const localDbUpdatedTime = LocalStorage.getItem('DB_UPDATED_TIME');
   return {
     isLatest: localDbUpdatedTime === time,

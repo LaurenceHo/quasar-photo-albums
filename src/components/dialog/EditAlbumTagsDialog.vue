@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="updateAlbumTagsDialogState">
-    <q-card style="min-width: 400px">
+    <q-card :style="$q.screen.gt.xs ? 'min-width: 400px' : 'min-width: 360px'">
       <q-card-section class="flex justify-between">
         <div class="text-h6">Album tags</div>
         <q-btn color="primary" icon="mdi-tag-plus" outline text-color="primary" @click="createTagDialog = true" />

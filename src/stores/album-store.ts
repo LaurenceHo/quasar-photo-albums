@@ -89,13 +89,7 @@ export const albumStore = defineStore('albums', {
 
   actions: {
     async getAlbumsByYear(year?: string) {
-      let compareResult = { isLatest: true, time: '' };
-      if (year === undefined) {
-        // If updated time from localStorage is empty or different from S3, get albums from database
-        compareResult = await compareDbUpdatedTime();
-        // Set updated time in local storage
-        LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
-      }
+      let updatedAlbumList = false;
 
       const setAlbumToLocalStorage = async () => {
         const { data: albums } = await albumService.getAlbumsByYear(year);
@@ -105,27 +99,41 @@ export const albumStore = defineStore('albums', {
             albums,
           };
           LocalStorage.set('FILTERED_ALBUMS_BY_YEAR', JSON.stringify(persistedAlbumData));
+          updatedAlbumList = true;
         }
       };
 
+      this.loadingAllAlbumInformation = true;
+
+      // Check if DB updated time first and compare with local storage
+      let compareResult = { isLatest: true, time: '' };
+      if (year === undefined) {
+        compareResult = await compareDbUpdatedTime();
+        // Set updated time in local storage
+        LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
+      }
+
       const tempAlbumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
       const tempAlbumsString = LocalStorage.getItem('FILTERED_ALBUMS_BY_YEAR');
+      // If tempAlbumString is not empty, it means it's not user's first time visit the page
       const { year: yearForCompare }: { year: string; albums: Album[] } =
         !isEmpty(tempAlbumsString) && typeof tempAlbumsString === 'string' ? JSON.parse(tempAlbumsString) : {};
 
-      this.loadingAllAlbumInformation = true;
-
-      if (year !== undefined && year !== yearForCompare) {
+      // If local storage is not the latest data or request year is different from local storage (user selects year
+      // from the dropdown),we should get albums from database
+      if ((year !== undefined && year !== yearForCompare) || !compareResult.isLatest) {
         await setAlbumToLocalStorage();
       }
 
+      // If memory cache is empty, it means user refresh the page or open the page
       if (this.albumList.length === 0 || this.albumTags.length === 0) {
-        if (!compareResult.isLatest || isEmpty(tempAlbumsString)) {
+        // Only fetch albums if local storage is empty and we didn't fetch albums from database yet
+        if (isEmpty(tempAlbumsString) && !updatedAlbumList) {
           await setAlbumToLocalStorage();
         }
 
         // Only fetch tags if it's empty
-        if (!compareResult.isLatest || isEmpty(tempAlbumTagsString)) {
+        if (isEmpty(tempAlbumTagsString)) {
           const { data: tags } = await albumTagService.getAlbumTags();
           if (tags) {
             const albumTagsString = JSON.stringify(tags);
@@ -155,27 +163,9 @@ export const albumStore = defineStore('albums', {
       this.refreshAlbumList = true;
     },
 
-    updateAlbum(albumToBeUpdated: Album, deleteAlbum: boolean) {
-      if (this.selectedYear === albumToBeUpdated.year) {
-        const findIndex = this.albumList.findIndex((album) => album.id === albumToBeUpdated.id);
-        if (findIndex === -1) {
-          this.albumList.push(albumToBeUpdated);
-          this.albumList = this.albumList.sort((a, b) => {
-            if (this.sortOrder === 'asc') {
-              return a.albumName.localeCompare(b.albumName);
-            } else {
-              return b.albumName.localeCompare(a.albumName);
-            }
-          });
-        } else {
-          if (deleteAlbum) {
-            this.albumList.splice(findIndex, 1);
-          } else {
-            this.albumList.splice(findIndex, 1, albumToBeUpdated);
-          }
-        }
-        this.refreshAlbumList = true;
-      }
+    async updateAlbum() {
+      await this.getAlbumsByYear();
+      this.refreshAlbumList = true;
     },
 
     updateRefreshAlbumListFlag() {

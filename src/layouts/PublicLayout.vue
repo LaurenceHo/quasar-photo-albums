@@ -73,7 +73,7 @@
       </div>
     </q-header>
 
-    <q-page-container>
+    <q-page-container id="page-container">
       <template v-if="!isCheckingUserPermission">
         <router-view />
       </template>
