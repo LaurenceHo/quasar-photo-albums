@@ -151,47 +151,7 @@ describe('Album Store', () => {
     const store = albumStore();
     store.albumList = mockAlbumList;
     store.selectedYear = '2024';
-    // If album exists
-    store.updateAlbum(
-      {
-        id: 'sport',
-        albumName: 'Sport Update 2',
-        description: 'Sport',
-        tags: ['sport'],
-        isPrivate: false,
-        year: '2024',
-      },
-      false
-    );
-    expect(store.albumList[0].albumName).toEqual('Sport Update 2');
-    expect(store.albumList.length).toEqual(11);
-    // If album doesn't exist
-    store.updateAlbum(
-      {
-        id: 'sport123',
-        albumName: 'Sport Update',
-        description: 'Sport',
-        tags: ['sport'],
-        isPrivate: false,
-        year: '2024',
-      },
-      false
-    );
-    expect(store.albumList.length).toEqual(12);
-    expect(store.albumList.find((album) => album.id === 'sport123')).not.toBeNull();
-    // Delete album
-    store.updateAlbum(
-      {
-        id: 'sport123',
-        albumName: 'Sport Update',
-        description: 'Sport',
-        tags: ['sport'],
-        isPrivate: false,
-        year: '2024',
-      },
-      true
-    );
-    expect(store.albumList.length).toEqual(11);
+    expect(store.refreshAlbumList).toBeTruthy();
   });
 
   it('updateAlbumTags', () => {

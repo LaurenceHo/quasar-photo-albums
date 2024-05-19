@@ -140,7 +140,6 @@ import * as ExifReader from 'exifreader';
 import { NumberTag, StringArrayTag } from 'exifreader';
 import { useQuasar } from 'quasar';
 import { isEmpty } from 'radash';
-import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
@@ -149,7 +148,6 @@ import { useRoute, useRouter } from 'vue-router';
 defineEmits(['refreshPhotoList']);
 const userPermissionStore = userStore();
 const usePhotoStore = photoStore();
-const useAlbumStore = albumStore();
 
 const q = useQuasar();
 const router = useRouter();
@@ -304,17 +302,8 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-@media only screen and (max-width: 768px) {
-  .image-container {
-    height: inherit;
-    min-height: 300px;
-  }
-}
-
-@media only screen and (min-width: 769px) {
-  .image-container {
-    height: 80vh;
-  }
+.image-container {
+  min-height: 300px;
 }
 
 .absolute-left {

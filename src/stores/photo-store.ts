@@ -1,4 +1,4 @@
-import { Photo } from 'components/models';
+import { Album, Photo } from 'components/models';
 import { defineStore } from 'pinia';
 import { LocalStorage } from 'quasar';
 import PhotoService from 'src/services/photo-service';
@@ -47,15 +47,17 @@ export const photoStore = defineStore('photos', {
 
         const { data, code } = await photoService.getPhotosByAlbumId(albumId, albumYear);
 
-        useAlbumStore.selectedAlbumItem = data?.album ?? {
-          year: 'na',
-          id: '',
-          albumName: '',
-          albumCover: '',
-          description: '',
-          tags: [],
-          isPrivate: false,
-        };
+        useAlbumStore.selectedAlbumItem =
+          data?.album ??
+          ({
+            year: 'na',
+            id: '',
+            albumName: '',
+            albumCover: '',
+            description: '',
+            tags: [],
+            isPrivate: false,
+          } as Album);
         this.photoList = data?.photos ?? [];
         this.fetchingPhotos = false;
 

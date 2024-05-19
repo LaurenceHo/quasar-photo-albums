@@ -53,7 +53,8 @@
               {{ albumItem.description }}
             </q-item-label>
             <div class="flex">
-              <q-chip v-for="tag in tagsForDisplay" :key="tag" color="secondary" dense square>{{ tag }}</q-chip>{{albumItem?.tags?.length > 3 ? "...": ""}}
+              <q-chip v-for="tag in tagsForDisplay" :key="tag" color="secondary" dense square>{{ tag }} </q-chip>
+              {{ albumItem?.tags?.length > 3 ? '...' : '' }}
             </div>
           </q-item-section>
 
@@ -104,7 +105,7 @@ const router = useRouter();
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.albumCover)}`);
 const thumbnailSize = computed(() => (q.screen.lt.sm ? 60 : 90));
-const tagsForDisplay = computed(() => albumItem.value?.tags ? albumItem.value?.tags.slice(0, 3) : []);
+const tagsForDisplay = computed(() => (albumItem.value?.tags ? albumItem.value?.tags.slice(0, 3) : []));
 
 const goToAlbum = () => router.push(`/album/${albumItem.value?.year.replace('/', '')}/${albumItem.value?.id}`);
 </script>

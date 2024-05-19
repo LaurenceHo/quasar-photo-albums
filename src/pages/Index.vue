@@ -19,7 +19,7 @@
           </router-view>
         </template>
         <template v-else>
-          <template v-if="route.name === 'Albums'">
+          <template v-if="route.name === 'AlbumsByYear' || route.name === 'DefaultAlbums'">
             <skeleton-album-list />
           </template>
           <template v-else-if="route.name === 'Photos'">
