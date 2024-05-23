@@ -4,6 +4,7 @@
     maximized
     transition-hide="slide-down"
     transition-show="slide-up"
+    no-route-dismiss
     @escape-key="closeDialog"
     @keydown.left="nextPhoto(-1)"
     @keydown.right="nextPhoto(1)"
@@ -139,7 +140,6 @@ import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import * as ExifReader from 'exifreader';
 import { NumberTag, StringArrayTag } from 'exifreader';
 import { useQuasar } from 'quasar';
-import { isEmpty } from 'radash';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
@@ -165,12 +165,11 @@ const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const selectedImage = computed(() => usePhotoStore.findPhotoByIndex(selectedImageIndex.value));
 const photoList = computed(() => usePhotoStore.photoList);
 const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
-
 const albumId = computed(() => route.params.albumId as string);
 const albumYear = computed(() => route.params.year as string);
-const photoId = computed(() => route.query.photo as string);
-// FIXME, we should not use computed for dialog, however, if we don't use it, when we go to next photo, the dialog will close
-const dialog = computed(() => !isEmpty(photoId.value) && selectedImageIndex.value !== -1);
+
+const photoId = ref(route.query.photo as string);
+const dialog = ref(false);
 
 /** Photo EXIF data */
 const dateTime = computed(() => {
@@ -247,8 +246,8 @@ const nextPhoto = (dir: number) => {
   selectedImageIndex.value = (selectedImageIndex.value + (dir % photoListLength) + photoListLength) % photoListLength;
 
   if (selectedImage.value) {
-    const photoId = selectedImage.value.key.split('/')[1];
-    router.replace({ query: { photo: photoId } });
+    photoId.value = selectedImage.value.key.split('/')[1];
+    router.replace({ query: { photo: photoId.value } });
   }
 };
 
@@ -275,6 +274,8 @@ watch(
         message: 'Photo does not exist',
       });
       setTimeout(() => router.push(`/album/${albumYear.value}/${albumId.value}`), 3000);
+    } else {
+      dialog.value = true;
     }
   },
   { deep: true, immediate: true }
@@ -302,8 +303,17 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-.image-container {
-  min-height: 300px;
+@media only screen and (max-width: 1024px) {
+  .image-container {
+    height: inherit;
+    min-height: 300px;
+  }
+}
+
+@media only screen and (min-width: 1025px) {
+  .image-container {
+    height: 80vh;
+  }
 }
 
 .absolute-left {

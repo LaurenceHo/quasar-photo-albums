@@ -22,16 +22,31 @@
           @click="setPhotoListStyle('grid')"
         />
       </q-btn-group>
-      <q-btn v-if="albumItem?.place" icon="mdi-map" round size="md" unelevated data-test-id="album-map-button">
-        <q-tooltip :offset="[0, 0]" class="bg-transparent" max-width="300px" style="width: 300px">
+      <q-btn
+        v-if="albumItem?.place"
+        icon="mdi-map"
+        round
+        size="md"
+        unelevated
+        data-test-id="album-map-button"
+        @click="showMap = !showMap"
+      >
+        <q-tooltip
+          v-model="showMap"
+          :offset="[0, 0]"
+          class="bg-transparent"
+          max-width="300px"
+          style="width: 300px"
+          no-parent-event
+        >
           <q-card>
             <q-card-section class="text-h6 text-grey-7">
-              {{ albumItem.place.displayName }}
+              {{ albumItem.place?.displayName }}
             </q-card-section>
             <q-card-section>
               <PhotoLocationMap
-                :latitude="albumItem.place.location.latitude"
-                :longitude="albumItem.place.location.longitude"
+                :latitude="albumItem.place?.location.latitude"
+                :longitude="albumItem.place?.location.longitude"
               />
             </q-card-section>
           </q-card>
@@ -181,6 +196,8 @@ const {
   getRenamePhotoDialogState,
 } = DialogStateComposable();
 const { getSelectedPhotoList, setSelectedPhotosList } = SelectedItemsComposable();
+
+const showMap = ref(false);
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumId = computed(() => route.params.albumId as string);

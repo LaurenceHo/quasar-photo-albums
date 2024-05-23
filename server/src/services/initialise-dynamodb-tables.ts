@@ -71,6 +71,8 @@ const initialiseAlbumTable = async () => {
     } catch (error) {
       console.error(`Error creating ${albumTableName}:`, error);
     }
+  } else {
+    console.log(`${albumTableName} table exists.👍`);
   }
 };
 
@@ -100,6 +102,8 @@ const initialiseAlbumTagsTable = async () => {
     } catch (error) {
       console.error(`Error creating ${albumTagsTableName}:`, error);
     }
+  } else {
+    console.log(`${albumTagsTableName} table exists.👍`);
   }
 };
 
@@ -132,6 +136,8 @@ const initialiseUserTable = async () => {
     } catch (error) {
       console.error(`Error creating ${userTableName}:`, error);
     }
+  } else {
+    console.log(`${userTableName} table exists.👍`);
   }
 };
 
