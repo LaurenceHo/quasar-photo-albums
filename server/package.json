@@ -47,7 +47,7 @@
     "eslint-plugin-import": "^2.25.4",
     "form-auto-content": "^3.2.1",
     "rimraf": "^5.0.5",
-    "serverless": "^3.38.0",
+    "serverless": "^4.0.24",
     "serverless-dotenv-plugin": "^6.0.0",
     "serverless-plugin-typescript": "^2.1.5",
     "typescript": "^5.1.3",
