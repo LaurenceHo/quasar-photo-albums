@@ -200,10 +200,11 @@ const imageOriginalWidth = computed(() => Number(exifTags.value['Image Width']?.
 const imageOriginalHeight = computed(() => Number(exifTags.value['Image Height']?.value ?? 0));
 const isPhotoLandscape = computed(
   () =>
-    exifTags.value.Orientation?.value === 1 ||
-    exifTags.value.Orientation?.value === 3 ||
-    ((exifTags.value.Orientation?.value === 0 || !exifTags.value.Orientation) &&
-      imageOriginalWidth.value > imageOriginalHeight.value)
+    (!exifTags.value.Orientation ||
+      exifTags.value.Orientation?.value === 0 ||
+      exifTags.value.Orientation?.value === 1 ||
+      exifTags.value.Orientation?.value === 3) &&
+    imageOriginalWidth.value > imageOriginalHeight.value
 );
 /** Photo EXIF data */
 

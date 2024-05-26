@@ -136,8 +136,10 @@
     </template>
     <ScrollToTopButton />
   </div>
-  <div v-else class="q-pt-md" @refresh-photo-list="refreshPhotoList">
-    <PhotoDetail @refresh-photo-list="refreshPhotoList" @close-photo-detail="closePhotoDetail" />
+  <div v-else>
+    <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+      <PhotoDetail @refresh-photo-list="refreshPhotoList" @close-photo-detail="closePhotoDetail" />
+    </transition>
   </div>
   <MovePhotoDialog
     v-if="getMovePhotoDialogState"
