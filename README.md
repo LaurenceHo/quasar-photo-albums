@@ -143,11 +143,13 @@ implement login UI and authentication process by yourself. Once you set up Googl
 screen, you can access login UI by going to `http://localhost:9000/login`. You will also need to add your Google account
 information in the [DynamoDB table](server/README.md#aws-dynamodb) you created. If every thing is set up correctly, you should be able to login
 with your Google account and see the admin page as below:
-![web-capture1](doc-images/Web_capture_1.jpeg)
-![web-capture2](doc-images/Web_capture_2.jpeg)
-![web-capture3](doc-images/Web_capture_3.jpeg)
-![web-capture4](doc-images/Web_capture_4.jpeg)
-![web-capture5](doc-images/Web_capture_5.jpeg)
+![web-capture1](doc-images/Web_capture_1.webp)
+![web-capture2](doc-images/Web_capture_2.webp)
+![web-capture3](doc-images/Web_capture_3.webp)
+![web-capture4](doc-images/Web_capture_4.webp)
+![web-capture5](doc-images/Web_capture_5.webp)
+![web-capture6](doc-images/Web_capture_6.jpeg)
+![web-capture7](doc-images/Web_capture_7.webp)
 
 ### AWS Lambda Function
 
