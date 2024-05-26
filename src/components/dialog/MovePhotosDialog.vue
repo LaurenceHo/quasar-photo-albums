@@ -86,7 +86,7 @@ import { albumStore } from 'stores/album-store';
 import { computed, ref, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
-const emits = defineEmits(['refreshPhotoList', 'closePhotoDetailDialog']);
+const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 const props = defineProps({
   albumId: {
     type: String,
@@ -171,7 +171,7 @@ const confirmMovePhotos = async () => {
     if (duplicatedPhotoKeys.value.length === 0) {
       setMovePhotoDialogState(false);
 
-      emits('closePhotoDetailDialog');
+      emits('closePhotoDetail');
       emits('refreshPhotoList');
     } else {
       needToRefreshPhotoList.value = true;

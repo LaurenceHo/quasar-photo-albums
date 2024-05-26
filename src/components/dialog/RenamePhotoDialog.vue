@@ -55,7 +55,7 @@ import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';
 import { computed, ref, toRefs, watch } from 'vue';
 
-const emits = defineEmits(['refreshPhotoList', 'closePhotoDetailDialog']);
+const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 const props = defineProps({
   albumId: {
     type: String,
@@ -107,7 +107,7 @@ const confirmRenamePhoto = async () => {
         useAlbumStore.updateAlbumCover(albumToBeSubmitted);
       }
     }
-    emits('closePhotoDetailDialog');
+    emits('closePhotoDetail');
     emits('refreshPhotoList');
     setRenamePhotoDialogState(false);
   }
