@@ -101,7 +101,7 @@ describe('MovePhotosDialog.vue', () => {
     await vm.$nextTick();
     expect(vm.duplicatedPhotoKeys).toEqual([]);
     // Check emit event
-    expect(wrapper.emitted().closePhotoDetailDialog).toEqual([[]]);
+    expect(wrapper.emitted().closePhotoDetail).toEqual([[]]);
     expect(wrapper.emitted().refreshPhotoList).toEqual([[]]);
   });
 

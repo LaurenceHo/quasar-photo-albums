@@ -1,20 +1,20 @@
 import { createTestingPinia } from '@pinia/testing';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { mount } from '@vue/test-utils';
-import { LoadingBar, Notify, QDialog } from 'quasar';
+import { LoadingBar, Notify } from 'quasar';
 import { beforeEach, describe, expect, it } from 'vitest';
-import PhotoDetailDialog from '../../../../src/components/dialog/PhotoDetailDialog.vue';
-import { userStore } from '../../../../src/stores/user-store';
-import { mockAlbum, mockPhotoList } from '../../mock-data';
-import { mockRouter as router } from '../../mock-router';
+import PhotoDetail from '../../../src/components/PhotoDetail.vue';
+import { userStore } from '../../../src/stores/user-store';
+import { mockAlbum, mockPhotoList } from '../mock-data';
+import { mockRouter as router } from '../mock-router';
 
-installQuasarPlugin({ components: { QDialog }, plugins: { LoadingBar, Notify } });
+installQuasarPlugin({ plugins: { LoadingBar, Notify } });
 
 describe('PhotoDetailDialog.vue', () => {
   let wrapper: any;
 
   beforeEach(async () => {
-    wrapper = mount(PhotoDetailDialog, {
+    wrapper = mount(PhotoDetail, {
       global: {
         plugins: [
           router,
@@ -40,7 +40,7 @@ describe('PhotoDetailDialog.vue', () => {
       },
     });
 
-    await router.push(`/album/2024/album-1?photo=photo2.jpg`);
+    await router.push(`/album/2024/sport?photo=photo2.jpg`);
     await router.isReady();
   });
 

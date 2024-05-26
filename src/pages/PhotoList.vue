@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pt-md">
+  <div v-if="!showPhotoDetail" class="q-pt-md">
     <div :key="photoId" class="row items-center">
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated @click="goBack()" />
       <q-btn-group outline class="q-pl-sm">
@@ -22,16 +22,31 @@
           @click="setPhotoListStyle('grid')"
         />
       </q-btn-group>
-      <q-btn v-if="albumItem?.place" icon="mdi-map" round size="md" unelevated data-test-id="album-map-button">
-        <q-tooltip :offset="[0, 0]" class="bg-transparent" max-width="300px" style="width: 300px">
+      <q-btn
+        v-if="albumItem?.place"
+        icon="mdi-map"
+        round
+        size="md"
+        unelevated
+        data-test-id="album-map-button"
+        @click="showMap = !showMap"
+      >
+        <q-tooltip
+          v-model="showMap"
+          :offset="[0, 0]"
+          class="bg-transparent"
+          max-width="300px"
+          style="width: 300px"
+          no-parent-event
+        >
           <q-card>
             <q-card-section class="text-h6 text-grey-7">
-              {{ albumItem.place.displayName }}
+              {{ albumItem.place?.displayName }}
             </q-card-section>
             <q-card-section>
               <PhotoLocationMap
-                :latitude="albumItem.place.location.latitude"
-                :longitude="albumItem.place.location.longitude"
+                :latitude="albumItem.place?.location.latitude"
+                :longitude="albumItem.place?.location.longitude"
               />
             </q-card-section>
           </q-card>
@@ -121,16 +136,21 @@
     </template>
     <ScrollToTopButton />
   </div>
+  <div v-else>
+    <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+      <PhotoDetail @refresh-photo-list="refreshPhotoList" @close-photo-detail="closePhotoDetail" />
+    </transition>
+  </div>
   <MovePhotoDialog
     v-if="getMovePhotoDialogState"
     :album-id="albumItem?.id"
-    @close-photo-detail-dialog="closePhotoDetailDialog"
+    @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
   <ConfirmDeletePhotosDialog
     v-if="getDeletePhotoDialogState"
     :album-id="albumItem?.id"
-    @close-photo-detail-dialog="closePhotoDetailDialog"
+    @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
   <UploadPhotosDialog
@@ -138,11 +158,10 @@
     :album-id="albumItem?.id"
     @refresh-photo-list="refreshPhotoList"
   />
-  <PhotoDetailDialog v-if="photoId" @refresh-photo-list="refreshPhotoList" />
   <RenamePhotoDialog
     v-if="getRenamePhotoDialogState"
     :album-id="albumItem?.id"
-    @close-photo-detail-dialog="closePhotoDetailDialog"
+    @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
 </template>
@@ -151,18 +170,18 @@
 import ScrollToTopButton from 'components/button/ScrollToTopButton.vue';
 import ConfirmDeletePhotosDialog from 'components/dialog/ConfirmDeletePhotosDialog.vue';
 import MovePhotoDialog from 'components/dialog/MovePhotosDialog.vue';
-import PhotoDetailDialog from 'components/dialog/PhotoDetailDialog.vue';
 import RenamePhotoDialog from 'components/dialog/RenamePhotoDialog.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
 import { Album, Photo as IPhoto } from 'components/models';
 import Photo from 'components/Photo.vue';
+import PhotoDetail from 'components/PhotoDetail.vue';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
@@ -182,6 +201,8 @@ const {
 } = DialogStateComposable();
 const { getSelectedPhotoList, setSelectedPhotosList } = SelectedItemsComposable();
 
+const showMap = ref(false);
+
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumId = computed(() => route.params.albumId as string);
 const albumYear = computed(() => route.params.year as string);
@@ -193,6 +214,7 @@ const photoAmount = computed(() => photosInAlbum.value.length);
 const photoId = computed(() => route.query.photo as string);
 
 const photoStyle = ref((route.query.photoStyle as string) || 'grid'); // Grid is default photo list style
+const showPhotoDetail = ref(!!photoId.value);
 
 const goBack = () => router.back();
 
@@ -201,7 +223,10 @@ const setPhotoListStyle = (type: 'detail' | 'grid') => {
   router.replace({ query: { ...route.query, photoStyle: type } });
 };
 
-const closePhotoDetailDialog = async () => await router.replace({ query: { ...route.query, photo: undefined } });
+const closePhotoDetail = async () => {
+  showPhotoDetail.value = false;
+  await router.replace({ query: { ...route.query, photo: undefined } });
+};
 
 const refreshPhotoList = async () => {
   const isPrevAlbumEmpty = photosInAlbum.value.length === 0;
@@ -226,5 +251,9 @@ watch(albumId, (newValue) => {
     usePhotoStore.getPhotos(newValue, albumYear.value);
     setSelectedPhotosList([]);
   }
+});
+
+watch(photoId, (newValue) => {
+  showPhotoDetail.value = !!newValue;
 });
 </script>
