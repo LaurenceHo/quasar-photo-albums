@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 import mapboxgl from 'mapbox-gl';
-import { onMounted, toRefs } from 'vue';
+import { onMounted, onUnmounted, toRefs } from 'vue';
 
 const props = defineProps({
   latitude: {
@@ -19,21 +19,32 @@ const props = defineProps({
 
 const { latitude, longitude } = toRefs(props);
 
+let map: mapboxgl.Map;
 onMounted(() => {
   mapboxgl.accessToken = process.env.MAPBOX_API_KEY as string;
-  const map = new mapboxgl.Map({
-    container: 'photo-location-map',
-    style: 'mapbox://styles/mapbox/streets-v11',
-    center: [longitude.value, latitude.value],
-    zoom: 11,
-  });
+  const container = document.getElementById('photo-location-map');
 
-  // Create a default Marker and add it to the map.
-  new mapboxgl.Marker().setLngLat([longitude.value as number, latitude.value as number]).addTo(map);
+  if (container) {
+    map = new mapboxgl.Map({
+      container: 'photo-location-map',
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [longitude.value, latitude.value],
+      zoom: 11,
+    });
 
-  map.on('idle', () => {
-    map.resize();
-  });
+    // Create a default Marker and add it to the map.
+    new mapboxgl.Marker().setLngLat([longitude.value as number, latitude.value as number]).addTo(map);
+
+    map.on('idle', () => {
+      map.resize();
+    });
+  }
+});
+
+onUnmounted(() => {
+  if (map) {
+    map.remove();
+  }
 });
 </script>
 <style lang="scss">

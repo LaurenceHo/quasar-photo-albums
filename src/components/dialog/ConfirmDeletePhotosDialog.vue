@@ -32,7 +32,7 @@ import SelectedItemsComposable from 'src/composables/selected-items-composaable'
 import PhotoService from 'src/services/photo-service';
 import { computed, ref, toRefs } from 'vue';
 
-const emits = defineEmits(['refreshPhotoList', 'closePhotoDetailDialog']);
+const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 const props = defineProps({
   albumId: {
     type: String,
@@ -60,7 +60,7 @@ const confirmDeletePhotos = async () => {
   const result = await photoService.deletePhotos(albumId?.value, photoKeysArray.value);
   isProcessing.value = false;
   if (result.code === 200) {
-    emits('closePhotoDetailDialog');
+    emits('closePhotoDetail');
     emits('refreshPhotoList');
   }
   setDeletePhotoDialogState(false);

@@ -20,8 +20,8 @@ export const albumTagsTableSchema: CreateTableCommandInput = {
     },
   ],
   ProvisionedThroughput: {
-    ReadCapacityUnits: 1,
-    WriteCapacityUnits: 1,
+    ReadCapacityUnits: 4,
+    WriteCapacityUnits: 4,
   },
   TableName: albumTagsTableName,
 };
