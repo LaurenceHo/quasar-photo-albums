@@ -3,11 +3,37 @@ provider:
   name: aws
   runtime: nodejs20.x
   stage: dev
-  region: us-east-1
+  region: ${env:AWS_REGION_NAME}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:PHOTO_ALBUMS_TABLE_NAME}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:PHOTO_ALBUM_TAGS_TABLE_NAME}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:PHOTO_USER_PERMISSION_TABLE_NAME}
+        - Effect: Allow
+          Action:
+            - s3:ListBucket
+            - s3:GetObject
+            - s3:PutObject
+            - s3:DeleteObject
+          Resource:
+            - arn:aws:s3:::${env:AWS_S3_BUCKET_NAME}
+            - arn:aws:s3:::${env:AWS_S3_BUCKET_NAME}/*
 
 plugins:
   - serverless-plugin-typescript
   - serverless-dotenv-plugin
+  - serverless-dynamodb-stream-arn-plugin
 
 useDotenv: true
 
@@ -27,7 +53,15 @@ functions:
       PHOTO_ALBUMS_TABLE_NAME: ${env:PHOTO_ALBUMS_TABLE_NAME}
       PHOTO_ALBUM_TAGS_TABLE_NAME: ${env:PHOTO_ALBUM_TAGS_TABLE_NAME}
       PHOTO_USER_PERMISSION_TABLE_NAME: ${env:PHOTO_USER_PERMISSION_TABLE_NAME}
+      DATA_AGGREGATIONS_TABLE_NAME: ${env:DATA_AGGREGATIONS_TABLE_NAME}
       JWT_SECRET: ${env:JWT_SECRET}
+  aggregations:
+    handler: aggregations/locations.handler
+    events:
+      - stream:
+          arn: ${fetchStreamARN(${env:PHOTO_ALBUMS_TABLE_NAME})}
+          startingPosition: LATEST
+          enabled: true
 
 custom:
   dotenv:
