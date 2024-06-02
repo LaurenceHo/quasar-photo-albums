@@ -5,6 +5,7 @@ on:
     branches:
       - develop
     paths:
+      - "server/aggregations/**"
       - "server/src/**"
   pull_request:
     branches:
@@ -32,9 +33,10 @@ jobs:
       ALBUM_URL: ${{ vars.ALBUM_URL }}
       IMAGEKIT_CDN_URL: ${{ vars.IMAGEKIT_CDN_URL }}
       AWS_S3_BUCKET_NAME: ${{ vars.AWS_S3_BUCKET_NAME }}
-      PHOTO_ALBUMS_TABLE_NAME: ${{ vars.PHOTO_ALBUMS_TABLE_NAME }}
-      PHOTO_ALBUM_TAGS_TABLE_NAME: ${{ vars.PHOTO_ALBUM_TAGS_TABLE_NAME }}
-      PHOTO_USER_PERMISSION_TABLE_NAME: ${{ vars.PHOTO_USER_PERMISSION_TABLE_NAME }}
+      PHOTO_ALBUMS_TABLE_NAME: ${{ secrets.PHOTO_ALBUMS_TABLE_NAME }}
+      PHOTO_ALBUM_TAGS_TABLE_NAME: ${{ secrets.PHOTO_ALBUM_TAGS_TABLE_NAME }}
+      PHOTO_USER_PERMISSION_TABLE_NAME: ${{ secrets.PHOTO_USER_PERMISSION_TABLE_NAME }}
+      DATA_AGGREGATIONS_TABLE_NAME: ${{ secrets.DATA_AGGREGATIONS_TABLE_NAME }}
 
     steps:
       - uses: actions/checkout@v4
@@ -65,10 +67,11 @@ jobs:
           PHOTO_ALBUMS_TABLE_NAME=$PHOTO_ALBUMS_TABLE_NAME
           PHOTO_ALBUM_TAGS_TABLE_NAME=$PHOTO_ALBUM_TAGS_TABLE_NAME
           PHOTO_USER_PERMISSION_TABLE_NAME=$PHOTO_USER_PERMISSION_TABLE_NAME
+          DATA_AGGREGATIONS_TABLE_NAME=$DATA_AGGREGATIONS_TABLE_NAME
           EOF
 
       - name: Serverless deploy
-        uses: serverless/github-action@master
+        uses: LaurenceHo/serverless-github-action@master
         with:
           args: -c "cd ./server && serverless deploy --force --conceal"
           entrypoint: /bin/sh

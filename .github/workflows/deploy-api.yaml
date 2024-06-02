@@ -5,6 +5,7 @@ on:
     branches:
       - master
     paths:
+      - "server/aggregations/**"
       - "server/src/**"
   workflow_dispatch:
     inputs:
@@ -30,6 +31,7 @@ jobs:
       PHOTO_ALBUMS_TABLE_NAME: ${{ secrets.PHOTO_ALBUMS_TABLE_NAME }}
       PHOTO_ALBUM_TAGS_TABLE_NAME: ${{ secrets.PHOTO_ALBUM_TAGS_TABLE_NAME }}
       PHOTO_USER_PERMISSION_TABLE_NAME: ${{ secrets.PHOTO_USER_PERMISSION_TABLE_NAME }}
+      DATA_AGGREGATIONS_TABLE_NAME: ${{ secrets.DATA_AGGREGATIONS_TABLE_NAME }}
 
     steps:
       - uses: actions/checkout@v4
@@ -60,10 +62,11 @@ jobs:
           PHOTO_ALBUMS_TABLE_NAME=$PHOTO_ALBUMS_TABLE_NAME
           PHOTO_ALBUM_TAGS_TABLE_NAME=$PHOTO_ALBUM_TAGS_TABLE_NAME
           PHOTO_USER_PERMISSION_TABLE_NAME=$PHOTO_USER_PERMISSION_TABLE_NAME
+          DATA_AGGREGATIONS_TABLE_NAME=$DATA_AGGREGATIONS_TABLE_NAME
           EOF
 
       - name: Serverless deploy
-        uses: serverless/github-action@master
+        uses: LaurenceHo/serverless-github-action@master
         with:
           args: -c "cd ./server && serverless deploy --stage prod --force --conceal"
           entrypoint: /bin/sh
