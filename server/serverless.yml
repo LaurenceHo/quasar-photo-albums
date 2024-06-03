@@ -33,7 +33,7 @@ provider:
 plugins:
   - serverless-plugin-typescript
   - serverless-dotenv-plugin
-  - serverless-dynamodb-stream-arn-plugin
+  - ./src/serverless-plugins/get-dynamodb-stream-arn.cjs
 
 useDotenv: true
 
@@ -56,12 +56,28 @@ functions:
       DATA_AGGREGATIONS_TABLE_NAME: ${env:DATA_AGGREGATIONS_TABLE_NAME}
       JWT_SECRET: ${env:JWT_SECRET}
   aggregations:
-    handler: aggregations/locations.handler
+    handler: src/aggregations/locations.handler
     events:
       - stream:
           arn: ${fetchStreamARN(${env:PHOTO_ALBUMS_TABLE_NAME})}
           startingPosition: LATEST
           enabled: true
+
+resources:
+  Resources:
+    AggregationTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:DATA_AGGREGATIONS_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
 custom:
   dotenv:

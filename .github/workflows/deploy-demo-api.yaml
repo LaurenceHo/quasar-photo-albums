@@ -5,7 +5,6 @@ on:
     branches:
       - develop
     paths:
-      - "server/aggregations/**"
       - "server/src/**"
   pull_request:
     branches:
@@ -71,7 +70,7 @@ jobs:
           EOF
 
       - name: Serverless deploy
-        uses: LaurenceHo/serverless-github-action@master
+        uses: serverless/github-action@master
         with:
           args: -c "cd ./server && serverless deploy --force --conceal"
           entrypoint: /bin/sh
