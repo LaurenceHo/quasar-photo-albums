@@ -20,6 +20,7 @@ provider:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:PHOTO_ALBUMS_TABLE_NAME}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:PHOTO_ALBUM_TAGS_TABLE_NAME}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:PHOTO_USER_PERMISSION_TABLE_NAME}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:DATA_AGGREGATIONS_TABLE_NAME}
         - Effect: Allow
           Action:
             - s3:ListBucket
@@ -56,7 +57,7 @@ functions:
       DATA_AGGREGATIONS_TABLE_NAME: ${env:DATA_AGGREGATIONS_TABLE_NAME}
       JWT_SECRET: ${env:JWT_SECRET}
   aggregations:
-    handler: src/aggregations/locations.handler
+    handler: src/aggregations/albums.handler
     events:
       - stream:
           arn: ${fetchStreamARN(${env:PHOTO_ALBUMS_TABLE_NAME})}
