@@ -35,18 +35,19 @@
           v-model="showMap"
           :offset="[0, 0]"
           class="bg-transparent"
-          max-width="300px"
-          style="width: 300px"
+          max-width="320px"
+          style="width: 320px"
           no-parent-event
         >
           <q-card>
             <q-card-section class="text-h6 text-grey-7">
               {{ albumItem.place?.displayName }}
             </q-card-section>
-            <q-card-section>
+            <q-card-section class="flex justify-center">
               <PhotoLocationMap
                 :latitude="albumItem.place?.location.latitude"
                 :longitude="albumItem.place?.location.longitude"
+                width="250px"
               />
             </q-card-section>
           </q-card>

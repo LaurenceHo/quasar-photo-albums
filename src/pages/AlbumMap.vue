@@ -31,7 +31,7 @@ const geoJson = computed(() => ({
               : ''
           }` +
           `${album.description ? `<p>${album.description}</p>` : ''}` +
-          `<a href='/album/${album.id}'>View Album</a>`,
+          `<a href='/album/${album.year}/${album.id}'>View Album</a>`,
       },
     };
   }),

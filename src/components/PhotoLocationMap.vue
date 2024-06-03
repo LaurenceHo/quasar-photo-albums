@@ -1,5 +1,5 @@
 <template>
-  <div id="photo-location-map" class="rounded-borders-lg"></div>
+  <div id="photo-location-map" class="rounded-borders-lg" :style="`width: ${width}; height: ${height};`"></div>
 </template>
 
 <script lang="ts" setup>
@@ -15,9 +15,17 @@ const props = defineProps({
     type: Number,
     default: () => 0,
   },
+  width: {
+    type: String,
+    default: () => '100%',
+  },
+  height: {
+    type: String,
+    default: () => '300px',
+  },
 });
 
-const { latitude, longitude } = toRefs(props);
+const { latitude, longitude, width, height } = toRefs(props);
 
 let map: mapboxgl.Map;
 onMounted(() => {
@@ -47,9 +55,3 @@ onUnmounted(() => {
   }
 });
 </script>
-<style lang="scss">
-#photo-location-map {
-  width: 100%;
-  height: 300px;
-}
-</style>
