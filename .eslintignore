@@ -6,3 +6,5 @@
 /node_modules
 .eslintrc.js
 /src-ssr
+src/css/**
+src/assets/**

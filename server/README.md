@@ -5,7 +5,7 @@
 For the detailed tutorial, you can also check [here](https://dev.to/laurenceho/deploy-app-to-aws-by-using-serverless-framework-2gen).
 You can also check how to migrate Express.js to Fastify [here](https://dev.to/laurenceho/from-expressjs-to-fastify-45d4).
 
-### Create AWS user in IAM
+### Create an AWS user in IAM
 
 Before doing local development, you will need to create an AWS user in IAM with appropriate permission.
 You AWS user needs to have the following permissions:
@@ -13,6 +13,9 @@ You AWS user needs to have the following permissions:
 1. DynamoDB: PutItem, DeleteItem, GetItem, Scan, Query, UpdateItem
 2. S3: PutObject, GetObject, DeleteObject, ListBucket
    Permissions for DynamoDB and S3 are required for this project. If you want to use other AWS services, you will need to add more permissions.
+3. Serverless deployment permission which involves with various AWS services such as CloudFormation, Lambda and LogGroup
+
+I'd suggest this user has admin permission, restrict it only be used in your local environment.
 
 ```json
 {
@@ -20,20 +23,8 @@ You AWS user needs to have the following permissions:
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": [
-        "dynamodb:GetItem",
-        "dynamodb:PutItem",
-        "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:Scan",
-        "dynamodb:Query"
-      ],
-      "Resource": ["YOU_AWS_DYNAMODB_TABLE_ARN"] // There should be 3 tables you created before
-    },
-    {
-      "Effect": "Allow",
-      "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject", "s3:ListBucket"],
-      "Resource": ["YOUR_AWS_S3_BUCKET_ARN", "YOUR_AWS_S3_BUCKET_ARN/*"]
+      "Action": "*",
+      "Resource": "*"
     }
   ]
 }
@@ -45,11 +36,12 @@ your real information in`.env.example` and modify file name to `.env`.
 ### AWS DynamoDB
 
 Replace this properties `PHOTO_ALBUMS_TABLE_NAME`, `PHOTO_ALBUM_TAGS_TABLE_NAME`, `PHOTO_USER_PERMISSION_TABLE_NAME`
-with your real information in`.env.example` and modify file name to `.env`. When you run Fastify locally, it will use
-those environment variables to create table and insert mock into your DynamoDB, so you don't have to create tables manually.
-You can see the initial dynamodb table in [./src/services/initialise-dynamodb-tables.ts](./src/services/initialise-dynamodb-tables.ts).
+and `DATA_AGGREGATIONS_TABLE_NAME` with your real information in`.env.example` and modify file name to `.env`.
+When you run Fastify locally, it will use those environment variables to create table and insert mock into your
+DynamoDB, so you don't have to create tables manually. You can see the initial dynamodb table in [./src/services/initialise-dynamodb-tables.ts](./src/services/initialise-dynamodb-tables.ts).
 
-Once the tables are created, you can check them in AWS DynamoDB console.
+Once the tables are created, you can check them in AWS DynamoDB console. After photo album created, you will also need to
+create [DynamoDB Stream](https://docs.aws.amazon.com/lambda/latest/dg/with-ddb-example.html) for data aggregation.
 
 #### ElectroDB
 
@@ -121,9 +113,9 @@ Your `serverless.yaml` should look like as below:
 service: my-fastify-application
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   stage: dev
-  region: us-east-1
+  region: ${env:AWS_REGION_NAME}
 
 plugins:
   - serverless-plugin-typescript #A Serverless Framework plugin to transpile TypeScript before deploying
@@ -152,7 +144,6 @@ functions:
 custom:
   dotenv:
     exclude:
-      - AWS_REGION_NAME
       - AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY
 ```
@@ -160,7 +151,7 @@ custom:
 Now, let's deploy it to AWS Lambda:
 
 ```bash
-$ npx serverless deploy
+$ npm run serverless:deploy
 ```
 
 If this is your first time using Serverless Framework, you will be asked to set up your AWS credentials.
@@ -205,37 +196,8 @@ You can check your AWS Lambda function in AWS console. You should see a new Lamb
 
 ### AWS Permissions
 
-Because your Lambda function will access S3 bucket and DynamoDB, make sure your Lambda functions have the following permissions:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "dynamodb:GetItem",
-        "dynamodb:PutItem",
-        "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:Scan",
-        "dynamodb:Query"
-      ],
-      "Resource": ["YOU_AWS_DYNAMODB_TABLE_ARN"] // There should be 3 tables you created before
-    },
-    {
-      "Effect": "Allow",
-      "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject", "s3:ListBucket"],
-      "Resource": ["YOUR_AWS_S3_BUCKET_ARN", "YOUR_AWS_S3_BUCKET_ARN/*"]
-    },
-    {
-      "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents", "logs:TagResource"],
-      "Effect": "Allow",
-      "Resource": ["YOUR_AWS_LOG_GROUP_ARN"]
-    }
-  ]
-}
-```
+If you deploy your Lambda function running the above command `npm run serverless:deploy`, Serverless Framework will deal
+with AWS permissions for you as long as you set up the correct DynamoDB table names and S3 bucket name.
 
 ### Enabling binary support using the API Gateway console
 
@@ -286,3 +248,4 @@ Please check [here](https://docs.aws.amazon.com/apigateway/latest/developerguide
 ### Location
 
 - /api/location/search - GET: Search location by keyword
+- /api/location/albums - GET: Get albums with location for displaying on the map

@@ -7,7 +7,7 @@
   "scripts": {
     "serve": "quasar dev",
     "build": "quasar build",
-    "lint": "eslint --ext .vue,.ts src/** --ignore-pattern src/css/** --ignore-pattern src/assets/** --fix && prettier --write src/** --ignore-unknown",
+    "lint": "eslint --ext .vue,.ts ./src --fix && prettier --write ./src --ignore-unknown",
     "test": "vitest run --coverage",
     "prepare": "husky"
   },
