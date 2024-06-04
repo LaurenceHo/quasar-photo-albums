@@ -17,7 +17,7 @@
       </q-card-section>
       <q-card-section class="flex column justify-center items-center" style="height: 80vh">
         <DropZone v-slot="{ dropZoneActive }" @files-dropped="addFiles">
-          <q-checkbox v-model="override" label="Override existing photos" />
+          <q-checkbox v-model="overwrite" label="Overwrite existing photos" />
           <div
             v-if="!isCompleteUploading"
             class="text-weight-bold flex justify-center column items-center"
@@ -105,7 +105,7 @@ const props = defineProps({
 const { albumId } = toRefs(props);
 const { getUploadPhotoDialogState, setUploadPhotoDialogState } = DialogStateComposable();
 const { files, addFiles, removeFile } = useFileList();
-const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, override } = useFileUploader();
+const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, overwrite } = useFileUploader();
 const { uploadFiles } = createUploader(albumId.value);
 
 const onInputChange = (e: any) => {
@@ -121,7 +121,7 @@ const finishUploadPhotos = () => {
 };
 
 const closeDialog = () => {
-  override.value = false;
+  overwrite.value = false;
   clearFiles();
   setIsCompleteUploading(false);
   setUploadPhotoDialogState(false);

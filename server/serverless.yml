@@ -3,7 +3,33 @@ provider:
   name: aws
   runtime: nodejs20.x
   stage: dev
-  region: us-east-1
+  region: ${env:AWS_REGION_NAME}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:PHOTO_ALBUMS_TABLE_NAME}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:PHOTO_ALBUM_TAGS_TABLE_NAME}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:PHOTO_USER_PERMISSION_TABLE_NAME}
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:DATA_AGGREGATIONS_TABLE_NAME}
+        - Effect: Allow
+          Action:
+            - s3:ListBucket
+            - s3:GetObject
+            - s3:PutObject
+            - s3:DeleteObject
+          Resource:
+            - arn:aws:s3:::${env:AWS_S3_BUCKET_NAME}
+            - arn:aws:s3:::${env:AWS_S3_BUCKET_NAME}/*
 
 plugins:
   - serverless-plugin-typescript
@@ -27,7 +53,88 @@ functions:
       PHOTO_ALBUMS_TABLE_NAME: ${env:PHOTO_ALBUMS_TABLE_NAME}
       PHOTO_ALBUM_TAGS_TABLE_NAME: ${env:PHOTO_ALBUM_TAGS_TABLE_NAME}
       PHOTO_USER_PERMISSION_TABLE_NAME: ${env:PHOTO_USER_PERMISSION_TABLE_NAME}
+      DATA_AGGREGATIONS_TABLE_NAME: ${env:DATA_AGGREGATIONS_TABLE_NAME}
       JWT_SECRET: ${env:JWT_SECRET}
+  aggregations:
+    handler: src/aggregations/albums.handler
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [AlbumTable, StreamArn]
+
+resources:
+  Resources:
+    AlbumTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:PHOTO_ALBUMS_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+          - AttributeName: sk
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 4
+          WriteCapacityUnits: 4
+        DeletionProtectionEnabled: true
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+        StreamSpecification:
+          StreamViewType: KEYS_ONLY
+    AlbumTagTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:PHOTO_ALBUM_TAGS_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: tag
+            AttributeType: S
+        KeySchema:
+          - AttributeName: tag
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 4
+          WriteCapacityUnits: 1
+        DeletionProtectionEnabled: true
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+    UserPermissionTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:PHOTO_USER_PERMISSION_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: uid
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uid
+            KeyType: HASH
+          - AttributeName: email
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        DeletionProtectionEnabled: true
+    AggregationTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:DATA_AGGREGATIONS_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 4
+          WriteCapacityUnits: 4
+        DeletionProtectionEnabled: true
 
 custom:
   dotenv:

@@ -20,6 +20,8 @@ const locationRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, d
     },
   });
 
+  instance.get('/api/location/albums', controller.findAlbumsWithLocation);
+
   done();
 };
 

@@ -64,15 +64,17 @@ onMounted(() => {
     }
   };
 
-  google.accounts.id.initialize({
-    client_id: process.env.GOOGLE_CLIENT_ID ?? '',
-    callback: handleCredentialResponse,
-  });
-  google.accounts.id.renderButton(document.getElementById('google-login-button'), {
-    theme: 'outline',
-    size: 'large',
-    width: '240',
-  });
+  if (google) {
+    google.accounts.id.initialize({
+      client_id: process.env.GOOGLE_CLIENT_ID ?? '',
+      callback: handleCredentialResponse,
+    });
+    google.accounts.id.renderButton(document.getElementById('google-login-button'), {
+      theme: 'outline',
+      size: 'large',
+      width: '240',
+    });
+  }
 });
 
 const q = useQuasar();

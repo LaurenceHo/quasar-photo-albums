@@ -7,7 +7,7 @@
   >
     <div class="row items-center q-pb-none">
       <q-space />
-      <q-btn flat icon="mdi-close" round @click="$emit('closePhotoDetail')" />
+      <q-btn data-test-id="close-button" flat icon="mdi-close" round @click="$emit('closePhotoDetail')" />
     </div>
     <div class="row">
       <div class="col-12 col-xl-9 col-lg-9 col-md-9 column items-center">
@@ -158,7 +158,7 @@ const albumId = computed(() => route.params.albumId as string);
 const albumYear = computed(() => route.params.year as string);
 const photoId = computed(() => route.query.photo as string);
 
-/** Photo EXIF data */
+/** Compute photo EXIF data begin */
 const dateTime = computed(() => {
   if (exifTags.value.DateTime?.description) {
     const dateTime = exifTags.value.DateTime?.description.split(' ');
@@ -206,7 +206,7 @@ const isPhotoLandscape = computed(
       exifTags.value.Orientation?.value === 3) &&
     imageOriginalWidth.value > imageOriginalHeight.value
 );
-/** Photo EXIF data */
+/** Compute photo EXIF data end */
 
 const imageDisplayWidth = computed(() => {
   if (imageOriginalWidth.value > 1080 && imageContainerWidth.value > 1080) {
@@ -233,7 +233,7 @@ const nextPhoto = (dir: number) => {
 
   if (selectedImage.value) {
     const photoId = selectedImage.value.key.split('/')[1];
-    router.replace({ query: { photo: photoId } });
+    router.replace({ query: { ...route.query, photo: photoId } });
   }
 };
 
@@ -242,6 +242,7 @@ watch(loadImage, () => {
   imageContainerHeight.value = document.getElementById('photo-image-detail')?.clientHeight ?? 0;
 });
 
+// When photo id changes, verify if it exists first
 watch(
   photoId,
   (newId) => {
@@ -265,6 +266,7 @@ watch(
   { deep: true, immediate: true }
 );
 
+// If photo exists based on URL, get EXIF data from photo
 watch(
   selectedImage,
   async (newValue) => {

@@ -37,7 +37,7 @@ This is a fullstack photo album web app using Vue3, Quasar, Fastify and AWS (inc
 function, S3, CloudFront and dynamoDB). You can use this web app to display your photos in S3 bucket and manage your photos. This app
 is supposed to be used by a small group of people (e.g. family members) so it doesn't have any user management feature.
 
-For the detailed tutorial, you can check [here](https://dev.to/laurenceho/a-fullstack-vuejs-photo-album-app-part-1-2bgd).
+I've written the detailed tutorial on dev.to, you can check [here](https://dev.to/laurenceho/a-fullstack-vuejs-photo-album-app-part-1-2bgd).
 
 ### Built With
 
@@ -55,12 +55,12 @@ You will need the follows:
 
 1. Google Place API key (For admin manage albums)
 2. Google OAuth 2.0 Client ID (For admin access)
-3. AWS user and role with appropriate permission
+3. AWS user and role with admin permission for your local development and deployment
 4. AWS S3 bucket (For SPA website hosting and storing photos)
-5. AWS DynamoDB table (For managing album information)
-6. AWS Lambda Function with API Gateway
-7. AWS CloudFront (It's not necessary)
-8. ImageKit account (It's not necessary)
+5. AWS DynamoDB table (For managing album information, Serverless framework will create 3 table for you once you run serverless deploy)
+6. AWS Lambda Function with API Gateway (Serverless framework will create these for you once you run serverless deploy)
+7. AWS CloudFront (It's optional)
+8. ImageKit account (It's optional)
 9. Mapbox API key (For displaying map)
 
 ### Create S3 bucket
@@ -154,7 +154,12 @@ with your Google account and see the admin page as below:
 ### AWS Lambda Function
 
 This project uses AWS Lambda Function to handle all APIs (as BFF, backend for frontend) and authentication process
-once it's deployed to AWS. Please check further information in the `server` folder. [here](server/README.md)
+once it's deployed to AWS. When you run serverless deploy, it will create necessary Lambda Functions, API Gateway and
+DynamoDB for you.
+
+‼️ **️Important** ‼️
+Before you start local development, you will need to do serverless deploy first. Please check further
+information in the `server` folder. [here](server/README.md)
 
 ## How to run locally
 

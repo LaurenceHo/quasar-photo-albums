@@ -106,11 +106,11 @@ export const albumStore = defineStore('albums', {
       this.loadingAllAlbumInformation = true;
 
       // Check if DB updated time first and compare with local storage
-      let compareResult = { isLatest: true, time: '' };
+      let compareResult = { isLatest: true, dbUpdatedTime: '' };
       if (year === undefined) {
-        compareResult = await compareDbUpdatedTime();
+        compareResult = await compareDbUpdatedTime(LocalStorage.getItem('DB_UPDATED_TIME'));
         // Set updated time in local storage
-        LocalStorage.set('DB_UPDATED_TIME', compareResult.time);
+        LocalStorage.set('DB_UPDATED_TIME', compareResult.dbUpdatedTime);
       }
 
       const tempAlbumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';

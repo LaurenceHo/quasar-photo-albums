@@ -1,6 +1,6 @@
 <template>
-  <div v-if="!showPhotoDetail" class="q-pt-md">
-    <div :key="photoId" class="row items-center">
+  <div v-if="!photoId" class="q-pt-md">
+    <div class="row items-center">
       <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated @click="goBack()" />
       <q-btn-group outline class="q-pl-sm">
         <q-btn
@@ -35,18 +35,19 @@
           v-model="showMap"
           :offset="[0, 0]"
           class="bg-transparent"
-          max-width="300px"
-          style="width: 300px"
+          max-width="320px"
+          style="width: 320px"
           no-parent-event
         >
           <q-card>
             <q-card-section class="text-h6 text-grey-7">
               {{ albumItem.place?.displayName }}
             </q-card-section>
-            <q-card-section>
+            <q-card-section class="flex justify-center">
               <PhotoLocationMap
                 :latitude="albumItem.place?.location.latitude"
                 :longitude="albumItem.place?.location.longitude"
+                width="250px"
               />
             </q-card-section>
           </q-card>
@@ -214,7 +215,6 @@ const photoAmount = computed(() => photosInAlbum.value.length);
 const photoId = computed(() => route.query.photo as string);
 
 const photoStyle = ref((route.query.photoStyle as string) || 'grid'); // Grid is default photo list style
-const showPhotoDetail = ref(!!photoId.value);
 
 const goBack = () => router.back();
 
@@ -224,7 +224,6 @@ const setPhotoListStyle = (type: 'detail' | 'grid') => {
 };
 
 const closePhotoDetail = async () => {
-  showPhotoDetail.value = false;
   await router.replace({ query: { ...route.query, photo: undefined } });
 };
 
@@ -251,9 +250,5 @@ watch(albumId, (newValue) => {
     usePhotoStore.getPhotos(newValue, albumYear.value);
     setSelectedPhotosList([]);
   }
-});
-
-watch(photoId, (newValue) => {
-  showPhotoDetail.value = !!newValue;
 });
 </script>
