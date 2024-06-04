@@ -39,7 +39,7 @@ export default class LocationController extends BaseController {
     try {
       const albumData = await dataAggregationService.findOne({ key: 'ALBUM_WITH_LOCATIONS' });
 
-      return this.ok<Album[]>(reply, 'ok', (albumData.value as Album[]) ?? []);
+      return this.ok<Album[]>(reply, 'ok', (albumData?.value as Album[]) ?? []);
     } catch (err: any) {
       console.error(`Failed to query photo album: ${err}`);
       return this.fail(reply, 'Failed to query photo album');
