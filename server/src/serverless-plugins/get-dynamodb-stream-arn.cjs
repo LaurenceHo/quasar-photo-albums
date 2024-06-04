@@ -22,17 +22,13 @@ class fetchDynamoDBStreamsPlugin {
               region = params[1];
             }
             const tableName = params[0];
-            serverless.cli.log(
-            	`Fetching Streams of [ Table : ${tableName} ]`
-            );
+            serverless.cli.log(`Fetching Streams of [ Table : ${tableName} ]`);
             const data = await getDynamoDBStreams(region, tableName);
 
             myStreamArn = extractStreamARNFromStreamData(data, tableName);
             if (!myStreamArn) throw new Error('Could not find stream of this Table');
             else {
-              serverless.cli.log(
-              	`Fetched stream of [ Table : ${tableName} ]`
-              );
+              serverless.cli.log(`Fetched stream of [ Table : ${tableName} ]`);
             }
           } catch (err) {
             const errorMessage = err && err.message ? err.message : err;
