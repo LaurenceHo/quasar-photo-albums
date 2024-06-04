@@ -29,9 +29,9 @@ const routes: RouteRecordRaw[] = [
         ],
       },
       {
-        path: '/map',
+        path: '/map/albums',
         component: () => import('pages/AlbumMap.vue'),
-        name: 'Map',
+        name: 'AlbumMap',
       },
       {
         path: '/login',

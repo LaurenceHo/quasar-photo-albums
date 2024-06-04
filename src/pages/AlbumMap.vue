@@ -6,14 +6,28 @@
 import { Album as AlbumItem } from 'components/models';
 import mapboxgl from 'mapbox-gl';
 import { albumStore } from 'stores/album-store';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { LocalStorage } from 'quasar';
+import LocationService from 'src/services/location-service';
+import { isEmpty } from 'radash';
+import { compareDbUpdatedTime, getStaticFileUrl } from 'src/utils/helper';
+
+interface AlbumsWithLocation {
+  dbUpdatedTime: string;
+  albums: AlbumItem[];
+}
+
+const locationService = new LocationService();
 
 const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
 const store = albumStore();
-const albumsHaveLocation = computed(() => store.albumsHaveLocation);
+const albumsWithLocation = ref<AlbumItem[]>([]);
+const isFetching = ref(false);
+
+const albumsHaveLocationFromStore = computed(() => store.albumsHaveLocation);
 const geoJson = computed(() => ({
   type: 'FeatureCollection',
-  features: albumsHaveLocation.value.map((album: AlbumItem) => {
+  features: albumsWithLocation.value.map((album: AlbumItem) => {
     return {
       type: 'Feature',
       geometry: {
@@ -37,7 +51,43 @@ const geoJson = computed(() => ({
   }),
 }));
 
-onMounted(() => {
+const fetchAlbumsWithLocation = async (dbUpdatedTime?: string) => {
+  let time = dbUpdatedTime;
+  if (!time) {
+    const response = await fetch(getStaticFileUrl('updateDatabaseAt.json'));
+    const dbUpdatedTimeJSON = await response.json();
+    time = dbUpdatedTimeJSON.time;
+  }
+
+  const result = await locationService.getAlbumsWithLocation();
+  if (result.data?.length && result.data?.length > 0) {
+    LocalStorage.set(
+      'ALBUMS_WITH_LOCATION',
+      JSON.stringify({ dbUpdatedTime: time, albums: result.data } as AlbumsWithLocation)
+    );
+  }
+};
+onMounted(async () => {
+  isFetching.value = true;
+  if (!LocalStorage.getItem('ALBUMS_WITH_LOCATION')) {
+    await fetchAlbumsWithLocation();
+  } else {
+    const compareResult = await compareDbUpdatedTime(
+      JSON.parse(<string>LocalStorage.getItem('ALBUMS_WITH_LOCATION')).dbUpdatedTime
+    );
+    if (!compareResult.isLatest) {
+      await fetchAlbumsWithLocation(compareResult.dbUpdatedTime);
+    }
+  }
+  isFetching.value = false;
+
+  const albumsStringFromLocalStorage = LocalStorage.getItem('ALBUMS_WITH_LOCATION');
+
+  albumsWithLocation.value =
+    !isEmpty(albumsStringFromLocalStorage) && typeof albumsStringFromLocalStorage === 'string'
+      ? JSON.parse(albumsStringFromLocalStorage).albums
+      : albumsHaveLocationFromStore.value || [];
+
   mapboxgl.accessToken = process.env.MAPBOX_API_KEY as string;
   const map = new mapboxgl.Map({
     container: 'album-location-map',
@@ -54,19 +104,44 @@ onMounted(() => {
     map.addSource('albums', {
       type: 'geojson',
       data: geoJson.value,
+      clusterMaxZoom: 14, // Max zoom to cluster points on
+      clusterRadius: 50, // Radius of each cluster when clustering points (defaults to 50)
     } as any);
 
-    // Add a layer showing the places.
     map.addLayer({
-      id: 'albums',
+      id: 'clusters',
       type: 'circle',
       source: 'albums',
+      filter: ['has', 'point_count'],
       paint: {
-        'circle-color': '#ef6692',
-        'circle-radius': 6,
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#ffffff',
+        'circle-color': '#4264fb',
+        'circle-radius': 20,
       },
+    });
+
+    map.addLayer({
+      id: 'cluster-count',
+      type: 'symbol',
+      source: 'albums',
+      filter: ['has', 'point_count'],
+    });
+
+    map.loadImage('/marker-icon.png', (error, image) => {
+      if (error) throw error;
+      // Add the image to the map style.
+      map.addImage('marker', image as ImageBitmap);
+
+      // Add a layer to use the image to represent the data.
+      map.addLayer({
+        id: 'unclustered-point',
+        type: 'symbol',
+        source: 'albums',
+        filter: ['!', ['has', 'point_count']],
+        layout: {
+          'icon-image': 'marker', // reference the image
+          'icon-size': 0.25,
+        },
+      });
     });
 
     // Create a popup, but don't add it to the map yet.
@@ -74,7 +149,7 @@ onMounted(() => {
 
     // When mouse moves over a point on the map, open a popup at the
     // location of the feature, with description HTML from its properties.
-    map.on('mouseenter', 'albums', (event: any) => {
+    map.on('mouseenter', 'unclustered-point', (event: any) => {
       // Change the cursor style as a UI indicator.
       map.getCanvas().style.cursor = 'pointer';
 
@@ -92,7 +167,7 @@ onMounted(() => {
       popup.setLngLat(coordinates).setHTML(description).addTo(map);
     });
 
-    map.on('mouseleave', 'albums', () => {
+    map.on('mouseleave', 'unclustered-point', () => {
       map.getCanvas().style.cursor = '';
     });
   });
