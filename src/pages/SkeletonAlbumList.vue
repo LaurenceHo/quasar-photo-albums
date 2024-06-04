@@ -9,7 +9,7 @@
   </div>
   <q-skeleton type="rect" width="300px" class="q-mr-md q-mb-sm" />
   <div class="justify-center row">
-    <div v-for="n in 6" :key="n" class="col-xl-6 col-lg-7 col-md-8 col-sm-10 col-xs-12 q-pa-xs">
+    <div v-for="n in 10" :key="n" class="col-xl-6 col-lg-7 col-md-8 col-sm-10 col-xs-12 q-pa-xs">
       <q-card flat bordered>
         <q-item>
           <q-item-section avatar>
@@ -31,6 +31,5 @@
       </q-card>
     </div>
   </div>
-  <q-skeleton type="QRange" width="300px" class="q-ml-auto q-mt-md" />
 </template>
 <script setup lang="ts"></script>

@@ -1,5 +1,5 @@
 import { Handler, DynamoDBStreamEvent } from 'aws-lambda';
-import { DataAggregationEntity } from '../schemas/aggregation.js';
+import { ALBUM_WITH_LOCATIONS, DataAggregationEntity } from '../schemas/aggregation.js';
 import AlbumService from '../services/album-service.js';
 
 export const handler: Handler = async (event: DynamoDBStreamEvent, context, callback) => {
@@ -16,7 +16,7 @@ export const handler: Handler = async (event: DynamoDBStreamEvent, context, call
 
   try {
     await DataAggregationEntity.update({
-      key: 'ALBUM_WITH_LOCATIONS',
+      key: ALBUM_WITH_LOCATIONS,
     })
       .set({ value: albumLists })
       .go({ response: 'none' });
