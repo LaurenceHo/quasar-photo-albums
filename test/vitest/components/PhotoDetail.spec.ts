@@ -74,6 +74,36 @@ describe('PhotoDetailDialog.vue', () => {
     expect(vm.photoFileName).toEqual('cover.jpg');
   });
 
+  it('should be able to navigate photos when press right or left key', async () => {
+    const { vm } = wrapper as any;
+    await wrapper.trigger('keydown.right');
+    await vm.$nextTick();
+    expect(vm.selectedImageIndex).toBe(2);
+    expect(vm.photoFileName).toEqual('photo3.jpg');
+
+    await wrapper.trigger('keydown.left');
+    await wrapper.trigger('keydown.left');
+    await vm.$nextTick();
+    expect(vm.selectedImageIndex).toBe(0);
+    expect(vm.photoFileName).toEqual('photo1.jpg');
+  });
+
+  it('should emit event when clicking close button', async () => {
+    const { vm } = wrapper as any;
+    expect(wrapper.emitted().closePhotoDetail).toBeUndefined();
+    await wrapper.findComponent('[data-test-id="close-button"]').trigger('click');
+    await vm.$nextTick();
+    expect(wrapper.emitted().closePhotoDetail).toEqual([[]]);
+  });
+
+  it('should emit event when pressing esc key', async () => {
+    const { vm } = wrapper as any;
+    expect(wrapper.emitted().closePhotoDetail).toBeUndefined();
+    await wrapper.trigger('keydown.esc');
+    await vm.$nextTick();
+    expect(wrapper.emitted().closePhotoDetail).toEqual([[]]);
+  });
+
   it('should have correct selected index id', async () => {
     const { vm } = wrapper as any;
     await router.replace({ query: { photo: 'cover.jpg' } });

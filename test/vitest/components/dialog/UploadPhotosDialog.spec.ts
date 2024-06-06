@@ -10,7 +10,7 @@ installQuasarPlugin({ components: { QDialog } });
 const mockUploadFiles = vi.fn().mockImplementation(() => Promise.resolve());
 vi.mock('../../../../src/composables/file-uploader-composable', () => ({
   default: vi.fn().mockImplementation(() => ({
-    override: ref(false),
+    overwrite: ref(false),
     isUploading: ref(false),
     isCompleteUploading: ref(false),
     setIsCompleteUploading: vi.fn(),

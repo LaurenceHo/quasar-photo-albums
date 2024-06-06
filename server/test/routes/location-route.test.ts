@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { app } from '../../src/app';
 import { mockAlbumList } from '../mock-data';
+import { ALBUM_WITH_LOCATIONS } from '../../src/schemas/aggregation.js';
 
 vi.mock('../../src/controllers/helpers', async () => ({
   perform: () =>
@@ -19,7 +20,7 @@ vi.mock('../../src/services/data-aggregation-service', () => ({
   default: vi.fn().mockImplementation(() => ({
     findOne: () => {
       return Promise.resolve({
-        key: 'ALBUM_WITH_LOCATIONS',
+        key: ALBUM_WITH_LOCATIONS,
         value: mockAlbumList,
       });
     },

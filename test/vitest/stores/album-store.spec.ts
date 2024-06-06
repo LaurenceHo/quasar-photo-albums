@@ -193,7 +193,7 @@ describe('Album Store', () => {
       isPrivate: false,
       albumName: '6-album-6',
       description: '',
-      id: 'album1',
+      id: 'album6',
       tags: [],
       year: '2024',
     });
