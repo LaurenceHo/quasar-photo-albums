@@ -31,6 +31,8 @@ jobs:
       AWS_API_GATEWAY_URL: ${{ vars.AWS_API_GATEWAY_URL }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
+      MAP_CENTRE_LNG: ${{ vars.MAP_CENTRE_LNG }}
+      MAP_CENTRE_LAT: ${{ vars.MAP_CENTRE_LAT }}
 
     steps:
       - uses: actions/checkout@v4
@@ -52,6 +54,8 @@ jobs:
           MAPBOX_API_KEY=$MAPBOX_API_KEY
           AWS_API_GATEWAY_URL=$AWS_API_GATEWAY_URL
           GOOGLE_CLIENT_ID=DEMO_GOOGLE_CLIENT_ID
+          MAP_CENTRE_LNG=$MAP_CENTRE_LNG
+          MAP_CENTRE_LAT=$MAP_CENTRE_LAT
           EOF
 
       - name: Test and build

@@ -25,6 +25,9 @@ interface AlbumsWithLocation {
 const locationService = new LocationService();
 
 const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
+const mapCentreLng = Number(process.env.MAP_CENTRE_LNG ?? 174.7633);
+const mapCentreLat = Number(process.env.MAP_CENTRE_LAT ?? -36.8484);
+
 const store = albumStore();
 const albumsWithLocation = ref<AlbumItem[]>([]);
 const isFetching = ref(false);
@@ -75,6 +78,45 @@ const fetchAlbumsWithLocation = async (dbUpdatedTime?: string) => {
     );
   }
 };
+
+const inspectCluster = (
+  map: mapboxgl.Map,
+  e: (mapboxgl.MapMouseEvent | mapboxgl.MapTouchEvent) & {
+    features?: mapboxgl.MapboxGeoJSONFeature[] | undefined;
+  } & mapboxgl.EventData
+) => {
+  const features: Feature[] = map.queryRenderedFeatures(e.point, {
+    layers: ['clusters'],
+  });
+  const clusterId = features[0]?.properties?.cluster_id;
+  (map.getSource('albums') as any).getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
+    if (err) return;
+
+    map.easeTo({
+      center: (features[0]?.geometry as Point).coordinates as [number, number],
+      zoom: zoom,
+    });
+  });
+};
+
+const createPopup = (map: mapboxgl.Map, event: any, popup: mapboxgl.Popup) => {
+  // Change the cursor style as a UI indicator.
+  map.getCanvas().style.cursor = 'pointer';
+
+  const coordinates = event.features[0].geometry.coordinates.slice();
+  const description = event.features[0].properties.description;
+  // Ensure that if the map is zoomed out such that multiple
+  // copies of the feature are visible, the popup appears
+  // over the copy being pointed to.
+  while (Math.abs(event.lngLat.lng - coordinates[0]) > 180) {
+    coordinates[0] += event.lngLat.lng > coordinates[0] ? 360 : -360;
+  }
+
+  // Populate the popup and set its coordinates
+  // based on the feature found.
+  popup.setLngLat(coordinates).setHTML(description).addTo(map);
+};
+
 onMounted(async () => {
   isFetching.value = true;
   if (!LocalStorage.getItem('ALBUMS_WITH_LOCATION')) {
@@ -100,7 +142,7 @@ onMounted(async () => {
   const map = new mapboxgl.Map({
     container: 'album-location-map',
     style: 'mapbox://styles/mapbox/standard',
-    center: [174.763336, -36.848461],
+    center: [mapCentreLng, mapCentreLat],
     zoom: 3,
   });
 
@@ -162,20 +204,9 @@ onMounted(async () => {
       });
     });
 
-    // inspect a cluster on click
+    // Inspect a cluster on mouse event
     map.on('click', 'clusters', (e) => {
-      const features: Feature[] = map.queryRenderedFeatures(e.point, {
-        layers: ['clusters'],
-      });
-      const clusterId = features[0]?.properties?.cluster_id;
-      (map.getSource('albums') as any).getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
-        if (err) return;
-
-        map.easeTo({
-          center: (features[0]?.geometry as Point).coordinates as [number, number],
-          zoom: zoom,
-        });
-      });
+      inspectCluster(map, e);
     });
 
     map.on('mouseenter', 'clusters', () => {
@@ -185,31 +216,27 @@ onMounted(async () => {
       map.getCanvas().style.cursor = '';
     });
 
+    // Inspect a cluster on touch event
+    map.on('touchstart', 'clusters', (e) => {
+      inspectCluster(map, e);
+    });
+
     // Create a popup, but don't add it to the map yet.
     const popup = new mapboxgl.Popup();
 
     // When mouse moves over a point on the map, open a popup at the
     // location of the feature, with description HTML from its properties.
     map.on('mouseenter', 'unclustered-point', (event: any) => {
-      // Change the cursor style as a UI indicator.
-      map.getCanvas().style.cursor = 'pointer';
-
-      const coordinates = event.features[0].geometry.coordinates.slice();
-      const description = event.features[0].properties.description;
-      // Ensure that if the map is zoomed out such that multiple
-      // copies of the feature are visible, the popup appears
-      // over the copy being pointed to.
-      while (Math.abs(event.lngLat.lng - coordinates[0]) > 180) {
-        coordinates[0] += event.lngLat.lng > coordinates[0] ? 360 : -360;
-      }
-
-      // Populate the popup and set its coordinates
-      // based on the feature found.
-      popup.setLngLat(coordinates).setHTML(description).addTo(map);
+      createPopup(map, event, popup);
     });
 
     map.on('mouseleave', 'unclustered-point', () => {
       map.getCanvas().style.cursor = '';
+    });
+
+    // When touch moves over a point on the map, open a popup
+    map.on('touchstart', 'unclustered-point', (event: any) => {
+      createPopup(map, event, popup);
     });
   });
 });
