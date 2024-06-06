@@ -40,21 +40,21 @@ export const handler: Handler = async (event: DynamoDBStreamEvent, context, call
     await DataAggregationEntity.update({
       key: ALBUM_WITH_LOCATIONS,
     })
-      .set({ value: albumsHavePlace })
+      .set({ value: albumsHavePlace, updatedAt: new Date().toISOString() })
       .go({ response: 'none' });
 
     // Insert featured albums
     await DataAggregationEntity.update({
       key: FEATURED_ALBUMS,
     })
-      .set({ value: featuredAlbums })
+      .set({ value: featuredAlbums, updatedAt: new Date().toISOString() })
       .go({ response: 'none' });
 
     // Insert albums by year
     await DataAggregationEntity.update({
       key: ALBUM_BY_YEARS,
     })
-      .set({ value: albumsByYear })
+      .set({ value: albumsByYear, updatedAt: new Date().toISOString() })
       .go({ response: 'none' });
     callback(null, 'success');
   } catch (err: any) {
