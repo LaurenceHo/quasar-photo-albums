@@ -34,7 +34,6 @@ provider:
 plugins:
   - serverless-plugin-typescript
   - serverless-dotenv-plugin
-  - ./src/serverless-plugins/get-dynamodb-stream-arn.cjs
 
 useDotenv: true
 
@@ -60,12 +59,68 @@ functions:
     handler: src/aggregations/albums.handler
     events:
       - stream:
-          arn: ${fetchStreamARN(${env:PHOTO_ALBUMS_TABLE_NAME})}
-          startingPosition: LATEST
-          enabled: true
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [AlbumTable, StreamArn]
 
 resources:
   Resources:
+    AlbumTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:PHOTO_ALBUMS_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+          - AttributeName: sk
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 4
+          WriteCapacityUnits: 4
+        DeletionProtectionEnabled: true
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+        StreamSpecification:
+          StreamViewType: KEYS_ONLY
+    AlbumTagTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:PHOTO_ALBUM_TAGS_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: tag
+            AttributeType: S
+        KeySchema:
+          - AttributeName: tag
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 4
+          WriteCapacityUnits: 1
+        DeletionProtectionEnabled: true
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+    UserPermissionTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:PHOTO_USER_PERMISSION_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: uid
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uid
+            KeyType: HASH
+          - AttributeName: email
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        DeletionProtectionEnabled: true
     AggregationTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -79,6 +134,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 4
           WriteCapacityUnits: 4
+        DeletionProtectionEnabled: true
 
 custom:
   dotenv:
