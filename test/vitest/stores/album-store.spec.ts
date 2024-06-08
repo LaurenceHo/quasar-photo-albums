@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { albumStore } from '../../../src/stores/album-store';
 import {
   mockAlbumList,
-  mockAlbumTagList,
   mockGetAlbumsResponse,
   mockGetAlbumTagsResponse,
   mockGetUserPermissionResponse,
@@ -40,18 +39,17 @@ vi.mock('../../../src/services/album-tag-service', () => ({
 describe('Album Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      statusText: 'OK',
+      json: async () => ({ time: new Date().toISOString() }),
+    } as Response);
   });
 
   afterEach(() => {
     const store = albumStore();
     store.albumList = [];
-  });
-
-  it('updateRefreshAlbumListFlag', () => {
-    const store = albumStore();
-    expect(store.refreshAlbumList).toBeFalsy();
-    store.updateRefreshAlbumListFlag();
-    expect(store.refreshAlbumList).toBeTruthy();
   });
 
   it('filteredAlbumList', () => {
@@ -133,47 +131,10 @@ describe('Album Store', () => {
     ]);
   });
 
-  it('updateAlbumCover', () => {
+  it('updateAlbumTags', async () => {
     const store = albumStore();
-    store.albumList = mockAlbumList;
-    store.updateAlbumCover({
-      id: 'sport',
-      albumName: 'Sport Update',
-      description: 'Sport',
-      tags: ['sport'],
-      isPrivate: false,
-      year: '2024',
-    });
-    expect(store.albumList[0].albumName).toEqual('Sport Update');
-  });
-
-  it('updateAlbum', () => {
-    const store = albumStore();
-    store.albumList = mockAlbumList;
-    store.selectedYear = '2024';
-    expect(store.refreshAlbumList).toBeTruthy();
-  });
-
-  it('updateAlbumTags', () => {
-    const store = albumStore();
-    store.albumTags = mockAlbumTagList;
-    expect(store.albumTags.length).toEqual(3);
-    // Add tag
-    store.updateAlbumTags(
-      {
-        tag: 'sport1',
-      },
-      false
-    );
-    expect(store.albumTags.length).toEqual(4);
-    // Delete tag
-    store.updateAlbumTags(
-      {
-        tag: 'sport1',
-      },
-      true
-    );
-    expect(store.albumTags.length).toEqual(3);
+    await store.updateAlbumTags();
+    expect(store.albumTags).toEqual(mockGetAlbumTagsResponse.data);
   });
 
   it('getAlbumsByYear', async () => {

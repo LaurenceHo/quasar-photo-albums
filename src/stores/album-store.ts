@@ -193,12 +193,6 @@ export const albumStore = defineStore('albums', {
       this.loadingAllAlbumInformation = false;
     },
 
-    updateAlbumCover(albumToBeUpdated: Album) {
-      const findIndex = this.albumList.findIndex((album) => album.id === albumToBeUpdated.id);
-      // Update the selected album item in the store so that the album cover is updated in the photo detail dialog
-      this.selectedAlbumItem = albumToBeUpdated;
-    },
-
     async updateAlbumList(year?: string) {
       this.selectedYear = year || this.selectedYear;
       await _fetchAlbumAndSetToLocalStorage(year);
@@ -208,10 +202,6 @@ export const albumStore = defineStore('albums', {
     async updateAlbumTags() {
       await _fetchAlbumTagsAndSetToLocalStorage();
       this.albumTags = _getAlbumTagsFromLocalStorage();
-    },
-
-    setSearchKey(searchKey: string) {
-      this.searchKey = searchKey;
     },
 
     sortByKey(sortOrder: 'asc' | 'desc') {

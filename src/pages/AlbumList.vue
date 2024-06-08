@@ -168,6 +168,7 @@ const setPageParams = (params: { pageNumber: number; itemsPerPage: number }) => 
 
 const updateSortOrder = () => useAlbumStore.$patch({ sortOrder: sortOrder.value === 'desc' ? 'asc' : 'desc' });
 
+// TODO - Should fetch from DynamoDB
 const yearOptions = getYearOptions();
 
 useAlbumStore.getAlbumsByYear(paramsYear.value);

@@ -1,6 +1,6 @@
 import { createTestingPinia } from '@pinia/testing';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { Notify } from 'quasar';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import EditPhotoButton from '../../../../src/components/button/EditPhotoButton.vue';
@@ -35,14 +35,6 @@ describe('EditPhotoButton.vue', () => {
               albums: {
                 selectedAlbumItem: mockAlbum,
               },
-              'user-permission': {
-                userPermission: {
-                  uid: 'test-uid',
-                  email: 'test@example.com',
-                  role: 'admin',
-                  displayName: 'test-user',
-                },
-              },
             },
           }),
         ],
@@ -50,7 +42,7 @@ describe('EditPhotoButton.vue', () => {
     });
   });
 
-  it('Check button item', async () => {
+  it('Make album cover button', async () => {
     const { vm } = wrapper as any;
     await vm.$nextTick();
     const store = albumStore();
@@ -58,9 +50,9 @@ describe('EditPhotoButton.vue', () => {
     await vm.$nextTick();
     await wrapper.findComponent('[data-test-id="make-album-cover-button"]').trigger('click');
     await vm.$nextTick();
-
-    expect(vm.isAlbumCover).toBe(false);
-    expect(store.updateAlbumCover).toHaveBeenCalledWith({
+    await flushPromises();
+    expect(store.updateAlbumList).toBeCalledWith('2024');
+    expect(store.selectedAlbumItem).toEqual({
       id: 'sport',
       albumName: 'Sport',
       description: 'Sport desc',

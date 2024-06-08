@@ -1,9 +1,10 @@
 import { createTestingPinia } from '@pinia/testing';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
-import { flushPromises, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { Loading, LoadingBar, Notify } from 'quasar';
 import { beforeEach, describe, expect, it } from 'vitest';
 import AlbumList from '../../../src/pages/AlbumList.vue';
+import SkeletonAlbumList from '../../../src/pages/SkeletonAlbumList.vue';
 import { albumStore } from '../../../src/stores/album-store';
 import { mockAlbumList } from '../mock-data';
 import { mockRouter as router } from '../mock-router';
@@ -40,11 +41,18 @@ describe('AlbumList.vue', () => {
     });
   });
 
-  it('Check album list', async () => {
-    await router.isReady();
-    await flushPromises();
+  it('Should display skeleton when loading', async () => {
+    expect(wrapper.findComponent(SkeletonAlbumList).exists()).toBe(true);
+  });
 
+  it('Check album list', async () => {
     const { vm } = wrapper as any;
+
+    const store = albumStore();
+    store.loadingAllAlbumInformation = false;
+    await vm.$nextTick();
+    expect(wrapper.findComponent(SkeletonAlbumList).exists()).toBe(false);
+
     expect(vm.totalItems).toEqual(11);
     expect(vm.chunkAlbumList).toHaveLength(11);
     expect(vm.totalPages).toEqual(1);
@@ -52,8 +60,6 @@ describe('AlbumList.vue', () => {
 
     await wrapper.findComponent('[data-test-id="album-grid-style-button"]').trigger('click');
     await vm.$nextTick();
-    await router.isReady();
-    await flushPromises();
     expect(vm.albumStyle).toEqual('grid');
   });
 
@@ -77,7 +83,7 @@ describe('AlbumList.vue', () => {
     const store = albumStore();
     vm.selectedYear = '2024';
     await vm.$nextTick();
-    expect(store.getAlbumsByYear).toHaveBeenCalledWith('2024');
+    expect(store.getAlbumsByYear).toBeCalledWith('2024');
   });
 
   it('Search album list by category', async () => {
@@ -89,20 +95,12 @@ describe('AlbumList.vue', () => {
   });
 
   it('Test sort order', async () => {
+    const store = albumStore();
     const { vm } = wrapper as any;
     expect(vm.sortOrder).toEqual('desc');
-    expect(vm.chunkAlbumList[0]).toHaveProperty('albumName', 'Sport');
     await wrapper.findComponent('[data-test-id="album-sort-order-button"]').trigger('click');
     expect(vm.sortOrder).toEqual('asc');
-    expect(vm.chunkAlbumList[0]).toHaveProperty('albumName', '6-album-6');
-  });
-
-  it('Refresh album list', async () => {
-    const { vm } = wrapper as any;
-    const store = albumStore();
-    store.refreshAlbumList = true;
-    await vm.$nextTick();
-    expect(store.updateRefreshAlbumListFlag).toHaveBeenCalledOnce();
+    expect(store.sortByKey).toBeCalledWith('asc');
   });
 
   it('Filter private albums', async () => {

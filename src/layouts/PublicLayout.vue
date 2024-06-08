@@ -125,7 +125,7 @@ const logout = () => {
 };
 
 watch(searchKey, (newValue) => {
-  store.setSearchKey(newValue);
+  store.$patch({ searchKey: newValue });
 });
 
 watch(routeName, (newValue) => {

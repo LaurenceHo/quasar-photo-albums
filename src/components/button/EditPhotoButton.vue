@@ -81,7 +81,7 @@ const makeCoverPhoto = async () => {
   const response = await albumService.updateAlbum(albumToBeUpdated);
   if (response.code === 200) {
     await useAlbumStore.updateAlbumList(albumToBeUpdated.year);
-    useAlbumStore.updateAlbumCover(albumToBeUpdated);
+    useAlbumStore.$patch({ selectedAlbumItem: albumToBeUpdated });
   }
 };
 

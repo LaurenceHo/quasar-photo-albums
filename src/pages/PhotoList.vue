@@ -238,14 +238,15 @@ const refreshPhotoList = async () => {
   const isPrevAlbumEmpty = photosInAlbum.value.length === 0;
   await usePhotoStore.getPhotos(albumId.value, albumYear.value, true);
   const isCurrentAlbumEmpty = photosInAlbum.value.length === 0;
+
+  let albumToBeUpdated = { ...(albumItem.value as Album) };
   if (isPrevAlbumEmpty) {
     // If album is empty before uploading photos, set the first photo as album cover.
-    const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photosInAlbum.value[0].key as string };
-    useAlbumStore.updateAlbumCover(albumToBeSubmitted);
+    albumToBeUpdated = { ...(albumItem.value as Album), albumCover: photosInAlbum.value[0].key as string };
   } else if (!isPrevAlbumEmpty && isCurrentAlbumEmpty) {
-    const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: '' };
-    useAlbumStore.updateAlbumCover(albumToBeSubmitted);
+    albumToBeUpdated = { ...(albumItem.value as Album), albumCover: '' };
   }
+  useAlbumStore.$patch({ selectedAlbumItem: albumToBeUpdated });
 
   setSelectedPhotosList([]);
 };

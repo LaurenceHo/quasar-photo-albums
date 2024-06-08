@@ -5,16 +5,17 @@
     flat
     icon="mdi-dots-vertical"
     round
+    data-test-id="edit-album-button"
   >
     <q-menu>
       <q-list style="min-width: 100px">
-        <q-item v-close-popup clickable @click="setAlbum">
+        <q-item v-close-popup clickable data-test-id="set-album-button" @click="setAlbum">
           <q-item-section avatar>
             <q-icon color="primary" name="mdi-pencil" />
           </q-item-section>
           <q-item-section>Edit Album</q-item-section>
         </q-item>
-        <q-item v-close-popup clickable @click="deleteAlbum = true">
+        <q-item v-close-popup clickable data-test-id="delete-album-button" @click="deleteAlbum = true">
           <q-item-section avatar>
             <q-icon color="primary" name="mdi-delete" />
           </q-item-section>
@@ -23,7 +24,7 @@
       </q-list>
     </q-menu>
   </q-btn>
-  <q-dialog v-model="deleteAlbum" persistent>
+  <q-dialog v-model="deleteAlbum" persistent data-test-id="confirm-delete-album-dialog">
     <q-card>
       <q-card-section class="row items-center">
         <q-icon color="primary" name="mdi-alert-circle" size="md" />
