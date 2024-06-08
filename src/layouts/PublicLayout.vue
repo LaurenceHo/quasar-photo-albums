@@ -116,7 +116,6 @@ const buttonToggle = ref(
 );
 
 userPermissionStore.checkUserPermission();
-store.getAlbumsByYear();
 
 const logout = () => {
   authService.logout().then(() => {

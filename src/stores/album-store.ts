@@ -38,6 +38,37 @@ const initialState: AlbumState = {
   },
   selectedYear: 'na',
 };
+
+const FILTERED_ALBUMS_BY_YEAR = 'FILTERED_ALBUMS_BY_YEAR';
+const ALBUM_TAGS = 'ALBUM_TAGS';
+const DB_UPDATED_TIME = 'DB_UPDATED_TIME';
+
+const setAlbumToLocalStorage = async (year: string | undefined, updatedAlbumList: boolean) => {
+  const { data: albums } = await albumService.getAlbumsByYear(year);
+  if (albums) {
+    const persistedAlbumData = {
+      year,
+      albums,
+    };
+    LocalStorage.set(FILTERED_ALBUMS_BY_YEAR, JSON.stringify(persistedAlbumData));
+    updatedAlbumList = true;
+  }
+};
+
+const setAlbumTagsToLocalStorage = async () => {
+  const { data: tags } = await albumTagService.getAlbumTags();
+  if (tags) {
+    const albumTagsString = JSON.stringify(tags);
+    LocalStorage.set(ALBUM_TAGS, albumTagsString);
+  }
+};
+
+function getAlbumTagsFromLocalStorage() {
+  const albumTagsString: string = LocalStorage.getItem(ALBUM_TAGS) || '';
+  const tempAlbumTags: { tag: string }[] = !isEmpty(albumTagsString) ? JSON.parse(albumTagsString) : [];
+  return sortByKey(tempAlbumTags, 'tag', 'asc');
+}
+
 export const albumStore = defineStore('albums', {
   state: () => initialState,
 
@@ -89,68 +120,49 @@ export const albumStore = defineStore('albums', {
 
   actions: {
     async getAlbumsByYear(year?: string) {
-      let updatedAlbumList = false;
-
-      const setAlbumToLocalStorage = async () => {
-        const { data: albums } = await albumService.getAlbumsByYear(year);
-        if (albums) {
-          const persistedAlbumData = {
-            year,
-            albums,
-          };
-          LocalStorage.set('FILTERED_ALBUMS_BY_YEAR', JSON.stringify(persistedAlbumData));
-          updatedAlbumList = true;
-        }
-      };
-
+      const updatedAlbumList = false;
       this.loadingAllAlbumInformation = true;
 
       // Check if DB updated time first and compare with local storage
       let compareResult = { isLatest: true, dbUpdatedTime: '' };
       if (year === undefined) {
-        compareResult = await compareDbUpdatedTime(LocalStorage.getItem('DB_UPDATED_TIME'));
+        compareResult = await compareDbUpdatedTime(LocalStorage.getItem(DB_UPDATED_TIME));
         // Set updated time in local storage
-        LocalStorage.set('DB_UPDATED_TIME', compareResult.dbUpdatedTime);
+        LocalStorage.set(DB_UPDATED_TIME, compareResult.dbUpdatedTime);
       }
 
-      const tempAlbumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
-      const tempAlbumsString = LocalStorage.getItem('FILTERED_ALBUMS_BY_YEAR');
+      const tempAlbumTagsString: string = LocalStorage.getItem(ALBUM_TAGS) || '';
+      const tempAlbumsString = LocalStorage.getItem(FILTERED_ALBUMS_BY_YEAR);
       // If tempAlbumString is not empty, it means it's not user's first time visit the page
       const { year: yearForCompare }: { year: string; albums: Album[] } =
         !isEmpty(tempAlbumsString) && typeof tempAlbumsString === 'string' ? JSON.parse(tempAlbumsString) : {};
 
       // If local storage is not the latest data or request year is different from local storage (user selects year
       // from the dropdown),we should get albums from database
-      if ((year !== undefined && year !== yearForCompare) || !compareResult.isLatest) {
-        await setAlbumToLocalStorage();
-      }
-
-      // If memory cache is empty, it means user refresh the page or open the page
-      if (this.albumList.length === 0 || this.albumTags.length === 0) {
-        // Only fetch albums if local storage is empty and we didn't fetch albums from database yet
+      if (year !== undefined && year !== yearForCompare) {
+        await setAlbumToLocalStorage(year, updatedAlbumList);
+      } else if (!compareResult.isLatest) {
+        await setAlbumToLocalStorage(yearForCompare, updatedAlbumList);
+      } else if (this.albumList.length === 0 || this.albumTags.length === 0) {
+        // If memory cache is empty, it means user refresh the page or open the page
+        // Only fetch albums if local storage is empty, and we didn't fetch albums from database yet
         if (isEmpty(tempAlbumsString) && !updatedAlbumList) {
-          await setAlbumToLocalStorage();
+          await setAlbumToLocalStorage(year, updatedAlbumList);
         }
 
         // Only fetch tags if it's empty
         if (isEmpty(tempAlbumTagsString)) {
-          const { data: tags } = await albumTagService.getAlbumTags();
-          if (tags) {
-            const albumTagsString = JSON.stringify(tags);
-            LocalStorage.set('ALBUM_TAGS', albumTagsString);
-          }
+          await setAlbumTagsToLocalStorage();
         }
       }
       // Get albums from local storage again
-      const albumsString: string = LocalStorage.getItem('FILTERED_ALBUMS_BY_YEAR') || '';
+      const albumsString: string = LocalStorage.getItem(FILTERED_ALBUMS_BY_YEAR) || '';
       const { year: parsedYear, albums: parsedAlbum }: { year: string; albums: Album[] } = JSON.parse(albumsString);
 
       this.selectedYear = parsedYear;
       this.albumList = sortByKey(parsedAlbum, 'albumName', this.sortOrder);
       // Get album tags from local storage again
-      const albumTagsString: string = LocalStorage.getItem('ALBUM_TAGS') || '';
-      const tempAlbumTags: { tag: string }[] = !isEmpty(albumTagsString) ? JSON.parse(albumTagsString) : [];
-      this.albumTags = tempAlbumTags.sort((a, b) => a.tag.localeCompare(b.tag));
+      this.albumTags = getAlbumTagsFromLocalStorage();
 
       this.loadingAllAlbumInformation = false;
     },
@@ -172,14 +184,9 @@ export const albumStore = defineStore('albums', {
       this.refreshAlbumList = !this.refreshAlbumList;
     },
 
-    updateAlbumTags(albumTag: AlbumTag, deleteTag: boolean) {
-      if (deleteTag) {
-        const findIndex = this.albumTags.findIndex((tag) => tag.tag === albumTag.tag);
-        this.albumTags.splice(findIndex, 1);
-      } else {
-        this.albumTags.push(albumTag);
-      }
-      this.albumTags = this.albumTags.sort((a, b) => a.tag.localeCompare(b.tag));
+    async updateAlbumTags(albumTag: AlbumTag, deleteTag: boolean) {
+      await setAlbumTagsToLocalStorage();
+      this.albumTags = getAlbumTagsFromLocalStorage();
     },
 
     setSearchKey(searchKey: string) {

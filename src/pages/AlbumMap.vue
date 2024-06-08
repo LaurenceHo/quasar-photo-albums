@@ -143,7 +143,7 @@ onMounted(async () => {
     container: 'album-location-map',
     style: 'mapbox://styles/mapbox/standard',
     center: [mapCentreLng, mapCentreLat],
-    zoom: 3,
+    zoom: 4,
   });
 
   map.on('idle', () => {
