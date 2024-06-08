@@ -3,15 +3,15 @@
 </template>
 
 <script lang="ts" setup>
-import { Album as AlbumItem } from 'components/models';
+import { Album as AlbumItem, AlbumTag } from 'components/models';
 import mapboxgl from 'mapbox-gl';
 import { albumStore } from 'stores/album-store';
 import { computed, onMounted, ref } from 'vue';
 import { LocalStorage } from 'quasar';
 import LocationService from 'src/services/location-service';
-import { isEmpty } from 'radash';
 import { compareDbUpdatedTime, getStaticFileUrl } from 'src/utils/helper';
 import { Feature, Point } from 'geojson';
+import { get } from 'radash';
 
 interface GeoJson {
   type: 'FeatureCollection';
@@ -71,7 +71,7 @@ const fetchAlbumsWithLocation = async (dbUpdatedTime?: string) => {
   }
 
   const result = await locationService.getAlbumsWithLocation();
-  if (result.data?.length && result.data?.length > 0) {
+  if ((get(result, 'data') as AlbumItem[]).length > 0) {
     LocalStorage.set(
       'ALBUMS_WITH_LOCATION',
       JSON.stringify({ dbUpdatedTime: time, albums: result.data } as AlbumsWithLocation)
@@ -131,12 +131,10 @@ onMounted(async () => {
   }
   isFetching.value = false;
 
-  const albumsStringFromLocalStorage = LocalStorage.getItem('ALBUMS_WITH_LOCATION');
+  const albumsStringFromLocalStorage: string = LocalStorage.getItem('ALBUMS_WITH_LOCATION') || '';
 
   albumsWithLocation.value =
-    !isEmpty(albumsStringFromLocalStorage) && typeof albumsStringFromLocalStorage === 'string'
-      ? JSON.parse(albumsStringFromLocalStorage).albums
-      : albumsHaveLocationFromStore.value || [];
+    get(JSON.parse(albumsStringFromLocalStorage), 'albums', albumsHaveLocationFromStore.value) || [];
 
   mapboxgl.accessToken = process.env.MAPBOX_API_KEY as string;
   const map = new mapboxgl.Map({

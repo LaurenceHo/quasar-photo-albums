@@ -98,13 +98,13 @@ const confirmRenamePhoto = async () => {
   );
   if (result.code === 200) {
     if (isAlbumCover.value) {
-      const albumToBeSubmitted = {
+      const albumToBeUpdated = {
         ...selectedAlbum.value,
         albumCover: `${albumId.value}/${newPhotoNameWithoutExtension.value}${fileType}`,
       };
-      const response = await albumService.updateAlbum(albumToBeSubmitted);
+      const response = await albumService.updateAlbum(albumToBeUpdated);
       if (response.code === 200) {
-        useAlbumStore.updateAlbumCover(albumToBeSubmitted);
+        await useAlbumStore.updateAlbumList(albumToBeUpdated.year);
       }
     }
     emits('closePhotoDetail');

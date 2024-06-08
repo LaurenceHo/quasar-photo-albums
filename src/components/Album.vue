@@ -107,7 +107,7 @@ const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.albumCo
 const thumbnailSize = computed(() => (q.screen.lt.sm ? 60 : 90));
 const tagsForDisplay = computed(() => (albumItem.value?.tags ? albumItem.value?.tags.slice(0, 3) : []));
 
-const goToAlbum = () => router.push(`/album/${albumItem.value?.year.replace('/', '')}/${albumItem.value?.id}`);
+const goToAlbum = () => router.push(`/album/${albumItem.value?.year}/${albumItem.value?.id}`);
 </script>
 <style lang="scss" scoped>
 .no-album-cover-square {

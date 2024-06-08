@@ -36,7 +36,7 @@
                 </div>
               </template>
             </q-btn-toggle>
-            <q-input v-if="routeName === 'Albums'" v-model="searchKey" color="accent" dense outlined>
+            <q-input v-if="routeName === 'AlbumsByYear'" v-model="searchKey" color="accent" dense outlined>
               <template #prepend>
                 <q-icon name="mdi-magnify" />
               </template>

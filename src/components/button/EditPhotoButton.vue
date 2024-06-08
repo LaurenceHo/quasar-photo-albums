@@ -77,10 +77,11 @@ const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialog
 const { setSelectedPhotosList, setCurrentPhotoToBeRenamed } = SelectedItemsComposable();
 
 const makeCoverPhoto = async () => {
-  const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photoKey.value as string };
-  const response = await albumService.updateAlbum(albumToBeSubmitted);
+  const albumToBeUpdated = { ...(albumItem.value as Album), albumCover: photoKey.value as string };
+  const response = await albumService.updateAlbum(albumToBeUpdated);
   if (response.code === 200) {
-    useAlbumStore.updateAlbumCover(albumToBeSubmitted);
+    await useAlbumStore.updateAlbumList(albumToBeUpdated.year);
+    useAlbumStore.updateAlbumCover(albumToBeUpdated);
   }
 };
 

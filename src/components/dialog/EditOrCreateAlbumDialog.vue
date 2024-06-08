@@ -154,10 +154,12 @@ import LocationService from 'src/services/location-service';
 import { getYearOptions } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
 import { computed, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 const locationService = new LocationService();
 const albumService = new AlbumService();
 const store = albumStore();
+const router = useRouter();
 
 const { getUpdateAlbumDialogState, setUpdateAlbumDialogState } = DialogStateComposable();
 const { getAlbumToBeUpdate, setAlbumToBeUpdated } = SelectedItemsComposable();
@@ -221,8 +223,9 @@ const confirmUpdateAlbum = async () => {
   }
 
   if (result.code === 200) {
+    await store.updateAlbumList(albumToBeSubmitted.year);
+    await router.push({ name: 'AlbumsByYear', params: { year: albumToBeSubmitted.year } });
     resetAlbum();
-    await store.updateAlbum();
   }
   isProcessing.value = false;
 };

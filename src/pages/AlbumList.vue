@@ -128,8 +128,6 @@ if (!paramsYear.value) {
 const pageNumber = ref(1);
 const itemsPerPage = ref(20);
 const albumStyle = ref((route.query.albumStyle as string) || 'list'); // List is default style
-const totalItems = ref(useAlbumStore.albumList.length);
-const chunkAlbumList = ref(useAlbumStore.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
 const selectedTags = ref([]);
 const privateAlbum = ref(false);
 const selectedYear = ref((route.params.year as string) || useAlbumStore.selectedYear || 'na');
@@ -137,7 +135,6 @@ const selectedYear = ref((route.params.year as string) || useAlbumStore.selected
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const albumList = computed(() => useAlbumStore.albumList);
 const sortOrder = computed(() => useAlbumStore.sortOrder);
-const refreshAlbumList = computed(() => useAlbumStore.refreshAlbumList);
 const searchKey = computed(() => useAlbumStore.searchKey);
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
 const firstIndex = computed(() => (pageNumber.value - 1) * itemsPerPage.value);
@@ -147,17 +144,17 @@ const lastIndex = computed(() =>
 const sortIcon = computed(() =>
   sortOrder.value === 'desc' ? 'mdi-sort-alphabetical-descending' : 'mdi-sort-alphabetical-ascending'
 );
-
-const getFilteredAlbumList = () => {
+const filteredAlbumList = computed(() =>
+  useAlbumStore.filteredAlbumList(searchKey.value, selectedTags.value, privateAlbum.value)
+);
+const totalItems = computed(() => filteredAlbumList.value.length);
+const chunkAlbumList = computed(() => {
   if (!isEmpty(searchKey.value) || !isEmpty(selectedTags.value) || privateAlbum.value) {
-    const filteredAlbumList = useAlbumStore.filteredAlbumList(searchKey.value, selectedTags.value, privateAlbum.value);
-    totalItems.value = filteredAlbumList.length;
-    chunkAlbumList.value = filteredAlbumList.slice(firstIndex.value, lastIndex.value);
+    return filteredAlbumList.value.slice(firstIndex.value, lastIndex.value);
   } else {
-    totalItems.value = useAlbumStore.albumList.length;
-    chunkAlbumList.value = useAlbumStore.chunkAlbumList(firstIndex.value, lastIndex.value);
+    return useAlbumStore.chunkAlbumList(firstIndex.value, lastIndex.value);
   }
-};
+});
 
 const setAlbumStyle = (type: 'list' | 'grid') => {
   albumStyle.value = type;
@@ -177,15 +174,7 @@ useAlbumStore.getAlbumsByYear(paramsYear.value);
 
 // Only update the order of album list when user click sort button in order to prevent sorting multiple times
 watch(sortOrder, (newValue) => {
-  useAlbumStore.setAlbumList(sortByKey(useAlbumStore.albumList, 'albumName', newValue));
-  getFilteredAlbumList();
-});
-
-watch(refreshAlbumList, (newValue) => {
-  if (newValue) {
-    getFilteredAlbumList();
-    useAlbumStore.updateRefreshAlbumListFlag();
-  }
+  useAlbumStore.sortByKey(newValue);
 });
 
 watch(selectedYear, (newValue) => {
@@ -194,12 +183,4 @@ watch(selectedYear, (newValue) => {
     router.push({ name: 'AlbumsByYear', params: { year: newValue } });
   }
 });
-
-watch(
-  [albumList, pageNumber, itemsPerPage, searchKey, selectedTags, privateAlbum],
-  () => {
-    getFilteredAlbumList();
-  },
-  { immediate: true, deep: true }
-);
 </script>

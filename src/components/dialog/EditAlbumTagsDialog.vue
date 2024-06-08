@@ -93,7 +93,7 @@ const confirmCreateTag = async () => {
 
   const result = await albumTagService.createAlbumTag(tag);
   if (result.code === 200) {
-    store.updateAlbumTags(tag, false);
+    await store.updateAlbumTags();
   }
   createTagDialog.value = false;
   isProcessing.value = false;
@@ -104,12 +104,7 @@ const confirmDeleteAlbum = async () => {
   isProcessing.value = true;
   const result = await albumTagService.deleteAlbumTag(tagName.value);
   if (result.code === 200) {
-    store.updateAlbumTags(
-      {
-        tag: tagName.value,
-      },
-      true
-    );
+    await store.updateAlbumTags();
   }
   deleteTagDialog.value = false;
   isProcessing.value = false;
