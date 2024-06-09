@@ -24,17 +24,18 @@ export const compareDbUpdatedTime = async (localDbUpdatedTime: string | null) =>
   };
 };
 
-export const sortByKey = (array: any[], key: string, sorting: 'asc' | 'desc') => {
+export const sortByKey = <T>(array: T[], key: keyof T, sortOrder: 'asc' | 'desc'): T[] => {
   return array.sort((a, b) => {
-    if (typeof a[key] === 'string') {
-      return sorting === 'asc' ? a[key].localeCompare(b[key]) : b[key].localeCompare(a[key]);
-    }
+    const aValue = a[key];
+    const bValue = b[key];
 
-    if (typeof a[key] === 'number') {
-      return sorting === 'asc' ? a[key] - b[key] : b[key] - a[key];
+    if (typeof aValue === 'string' && typeof bValue === 'string') {
+      return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+    } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+    } else {
+      return 0;
     }
-
-    return 0;
   });
 };
 

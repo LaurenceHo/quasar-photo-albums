@@ -154,10 +154,12 @@ import LocationService from 'src/services/location-service';
 import { getYearOptions } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
 import { computed, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 const locationService = new LocationService();
 const albumService = new AlbumService();
 const store = albumStore();
+const router = useRouter();
 
 const { getUpdateAlbumDialogState, setUpdateAlbumDialogState } = DialogStateComposable();
 const { getAlbumToBeUpdate, setAlbumToBeUpdated } = SelectedItemsComposable();
@@ -201,7 +203,7 @@ const confirmUpdateAlbum = async () => {
 
   isProcessing.value = true;
 
-  const albumToBeSubmitted: Album = {
+  const albumToBeUpdated: Album = {
     year: selectedYear.value,
     id: getAlbumToBeUpdate.value.id || albumId.value,
     albumCover: getAlbumToBeUpdate.value.albumCover,
@@ -215,14 +217,15 @@ const confirmUpdateAlbum = async () => {
 
   let result;
   if (getAlbumToBeUpdate.value.id) {
-    result = await albumService.updateAlbum(albumToBeSubmitted);
+    result = await albumService.updateAlbum(albumToBeUpdated);
   } else {
-    result = await albumService.createAlbum(albumToBeSubmitted);
+    result = await albumService.createAlbum(albumToBeUpdated);
   }
 
   if (result.code === 200) {
+    await store.getAlbumsByYear(albumToBeUpdated.year, true);
+    await router.push({ name: 'AlbumsByYear', params: { year: albumToBeUpdated.year } });
     resetAlbum();
-    await store.updateAlbum();
   }
   isProcessing.value = false;
 };

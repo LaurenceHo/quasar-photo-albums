@@ -1,147 +1,153 @@
 <template>
-  <div v-if="!photoId" class="q-pt-md">
-    <div class="row items-center">
-      <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated @click="goBack()" />
-      <q-btn-group outline class="q-pl-sm">
+  <template v-if="!fetchingPhotos">
+    <div v-if="!photoId" class="q-pt-md">
+      <div class="row items-center">
+        <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated @click="goBack()" />
+        <q-btn-group outline class="q-pl-sm">
+          <q-btn
+            :outline="photoStyle === 'grid'"
+            color="primary"
+            data-test-id="photo-list-style-button"
+            dense
+            icon="mdi-format-list-bulleted-square"
+            padding="sm"
+            @click="setPhotoListStyle('detail')"
+          />
+          <q-btn
+            :outline="photoStyle === 'detail'"
+            color="primary"
+            data-test-id="photo-grid-style-button"
+            dense
+            icon="mdi-view-grid"
+            padding="sm"
+            @click="setPhotoListStyle('grid')"
+          />
+        </q-btn-group>
         <q-btn
-          :outline="photoStyle === 'grid'"
-          color="primary"
-          data-test-id="photo-list-style-button"
-          dense
-          icon="mdi-format-list-bulleted-square"
-          padding="sm"
-          @click="setPhotoListStyle('detail')"
-        />
-        <q-btn
-          :outline="photoStyle === 'detail'"
-          color="primary"
-          data-test-id="photo-grid-style-button"
-          dense
-          icon="mdi-view-grid"
-          padding="sm"
-          @click="setPhotoListStyle('grid')"
-        />
-      </q-btn-group>
-      <q-btn
-        v-if="albumItem?.place"
-        icon="mdi-map"
-        round
-        size="md"
-        unelevated
-        data-test-id="album-map-button"
-        @click="showMap = !showMap"
+          v-if="albumItem?.place"
+          icon="mdi-map"
+          round
+          size="md"
+          unelevated
+          data-test-id="album-map-button"
+          @click="showMap = !showMap"
+        >
+          <q-tooltip
+            v-model="showMap"
+            :offset="[0, 0]"
+            class="bg-transparent"
+            max-width="320px"
+            style="width: 320px"
+            no-parent-event
+          >
+            <q-card>
+              <q-card-section class="text-h6 text-grey-7">
+                {{ albumItem.place?.displayName }}
+              </q-card-section>
+              <q-card-section class="flex justify-center">
+                <PhotoLocationMap
+                  :latitude="albumItem.place?.location.latitude"
+                  :longitude="albumItem.place?.location.longitude"
+                  width="250px"
+                />
+              </q-card-section>
+            </q-card>
+          </q-tooltip>
+        </q-btn>
+        <div
+          class="text-h5 text-weight-medium q-py-md"
+          :class="albumItem?.place ? '' : 'q-pl-sm'"
+          data-test-id="album-name"
+        >
+          {{ albumItem?.albumName }} {{ albumItem?.isPrivate ? '(private album)' : '' }}
+        </div>
+      </div>
+      <div v-if="albumItem?.description" class="text-h6 text-grey-7 q-pb-sm" data-test-id="album-desc">
+        {{ albumItem?.description }}
+      </div>
+      <div v-if="albumItem?.tags?.length && albumItem?.tags?.length > 0" class="flex q-pb-md">
+        <q-chip v-for="(tag, i) in albumItem.tags" :key="i" color="secondary" data-test-id="album-tag">
+          {{ tag }}
+        </q-chip>
+      </div>
+      <q-card
+        v-if="isAdminUser"
+        bordered
+        class="admin-panel q-mb-md flex items-center justify-between"
+        flat
+        data-test-id="photo-manage-panel"
       >
-        <q-tooltip
-          v-model="showMap"
-          :offset="[0, 0]"
-          class="bg-transparent"
-          max-width="320px"
-          style="width: 320px"
-          no-parent-event
-        >
-          <q-card>
-            <q-card-section class="text-h6 text-grey-7">
-              {{ albumItem.place?.displayName }}
-            </q-card-section>
-            <q-card-section class="flex justify-center">
-              <PhotoLocationMap
-                :latitude="albumItem.place?.location.latitude"
-                :longitude="albumItem.place?.location.longitude"
-                width="250px"
-              />
-            </q-card-section>
-          </q-card>
-        </q-tooltip>
-      </q-btn>
-      <div
-        class="text-h5 text-weight-medium q-py-md"
-        :class="albumItem?.place ? '' : 'q-pl-sm'"
-        data-test-id="album-name"
-      >
-        {{ albumItem?.albumName }} {{ albumItem?.isPrivate ? '(private album)' : '' }}
-      </div>
+        <div class="text-h6 flex items-center">
+          <q-btn flat icon="mdi-image-plus" round @click="setUploadPhotoDialogState(true)">
+            <q-tooltip> Upload photos</q-tooltip>
+          </q-btn>
+          <q-separator inset vertical />
+          <q-btn
+            v-if="getSelectedPhotoList.length !== photoAmount && getSelectedPhotoList.length < 50"
+            flat
+            icon="mdi-check-all"
+            round
+            data-test-id="select-all-photos-button"
+            @click="setSelectedPhotosList(photoKeysList)"
+          >
+            <q-tooltip> Select all photos (Max 50 photos)</q-tooltip>
+          </q-btn>
+          <q-btn
+            v-if="getSelectedPhotoList.length > 0"
+            flat
+            icon="mdi-close"
+            round
+            data-test-id="unselect-all-photos-button"
+            @click="setSelectedPhotosList([])"
+          >
+            <q-tooltip> Unselect all photos</q-tooltip>
+          </q-btn>
+          <div v-if="getSelectedPhotoList.length > 0">{{ getSelectedPhotoList.length }} selected</div>
+        </div>
+        <div>
+          <q-btn
+            v-if="getSelectedPhotoList.length > 0"
+            flat
+            icon="mdi-delete"
+            round
+            @click="setDeletePhotoDialogState(true)"
+          >
+            <q-tooltip> Delete selected photos</q-tooltip>
+          </q-btn>
+          <q-btn
+            v-if="getSelectedPhotoList.length > 0"
+            flat
+            icon="mdi-image-move"
+            round
+            @click="setMovePhotoDialogState(true)"
+          >
+            <q-tooltip> Move selected photos to another album</q-tooltip>
+          </q-btn>
+        </div>
+      </q-card>
+      <template v-if="photosInAlbum.length > 0">
+        <div v-if="photoStyle === 'grid'" class="q-col-gutter-md row">
+          <Photo v-for="photo in photosInAlbum" :key="photo.key" :photo="photo" :photo-style="photoStyle" />
+        </div>
+        <div v-else class="row">
+          <Photo v-for="photo in photosInAlbum" :key="photo.key" :photo="photo" :photo-style="photoStyle" />
+        </div>
+      </template>
+      <template v-if="photosInAlbum.length === 0">
+        <div class="text-h5 text-weight-medium">No results.</div>
+      </template>
+      <ScrollToTopButton />
     </div>
-    <div v-if="albumItem?.description" class="text-h6 text-grey-7 q-pb-sm" data-test-id="album-desc">
-      {{ albumItem?.description }}
+    <div v-else>
+      <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+        <PhotoDetail @refresh-photo-list="refreshPhotoList" @close-photo-detail="closePhotoDetail" />
+      </transition>
     </div>
-    <div v-if="albumItem?.tags?.length && albumItem?.tags?.length > 0" class="flex q-pb-md">
-      <q-chip v-for="(tag, i) in albumItem.tags" :key="i" color="secondary" data-test-id="album-tag">
-        {{ tag }}
-      </q-chip>
-    </div>
-    <q-card
-      v-if="isAdminUser"
-      bordered
-      class="admin-panel q-mb-md flex items-center justify-between"
-      flat
-      data-test-id="photo-manage-panel"
-    >
-      <div class="text-h6 flex items-center">
-        <q-btn flat icon="mdi-image-plus" round @click="setUploadPhotoDialogState(true)">
-          <q-tooltip> Upload photos</q-tooltip>
-        </q-btn>
-        <q-separator inset vertical />
-        <q-btn
-          v-if="getSelectedPhotoList.length !== photoAmount && getSelectedPhotoList.length < 50"
-          flat
-          icon="mdi-check-all"
-          round
-          data-test-id="select-all-photos-button"
-          @click="setSelectedPhotosList(photoKeysList)"
-        >
-          <q-tooltip> Select all photos (Max 50 photos)</q-tooltip>
-        </q-btn>
-        <q-btn
-          v-if="getSelectedPhotoList.length > 0"
-          flat
-          icon="mdi-close"
-          round
-          data-test-id="unselect-all-photos-button"
-          @click="setSelectedPhotosList([])"
-        >
-          <q-tooltip> Unselect all photos</q-tooltip>
-        </q-btn>
-        <div v-if="getSelectedPhotoList.length > 0">{{ getSelectedPhotoList.length }} selected</div>
-      </div>
-      <div>
-        <q-btn
-          v-if="getSelectedPhotoList.length > 0"
-          flat
-          icon="mdi-delete"
-          round
-          @click="setDeletePhotoDialogState(true)"
-        >
-          <q-tooltip> Delete selected photos</q-tooltip>
-        </q-btn>
-        <q-btn
-          v-if="getSelectedPhotoList.length > 0"
-          flat
-          icon="mdi-image-move"
-          round
-          @click="setMovePhotoDialogState(true)"
-        >
-          <q-tooltip> Move selected photos to another album</q-tooltip>
-        </q-btn>
-      </div>
-    </q-card>
-    <template v-if="photosInAlbum.length > 0">
-      <div v-if="photoStyle === 'grid'" class="q-col-gutter-md row">
-        <Photo v-for="photo in photosInAlbum" :key="photo.key" :photo="photo" :photo-style="photoStyle" />
-      </div>
-      <div v-else class="row">
-        <Photo v-for="photo in photosInAlbum" :key="photo.key" :photo="photo" :photo-style="photoStyle" />
-      </div>
-    </template>
-    <template v-if="photosInAlbum.length === 0 && !fetchingPhotos">
-      <div class="text-h5 text-weight-medium">No results.</div>
-    </template>
-    <ScrollToTopButton />
-  </div>
-  <div v-else>
-    <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-      <PhotoDetail @refresh-photo-list="refreshPhotoList" @close-photo-detail="closePhotoDetail" />
-    </transition>
-  </div>
+  </template>
+  <template v-else>
+    <skeleton-photo-list />
+  </template>
+
   <MovePhotoDialog
     v-if="getMovePhotoDialogState"
     :album-id="albumItem?.id"
@@ -177,8 +183,10 @@ import { Album, Photo as IPhoto } from 'components/models';
 import Photo from 'components/Photo.vue';
 import PhotoDetail from 'components/PhotoDetail.vue';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
+import SkeletonPhotoList from 'pages/SkeletonPhotoList.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import SelectedItemsComposable from 'src/composables/selected-items-composaable';
+import AlbumService from 'src/services/album-service';
 import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
@@ -187,6 +195,8 @@ import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
+
+const albumService = new AlbumService();
 
 const useAlbumStore = albumStore();
 const userPermissionStore = userStore();
@@ -231,18 +241,25 @@ const refreshPhotoList = async () => {
   const isPrevAlbumEmpty = photosInAlbum.value.length === 0;
   await usePhotoStore.getPhotos(albumId.value, albumYear.value, true);
   const isCurrentAlbumEmpty = photosInAlbum.value.length === 0;
+
+  let albumToBeUpdated = null;
   if (isPrevAlbumEmpty) {
     // If album is empty before uploading photos, set the first photo as album cover.
-    const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: photosInAlbum.value[0].key as string };
-    useAlbumStore.updateAlbumCover(albumToBeSubmitted);
+    albumToBeUpdated = { ...(albumItem.value as Album), albumCover: photosInAlbum.value[0].key as string };
   } else if (!isPrevAlbumEmpty && isCurrentAlbumEmpty) {
-    const albumToBeSubmitted = { ...(albumItem.value as Album), albumCover: '' };
-    useAlbumStore.updateAlbumCover(albumToBeSubmitted);
+    albumToBeUpdated = { ...(albumItem.value as Album), albumCover: '' };
+  }
+  if (albumToBeUpdated) {
+    const result = await albumService.updateAlbum(albumToBeUpdated);
+    if (result.code === 200) {
+      await useAlbumStore.getAlbumsByYear(albumToBeUpdated.year, true);
+    }
   }
 
   setSelectedPhotosList([]);
 };
 
+useAlbumStore.getAlbumsByYear();
 usePhotoStore.getPhotos(albumId.value, albumYear.value);
 
 watch(albumId, (newValue) => {

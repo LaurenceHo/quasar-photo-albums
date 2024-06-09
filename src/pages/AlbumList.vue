@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pt-md">
+  <div v-if="!loadingAllAlbumInformation" class="q-pt-md">
     <div class="q-pb-md row justify-between items-center content-center">
       <div class="col-shrink q-mr-sm q-pb-sm">
         <q-btn-group outline>
@@ -92,12 +92,16 @@
     </template>
     <ScrollToTopButton />
   </div>
+  <template v-else>
+    <skeleton-album-list />
+  </template>
 </template>
 
 <script lang="ts" setup>
 import Album from 'components/Album.vue';
 import ScrollToTopButton from 'components/button/ScrollToTopButton.vue';
 import Pagination from 'components/Pagination.vue';
+import SkeletonAlbumList from 'pages/SkeletonAlbumList.vue';
 import { isEmpty } from 'radash';
 import { Album as AlbumItem } from 'src/components/models';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
@@ -109,30 +113,29 @@ import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
-const store = albumStore();
+const useAlbumStore = albumStore();
 const userPermissionStore = userStore();
 
+const loadingAllAlbumInformation = computed(() => useAlbumStore.loadingAllAlbumInformation);
 const { albumTags, filterTags } = AlbumTagsFilterComposable();
 
 const paramsYear = computed(() => route.params.year as string);
 
 if (!paramsYear.value) {
-  router.push({ name: 'AlbumsByYear', params: { year: store.selectedYear || 'na' } });
+  router.push({ name: 'AlbumsByYear', params: { year: useAlbumStore.selectedYear || 'na' } });
 }
 
 const pageNumber = ref(1);
 const itemsPerPage = ref(20);
 const albumStyle = ref((route.query.albumStyle as string) || 'list'); // List is default style
-const totalItems = ref(store.albumList.length);
-const chunkAlbumList = ref(store.chunkAlbumList(0, itemsPerPage.value) as AlbumItem[]);
 const selectedTags = ref([]);
 const privateAlbum = ref(false);
-const selectedYear = ref((route.params.year as string) || store.selectedYear || 'na');
+const selectedYear = ref((route.params.year as string) || useAlbumStore.selectedYear || 'na');
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const sortOrder = computed(() => store.sortOrder);
-const refreshAlbumList = computed(() => store.refreshAlbumList);
-const searchKey = computed(() => store.searchKey);
+const albumList = computed(() => useAlbumStore.albumList);
+const sortOrder = computed(() => useAlbumStore.sortOrder);
+const searchKey = computed(() => useAlbumStore.searchKey);
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
 const firstIndex = computed(() => (pageNumber.value - 1) * itemsPerPage.value);
 const lastIndex = computed(() =>
@@ -141,21 +144,17 @@ const lastIndex = computed(() =>
 const sortIcon = computed(() =>
   sortOrder.value === 'desc' ? 'mdi-sort-alphabetical-descending' : 'mdi-sort-alphabetical-ascending'
 );
-
-onBeforeMount(() => {
-  store.getAlbumsByYear(paramsYear.value);
-});
-
-const getFilteredAlbumList = () => {
+const filteredAlbumList = computed(() =>
+  useAlbumStore.filteredAlbumList(searchKey.value, selectedTags.value, privateAlbum.value)
+);
+const totalItems = computed(() => filteredAlbumList.value.length);
+const chunkAlbumList = computed(() => {
   if (!isEmpty(searchKey.value) || !isEmpty(selectedTags.value) || privateAlbum.value) {
-    const filteredAlbumList = store.filteredAlbumList(searchKey.value, selectedTags.value, privateAlbum.value);
-    totalItems.value = filteredAlbumList.length;
-    chunkAlbumList.value = filteredAlbumList.slice(firstIndex.value, lastIndex.value);
+    return filteredAlbumList.value.slice(firstIndex.value, lastIndex.value);
   } else {
-    totalItems.value = store.albumList.length;
-    chunkAlbumList.value = store.chunkAlbumList(firstIndex.value, lastIndex.value);
+    return useAlbumStore.chunkAlbumList(firstIndex.value, lastIndex.value);
   }
-};
+});
 
 const setAlbumStyle = (type: 'list' | 'grid') => {
   albumStyle.value = type;
@@ -167,31 +166,22 @@ const setPageParams = (params: { pageNumber: number; itemsPerPage: number }) => 
   itemsPerPage.value = params.itemsPerPage;
 };
 
-const updateSortOrder = () => store.$patch({ sortOrder: sortOrder.value === 'desc' ? 'asc' : 'desc' });
+const updateSortOrder = () => useAlbumStore.$patch({ sortOrder: sortOrder.value === 'desc' ? 'asc' : 'desc' });
 
+// TODO - Should fetch from DynamoDB
 const yearOptions = getYearOptions();
+
+useAlbumStore.getAlbumsByYear(paramsYear.value);
 
 // Only update the order of album list when user click sort button in order to prevent sorting multiple times
 watch(sortOrder, (newValue) => {
-  store.setAlbumList(sortByKey(store.albumList, 'albumName', newValue));
-  getFilteredAlbumList();
-});
-
-watch(refreshAlbumList, (newValue) => {
-  if (newValue) {
-    getFilteredAlbumList();
-    store.updateRefreshAlbumListFlag();
-  }
+  useAlbumStore.sortByKey(newValue);
 });
 
 watch(selectedYear, (newValue) => {
   if (newValue) {
-    store.getAlbumsByYear(newValue);
+    useAlbumStore.getAlbumsByYear(newValue);
     router.push({ name: 'AlbumsByYear', params: { year: newValue } });
   }
-});
-
-watch([pageNumber, itemsPerPage, searchKey, selectedTags, privateAlbum], () => {
-  getFilteredAlbumList();
 });
 </script>

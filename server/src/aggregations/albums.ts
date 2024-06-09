@@ -23,7 +23,7 @@ export const handler: Handler = async (event: DynamoDBStreamEvent, context, call
   const albumsHavePlace = albumLists.filter((album) => album.place != null);
   const featuredAlbums = albumLists.filter((album) => album.isFeatured);
   const albumsByYear = albumLists
-    .sort((a, b) => (a.year > b.year ? 1 : -1))
+    .sort((a, b) => (a.year > b.year ? -1 : 1))
     .reduce(
       (acc, album) => {
         if (!acc[album.year]) {
@@ -36,26 +36,27 @@ export const handler: Handler = async (event: DynamoDBStreamEvent, context, call
     );
 
   try {
-    // Insert albums with location
-    await DataAggregationEntity.update({
-      key: ALBUM_WITH_LOCATIONS,
-    })
-      .set({ value: albumsHavePlace, updatedAt: new Date().toISOString() })
-      .go({ response: 'none' });
+    await Promise.all([
+      // Insert albums with location
+      DataAggregationEntity.update({
+        key: ALBUM_WITH_LOCATIONS,
+      })
+        .set({ value: albumsHavePlace, updatedAt: new Date().toISOString() })
+        .go({ response: 'none' }),
+      // Insert featured albums
+      DataAggregationEntity.update({
+        key: FEATURED_ALBUMS,
+      })
+        .set({ value: featuredAlbums, updatedAt: new Date().toISOString() })
+        .go({ response: 'none' }),
+      // Insert albums by year
+      DataAggregationEntity.update({
+        key: ALBUM_BY_YEARS,
+      })
+        .set({ value: albumsByYear, updatedAt: new Date().toISOString() })
+        .go({ response: 'none' }),
+    ]);
 
-    // Insert featured albums
-    await DataAggregationEntity.update({
-      key: FEATURED_ALBUMS,
-    })
-      .set({ value: featuredAlbums, updatedAt: new Date().toISOString() })
-      .go({ response: 'none' });
-
-    // Insert albums by year
-    await DataAggregationEntity.update({
-      key: ALBUM_BY_YEARS,
-    })
-      .set({ value: albumsByYear, updatedAt: new Date().toISOString() })
-      .go({ response: 'none' });
     callback(null, 'success');
   } catch (err: any) {
     callback(err);

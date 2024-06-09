@@ -36,7 +36,7 @@
                 </div>
               </template>
             </q-btn-toggle>
-            <q-input v-if="routeName === 'Albums'" v-model="searchKey" color="accent" dense outlined>
+            <q-input v-if="routeName === 'AlbumsByYear'" v-model="searchKey" color="accent" dense outlined>
               <template #prepend>
                 <q-icon name="mdi-magnify" />
               </template>
@@ -116,7 +116,6 @@ const buttonToggle = ref(
 );
 
 userPermissionStore.checkUserPermission();
-store.getAlbumsByYear();
 
 const logout = () => {
   authService.logout().then(() => {
@@ -126,7 +125,7 @@ const logout = () => {
 };
 
 watch(searchKey, (newValue) => {
-  store.setSearchKey(newValue);
+  store.$patch({ searchKey: newValue });
 });
 
 watch(routeName, (newValue) => {

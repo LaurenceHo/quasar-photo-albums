@@ -3,38 +3,16 @@ import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-v
 import { flushPromises, mount } from '@vue/test-utils';
 import { Loading, LoadingBar, Notify } from 'quasar';
 import { describe, expect, it, vi } from 'vitest';
+import PhotoDetail from '../../../src/components/PhotoDetail.vue';
 import PhotoList from '../../../src/pages/PhotoList.vue';
+import { albumStore } from '../../../src/stores/album-store';
 import { mockAlbumList, mockPhotoList } from '../mock-data';
 import { mockRouter as router } from '../mock-router';
 
 installQuasarPlugin({ plugins: { Loading, LoadingBar, Notify } });
 
-vi.mock('../../../src/services/photo-service', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    getPhotosByAlbumId: () =>
-      Promise.resolve({
-        data: {
-          album: mockAlbumList[1],
-          photos: [
-            {
-              key: '2020-02-15/batch_2019-08-24 10.32.31.jpg',
-            },
-            {
-              key: '2020-02-15/batch_2019-08-24 10.38.09.jpg',
-            },
-            {
-              key: '2020-02-15/batch_2019-08-24 10.39.21.jpg',
-            },
-          ],
-        },
-      }),
-  })),
-}));
 describe('PhotoList.vue', () => {
   it('Check photo list', async () => {
-    await router.push('/album/2024/food');
-    await router.isReady();
-
     const wrapper = mount(PhotoList, {
       global: {
         plugins: [
@@ -44,9 +22,22 @@ describe('PhotoList.vue', () => {
               albums: {
                 albumList: mockAlbumList,
                 albumTags: ['sport', 'food', 'hiking', 'secret'],
+                selectedAlbumItem: mockAlbumList[1],
+              },
+              photos: {
+                photoList: [
+                  {
+                    key: 'food/food1.jpg',
+                  },
+                  {
+                    key: 'food/food9.jpg',
+                  },
+                  {
+                    key: 'food/food21.jpg',
+                  },
+                ],
               },
             },
-            stubActions: false,
           }),
         ],
       },
@@ -56,6 +47,7 @@ describe('PhotoList.vue', () => {
     const { vm } = wrapper as any;
     await vm.$nextTick();
 
+    expect(wrapper.findComponent(PhotoDetail).exists()).toBeFalsy();
     expect(vm.photosInAlbum.length).toEqual(3);
     expect(wrapper.findAll('[data-test-id="photo-item"]').length).toEqual(3);
     expect(wrapper.findAll('[data-test-id="album-tag"]').length).toEqual(2);
@@ -72,7 +64,6 @@ describe('PhotoList.vue', () => {
   });
 
   it('Check photo list with manage panel', async () => {
-    const mockUpdateAlbumCover = vi.fn();
     await router.push('/album/2024/do-something-secret');
     await router.isReady();
 
@@ -84,7 +75,6 @@ describe('PhotoList.vue', () => {
             initialState: {
               albums: {
                 selectedAlbumItem: mockAlbumList[4],
-                updateAlbumCover: mockUpdateAlbumCover,
               },
               photos: {
                 photoList: mockPhotoList,
@@ -105,6 +95,8 @@ describe('PhotoList.vue', () => {
 
     const { vm } = wrapper as any;
     await vm.$nextTick();
+
+    expect(wrapper.findComponent(PhotoDetail).exists()).toBeFalsy();
     expect(vm.photosInAlbum.length).toEqual(4);
     expect(wrapper.findAll('[data-test-id="photo-item"]').length).toEqual(4);
     expect(wrapper.findAll('[data-test-id="album-tag"]').length).toEqual(1);
@@ -121,7 +113,32 @@ describe('PhotoList.vue', () => {
     // Refresh photo list page
     vm.refreshPhotoList();
     await vm.$nextTick();
-    expect(mockUpdateAlbumCover).not.toHaveBeenCalled();
     expect(vm.getSelectedPhotoList.length).toEqual(0);
+  });
+
+  it('should display photo detail', async () => {
+    await router.push('/album/2024/food?photo=photo1.jpg');
+    await router.isReady();
+
+    const wrapper = mount(PhotoList, {
+      global: {
+        plugins: [
+          router,
+          createTestingPinia({
+            initialState: {
+              albums: {
+                albumList: mockAlbumList,
+                albumTags: ['sport', 'food', 'hiking', 'secret'],
+              },
+            },
+          }),
+        ],
+      },
+    });
+
+    await flushPromises();
+    const { vm } = wrapper as any;
+    await vm.$nextTick();
+    expect(wrapper.findComponent(PhotoDetail).exists()).toBeTruthy();
   });
 });

@@ -1,4 +1,3 @@
-import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb';
 import { CustomAttributeType, Entity, EntityRecord } from 'electrodb';
 import { Place } from '../models.js';
 import { ddbDocClient } from '../services/dynamodb-client.js';
@@ -29,34 +28,6 @@ type PlaceAttributes =
     }
   | null
   | undefined;
-
-export const albumTableSchema: CreateTableCommandInput = {
-  TableName: albumTableName,
-  KeySchema: [
-    {
-      AttributeName: 'pk',
-      KeyType: 'HASH',
-    },
-    {
-      AttributeName: 'sk',
-      KeyType: 'RANGE',
-    },
-  ],
-  AttributeDefinitions: [
-    {
-      AttributeName: 'pk',
-      AttributeType: 'S',
-    },
-    {
-      AttributeName: 'sk',
-      AttributeType: 'S',
-    },
-  ],
-  ProvisionedThroughput: {
-    ReadCapacityUnits: 4,
-    WriteCapacityUnits: 4,
-  },
-};
 
 export const AlbumEntity = new Entity(
   {
