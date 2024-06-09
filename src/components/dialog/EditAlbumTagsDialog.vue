@@ -62,7 +62,7 @@
 
       <q-card-actions align="right">
         <q-btn v-close-popup :disable="isProcessing" color="primary" flat label="Cancel" no-caps />
-        <q-btn :loading="isProcessing" color="primary" label="Confirm" no-caps unelevated @click="confirmDeleteAlbum" />
+        <q-btn :loading="isProcessing" color="primary" label="Confirm" no-caps unelevated @click="confirmDeleteTag" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -75,7 +75,7 @@ import { albumStore } from 'stores/album-store';
 import { computed, ref } from 'vue';
 
 const albumTagService = new AlbumTagService();
-const store = albumStore();
+const useAlbumStore = albumStore();
 const { updateAlbumTagsDialogState } = DialogStateComposable();
 
 const isProcessing = ref(false);
@@ -83,7 +83,7 @@ const createTagDialog = ref(false);
 const deleteTagDialog = ref(false);
 const tagName = ref('');
 
-const albumTags = computed(() => store.albumTags);
+const albumTags = computed(() => useAlbumStore.albumTags);
 
 const confirmCreateTag = async () => {
   isProcessing.value = true;
@@ -93,18 +93,18 @@ const confirmCreateTag = async () => {
 
   const result = await albumTagService.createAlbumTag(tag);
   if (result.code === 200) {
-    await store.updateAlbumTags();
+    await useAlbumStore.getAlbumsByYear(useAlbumStore.selectedYear, true);
   }
   createTagDialog.value = false;
   isProcessing.value = false;
   tagName.value = '';
 };
 
-const confirmDeleteAlbum = async () => {
+const confirmDeleteTag = async () => {
   isProcessing.value = true;
   const result = await albumTagService.deleteAlbumTag(tagName.value);
   if (result.code === 200) {
-    await store.updateAlbumTags();
+    await useAlbumStore.getAlbumsByYear(useAlbumStore.selectedYear, true);
   }
   deleteTagDialog.value = false;
   isProcessing.value = false;

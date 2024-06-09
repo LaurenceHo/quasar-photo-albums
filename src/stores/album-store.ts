@@ -37,9 +37,9 @@ const initialState: AlbumState = {
   selectedYear: 'na',
 };
 
-const UPDATED_DB_TIME_FILE = 'updateDatabaseAt.json';
-const FILTERED_ALBUMS_BY_YEAR = 'FILTERED_ALBUMS_BY_YEAR';
-const ALBUM_TAGS = 'ALBUM_TAGS';
+export const UPDATED_DB_TIME_FILE = 'updateDatabaseAt.json';
+export const FILTERED_ALBUMS_BY_YEAR = 'FILTERED_ALBUMS_BY_YEAR';
+export const ALBUM_TAGS = 'ALBUM_TAGS';
 
 interface FilteredAlbumsByYear {
   dbUpdatedTime: string;
@@ -152,7 +152,7 @@ export const albumStore = defineStore('albums', {
   },
 
   actions: {
-    async getAlbumsByYear(year?: string) {
+    async getAlbumsByYear(year?: string, forceUpdate = false) {
       this.loadingAllAlbumInformation = true;
 
       if (!LocalStorage.getItem(FILTERED_ALBUMS_BY_YEAR)) {
@@ -164,7 +164,7 @@ export const albumStore = defineStore('albums', {
         const compareResult = await compareDbUpdatedTime(filteredAlbumsByYear.dbUpdatedTime);
         // If local storage is not the latest data or request year is different from local storage (user selects year
         // from the dropdown),we should get albums from database
-        if (!compareResult.isLatest || (year !== undefined && year !== filteredAlbumsByYear.year)) {
+        if (forceUpdate || !compareResult.isLatest || (year !== undefined && year !== filteredAlbumsByYear.year)) {
           await _fetchAlbumAndSetToLocalStorage(year, compareResult.dbUpdatedTime);
         }
       }
@@ -175,7 +175,7 @@ export const albumStore = defineStore('albums', {
         const compareResult = await compareDbUpdatedTime(
           JSON.parse(<string>LocalStorage.getItem(ALBUM_TAGS)).dbUpdatedTime
         );
-        if (!compareResult.isLatest) {
+        if (forceUpdate || !compareResult.isLatest) {
           await _fetchAlbumTagsAndSetToLocalStorage(compareResult.dbUpdatedTime);
         }
       }
@@ -191,17 +191,6 @@ export const albumStore = defineStore('albums', {
       this.albumTags = _getAlbumTagsFromLocalStorage();
 
       this.loadingAllAlbumInformation = false;
-    },
-
-    async updateAlbumList(year?: string) {
-      this.selectedYear = year || this.selectedYear;
-      await _fetchAlbumAndSetToLocalStorage(year);
-      this.albumList = _getAlbumsFromLocalStorage(this.sortOrder);
-    },
-
-    async updateAlbumTags() {
-      await _fetchAlbumTagsAndSetToLocalStorage();
-      this.albumTags = _getAlbumTagsFromLocalStorage();
     },
 
     sortByKey(sortOrder: 'asc' | 'desc') {

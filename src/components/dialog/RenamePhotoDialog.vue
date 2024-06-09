@@ -104,7 +104,7 @@ const confirmRenamePhoto = async () => {
       };
       const response = await albumService.updateAlbum(albumToBeUpdated);
       if (response.code === 200) {
-        await useAlbumStore.updateAlbumList(albumToBeUpdated.year);
+        await useAlbumStore.getAlbumsByYear(albumToBeUpdated.year, true);
       }
     }
     emits('closePhotoDetail');

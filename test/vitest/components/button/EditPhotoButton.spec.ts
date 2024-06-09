@@ -51,7 +51,7 @@ describe('EditPhotoButton.vue', () => {
     await wrapper.findComponent('[data-test-id="make-album-cover-button"]').trigger('click');
     await vm.$nextTick();
     await flushPromises();
-    expect(store.updateAlbumList).toBeCalledWith('2024');
+    expect(store.getAlbumsByYear).toBeCalledWith('2024', true);
     expect(store.selectedAlbumItem).toEqual({
       id: 'sport',
       albumName: 'Sport',

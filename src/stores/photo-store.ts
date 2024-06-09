@@ -2,7 +2,7 @@ import { Album, Photo } from 'components/models';
 import { defineStore } from 'pinia';
 import { LocalStorage } from 'quasar';
 import PhotoService from 'src/services/photo-service';
-import { albumStore } from 'stores/album-store';
+import { albumStore, FILTERED_ALBUMS_BY_YEAR } from 'stores/album-store';
 
 export interface PhotoStoreState {
   photoList: Photo[];
@@ -65,7 +65,7 @@ export const photoStore = defineStore('photos', {
           if (code === 401 || code === 403) {
             // Temporarily set selected album id to the album id from URL to avoid re-fetching photos
             useAlbumStore.selectedAlbumItem.id = albumId;
-            LocalStorage.remove('FILTERED_ALBUMS_BY_YEAR');
+            LocalStorage.remove(FILTERED_ALBUMS_BY_YEAR);
           }
           setTimeout(() => window.location.assign('/'), 3000);
         }

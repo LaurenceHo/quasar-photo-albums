@@ -186,6 +186,7 @@ import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import SkeletonPhotoList from 'pages/SkeletonPhotoList.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import SelectedItemsComposable from 'src/composables/selected-items-composaable';
+import AlbumService from 'src/services/album-service';
 import { albumStore } from 'stores/album-store';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
@@ -194,6 +195,8 @@ import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
+
+const albumService = new AlbumService();
 
 const useAlbumStore = albumStore();
 const userPermissionStore = userStore();
@@ -239,18 +242,24 @@ const refreshPhotoList = async () => {
   await usePhotoStore.getPhotos(albumId.value, albumYear.value, true);
   const isCurrentAlbumEmpty = photosInAlbum.value.length === 0;
 
-  let albumToBeUpdated = { ...(albumItem.value as Album) };
+  let albumToBeUpdated = null;
   if (isPrevAlbumEmpty) {
     // If album is empty before uploading photos, set the first photo as album cover.
     albumToBeUpdated = { ...(albumItem.value as Album), albumCover: photosInAlbum.value[0].key as string };
   } else if (!isPrevAlbumEmpty && isCurrentAlbumEmpty) {
     albumToBeUpdated = { ...(albumItem.value as Album), albumCover: '' };
   }
-  useAlbumStore.$patch({ selectedAlbumItem: albumToBeUpdated });
+  if (albumToBeUpdated) {
+    const result = await albumService.updateAlbum(albumToBeUpdated);
+    if (result.code === 200) {
+      await useAlbumStore.getAlbumsByYear(albumToBeUpdated.year, true);
+    }
+  }
 
   setSelectedPhotosList([]);
 };
 
+useAlbumStore.getAlbumsByYear();
 usePhotoStore.getPhotos(albumId.value, albumYear.value);
 
 watch(albumId, (newValue) => {

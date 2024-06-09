@@ -203,7 +203,7 @@ const confirmUpdateAlbum = async () => {
 
   isProcessing.value = true;
 
-  const albumToBeSubmitted: Album = {
+  const albumToBeUpdated: Album = {
     year: selectedYear.value,
     id: getAlbumToBeUpdate.value.id || albumId.value,
     albumCover: getAlbumToBeUpdate.value.albumCover,
@@ -217,14 +217,14 @@ const confirmUpdateAlbum = async () => {
 
   let result;
   if (getAlbumToBeUpdate.value.id) {
-    result = await albumService.updateAlbum(albumToBeSubmitted);
+    result = await albumService.updateAlbum(albumToBeUpdated);
   } else {
-    result = await albumService.createAlbum(albumToBeSubmitted);
+    result = await albumService.createAlbum(albumToBeUpdated);
   }
 
   if (result.code === 200) {
-    await store.updateAlbumList(albumToBeSubmitted.year);
-    await router.push({ name: 'AlbumsByYear', params: { year: albumToBeSubmitted.year } });
+    await store.getAlbumsByYear(albumToBeUpdated.year, true);
+    await router.push({ name: 'AlbumsByYear', params: { year: albumToBeUpdated.year } });
     resetAlbum();
   }
   isProcessing.value = false;

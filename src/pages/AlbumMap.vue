@@ -5,7 +5,7 @@
 <script lang="ts" setup>
 import { Album as AlbumItem, AlbumTag } from 'components/models';
 import mapboxgl from 'mapbox-gl';
-import { albumStore } from 'stores/album-store';
+import { albumStore, UPDATED_DB_TIME_FILE } from 'stores/album-store';
 import { computed, onMounted, ref } from 'vue';
 import { LocalStorage } from 'quasar';
 import LocationService from 'src/services/location-service';
@@ -65,7 +65,7 @@ const geoJson = computed(
 const fetchAlbumsWithLocation = async (dbUpdatedTime?: string) => {
   let time = dbUpdatedTime;
   if (!time) {
-    const response = await fetch(getStaticFileUrl('updateDatabaseAt.json'));
+    const response = await fetch(getStaticFileUrl(UPDATED_DB_TIME_FILE));
     const dbUpdatedTimeJSON = await response.json();
     time = dbUpdatedTimeJSON.time;
   }

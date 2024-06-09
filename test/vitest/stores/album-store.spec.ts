@@ -131,12 +131,6 @@ describe('Album Store', () => {
     ]);
   });
 
-  it('updateAlbumTags', async () => {
-    const store = albumStore();
-    await store.updateAlbumTags();
-    expect(store.albumTags).toEqual(mockGetAlbumTagsResponse.data);
-  });
-
   it('getAlbumsByYear', async () => {
     const store = albumStore();
     await store.getAlbumsByYear();

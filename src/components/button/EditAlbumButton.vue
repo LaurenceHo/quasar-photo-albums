@@ -83,7 +83,7 @@ const confirmDeleteAlbum = async () => {
   isProcessing.value = true;
   const result = await albumService.deleteAlbum(albumItem?.value.id, albumItem?.value.year);
   if (result.code === 200) {
-    await store.updateAlbumList(store.selectedYear);
+    await store.getAlbumsByYear(store.selectedYear, true);
   }
   deleteAlbum.value = false;
   isProcessing.value = false;
