@@ -5,7 +5,21 @@ import {
   DataAggregationEntity,
   FEATURED_ALBUMS,
 } from '../schemas/aggregation.js';
+import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
+
+export const countAlbumsByYear = (albums: Album[]): Record<string, number>[] => {
+  const yearCount: Record<string, number> = {};
+
+  albums.forEach((album) => {
+    yearCount[album.year] = (yearCount[album.year] || 0) + 1;
+  });
+
+  return Object.keys(yearCount)
+    .sort()
+    .reverse()
+    .map((year) => ({ [year]: yearCount[year] }));
+};
 
 export const handler: Handler = async (event: DynamoDBStreamEvent, context, callback) => {
   console.log(JSON.stringify(event, null, 2));
@@ -13,27 +27,16 @@ export const handler: Handler = async (event: DynamoDBStreamEvent, context, call
   const albumService = new AlbumService();
 
   // Get all public albums
-  const albumLists = await albumService.findAll(
+  const albumList = await albumService.findAll(
     'scan',
     null,
     ['year', 'id', 'albumName', 'albumCover', 'place', 'isFeatured'],
     ({ isPrivate }: any, { eq }: any) => `${eq(isPrivate, false)}`
   );
 
-  const albumsHavePlace = albumLists.filter((album) => album.place != null);
-  const featuredAlbums = albumLists.filter((album) => album.isFeatured);
-  const albumsByYear = albumLists
-    .sort((a, b) => (a.year > b.year ? -1 : 1))
-    .reduce(
-      (acc, album) => {
-        if (!acc[album.year]) {
-          acc[album.year] = 0;
-        }
-        acc[album.year]++;
-        return acc;
-      },
-      {} as Record<string, number>
-    );
+  const albumsHavePlace = albumList.filter((album) => album.place != null);
+  const featuredAlbums = albumList.filter((album) => album.isFeatured);
+  const albumsByYear = countAlbumsByYear(albumList);
 
   try {
     await Promise.all([

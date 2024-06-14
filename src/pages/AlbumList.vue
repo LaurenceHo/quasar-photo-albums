@@ -103,12 +103,11 @@ import ScrollToTopButton from 'components/button/ScrollToTopButton.vue';
 import Pagination from 'components/Pagination.vue';
 import SkeletonAlbumList from 'pages/SkeletonAlbumList.vue';
 import { isEmpty } from 'radash';
-import { Album as AlbumItem } from 'src/components/models';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import { albumStore } from 'src/stores/album-store';
-import { getYearOptions, sortByKey } from 'src/utils/helper';
+import { getYearOptions } from 'src/utils/helper';
 import { userStore } from 'stores/user-store';
-import { computed, onBeforeMount, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
@@ -133,7 +132,6 @@ const privateAlbum = ref(false);
 const selectedYear = ref((route.params.year as string) || useAlbumStore.selectedYear || 'na');
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const albumList = computed(() => useAlbumStore.albumList);
 const sortOrder = computed(() => useAlbumStore.sortOrder);
 const searchKey = computed(() => useAlbumStore.searchKey);
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));

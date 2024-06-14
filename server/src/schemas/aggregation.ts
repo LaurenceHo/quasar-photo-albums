@@ -2,7 +2,7 @@ import { CustomAttributeType, Entity } from 'electrodb';
 import { ddbDocClient } from '../services/dynamodb-client.js';
 import { Album } from './album.js';
 
-type AlbumsByYear = Record<string, number>;
+type AlbumsByYear = Record<string, number>[];
 
 type ValueMap = {
   ALBUM_WITH_LOCATIONS: Album[];

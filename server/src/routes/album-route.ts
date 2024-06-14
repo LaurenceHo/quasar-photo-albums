@@ -11,12 +11,15 @@ const albumSchema = {
   properties: {
     year: {
       type: 'string',
+      minLength: 1,
     },
     id: {
       type: 'string',
+      minLength: 1,
     },
     albumName: {
       type: 'string',
+      minLength: 1,
     },
     description: {
       type: 'string',
