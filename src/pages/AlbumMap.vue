@@ -3,15 +3,15 @@
 </template>
 
 <script lang="ts" setup>
-import { Album as AlbumItem, AlbumTag } from 'components/models';
+import { Album as AlbumItem, ApiResponse } from 'components/models';
+import { Feature, Point } from 'geojson';
 import mapboxgl from 'mapbox-gl';
+import { LocalStorage } from 'quasar';
+import { get } from 'radash';
+import AggregateService from 'src/services/aggregate-service';
+import { compareDbUpdatedTime, getStaticFileUrl } from 'src/utils/helper';
 import { albumStore, UPDATED_DB_TIME_FILE } from 'stores/album-store';
 import { computed, onMounted, ref } from 'vue';
-import { LocalStorage } from 'quasar';
-import LocationService from 'src/services/location-service';
-import { compareDbUpdatedTime, getStaticFileUrl } from 'src/utils/helper';
-import { Feature, Point } from 'geojson';
-import { get } from 'radash';
 
 interface GeoJson {
   type: 'FeatureCollection';
@@ -22,7 +22,7 @@ interface AlbumsWithLocation {
   albums: AlbumItem[];
 }
 
-const locationService = new LocationService();
+const aggregateService = new AggregateService();
 
 const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
 const mapCentreLng = Number(process.env.MAP_CENTRE_LNG ?? 174.7633);
@@ -70,7 +70,7 @@ const fetchAlbumsWithLocation = async (dbUpdatedTime?: string) => {
     time = dbUpdatedTimeJSON.time;
   }
 
-  const result = await locationService.getAlbumsWithLocation();
+  const result = (await aggregateService.getAggregateData('albumsWithLocation')) as ApiResponse<AlbumItem[]>;
   if ((get(result, 'data') as AlbumItem[]).length > 0) {
     LocalStorage.set(
       'ALBUMS_WITH_LOCATION',

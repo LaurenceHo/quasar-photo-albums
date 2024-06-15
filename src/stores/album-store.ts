@@ -1,26 +1,31 @@
 import { defineStore } from 'pinia';
 import { LocalStorage } from 'quasar';
 import { get, isEmpty } from 'radash';
-import { Album, AlbumTag } from 'src/components/models';
+import { Album, AlbumsByYear, AlbumTag } from 'src/components/models';
+import AggregateService from 'src/services/aggregate-service';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
 import { compareDbUpdatedTime, getStaticFileUrl, sortByKey } from 'src/utils/helper';
 
 export interface AlbumState {
   loadingAllAlbumInformation: boolean;
+  loadingCountAlbumsByYear: boolean;
   albumList: Album[];
   albumTags: AlbumTag[];
   searchKey: string;
   sortOrder: 'asc' | 'desc';
   selectedAlbumItem: Album;
   selectedYear: string;
+  countAlbumsByYear: AlbumsByYear;
 }
 
 const albumService = new AlbumService();
 const albumTagService = new AlbumTagService();
+const aggregateService = new AggregateService();
 
 const initialState: AlbumState = {
   loadingAllAlbumInformation: true,
+  loadingCountAlbumsByYear: true,
   albumList: [],
   albumTags: [],
   searchKey: '',
@@ -35,6 +40,7 @@ const initialState: AlbumState = {
     isPrivate: false,
   },
   selectedYear: 'na',
+  countAlbumsByYear: [],
 };
 
 export const UPDATED_DB_TIME_FILE = 'updateDatabaseAt.json';
@@ -191,6 +197,13 @@ export const albumStore = defineStore('albums', {
       this.albumTags = _getAlbumTagsFromLocalStorage();
 
       this.loadingAllAlbumInformation = false;
+    },
+    async getCountAlbumsByYear() {
+      this.loadingCountAlbumsByYear = true;
+
+      const { data } = await aggregateService.getAggregateData('countAlbumsByYear');
+      this.countAlbumsByYear = data as AlbumsByYear;
+      this.loadingCountAlbumsByYear = false;
     },
 
     sortByKey(sortOrder: 'asc' | 'desc') {

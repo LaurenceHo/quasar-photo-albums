@@ -20,10 +20,10 @@
             v-model="selectedYear"
             class="q-pb-lg"
             :options="yearOptions"
-            dense
             label="Year"
             outlined
             :disable="getAlbumToBeUpdate.id !== ''"
+            :rules="[(val: string) => !!val || 'Year is required']"
           />
           <q-input
             v-model="albumId"
@@ -250,14 +250,14 @@ watch(
   getUpdateAlbumDialogState,
   (newValue) => {
     if (newValue) {
-      selectedYear.value = getAlbumToBeUpdate.value.year ?? String(new Date().getFullYear());
+      selectedYear.value = getAlbumToBeUpdate.value.year || String(new Date().getFullYear());
       albumId.value = getAlbumToBeUpdate.value.id;
       albumName.value = getAlbumToBeUpdate.value.albumName;
-      albumDesc.value = getAlbumToBeUpdate.value.description ?? '';
+      albumDesc.value = getAlbumToBeUpdate.value.description || '';
       privateAlbum.value = getAlbumToBeUpdate.value.isPrivate;
-      featuredAlbum.value = getAlbumToBeUpdate.value.isFeatured ?? null;
-      selectedAlbumTags.value = getAlbumToBeUpdate.value.tags ?? [];
-      selectedPlace.value = getAlbumToBeUpdate.value.place ?? null;
+      featuredAlbum.value = getAlbumToBeUpdate.value.isFeatured || null;
+      selectedAlbumTags.value = getAlbumToBeUpdate.value.tags || [];
+      selectedPlace.value = getAlbumToBeUpdate.value.place || null;
     }
   },
   { deep: true, immediate: true }

@@ -246,4 +246,7 @@ Please check [here](https://docs.aws.amazon.com/apigateway/latest/developerguide
 ### Location
 
 - /api/location/search - GET: Search location by keyword
-- /api/location/albums - GET: Get albums with location for displaying on the map
+
+### Aggregate
+
+- /api/aggregate/:type - GET: Get aggregate data by type

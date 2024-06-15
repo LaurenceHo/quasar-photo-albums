@@ -75,6 +75,47 @@ describe('album route', () => {
       const response = await app.inject({ method: 'post', url: '/api/albums' });
       expect(response.statusCode).toBe(422);
     });
+
+    it('should return 422 bad request when album year is an empty string', async () => {
+      const response = await app.inject({
+        method: 'post',
+        url: '/api/albums',
+        payload: {
+          year: '',
+          id: 'test-album',
+          albumName: 'Test album',
+          isPrivate: true,
+        } as Album,
+      });
+      expect(response.statusCode).toBe(422);
+    });
+
+    it('should return 422 bad request when id is an empty string', async () => {
+      const response = await app.inject({
+        method: 'post',
+        url: '/api/albums',
+        payload: {
+          year: '2024',
+          id: '',
+          albumName: 'Test album',
+          isPrivate: true,
+        } as Album,
+      });
+      expect(response.statusCode).toBe(422);
+    });
+
+    it('should return 422 bad request when albumName is missing', async () => {
+      const response = await app.inject({
+        method: 'post',
+        url: '/api/albums',
+        payload: {
+          year: '2024',
+          id: 'test-id',
+          isPrivate: true,
+        } as Album,
+      });
+      expect(response.statusCode).toBe(422);
+    });
   });
 
   describe('update album', () => {

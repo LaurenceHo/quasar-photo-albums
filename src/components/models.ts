@@ -59,3 +59,16 @@ export interface UploadableFile {
   status: 'loading' | boolean | null;
   exists: boolean;
 }
+
+export type AlbumsByYear = { year: string; count: number }[];
+
+export type DataAggregateValueMap = {
+  albumsWithLocation: Album[];
+  countAlbumsByYear: AlbumsByYear;
+  featuredAlbums: Album[];
+};
+
+export interface DataAggregation<K extends keyof DataAggregateValueMap> {
+  key: K;
+  value: DataAggregateValueMap[K];
+}
