@@ -39,13 +39,21 @@ describe('aggregation albums', () => {
     const sumAlbums = countAlbumsByYear(albumList);
     expect(sumAlbums).toStrictEqual([
       {
-        na: 1,
+        count: 1,
+        year: 'na',
       },
       {
-        '2024': 1,
+        count: 1,
+        year: '2024',
       },
-      { '2023': 2 },
-      { '2000': 1 },
+      {
+        count: 2,
+        year: '2023',
+      },
+      {
+        count: 1,
+        year: '2000',
+      },
     ]);
   });
 });

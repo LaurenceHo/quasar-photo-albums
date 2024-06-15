@@ -11,9 +11,4 @@ export default class LocationService extends HttpRequestService {
     this.setDisplayingParameters(false);
     return this.perform('GET', `/search?textQuery=${text}`);
   }
-
-  public getAlbumsWithLocation(): Promise<ApiResponse<Album[]>> {
-    this.setDisplayingParameters(true);
-    return this.perform('GET', '/albums');
-  }
 }

@@ -1,27 +1,28 @@
 import { Handler, DynamoDBStreamEvent } from 'aws-lambda';
 import {
-  ALBUM_BY_YEARS,
-  ALBUM_WITH_LOCATIONS,
+  ALBUMS_WITH_LOCATION,
+  AlbumsByYear,
+  COUNT_ALBUMS_BY_YEAR,
   DataAggregationEntity,
   FEATURED_ALBUMS,
 } from '../schemas/aggregation.js';
 import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
 
-export const countAlbumsByYear = (albums: Album[]): Record<string, number>[] => {
-  const yearCount: Record<string, number> = {};
+export const countAlbumsByYear = (albums: Album[]): AlbumsByYear =>
+  albums
+    .reduce((acc, album) => {
+      const existingYear = acc.find((item) => item.year === album.year);
+      if (existingYear) {
+        existingYear.count++;
+      } else {
+        acc.push({ year: album.year, count: 1 });
+      }
+      return acc;
+    }, [] as AlbumsByYear)
+    .sort((a, b) => b.year.localeCompare(a.year));
 
-  albums.forEach((album) => {
-    yearCount[album.year] = (yearCount[album.year] || 0) + 1;
-  });
-
-  return Object.keys(yearCount)
-    .sort()
-    .reverse()
-    .map((year) => ({ [year]: yearCount[year] }));
-};
-
-export const handler: Handler = async (event: DynamoDBStreamEvent, context, callback) => {
+export const handler: Handler = async (event: DynamoDBStreamEvent, _context, callback) => {
   console.log(JSON.stringify(event, null, 2));
 
   const albumService = new AlbumService();
@@ -42,7 +43,7 @@ export const handler: Handler = async (event: DynamoDBStreamEvent, context, call
     await Promise.all([
       // Insert albums with location
       DataAggregationEntity.update({
-        key: ALBUM_WITH_LOCATIONS,
+        key: ALBUMS_WITH_LOCATION,
       })
         .set({ value: albumsHavePlace, updatedAt: new Date().toISOString() })
         .go({ response: 'none' }),
@@ -52,9 +53,9 @@ export const handler: Handler = async (event: DynamoDBStreamEvent, context, call
       })
         .set({ value: featuredAlbums, updatedAt: new Date().toISOString() })
         .go({ response: 'none' }),
-      // Insert albums by year
+      // Insert count albums by year
       DataAggregationEntity.update({
-        key: ALBUM_BY_YEARS,
+        key: COUNT_ALBUMS_BY_YEAR,
       })
         .set({ value: albumsByYear, updatedAt: new Date().toISOString() })
         .go({ response: 'none' }),

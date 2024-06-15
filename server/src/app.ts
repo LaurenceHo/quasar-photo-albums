@@ -8,6 +8,7 @@ import throttle from '@fastify/throttle';
 import dotenv from 'dotenv';
 import Fastify, { FastifyError, FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import serverless from 'serverless-http';
+import aggregateRoute from './routes/aggregate-route.js';
 import albumRoute from './routes/album-route.js';
 import albumTagsRoute from './routes/album-tag-route.js';
 import { verifyJwtClaim, verifyUserPermission } from './routes/auth-middleware.js';
@@ -83,5 +84,6 @@ app.register(albumRoute);
 app.register(albumTagsRoute);
 app.register(photoRoute);
 app.register(locationRoute);
+app.register(aggregateRoute);
 
 export const handler = serverless(app as any);

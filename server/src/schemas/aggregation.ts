@@ -2,11 +2,11 @@ import { CustomAttributeType, Entity } from 'electrodb';
 import { ddbDocClient } from '../services/dynamodb-client.js';
 import { Album } from './album.js';
 
-type AlbumsByYear = Record<string, number>[];
+export type AlbumsByYear = { year: string; count: number }[];
 
 type ValueMap = {
-  ALBUM_WITH_LOCATIONS: Album[];
-  ALBUM_BY_YEARS: AlbumsByYear;
+  ALBUMS_WITH_LOCATION: Album[];
+  COUNT_ALBUMS_BY_YEAR: AlbumsByYear;
   FEATURED_ALBUMS: Album[];
 };
 
@@ -19,8 +19,8 @@ export const dataAggregationsTableName = process.env.DATA_AGGREGATIONS_TABLE_NAM
 
 type ValueAttributes = Album[] | AlbumsByYear;
 
-export const ALBUM_WITH_LOCATIONS = 'ALBUM_WITH_LOCATIONS';
-export const ALBUM_BY_YEARS = 'ALBUM_BY_YEARS';
+export const ALBUMS_WITH_LOCATION = 'ALBUMS_WITH_LOCATION';
+export const COUNT_ALBUMS_BY_YEAR = 'COUNT_ALBUMS_BY_YEAR';
 export const FEATURED_ALBUMS = 'FEATURED_ALBUMS';
 
 export const DataAggregationEntity = new Entity(
@@ -32,7 +32,7 @@ export const DataAggregationEntity = new Entity(
     },
     attributes: {
       key: {
-        type: [ALBUM_WITH_LOCATIONS, ALBUM_BY_YEARS, FEATURED_ALBUMS] as const,
+        type: [ALBUMS_WITH_LOCATION, COUNT_ALBUMS_BY_YEAR, FEATURED_ALBUMS] as const,
         required: true,
         readOnly: true,
       },
