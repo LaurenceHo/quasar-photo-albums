@@ -16,15 +16,7 @@
         Select another album for {{ getSelectedPhotoList.length > 1 ? 'these' : 'this' }} photo{{
           getSelectedPhotoList.length > 1 ? 's' : ''
         }}.
-        <q-select
-          v-model="selectedYear"
-          class="q-pb-md"
-          :options="yearOptions"
-          dense
-          label="Year"
-          outlined
-          :disable="isLoadingAlbums"
-        />
+        <select-year :selected-year="selectedYear" extra-class="q-pb-md" @select-year="setSelectedYear" />
         <q-select
           v-model="selectedAlbumModel"
           :options="filteredAlbumsList"
@@ -77,11 +69,11 @@
   </q-dialog>
 </template>
 <script lang="ts" setup>
+import SelectYear from 'components/SelectYear.vue';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import AlbumService from 'src/services/album-service';
 import PhotoService from 'src/services/photo-service';
-import { getYearOptions } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
 import { computed, ref, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -100,7 +92,7 @@ const { getSelectedPhotoList } = SelectedItemsComposable();
 
 const albumService = new AlbumService();
 const photoService = new PhotoService();
-const store = albumStore();
+const useAlbumStore = albumStore();
 const route = useRoute();
 
 const photoKeysArray = computed(
@@ -110,19 +102,21 @@ const photoKeysArray = computed(
       return photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
     }) as string[]
 );
-let staticAlbums = store.albumList
+let staticAlbums = useAlbumStore.albumList
   .filter((album) => album.id !== albumId.value)
   .map((album) => ({ label: album.albumName, value: album.id }));
 
 const duplicatedPhotoKeys = ref<string[]>([]);
 const filteredAlbumsList = ref(staticAlbums);
 const selectedAlbumModel = ref(filteredAlbumsList.value[0] ?? { label: '', value: '' });
-const selectedYear = ref((route.params.year as string) || store.selectedYear || 'na');
+const selectedYear = ref((route.params.year as string) || useAlbumStore.selectedYear || 'na');
 const isProcessing = ref(false);
 const isLoadingAlbums = ref(false);
 const needToRefreshPhotoList = ref(false);
 
-const yearOptions = getYearOptions();
+const setSelectedYear = (year: string) => {
+  selectedYear.value = year;
+};
 
 const filterAlbumsFunction = (input: string, update: any) => {
   if (input === '') {
