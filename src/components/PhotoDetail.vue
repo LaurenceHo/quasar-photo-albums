@@ -22,8 +22,8 @@
               :src="selectedImage?.url"
               class="rounded-borders-lg responsive-image"
               style="margin: auto"
-              :width="isPhotoLandscape || $q.screen.lt.sm ? `${imageDisplayWidth}px` : undefined"
-              :height="!isPhotoLandscape && $q.screen.gt.xs ? `${imageDisplayHeight}px` : undefined"
+              :width="isPhotoLandscape ? `${imageDisplayWidth}px` : undefined"
+              :height="!isPhotoLandscape && $q.screen.lt.md && $q.screen.gt.xs ? `${imageDisplayHeight}px` : undefined"
               @load="loadImage = false"
             />
           </div>
@@ -289,14 +289,21 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 599px) {
   .image-container {
     height: inherit;
     min-height: 300px;
   }
 }
 
-@media only screen and (min-width: 1025px) {
+@media only screen and (min-width: 600px) and (max-width: 1023px) {
+  .image-container {
+    height: inherit;
+    min-height: 400px;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
   .image-container {
     height: 80vh;
   }
