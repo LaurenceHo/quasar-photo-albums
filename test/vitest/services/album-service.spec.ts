@@ -18,7 +18,12 @@ describe('album-service.ts', () => {
     const albumService = new AlbumService();
 
     albumService.getAlbumsByYear();
-    expect(mockSetDisplayingParameters).toHaveBeenCalledWith(false);
+    expect(mockSetDisplayingParameters).toHaveBeenCalledWith(
+      false,
+      undefined,
+      true,
+      'Ooops, can not get albums, please try again later'
+    );
     expect(mockPerform).toHaveBeenCalledWith('GET', '/na');
   });
 

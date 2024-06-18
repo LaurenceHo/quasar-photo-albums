@@ -68,6 +68,6 @@ export default class AggregateController extends BaseController {
         return this.fail(reply, 'Failed to query aggregate data for featured albums');
       }
     }
-    return this.clientError(reply, 'Invalid aggregate type');
+    return this.clientError(reply, `Invalid aggregate type: ${aggregateType}`);
   };
 }

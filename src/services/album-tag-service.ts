@@ -8,7 +8,7 @@ export default class AlbumTagService extends HttpRequestService {
   }
 
   getAlbumTags(): Promise<ApiResponse<AlbumTag[]>> {
-    this.setDisplayingParameters(false);
+    this.setDisplayingParameters(false, undefined, true, 'Ooops, can not get album categories, please try again later');
     return this.perform('GET', '');
   }
 
