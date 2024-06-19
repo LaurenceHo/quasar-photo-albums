@@ -17,7 +17,12 @@ describe('album-tag-service.ts', () => {
     const albumTagService = new AlbumTagService();
 
     albumTagService.getAlbumTags();
-    expect(mockSetDisplayingParameters).toHaveBeenCalledWith(false);
+    expect(mockSetDisplayingParameters).toHaveBeenCalledWith(
+      false,
+      undefined,
+      true,
+      'Ooops, can not get album categories, please try again later'
+    );
     expect(mockPerform).toHaveBeenCalledWith('GET', '');
   });
 

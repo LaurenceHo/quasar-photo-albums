@@ -8,7 +8,7 @@ export default class AlbumService extends HttpRequestService {
   }
 
   public getAlbumsByYear(year = 'na'): Promise<ApiResponse<Album[]>> {
-    this.setDisplayingParameters(false);
+    this.setDisplayingParameters(false, undefined, true, 'Ooops, can not get albums, please try again later');
     return this.perform('GET', `/${year}`);
   }
 

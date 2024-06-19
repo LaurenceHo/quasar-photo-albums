@@ -5,22 +5,25 @@ import { notify } from 'src/utils/helper';
 export default class HttpRequestService {
   baseUrl = process.env.NODE_ENV === 'production' ? process.env.AWS_API_GATEWAY_URL : 'http://localhost:3000/api';
   displayLoadingBar = false;
-  customSuccessMessage: string | null = null;
+  customSuccessMessage: string | undefined;
   displayErrorNotification = true;
-
+  customErrorMessage: string | undefined;
   /**
    * @param displayLoadingBar
    * @param customSuccessMessage
    * @param displayErrorNotification
+   * @param customErrorMessage
    */
   public setDisplayingParameters(
     displayLoadingBar: boolean,
-    customSuccessMessage: string | null = null,
-    displayErrorNotification = true
+    customSuccessMessage?: string,
+    displayErrorNotification = true,
+    customErrorMessage?: string
   ) {
     this.displayLoadingBar = displayLoadingBar;
     this.customSuccessMessage = customSuccessMessage;
     this.displayErrorNotification = displayErrorNotification;
+    this.customErrorMessage = customErrorMessage;
   }
 
   /**
@@ -104,7 +107,11 @@ export default class HttpRequestService {
       errorJson = await response.json();
       // If we can parse error response to JSON, display error message from JSON
       if (this.displayErrorNotification) {
-        notify('negative', errorJson.message || errorJson.status || response.statusText, true);
+        notify(
+          'negative',
+          this.customErrorMessage || errorJson.message || errorJson.status || response.statusText,
+          true
+        );
       }
       return errorJson;
     } catch (error) {
