@@ -40,7 +40,7 @@ describe('PhotoDetailDialog.vue', () => {
       },
     });
 
-    await router.push(`/album/2024/sport?photo=photo2.jpg`);
+    await router.push('/album/2024/sport?photo=photo2.jpg');
     await router.isReady();
   });
 

@@ -166,7 +166,7 @@ information in the `server` folder. [here](server/README.md)
 ### Install the dependencies
 
 ```bash
-$ npm install
+$ bun install
 ```
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
@@ -178,19 +178,19 @@ $ quasar dev
 or
 
 ```bash
-$ npm run serve
+$ bun run serve
 ```
 
 ### Lint the files
 
 ```bash
-$ npm run lint
+$ bun run lint
 ```
 
 ### Run unit tests
 
 ```bash
-$ npm run test
+$ bun run test
 ```
 
 ### Build the app for production
@@ -202,7 +202,7 @@ $ quasar build
 or
 
 ```bash
-$ npm run build
+$ bun run build
 ```
 
 ### Customize the Quasar configuration

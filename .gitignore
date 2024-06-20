@@ -1,11 +1,11 @@
 .DS_Store
 .thumbs.db
-node_modules
+node_modules/
 
 # Quasar core related directories
 .quasar
-/dist
-
+dist/
+coverage/
 # Log files
 *.log
 

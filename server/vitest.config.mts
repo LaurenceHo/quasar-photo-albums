@@ -5,8 +5,8 @@ export default defineConfig({
   test: {
     coverage: {
       provider: 'v8',
-      reportsDirectory: 'test/coverage',
-      exclude:['**/**.js','**/**.d.ts','.serverless/**','.eslintrc.mjs']
+      reportsDirectory: 'coverage',
+      exclude: ['**/**.js', '**/**.d.ts', '.serverless/**', '.eslintrc.mjs'],
     },
     globals: true,
     include: [
@@ -15,5 +15,5 @@ export default defineConfig({
       'src/**/*.vitest.{test,spec}.{ts,tsx}',
       'test/**/*.{test,spec}.{ts,tsx}',
     ],
-  }
+  },
 });

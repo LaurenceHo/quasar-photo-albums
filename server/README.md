@@ -36,8 +36,8 @@ your real information in`.env.example` and modify file name to `.env`.
 ### AWS DynamoDB
 
 Replace this properties `PHOTO_ALBUMS_TABLE_NAME`, `PHOTO_ALBUM_TAGS_TABLE_NAME`, `PHOTO_USER_PERMISSION_TABLE_NAME`
-and `DATA_AGGREGATIONS_TABLE_NAME` with your the table name you want to use in`.env.example` and modify file name to `.env`.
-When you run `npm run serverless:deploy`, it will use those environment variables to create tables, so you don't have to
+and `DATA_AGGREGATIONS_TABLE_NAME` with the table name you want to use in`.env.example` and modify file name to `.env`.
+When you run `bun run serverless:deploy`, it will use those environment variables to create tables, so you don't have to
 create tables manually. Once the tables are created, you can check them in AWS DynamoDB console.
 
 #### ElectroDB
@@ -56,13 +56,13 @@ replace this property `GOOGLE_PLACES_API_KEY` with your real information in`.env
 ### Install the dependencies
 
 ```bash
-$ npm install
+$ bun install
 ```
 
 ### Run Fastify locally
 
 ```bash
-$ npm run start:server
+$ bun run start:server
 ```
 
 ## Use serverless-http to wrap Fastify app
@@ -73,13 +73,13 @@ You can find my detailed tutorial [here](https://dev.to/laurenceho/from-expressj
 Firstly, install serverless-http
 
 ```bash
-$ npm install -S serverless-http
+$ bun add serverless-http
 ```
 
 Secondly, install serverless and serverless-plugin-typescript
 
 ```bash
-$ npm install -S -D serverless serverless-plugin-typescript
+$ bun add serverless serverless-plugin-typescript
 ```
 
 Then, wrap your Fastify app with serverless-http
@@ -102,7 +102,7 @@ locally, we also need to install [serverless-dotenv-plugin](https://www.serverle
 `serverless.yml`.
 
 ```bash
-$ npm i -D serverless-dotenv-plugin
+$ bun add serverless-dotenv-plugin
 ```
 
 Your `serverless.yaml` should look like as below:
@@ -149,7 +149,7 @@ custom:
 Now, let's deploy it to AWS Lambda:
 
 ```bash
-$ npm run serverless:deploy
+$ bun run serverless:deploy
 ```
 
 If this is your first time using Serverless Framework, you will be asked to set up your AWS credentials.
@@ -194,7 +194,7 @@ You can check your AWS Lambda function in AWS console. You should see a new Lamb
 
 ### AWS Permissions
 
-If you deploy your Lambda function and API Gateway by running the above command `npm run serverless:deploy`, Serverless
+If you deploy your Lambda function and API Gateway by running the above command `bun run serverless:deploy`, Serverless
 Framework will deal with AWS permissions for you as long as you set up the correct DynamoDB table names and S3 bucket name.
 
 ### Enabling binary support using the API Gateway console
