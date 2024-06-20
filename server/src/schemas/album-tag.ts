@@ -3,7 +3,7 @@ import { ddbDocClient } from '../services/dynamodb-client.js';
 
 export type AlbumTag = EntityRecord<typeof AlbumTagEntity>;
 
-export const albumTagsTableName = process.env.PHOTO_ALBUM_TAGS_TABLE_NAME || 'photo-album-tags';
+export const albumTagsTableName = process.env['PHOTO_ALBUM_TAGS_TABLE_NAME'] || 'photo-album-tags';
 
 export const AlbumTagEntity = new Entity(
   {

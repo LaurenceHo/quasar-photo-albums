@@ -20,7 +20,7 @@ export default class AlbumController extends BaseController {
 
       if (result.valid && result.value != null) {
         try {
-          const decodedPayload = jwt.verify(result.value, process.env.JWT_SECRET as string);
+          const decodedPayload = jwt.verify(result.value, process.env['JWT_SECRET'] as string);
           isAdmin = get(decodedPayload, 'role') === 'admin';
         } catch (error) {
           reply.setCookie('jwt', '', { maxAge: 0, path: '/' });

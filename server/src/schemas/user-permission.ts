@@ -3,7 +3,7 @@ import { ddbDocClient } from '../services/dynamodb-client.js';
 
 export type UserPermission = EntityRecord<typeof UserPermissionEntity>;
 
-export const userTableName = process.env.PHOTO_USER_PERMISSION_TABLE_NAME || 'user-permission';
+export const userTableName = process.env['PHOTO_USER_PERMISSION_TABLE_NAME'] || 'user-permission';
 
 export const UserPermissionEntity = new Entity(
   {

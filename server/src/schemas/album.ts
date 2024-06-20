@@ -4,7 +4,7 @@ import { ddbDocClient } from '../services/dynamodb-client.js';
 
 export type Album = EntityRecord<typeof AlbumEntity> & Place;
 
-export const albumTableName = process.env.PHOTO_ALBUMS_TABLE_NAME || 'photo-albums';
+export const albumTableName = process.env['PHOTO_ALBUMS_TABLE_NAME'] || 'photo-albums';
 
 type PlaceAttributes =
   | {
