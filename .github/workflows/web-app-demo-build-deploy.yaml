@@ -55,6 +55,7 @@ jobs:
 
       - name: Test and build
         run: |
+          npm run types
           npm run test
           npm run build
 

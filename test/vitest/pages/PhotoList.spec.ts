@@ -2,10 +2,9 @@ import { createTestingPinia } from '@pinia/testing';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import { Loading, LoadingBar, Notify } from 'quasar';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import PhotoDetail from '../../../src/components/PhotoDetail.vue';
 import PhotoList from '../../../src/pages/PhotoList.vue';
-import { albumStore } from '../../../src/stores/album-store';
 import { mockAlbumList, mockPhotoList } from '../mock-data';
 import { mockRouter as router } from '../mock-router';
 

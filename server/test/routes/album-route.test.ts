@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, afterEach } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { app } from '../../src/app';
 import { Album } from '../../src/schemas/album';
 import { mockAlbumList } from '../mock-data';
