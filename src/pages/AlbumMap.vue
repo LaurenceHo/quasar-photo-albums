@@ -24,9 +24,9 @@ interface AlbumsWithLocation {
 
 const aggregateService = new AggregateService();
 
-const cdnURL = process.env['IMAGEKIT_CDN_URL'] as string;
-const mapCentreLng = Number(process.env['MAP_CENTRE_LNG'] ?? 174.7633);
-const mapCentreLat = Number(process.env['MAP_CENTRE_LAT'] ?? -36.8484);
+const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
+const mapCentreLng = Number(process.env.MAP_CENTRE_LNG ?? 174.7633);
+const mapCentreLat = Number(process.env.MAP_CENTRE_LAT ?? -36.8484);
 
 const store = albumStore();
 const albumsWithLocation = ref<AlbumItem[]>([]);
@@ -136,7 +136,7 @@ onMounted(async () => {
   albumsWithLocation.value =
     get(JSON.parse(albumsStringFromLocalStorage), 'albums', albumsHaveLocationFromStore.value) || [];
 
-  mapboxgl.accessToken = process.env['MAPBOX_API_KEY'] as string;
+  mapboxgl.accessToken = process.env.MAPBOX_API_KEY as string;
   const map = new mapboxgl.Map({
     container: 'album-location-map',
     style: 'mapbox://styles/mapbox/standard',
