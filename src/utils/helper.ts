@@ -1,7 +1,7 @@
-import { LocalStorage, Notify } from 'quasar';
+import { Notify } from 'quasar';
 
 export const getStaticFileUrl = (objectKey: string): string => {
-  return `${process.env.STATIC_FILES_URL}/${objectKey}`;
+  return `${process.env['STATIC_FILES_URL']}/${objectKey}`;
 };
 
 export const getYearOptions = () => {

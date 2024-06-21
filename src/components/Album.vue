@@ -2,7 +2,7 @@
   <div v-if="albumStyle === 'grid'" class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6" data-test-id="grid-album-item">
     <div class="relative-position">
       <q-img
-        v-if="albumItem?.albumCover"
+        v-if="albumItem['albumCover']"
         :ratio="1"
         :src="`${thumbnail}?tr=w-250,h-250`"
         class="rounded-borders-lg cursor-pointer"
@@ -12,7 +12,7 @@
         <q-icon class="absolute-center" name="mdi-image" size="48px" />
       </div>
       <q-icon
-        v-if="albumItem.isPrivate"
+        v-if="albumItem['isPrivate']"
         class="absolute"
         color="white"
         name="mdi-lock"
@@ -21,23 +21,27 @@
       />
       <EditAlbumButton v-if="isAdminUser" :album-item="albumItem" :album-style="albumStyle" />
     </div>
-    <div class="q-pt-sm text-subtitle2">{{ albumItem.albumName }}</div>
+    <div class="q-pt-sm text-subtitle2">{{ albumItem['albumName'] }}</div>
   </div>
   <template v-else>
     <div class="col-xl-6 col-lg-7 col-md-8 col-sm-10 col-xs-12 q-pa-xs">
       <q-card flat bordered data-test-id="list-album-item">
         <q-item clickable class="q-px-sm">
           <q-item-section avatar @click="goToAlbum">
-            <q-avatar :class="{ 'no-album-cover-square': !albumItem.albumCover }" :size="`${thumbnailSize}px`" rounded>
+            <q-avatar
+              :class="{ 'no-album-cover-square': !albumItem['albumCover'] }"
+              :size="`${thumbnailSize}px`"
+              rounded
+            >
               <q-img
-                v-if="albumItem?.albumCover"
+                v-if="albumItem['albumCover']"
                 :ratio="1"
                 :src="`${thumbnail}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
                 class="rounded-borders"
               />
               <q-icon v-else name="mdi-image" />
               <q-icon
-                v-if="albumItem.isPrivate"
+                v-if="albumItem['isPrivate']"
                 class="absolute"
                 color="white"
                 name="mdi-lock"
@@ -48,13 +52,13 @@
           </q-item-section>
 
           <q-item-section @click="goToAlbum()">
-            <q-item-label class="text-subtitle2" lines="1">{{ albumItem.albumName }}</q-item-label>
-            <q-item-label v-if="albumItem.description" caption lines="1">
-              {{ albumItem.description }}
+            <q-item-label class="text-subtitle2" lines="1">{{ albumItem['albumName'] }}</q-item-label>
+            <q-item-label v-if="albumItem['description']" caption lines="1">
+              {{ albumItem['description'] }}
             </q-item-label>
             <div class="flex">
               <q-chip v-for="tag in tagsForDisplay" :key="tag" color="secondary" dense square>{{ tag }} </q-chip>
-              {{ albumItem?.tags?.length > 3 ? '...' : '' }}
+              {{ albumItem['tags']?.length > 3 ? '...' : '' }}
             </div>
           </q-item-section>
 
@@ -76,7 +80,7 @@ import { computed, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
 
 const q = useQuasar();
-const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
+const cdnURL = process.env['IMAGEKIT_CDN_URL'] as string;
 
 const props = defineProps({
   albumStyle: {
@@ -103,11 +107,11 @@ const { albumItem } = toRefs(props);
 const userPermissionStore = userStore();
 const router = useRouter();
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.albumCover)}`);
+const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.['albumCover'])}`);
 const thumbnailSize = computed(() => (q.screen.lt.sm ? 60 : 90));
-const tagsForDisplay = computed(() => (albumItem.value?.tags ? albumItem.value?.tags.slice(0, 3) : []));
+const tagsForDisplay = computed(() => (albumItem.value?.['tags'] ? albumItem.value?.['tags'].slice(0, 3) : []));
 
-const goToAlbum = () => router.push(`/album/${albumItem.value?.year}/${albumItem.value?.id}`);
+const goToAlbum = () => router.push(`/album/${albumItem.value?.['year']}/${albumItem.value?.['id']}`);
 </script>
 <style lang="scss" scoped>
 .no-album-cover-square {

@@ -19,11 +19,11 @@
             <img
               v-show="!loadImage && selectedImage"
               :alt="photoFileName"
-              :src="selectedImage?.url"
+              :src="selectedImage?.url || ''"
               class="rounded-borders-lg responsive-image"
               style="margin: auto"
-              :width="isPhotoLandscape ? `${imageDisplayWidth}px` : undefined"
-              :height="!isPhotoLandscape && $q.screen.lt.md && $q.screen.gt.xs ? `${imageDisplayHeight}px` : undefined"
+              :width="isPhotoLandscape ? `${imageDisplayWidth}px` : ''"
+              :height="!isPhotoLandscape && $q.screen.lt.md && $q.screen.gt.xs ? `${imageDisplayHeight}px` : ''"
               @load="loadImage = false"
             />
           </div>
@@ -154,16 +154,17 @@ const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const selectedImage = computed(() => usePhotoStore.findPhotoByIndex(selectedImageIndex.value));
 const photoList = computed(() => usePhotoStore.photoList);
 const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
-const albumId = computed(() => route.params.albumId as string);
-const albumYear = computed(() => route.params.year as string);
-const photoId = computed(() => route.query.photo as string);
+const albumId = computed(() => route.params['albumId'] as string);
+const albumYear = computed(() => route.params['year'] as string);
+const photoId = computed(() => route.query['photo'] as string);
 
 /** Compute photo EXIF data begin */
 const dateTime = computed(() => {
   if (exifTags.value.DateTime?.description) {
     const dateTime = exifTags.value.DateTime?.description.split(' ');
-    const time = dateTime[1].split(':');
-    return `${dateTime[0].replaceAll(':', '/')} ${time[0]}:${time[1]} ${exifTags.value.OffsetTime?.value?.[0] ?? ''}`;
+    const time = dateTime[1]?.split(':');
+    const composeTime = time ? time[0] + ':' + time[1] : '';
+    return `${dateTime[0]?.replaceAll(':', '/')} ${composeTime} ${exifTags.value.OffsetTime?.value?.[0] ?? ''}`;
   }
   return '';
 });
@@ -211,7 +212,7 @@ const isPhotoLandscape = computed(
 const imageDisplayWidth = computed(() => {
   if (imageOriginalWidth.value > 1080 && imageContainerWidth.value > 1080) {
     return 1080;
-  } else if (imageOriginalWidth.value > 1080 && imageContainerWidth.value < 1080) {
+  } else if (imageOriginalWidth.value > imageContainerWidth.value && imageContainerWidth.value < 1080) {
     return imageContainerWidth.value;
   }
   return imageOriginalWidth.value;
@@ -272,7 +273,7 @@ watch(
   async (newValue) => {
     if (newValue?.key) {
       // Remove album id for displaying photo file name
-      photoFileName.value = newValue.key.split('/')[1];
+      photoFileName.value = newValue.key.split('/')[1] || '';
       loadImage.value = true;
       try {
         // Read EXIF data

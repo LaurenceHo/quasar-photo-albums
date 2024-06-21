@@ -71,7 +71,7 @@ const { setUpdateAlbumDialogState } = DialogStateComposable();
 const { setAlbumToBeUpdated } = SelectedItemsComposable();
 
 const deleteAlbum = ref(false);
-const albumName = ref(albumItem?.value?.albumName);
+const albumName = ref(albumItem.value['albumName']);
 const isProcessing = ref(false);
 
 const setAlbum = () => {
@@ -81,7 +81,7 @@ const setAlbum = () => {
 
 const confirmDeleteAlbum = async () => {
   isProcessing.value = true;
-  const result = await albumService.deleteAlbum(albumItem?.value.id, albumItem?.value.year);
+  const result = await albumService.deleteAlbum(albumItem.value['id'], albumItem.value['year']);
   if (result.code === 200) {
     await store.getAlbumsByYear(store.selectedYear, true);
   }

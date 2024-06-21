@@ -23,12 +23,10 @@
 
 <script lang="ts" setup>
 import { albumStore } from 'src/stores/album-store';
-import { photoStore } from 'stores/photo-store';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 const useAlbumStore = albumStore();
-const usePhotoStore = photoStore();
 const route = useRoute();
 
 const selectedAlbumItem = computed(() => useAlbumStore.selectedAlbumItem);

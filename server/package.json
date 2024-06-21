@@ -9,12 +9,13 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "format": "prettier --ignore-path .gitignore --write ./src ./test --ignore-unknown",
+    "lint": "eslint --ext .js,.ts ./src ./test --fix && bun run format",
     "serverless:deploy": "serverless deploy",
     "serverless:deploy:prod": "serverless deploy --stage prod",
-    "lint": "eslint --ext .js,.ts ./src ./test --fix && prettier --write src/* test/* --ignore-unknown",
     "start:server": "rimraf dist && tsc && node dist/index.js",
     "test:server": "vitest run --coverage",
-    "type-check": "tsc --noEmit"
+    "types": "tsc --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.600.0",
@@ -27,8 +28,6 @@
     "@fastify/multipart": "^8.3.0",
     "@fastify/rate-limit": "^9.1.0",
     "@fastify/throttle": "^2.0.1",
-    "@tsconfig/node20": "^20.1.4",
-    "@tsconfig/strictest": "^2.0.5",
     "aws-lambda": "^1.0.7",
     "dotenv": "^16.4.5",
     "electrodb": "^2.14.1",
@@ -40,6 +39,8 @@
     "serverless-http": "^3.2.0"
   },
   "devDependencies": {
+    "@tsconfig/node20": "^20.1.4",
+    "@tsconfig/strictest": "^2.0.5",
     "@types/aws-lambda": "^8.10.140",
     "@types/jsonwebtoken": "^9.0.6",
     "@typescript-eslint/eslint-plugin": "^7.13.1",

@@ -215,16 +215,16 @@ const { getSelectedPhotoList, setSelectedPhotosList } = SelectedItemsComposable(
 const showMap = ref(false);
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const albumId = computed(() => route.params.albumId as string);
-const albumYear = computed(() => route.params.year as string);
+const albumId = computed(() => route.params['albumId'] as string);
+const albumYear = computed(() => route.params['year'] as string);
 const albumItem = computed(() => useAlbumStore.selectedAlbumItem);
 const photosInAlbum = computed(() => usePhotoStore.photoList as IPhoto[]);
 const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
 const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.key).slice(0, 50)); // Max 50 photos
 const photoAmount = computed(() => photosInAlbum.value.length);
-const photoId = computed(() => route.query.photo as string);
+const photoId = computed(() => route.query['photo'] as string);
 
-const photoStyle = ref((route.query.photoStyle as string) || 'grid'); // Grid is default photo list style
+const photoStyle = ref((route.query['photoStyle'] as string) || 'grid'); // Grid is default photo list style
 
 const goBack = () => router.back();
 
@@ -245,7 +245,7 @@ const refreshPhotoList = async () => {
   let albumToBeUpdated = null;
   if (isPrevAlbumEmpty) {
     // If album is empty before uploading photos, set the first photo as album cover.
-    albumToBeUpdated = { ...(albumItem.value as Album), albumCover: photosInAlbum.value[0].key as string };
+    albumToBeUpdated = { ...(albumItem.value as Album), albumCover: photosInAlbum.value[0]?.key as string };
   } else if (!isPrevAlbumEmpty && isCurrentAlbumEmpty) {
     albumToBeUpdated = { ...(albumItem.value as Album), albumCover: '' };
   }

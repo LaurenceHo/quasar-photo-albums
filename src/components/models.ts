@@ -7,7 +7,7 @@ export interface Album {
   albumCover?: string;
   description?: string;
   isPrivate: boolean;
-  isFeatured?: boolean;
+  isFeatured?: boolean | undefined;
   tags?: string[];
   place?: Place | null;
 }

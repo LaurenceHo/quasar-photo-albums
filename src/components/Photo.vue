@@ -6,18 +6,18 @@
   >
     <div :class="`relative-position ${isPhotoSelected ? 'photo-selected' : ''}`">
       <q-img
-        :id="`photo-image-${photo.key}`"
+        :id="`photo-image-${photo['key']}`"
         :ratio="1"
-        :src="`${photo.url}?tr=w-${imageWidth},h-${imageWidth}`"
+        :src="`${photo['url']}?tr=w-${imageWidth},h-${imageWidth}`"
         class="rounded-borders-lg cursor-pointer"
-        :alt="`photo image ${photo.key}`"
+        :alt="`photo image ${photo['key']}`"
         @click="goToPhotoDetail()"
       />
       <div v-if="isAdminUser" class="absolute-top flex justify-between photo-top-button-container">
         <q-checkbox
           v-model="selectedPhotosList"
           data-test-id="select-photo-checkbox"
-          :val="photo.key"
+          :val="photo['key']"
           checked-icon="mdi-check-circle"
           color="positive"
           unchecked-icon="mdi-check-circle"
@@ -26,7 +26,7 @@
         </q-checkbox>
         <EditPhotoButton
           data-test-id="edit-photo-button"
-          :photo-key="photo.key"
+          :photo-key="photo['key']"
           color="white"
           @refresh-photo-list="$emit('refreshPhotoList')"
         />
@@ -41,7 +41,7 @@
             <q-avatar :size="`${thumbnailSize}px`" rounded class="q-ma-sm cursor-pointer">
               <q-img
                 :ratio="1"
-                :src="`${photo.url}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
+                :src="`${photo['url']}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
                 class="rounded-borders"
               />
             </q-avatar>
@@ -56,7 +56,7 @@
           <q-item-section v-if="isAdminUser" side>
             <EditPhotoButton
               data-test-id="edit-photo-button"
-              :photo-key="photo.key"
+              :photo-key="photo['key']"
               @refresh-photo-list="$emit('refreshPhotoList')"
             />
           </q-item-section>
@@ -88,7 +88,7 @@ const props = defineProps({
 });
 
 const { photo } = toRefs(props);
-const imageWidth = ref(document.getElementById(`photo-image-${photo.value.key}`)?.clientWidth ?? 0);
+const imageWidth = ref(document.getElementById(`photo-image-${photo.value['key']}`)?.clientWidth ?? 0);
 
 const q = useQuasar();
 const route = useRoute();
@@ -97,19 +97,19 @@ const userPermissionStore = userStore();
 const { selectedPhotosList } = SelectedItemsComposable();
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const photoId = computed(() => photo.value.key.split('/')[1]);
+const photoId = computed(() => photo.value['key'].split('/')[1]);
 const thumbnailSize = computed(() => (q.screen.lt.sm ? 60 : 80));
-const lastModified = computed(() => new Date(photo.value.lastModified).toLocaleString());
+const lastModified = computed(() => new Date(photo.value['lastModified']).toLocaleString());
 const fileSize = computed(() => {
-  const size = photo.value.size / 1024;
+  const size = photo.value['size'] / 1024;
   return size < 1024 ? `${size.toFixed(2)} KB` : `${(size / 1024).toFixed(2)} MB`;
 });
-const isPhotoSelected = computed(() => selectedPhotosList.value.includes(photo.value.key));
+const isPhotoSelected = computed(() => selectedPhotosList.value.includes(photo.value['key']));
 
 const goToPhotoDetail = async () => await router.replace({ query: { ...route.query, photo: photoId.value } });
 
 onMounted(() => {
-  imageWidth.value = document.getElementById(`photo-image-${photo.value.key}`)?.clientWidth ?? 250;
+  imageWidth.value = document.getElementById(`photo-image-${photo.value['key']}`)?.clientWidth ?? 250;
 });
 </script>
 <style lang="scss">
