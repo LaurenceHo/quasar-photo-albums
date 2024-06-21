@@ -8,7 +8,7 @@
     "serve": "quasar dev",
     "build": "quasar build",
     "format": "prettier --ignore-path .gitignore --write ./src ./test --ignore-unknown",
-    "lint": "eslint --ext .vue,.ts ./src ./test --fix && bun run format",
+    "lint": "eslint --ext .vue,.ts ./src ./test --fix",
     "test": "vitest run --coverage",
     "types": "vue-tsc --noEmit",
     "prepare": "husky"

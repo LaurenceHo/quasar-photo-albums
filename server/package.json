@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "format": "prettier --ignore-path .gitignore --write ./src ./test --ignore-unknown",
-    "lint": "eslint --ext .js,.ts ./src ./test --fix && bun run format",
+    "lint": "eslint --ext .js,.ts ./src ./test --fix",
     "serverless:deploy": "serverless deploy",
     "serverless:deploy:prod": "serverless deploy --stage prod",
     "start:server": "rimraf dist && tsc && node dist/index.js",

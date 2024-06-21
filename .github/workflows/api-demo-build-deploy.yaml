@@ -1,11 +1,6 @@
 name: Build and deploy API for demo app
 
 on:
-  push:
-    branches:
-      - develop
-    paths:
-      - "server/src/**"
   pull_request:
     branches:
       - master
@@ -50,6 +45,7 @@ jobs:
           npm install
           cd ./server
           npm install
+          npm run types
           npm run test:server
 
       - name: Write .env file

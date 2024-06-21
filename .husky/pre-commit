@@ -1,3 +1,7 @@
+bun run types
 bun run lint
+bun run format
 cd server
+bun run types
 bun run lint
+bun run format
