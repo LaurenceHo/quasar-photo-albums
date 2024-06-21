@@ -80,7 +80,7 @@ import { computed, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
 
 const q = useQuasar();
-const cdnURL = process.env['IMAGEKIT_CDN_URL'] as string;
+const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
 
 const props = defineProps({
   albumStyle: {

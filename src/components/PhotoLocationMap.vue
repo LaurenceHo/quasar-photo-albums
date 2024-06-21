@@ -29,7 +29,7 @@ const { latitude, longitude, width, height } = toRefs(props);
 
 let map: mapboxgl.Map;
 onMounted(() => {
-  mapboxgl.accessToken = process.env['MAPBOX_API_KEY'] as string;
+  mapboxgl.accessToken = process.env.MAPBOX_API_KEY as string;
   const container = document.getElementById('photo-location-map');
 
   if (container) {
