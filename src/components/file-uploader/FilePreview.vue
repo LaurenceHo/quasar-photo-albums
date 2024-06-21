@@ -6,14 +6,14 @@
   >
     <div>{{ fileSize }}</div>
     <div class="relative-position">
-      <q-img v-if="isValidImageFile" :alt="file.file.name" :src="file.url" :title="file.file.name" />
+      <q-img v-if="isValidImageFile" :alt="file['file'].name" :src="file['url']" :title="file['file'].name" />
       <div v-else>
         <div>This file is not allowed:</div>
-        <strong>{{ file.file.name }}</strong>
+        <strong>{{ file['file'].name }}</strong>
       </div>
       <q-btn
-        v-if="file.status !== true && !file.exists"
-        :disabled="file.status === 'loading'"
+        v-if="file['status'] !== true && !file['exists']"
+        :disabled="file['status'] === 'loading'"
         round
         dense
         size="xs"
@@ -23,14 +23,14 @@
         @click="$emit('remove', file)"
       />
       <div class="absolute-bottom-right">
-        <q-chip v-if="file.status === 'loading'" dense icon="mdi-progress-upload" class="loading-indicator">
+        <q-chip v-if="file['status'] === 'loading'" dense icon="mdi-progress-upload" class="loading-indicator">
           Uploading
         </q-chip>
-        <q-chip v-else-if="file.status === true" dense color="positive" icon="mdi-check" text-color="white">
+        <q-chip v-else-if="file['status'] === true" dense color="positive" icon="mdi-check" text-color="white">
           Uploaded
         </q-chip>
         <q-chip
-          v-else-if="file.status === false && !file.exists"
+          v-else-if="file['status'] === false && !file['exists']"
           dense
           color="negative"
           icon="mdi-alert-circle"
@@ -38,7 +38,7 @@
         >
           Error
         </q-chip>
-        <q-chip v-else-if="file.status === false && file.exists" dense icon="mdi-file-alert" color="warning">
+        <q-chip v-else-if="file['status'] === false && file['exists']" dense icon="mdi-file-alert" color="warning">
           File exists
         </q-chip>
       </div>
@@ -56,13 +56,13 @@ const props = defineProps({
 });
 const { file } = toRefs(props);
 const fileSize = computed(() => {
-  const size = file.value.file.size / 1024;
+  const size = file.value['file'].size / 1024;
   return size < 1024 ? `${size.toFixed(2)} KB` : `${(size / 1024).toFixed(2)} MB`;
 });
 
 const isValidImageFile = computed(() => {
-  const fileSize = file.value.file.size / 1024 / 1024;
-  return file.value.id.includes('image') && fileSize < 5;
+  const fileSize = file.value['file'].size / 1024 / 1024;
+  return file.value['id'].includes('image') && fileSize < 5;
 });
 </script>
 

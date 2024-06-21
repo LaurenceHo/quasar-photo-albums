@@ -3,10 +3,10 @@ node_modules/
 .env
 *.log
 # Compiled JavaScript files
-/dist/
+dist/
 
 # TypeScript v1 declaration files
 typings/
-/.serverless/
-/.build/
-/test/coverage/
+.serverless/
+.build/
+coverage/

@@ -4,7 +4,7 @@ import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
 import S3Service from '../services/s3-service.js';
 
-const s3BucketName = process.env.AWS_S3_BUCKET_NAME;
+const s3BucketName = process.env['AWS_S3_BUCKET_NAME'];
 const albumService = new AlbumService();
 const s3Service = new S3Service();
 
@@ -53,7 +53,7 @@ export const uploadObject = async (filePath: string, object: any) => {
 
 export const deleteObjects = async (objectKeys: string[]) => {
   const deleteParams: DeleteObjectsCommandInput = {
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Bucket: process.env['AWS_S3_BUCKET_NAME'],
     Delete: { Objects: [] },
   };
 
@@ -69,7 +69,7 @@ export const deleteObjects = async (objectKeys: string[]) => {
 
 export const emptyS3Folder = async (folderName: string) => {
   const listedObjects = await s3Service.listObjects({
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Bucket: process.env['AWS_S3_BUCKET_NAME'],
     Prefix: folderName,
   });
 
@@ -91,7 +91,7 @@ export const emptyS3Folder = async (folderName: string) => {
 
 export const perform = async (method: 'GET' | 'POST', urlPath: string, requestJsonBody?: any, maskFields?: string) => {
   const headers = new Headers({ Accept: '*/*' });
-  headers.append('X-Goog-Api-Key', process.env.GOOGLE_PLACES_API_KEY as string);
+  headers.append('X-Goog-Api-Key', process.env['GOOGLE_PLACES_API_KEY'] as string);
   if (!isEmpty(maskFields)) {
     headers.append('X-Goog-FieldMask', maskFields ?? '');
   }

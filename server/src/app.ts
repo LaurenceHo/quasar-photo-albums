@@ -29,7 +29,7 @@ await app.register(cors, {
   methods: ['GET, POST, PUT, DELETE, OPTIONS'],
   optionsSuccessStatus: 200,
   origin: (origin, cb) => {
-    const allowedOrigins = ['http://localhost:9000', process.env.ALBUM_URL];
+    const allowedOrigins = ['http://localhost:9000', process.env['ALBUM_URL']];
     if (origin === undefined || allowedOrigins.indexOf(origin) > -1) {
       cb(null, true);
       return;
@@ -42,7 +42,7 @@ await app.register(cors, {
 await app.register(helmet);
 await app.register(rateLimit, { max: 100 });
 await app.register(auth);
-await app.register(cookie, { secret: process.env.JWT_SECRET as string });
+await app.register(cookie, { secret: process.env['JWT_SECRET'] as string });
 await app.register(multipart, {
   limits: {
     fieldSize: 256, // Max field value size in bytes
@@ -58,7 +58,7 @@ await app.register(throttle, {
 });
 
 // Route
-app.addHook('onRequest', (request, reply, done) => {
+app.addHook('onRequest', (request, _reply, done) => {
   console.log('##### Request: ', request.method, request.url);
   done();
 });

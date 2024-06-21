@@ -1,3 +1,7 @@
-npm run lint
+bun run types
+bun run lint
+bun run format
 cd server
-npm run lint
+bun run types
+bun run lint
+bun run format

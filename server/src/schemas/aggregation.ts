@@ -15,7 +15,7 @@ export interface DataAggregation<K extends keyof ValueMap> {
   value: ValueMap[K];
 }
 
-export const dataAggregationsTableName = process.env.DATA_AGGREGATIONS_TABLE_NAME || 'data-aggregations';
+export const dataAggregationsTableName = process.env['DATA_AGGREGATIONS_TABLE_NAME'] || 'data-aggregations';
 
 type ValueAttributes = Album[] | AlbumsByYear;
 

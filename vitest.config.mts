@@ -8,7 +8,7 @@ export default defineConfig({
   test: {
     coverage: {
       provider: 'v8',
-      reportsDirectory: 'test/vitest/coverage',
+      reportsDirectory: 'coverage',
       exclude:['**/**.js','**/**.d.ts','.quasar/**','.eslintrc.mjs','server/**']
     },
     globals: true,

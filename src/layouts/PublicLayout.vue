@@ -103,7 +103,7 @@ const { setUpdateAlbumDialogState, setUpdateAlbumTagsDialogState } = DialogState
 
 const searchKey = ref('');
 const routeName = computed(() => route.name);
-const albumAppName = computed(() => process.env.ALBUM_APP_TITLE);
+const albumAppName = computed(() => process.env['ALBUM_APP_TITLE']);
 const userPermission = computed(() => userPermissionStore.userPermission as UserPermission);
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const isCheckingUserPermission = computed(() => userPermissionStore.isCheckingUserPermission);

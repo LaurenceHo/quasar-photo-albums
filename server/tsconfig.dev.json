@@ -1,5 +1,3 @@
 {
-  "include": [
-    ".eslintrc.mjs"
-  ]
+  "include": [".eslintrc.mjs"]
 }

@@ -1,20 +1,15 @@
 {
+  "extends": [
+    "@tsconfig/node20/tsconfig.json",
+    "@tsconfig/strictest/tsconfig.json"
+  ],
   // https://www.typescriptlang.org/tsconfig#compilerOptions
   "compilerOptions": {
-    "esModuleInterop": true,
-    "lib": ["esnext"],
     "module": "esnext",
-    "moduleResolution": "node",
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
+    "moduleResolution": "bundler",
     "outDir": "dist",
-    "preserveConstEnums": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true,
     "sourceMap": true,
-    "strict": true,
-    "target": "esnext",
-    "types": ["node"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

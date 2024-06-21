@@ -1,11 +1,6 @@
 name: Build and deploy demo web app
 
 on:
-  push:
-    branches:
-      - develop
-    paths:
-      - "src/**"
   pull_request:
     branches:
       - master
@@ -60,6 +55,7 @@ jobs:
 
       - name: Test and build
         run: |
+          npm run types
           npm run test
           npm run build
 

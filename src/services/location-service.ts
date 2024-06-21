@@ -1,4 +1,4 @@
-import { Album, ApiResponse, Place } from 'src/components/models';
+import { ApiResponse, Place } from 'src/components/models';
 import HttpRequestService from 'src/services/http-request-service';
 
 export default class LocationService extends HttpRequestService {
