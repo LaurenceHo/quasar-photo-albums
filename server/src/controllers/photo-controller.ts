@@ -10,7 +10,7 @@ import { deleteObjects, updatePhotoAlbum, uploadObject } from './helpers.js';
 
 const s3Service = new S3Service();
 const albumService = new AlbumService();
-const bucketName = process.env.AWS_S3_BUCKET_NAME;
+const bucketName = process.env['AWS_S3_BUCKET_NAME'];
 
 export default class PhotoController extends BaseController {
   /**
@@ -30,7 +30,7 @@ export default class PhotoController extends BaseController {
           const result = reply.unsignCookie(token);
           if (result.valid && result.value != null) {
             try {
-              const decodedPayload = jwt.verify(result.value, process.env.JWT_SECRET as string);
+              const decodedPayload = jwt.verify(result.value, process.env['JWT_SECRET'] as string);
               const isAdmin = get(decodedPayload, 'role') === 'admin';
               if (!isAdmin) {
                 return cleanJwtCookie(reply, 'Unauthorized action.', 403);
@@ -54,7 +54,7 @@ export default class PhotoController extends BaseController {
         if (!isEmpty(photos) && isEmpty(album.albumCover)) {
           await updatePhotoAlbum({
             ...album,
-            albumCover: photos[0].key,
+            albumCover: photos[0]?.key || '',
             updatedBy: 'System',
             updatedAt: new Date().toISOString(),
           });
@@ -111,7 +111,7 @@ export default class PhotoController extends BaseController {
       const promise = new Promise((resolve, reject) => {
         s3Service
           .copy({
-            Bucket: process.env.AWS_S3_BUCKET_NAME,
+            Bucket: process.env['AWS_S3_BUCKET_NAME'],
             CopySource: `/${bucketName}/${sourcePhotoKey}`,
             Key: `${destinationAlbumId}/${photoKey}`,
           })

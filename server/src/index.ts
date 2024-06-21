@@ -8,7 +8,7 @@ console.log('Finish verifying DynamoDB tables.');
 
 const s3Service = new S3Service();
 
-const exists = await s3Service.checkObject({ Bucket: process.env.AWS_S3_BUCKET_NAME, Key: 'updateDatabaseAt.json' });
+const exists = await s3Service.checkObject({ Bucket: process.env['AWS_S3_BUCKET_NAME'], Key: 'updateDatabaseAt.json' });
 if (!exists) {
   console.log('updateDatabaseAt.json does not exist');
   await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));

@@ -117,14 +117,14 @@ const userPermissionStore = userStore();
 
 const { albumTags, filterTags } = AlbumTagsFilterComposable();
 
-const paramsYear = computed(() => route.params.year as string);
+const paramsYear = computed(() => route.params['year'] as string);
 
 const pageNumber = ref(1);
 const itemsPerPage = ref(20);
-const albumStyle = ref((route.query.albumStyle as string) || 'list'); // List is default style
+const albumStyle = ref((route.query['albumStyle'] as string) || 'list'); // List is default style
 const selectedTags = ref([]);
 const privateAlbum = ref(false);
-const selectedYear = ref((route.params.year as string) || useAlbumStore.selectedYear || 'na');
+const selectedYear = ref((route.params['year'] as string) || useAlbumStore.selectedYear || 'na');
 
 const loadingAllAlbumInformation = computed(() => useAlbumStore.loadingAllAlbumInformation);
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);

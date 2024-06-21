@@ -3,7 +3,7 @@ import { isEmpty } from 'radash';
 import { notify } from 'src/utils/helper';
 
 export default class HttpRequestService {
-  baseUrl = process.env.NODE_ENV === 'production' ? process.env.AWS_API_GATEWAY_URL : 'http://localhost:3000/api';
+  baseUrl = process.env.NODE_ENV === 'production' ? process.env['AWS_API_GATEWAY_URL'] : 'http://localhost:3000/api';
   displayLoadingBar = false;
   customSuccessMessage: string | undefined;
   displayErrorNotification = true;
@@ -120,6 +120,7 @@ export default class HttpRequestService {
       if (this.displayErrorNotification) {
         notify('negative', `Error: ${response.statusText}`);
       }
+      return null;
     } finally {
       LoadingBar.stop();
     }

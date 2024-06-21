@@ -25,7 +25,7 @@ export default class AuthController extends BaseController {
       } else {
         if (result.valid && result.value != null) {
           try {
-            const decodedPayload = jwt.verify(result.value, process.env.JWT_SECRET as string) as UserPermission;
+            const decodedPayload = jwt.verify(result.value, process.env['JWT_SECRET'] as string) as UserPermission;
             return this.ok<UserPermission>(reply, 'ok', decodedPayload);
           } catch (error) {
             reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
@@ -59,7 +59,7 @@ export default class AuthController extends BaseController {
 
         if (userPermission) {
           // Sign JWT token
-          const token = jwt.sign(userPermission, process.env.JWT_SECRET as string, { expiresIn: '7d' });
+          const token = jwt.sign(userPermission, process.env['JWT_SECRET'] as string, { expiresIn: '7d' });
           // Set token as cookies
           await setJwtCookies(reply, token);
           return this.ok<UserPermission>(reply, 'ok', userPermission);
@@ -109,7 +109,7 @@ const _verifyIdToken = async (token: string) => {
   // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
   const ticket = await client.verifyIdToken({
     idToken: token,
-    audience: process.env.GOOGLE_CLIENT_ID ?? '',
+    audience: process.env['GOOGLE_CLIENT_ID'] ?? '',
   });
   return ticket.getPayload();
 };

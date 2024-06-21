@@ -85,7 +85,7 @@ const mockUserPermission = {
 };
 
 export const mockSignedCookies = () => {
-  const token = jwt.sign(mockUserPermission, process.env.JWT_SECRET as string, { expiresIn: '7d' });
-  const signer = signerFactory(process.env.JWT_SECRET);
+  const token = jwt.sign(mockUserPermission, process.env['JWT_SECRET'] as string, { expiresIn: '7d' });
+  const signer = signerFactory(process.env['JWT_SECRET']);
   return signer.sign(token);
 };

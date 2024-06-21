@@ -177,8 +177,8 @@ const isProcessing = ref(false);
 const selectedPlace = ref(null as Place | null);
 const placeSuggestions = ref([] as Place[]);
 const isSearching = ref(false);
-const locationLatitude = computed(() => selectedPlace.value?.location?.latitude);
-const locationLongitude = computed(() => selectedPlace.value?.location?.longitude);
+const locationLatitude = computed(() => selectedPlace.value?.location?.latitude || 0);
+const locationLongitude = computed(() => selectedPlace.value?.location?.longitude || 0);
 
 const searchPlace = async (searchText: string) => {
   if (searchText) {
@@ -206,7 +206,7 @@ const confirmUpdateAlbum = async () => {
   const albumToBeUpdated: Album = {
     year: selectedYear.value,
     id: getAlbumToBeUpdate.value.id || albumId.value,
-    albumCover: getAlbumToBeUpdate.value.albumCover,
+    albumCover: getAlbumToBeUpdate.value.albumCover || '',
     albumName: albumName.value,
     description: albumDesc.value,
     isPrivate: privateAlbum.value,

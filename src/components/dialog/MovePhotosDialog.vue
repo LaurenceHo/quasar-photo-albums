@@ -109,7 +109,7 @@ let staticAlbums = useAlbumStore.albumList
 const duplicatedPhotoKeys = ref<string[]>([]);
 const filteredAlbumsList = ref(staticAlbums);
 const selectedAlbumModel = ref(filteredAlbumsList.value[0] ?? { label: '', value: '' });
-const selectedYear = ref((route.params.year as string) || useAlbumStore.selectedYear || 'na');
+const selectedYear = ref((route.params['year'] as string) || useAlbumStore.selectedYear || 'na');
 const isProcessing = ref(false);
 const isLoadingAlbums = ref(false);
 const needToRefreshPhotoList = ref(false);
@@ -140,10 +140,18 @@ const confirmMovePhotos = async () => {
     selectedAlbumModel.value.value,
     selectedYear.value
   );
-  const tempDuplicatedPhotoKeys =
-    photosInSelectedAlbum.data?.photos
-      ?.filter((photo) => photoKeysArray.value.includes(photo.key.split('/')[1]))
-      .map((photo) => photo.key.split('/')[1]) ?? [];
+  let tempDuplicatedPhotoKeys: string[] = [];
+  if (photosInSelectedAlbum.data?.photos) {
+    tempDuplicatedPhotoKeys = photosInSelectedAlbum.data.photos
+      .filter((photo) => {
+        const photoKey = photo.key.split('/')[1];
+        if (photoKey) {
+          return photoKeysArray.value.includes(photoKey);
+        }
+        return false;
+      })
+      .map((photo) => photo.key.split('/')[1] || '');
+  }
 
   let filteredPhotoKeys = photoKeysArray.value;
   // Remove duplicated photos from the list

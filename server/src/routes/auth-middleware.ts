@@ -42,7 +42,10 @@ export const verifyJwtClaim: FastifyAuthFunction = async (request: FastifyReques
   const result = reply.unsignCookie(token);
   if (result.valid && result.value != null) {
     try {
-      (request as RequestWithUser).user = jwt.verify(result.value, process.env.JWT_SECRET as string) as UserPermission;
+      (request as RequestWithUser).user = jwt.verify(
+        result.value,
+        process.env['JWT_SECRET'] as string
+      ) as UserPermission;
     } catch (error) {
       reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
       done(new Error('Authentication failed. Please login.'));

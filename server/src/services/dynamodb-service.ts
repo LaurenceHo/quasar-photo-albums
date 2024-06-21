@@ -80,6 +80,6 @@ export abstract class DynamodbService<T> implements BaseService<T> {
   async delete(objectKey: { [key: string]: string | number }): Promise<boolean> {
     const response: EntityIdentifiers<typeof this._entity> = await this._entity.delete(objectKey).go();
 
-    return isEqual(response.data, objectKey);
+    return isEqual(response['data'], objectKey);
   }
 }
