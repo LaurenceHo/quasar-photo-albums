@@ -18,12 +18,16 @@ export abstract class DynamodbService<T> implements BaseService<T> {
   async findAll<K extends keyof T>(
     method: 'scan' | 'query' = 'scan',
     filter?: { indexName: string; key: { [P in K]?: T[P] } } | null,
-    attributes?: Array<keyof T>,
+    attributes?: Array<keyof T> | null,
     whereClause?: ((_val1: any, _val2: any) => string) | null
   ): Promise<T[]> {
     const options: QueryOptions & { attributes?: Array<keyof T> } = {
       ignoreOwnership: true,
     };
+    if (method === 'query' && !filter) {
+      throw new Error('Filter is required for query method');
+    }
+
     if (attributes) {
       options['attributes'] = attributes;
     }

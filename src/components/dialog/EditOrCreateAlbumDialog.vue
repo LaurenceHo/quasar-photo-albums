@@ -203,6 +203,14 @@ const confirmUpdateAlbum = async () => {
 
   isProcessing.value = true;
 
+  // Remove duplicate tags
+  if (!isEmpty(selectedAlbumTags.value)) {
+    const tagSet = new Set(selectedAlbumTags.value);
+    selectedAlbumTags.value = Array.from(tagSet);
+  } else {
+    selectedAlbumTags.value = [];
+  }
+
   const albumToBeUpdated: Album = {
     year: selectedYear.value,
     id: getAlbumToBeUpdate.value.id || albumId.value,
@@ -212,7 +220,7 @@ const confirmUpdateAlbum = async () => {
     isPrivate: privateAlbum.value,
     isFeatured: featuredAlbum.value ?? undefined,
     place: selectedPlace.value,
-    tags: !isEmpty(selectedAlbumTags.value) ? selectedAlbumTags.value : [],
+    tags: selectedAlbumTags.value,
   };
 
   let result;

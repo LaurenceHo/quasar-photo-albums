@@ -3,8 +3,11 @@ import { AlbumTag } from '../schemas/album-tag.js';
 import AlbumTagService from '../services/album-tag-service.js';
 import { BaseController } from './base-controller.js';
 import { uploadObject } from './helpers.js';
+import AlbumService from '../services/album-service.js';
+import { RequestWithUser } from '../models';
 
 const albumTagService = new AlbumTagService();
+const albumService = new AlbumService();
 
 export default class AlbumTagController extends BaseController {
   findAll: RouteHandler = async (_request: FastifyRequest, reply: FastifyReply) => {
@@ -41,6 +44,28 @@ export default class AlbumTagController extends BaseController {
       const result = await albumTagService.delete({ tag });
 
       if (result) {
+        const findAlbumsContainingTag = await albumService.findAll(
+          'scan',
+          null,
+          ['year', 'id', 'tags'],
+          ({ tags }: any, { contains }: any) => `${contains(tags, tag)}`
+        );
+
+        const promises: Promise<any>[] = [];
+        for (const album of findAlbumsContainingTag) {
+          const { year, id } = album;
+          const cloneAlbum: any = { ...album };
+
+          cloneAlbum.updatedBy = (request as RequestWithUser).user?.email ?? 'unknown';
+          cloneAlbum.updatedAt = new Date().toISOString();
+          cloneAlbum.tags = cloneAlbum.tags.filter((t: string) => t !== tag);
+          delete cloneAlbum.year;
+          delete cloneAlbum.id;
+
+          promises.push(albumService.update({ year, id }, cloneAlbum));
+        }
+
+        await Promise.all(promises);
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
         return this.ok(reply, 'Album tag deleted');
       }
