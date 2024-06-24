@@ -15,11 +15,12 @@ const albumTagRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, d
     handler: controller.create,
     schema: {
       body: {
-        type: 'object',
-        required: ['tag'],
-        properties: {
-          tag: {
-            type: 'string',
+        type: 'array',
+        items: {
+          type: 'object',
+          required: ['tag'],
+          properties: {
+            tag: { type: 'string' },
           },
         },
       },

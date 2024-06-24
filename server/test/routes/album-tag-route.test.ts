@@ -45,13 +45,26 @@ describe('album tag route with auth', () => {
     expect(response.statusCode).toBe(422);
   });
 
-  it('should return 200 when adding tag', async () => {
+  it('should return 422 when adding tag and request body is not array', async () => {
     const response = await app.inject({
       method: 'post',
       url: '/api/albumTags',
       payload: {
         tag: 'tag1',
       },
+    });
+    expect(response.payload).toBe(JSON.stringify({ code: 422, status: 'Bad Request', message: 'body must be array' }));
+  });
+
+  it('should return 200 when adding tag', async () => {
+    const response = await app.inject({
+      method: 'post',
+      url: '/api/albumTags',
+      payload: [
+        {
+          tag: 'tag1',
+        },
+      ],
     });
     expect(response.payload).toBe(
       JSON.stringify({

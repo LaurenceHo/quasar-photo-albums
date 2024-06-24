@@ -81,7 +81,7 @@ describe('AlbumList.vue', () => {
   it('Search album list by year', async () => {
     const { vm } = wrapper as any;
     const store = albumStore();
-    vm.selectedYear = '2024';
+    store.selectedYear = '2024';
     await vm.$nextTick();
     expect(store.getAlbumsByYear).toBeCalledWith('2024');
   });

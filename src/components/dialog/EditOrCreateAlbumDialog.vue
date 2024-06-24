@@ -79,6 +79,7 @@
             stack-label
             use-chips
             use-input
+            new-value-mode="add-unique"
             @filter="filterTags"
           />
           <q-toggle
@@ -155,15 +156,19 @@ import { getYearOptions } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import AlbumTagService from 'src/services/album-tag-service';
 
 const locationService = new LocationService();
 const albumService = new AlbumService();
+const albumTagService = new AlbumTagService();
 const store = albumStore();
 const router = useRouter();
 
 const { getUpdateAlbumDialogState, setUpdateAlbumDialogState } = DialogStateComposable();
 const { getAlbumToBeUpdate, setAlbumToBeUpdated } = SelectedItemsComposable();
 const { albumTags, filterTags } = AlbumTagsFilterComposable();
+
+const storedTagsStringArray = computed(() => store.albumTags.map((tag) => tag.tag));
 
 const selectedYear = ref(String(new Date().getFullYear()));
 const albumId = ref('');
@@ -173,7 +178,6 @@ const privateAlbum = ref(false);
 const featuredAlbum = ref<boolean | null>(null);
 const selectedAlbumTags = ref([] as string[]);
 const isProcessing = ref(false);
-
 const selectedPlace = ref(null as Place | null);
 const placeSuggestions = ref([] as Place[]);
 const isSearching = ref(false);
@@ -209,6 +213,14 @@ const confirmUpdateAlbum = async () => {
     selectedAlbumTags.value = Array.from(tagSet);
   } else {
     selectedAlbumTags.value = [];
+  }
+
+  // Create tag
+  if (!isEmpty(selectedAlbumTags.value)) {
+    const findNewTags = selectedAlbumTags.value.filter((tag) => !storedTagsStringArray.value.includes(tag));
+    if (findNewTags.length > 0) {
+      await albumTagService.createAlbumTags(findNewTags.map((tag) => ({ tag })));
+    }
   }
 
   const albumToBeUpdated: Album = {

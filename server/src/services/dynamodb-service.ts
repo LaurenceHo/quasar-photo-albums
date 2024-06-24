@@ -1,5 +1,5 @@
 import { CreateEntityResponse, EntityIdentifiers, QueryOptions, QueryResponse } from 'electrodb';
-import { get, isEqual } from 'radash';
+import { get, isEmpty, isEqual } from 'radash';
 import { BaseService } from '../models.js';
 import { ddbDocClient } from './dynamodb-client.js';
 
@@ -59,10 +59,10 @@ export abstract class DynamodbService<T> implements BaseService<T> {
     return get(response, 'data');
   }
 
-  async create(item: T): Promise<boolean> {
-    const response: CreateEntityResponse<typeof this._entity> = await this._entity.create(item).go();
+  async create(item: T | T[]): Promise<boolean> {
+    const response: CreateEntityResponse<typeof this._entity> = await this._entity.put(item).go({ response: 'none' });
 
-    return !!get(response, 'data');
+    return isEmpty(response.data);
   }
 
   async update(

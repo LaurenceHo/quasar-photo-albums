@@ -22,9 +22,9 @@ export default class AlbumTagController extends BaseController {
   };
 
   create: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const tag: AlbumTag = request.body as AlbumTag;
+    const tags: AlbumTag[] = request.body as AlbumTag[];
     try {
-      const result = await albumTagService.create(tag);
+      const result = await albumTagService.create(tags);
 
       if (result) {
         await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
