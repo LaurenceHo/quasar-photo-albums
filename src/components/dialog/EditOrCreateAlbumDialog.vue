@@ -2,7 +2,7 @@
   <q-dialog v-model="getUpdateAlbumDialogState" persistent>
     <q-card :style="$q.screen.gt.xs ? 'min-width: 500px' : 'min-width: 360px'">
       <q-card-section>
-        <div class="text-h6">{{ getAlbumToBeUpdate.id ? 'Edit' : 'New' }} Album</div>
+        <div class="text-h6" data-test-id="dialog-title">{{ getAlbumToBeUpdate.id ? 'Edit' : 'New' }} Album</div>
       </q-card-section>
 
       <q-form @submit.prevent.stop="confirmUpdateAlbum">
@@ -130,6 +130,7 @@
         <q-card-actions align="right" class="text-primary">
           <q-btn :disable="isProcessing" flat label="Cancel" no-caps @click="resetAlbum" />
           <q-btn
+            data-test-id="submit-button"
             :label="getAlbumToBeUpdate.id ? 'Update' : 'Create'"
             :loading="isProcessing"
             color="primary"
@@ -199,7 +200,7 @@ const confirmUpdateAlbum = async () => {
   albumId.value = albumId.value.trim();
   albumName.value = albumName.value.trim();
 
-  if (isEmpty(albumId.value) || isEmpty(albumName.value)) {
+  if (isEmpty(selectedYear.value) || isEmpty(albumId.value) || isEmpty(albumName.value)) {
     return;
   }
 

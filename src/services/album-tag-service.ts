@@ -13,7 +13,7 @@ export default class AlbumTagService extends HttpRequestService {
   }
 
   createAlbumTags(tags: AlbumTag[]): Promise<ResponseStatus> {
-    this.setDisplayingParameters(true, `Tag created`);
+    this.setDisplayingParameters(true, 'Tag created');
     return this.perform('POST', '', tags);
   }
 
