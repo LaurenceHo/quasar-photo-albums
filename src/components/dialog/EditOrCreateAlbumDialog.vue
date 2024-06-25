@@ -84,8 +84,8 @@
             use-chips
             use-input
             new-value-mode="add-unique"
-            @filter="filterTags"
             data-test-id="select-album-tags"
+            @filter="filterTags"
           />
           <q-toggle
             v-model="featuredAlbum"
