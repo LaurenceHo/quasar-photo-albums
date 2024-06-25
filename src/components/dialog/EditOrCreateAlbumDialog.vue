@@ -5,7 +5,7 @@
         <div class="text-h6" data-test-id="dialog-title">{{ getAlbumToBeUpdate.id ? 'Edit' : 'New' }} Album</div>
       </q-card-section>
 
-      <q-form @submit.prevent.stop="confirmUpdateAlbum">
+      <q-form @submit.prevent="confirmUpdateAlbum" @reset="resetAlbum">
         <q-card-section class="q-pt-none scroll" style="max-height: 50vh">
           <q-toggle
             v-model="privateAlbum"
@@ -24,6 +24,7 @@
             outlined
             :disable="getAlbumToBeUpdate.id !== ''"
             :rules="[(val: string) => !!val || 'Year is required']"
+            data-test-id="select-album-year"
           />
           <q-input
             v-model="albumId"
@@ -41,6 +42,7 @@
             maxlength="30"
             outlined
             stack-label
+            data-test-id="input-album-id"
           />
           <q-input
             v-model="albumName"
@@ -52,6 +54,7 @@
             maxlength="50"
             outlined
             stack-label
+            data-test-id="input-album-name"
           />
           <q-input
             v-model="albumDesc"
@@ -64,6 +67,7 @@
             outlined
             stack-label
             type="textarea"
+            data-test-id="input-album-desc"
           />
           <q-select
             v-model="selectedAlbumTags"
@@ -81,6 +85,7 @@
             use-input
             new-value-mode="add-unique"
             @filter="filterTags"
+            data-test-id="select-album-tags"
           />
           <q-toggle
             v-model="featuredAlbum"
@@ -128,7 +133,7 @@
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
-          <q-btn :disable="isProcessing" flat label="Cancel" no-caps @click="resetAlbum" />
+          <q-btn :disable="isProcessing" flat label="Cancel" no-caps type="reset" />
           <q-btn
             data-test-id="submit-button"
             :label="getAlbumToBeUpdate.id ? 'Update' : 'Create'"
