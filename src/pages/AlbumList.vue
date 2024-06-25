@@ -124,10 +124,10 @@ const itemsPerPage = ref(20);
 const albumStyle = ref((route.query['albumStyle'] as string) || 'list'); // List is default style
 const selectedTags = ref([]);
 const privateAlbum = ref(false);
-const selectedYear = ref((route.params['year'] as string) || useAlbumStore.selectedYear || 'na');
 
-const loadingAllAlbumInformation = computed(() => useAlbumStore.loadingAllAlbumInformation);
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
+const selectedYear = computed(() => useAlbumStore.selectedYear);
+const loadingAllAlbumInformation = computed(() => useAlbumStore.loadingAllAlbumInformation);
 const sortOrder = computed(() => useAlbumStore.sortOrder);
 const searchKey = computed(() => useAlbumStore.searchKey);
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
@@ -160,9 +160,7 @@ const setPageParams = (params: { pageNumber: number; itemsPerPage: number }) => 
   itemsPerPage.value = params.itemsPerPage;
 };
 
-const setSelectedYear = (year: string) => {
-  selectedYear.value = year;
-};
+const setSelectedYear = (year: string) => useAlbumStore.$patch({ selectedYear: year });
 
 const updateSortOrder = () => useAlbumStore.$patch({ sortOrder: sortOrder.value === 'desc' ? 'asc' : 'desc' });
 
@@ -174,15 +172,12 @@ watch(sortOrder, (newValue) => {
 });
 
 watch(selectedYear, (newValue) => {
-  if (newValue && newValue !== useAlbumStore.selectedYear) {
-    useAlbumStore.getAlbumsByYear(newValue);
-    router.push({ name: 'AlbumsByYear', params: { year: newValue } });
-  }
+  useAlbumStore.getAlbumsByYear(newValue);
+  router.push({ name: 'AlbumsByYear', params: { year: newValue } });
 });
 
 watch(loadingAllAlbumInformation, (newValue) => {
   if (!newValue && !paramsYear.value) {
-    selectedYear.value = useAlbumStore.selectedYear || 'na';
     router.push({ name: 'AlbumsByYear', params: { year: useAlbumStore.selectedYear || 'na' } });
   }
 });

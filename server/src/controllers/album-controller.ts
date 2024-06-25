@@ -79,10 +79,8 @@ export default class AlbumController extends BaseController {
   update: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const album = request.body as Album;
-      album.updatedBy = (request as RequestWithUser).user?.email ?? 'unknown';
-      album.updatedAt = new Date().toISOString();
 
-      const result = await updatePhotoAlbum(album);
+      const result = await updatePhotoAlbum(album, (request as RequestWithUser).user?.email);
 
       if (result) {
         return this.ok(reply, 'Album updated');

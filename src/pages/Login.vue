@@ -31,6 +31,7 @@ import { computed, onMounted, ref } from 'vue';
 onMounted(() => {
   // https://developers.google.com/identity/gsi/web/reference/js-reference
   const handleCredentialResponse = async (response: any) => {
+    LocalStorage.clear();
     try {
       loading.value = true;
       const { data: userPermission } = await authService.verifyIdToken(response.credential);
@@ -43,7 +44,6 @@ onMounted(() => {
           message: `Welcome, ${userPermission.displayName}`,
           timeout: 2000,
         });
-        LocalStorage.remove('FILTERED_ALBUMS_BY_YEAR');
         setTimeout(() => window.location.assign('/'), 1000);
       } else {
         q.notify({

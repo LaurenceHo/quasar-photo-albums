@@ -8,9 +8,12 @@ const s3BucketName = process.env['AWS_S3_BUCKET_NAME'];
 const albumService = new AlbumService();
 const s3Service = new S3Service();
 
-export const updatePhotoAlbum = async (album: Album) => {
+export const updatePhotoAlbum = async (album: Album, email = 'unknown') => {
   try {
     const cloneAlbum: any = { ...album };
+    cloneAlbum.updatedBy = email;
+    cloneAlbum.updatedAt = new Date().toISOString();
+
     delete cloneAlbum.year;
     delete cloneAlbum.id;
     delete cloneAlbum.createdAt;

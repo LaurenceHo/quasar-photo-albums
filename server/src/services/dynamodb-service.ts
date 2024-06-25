@@ -1,5 +1,5 @@
 import { CreateEntityResponse, EntityIdentifiers, QueryOptions, QueryResponse } from 'electrodb';
-import { get, isEqual } from 'radash';
+import { get, isEmpty, isEqual } from 'radash';
 import { BaseService } from '../models.js';
 import { ddbDocClient } from './dynamodb-client.js';
 
@@ -18,12 +18,16 @@ export abstract class DynamodbService<T> implements BaseService<T> {
   async findAll<K extends keyof T>(
     method: 'scan' | 'query' = 'scan',
     filter?: { indexName: string; key: { [P in K]?: T[P] } } | null,
-    attributes?: Array<keyof T>,
+    attributes?: Array<keyof T> | null,
     whereClause?: ((_val1: any, _val2: any) => string) | null
   ): Promise<T[]> {
     const options: QueryOptions & { attributes?: Array<keyof T> } = {
       ignoreOwnership: true,
     };
+    if (method === 'query' && !filter) {
+      throw new Error('Filter is required for query method');
+    }
+
     if (attributes) {
       options['attributes'] = attributes;
     }
@@ -55,10 +59,10 @@ export abstract class DynamodbService<T> implements BaseService<T> {
     return get(response, 'data');
   }
 
-  async create(item: T): Promise<boolean> {
-    const response: CreateEntityResponse<typeof this._entity> = await this._entity.create(item).go();
+  async create(item: T | T[]): Promise<boolean> {
+    const response: CreateEntityResponse<typeof this._entity> = await this._entity.put(item).go({ response: 'none' });
 
-    return !!get(response, 'data');
+    return isEmpty(response.data);
   }
 
   async update(

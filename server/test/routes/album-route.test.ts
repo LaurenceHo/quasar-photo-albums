@@ -31,7 +31,7 @@ vi.mock('../../src/controllers/helpers', async () => ({
 
 describe('album route', () => {
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should return correct albums', async () => {

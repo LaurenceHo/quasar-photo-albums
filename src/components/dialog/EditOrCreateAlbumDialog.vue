@@ -2,10 +2,10 @@
   <q-dialog v-model="getUpdateAlbumDialogState" persistent>
     <q-card :style="$q.screen.gt.xs ? 'min-width: 500px' : 'min-width: 360px'">
       <q-card-section>
-        <div class="text-h6">{{ getAlbumToBeUpdate.id ? 'Edit' : 'New' }} Album</div>
+        <div class="text-h6" data-test-id="dialog-title">{{ getAlbumToBeUpdate.id ? 'Edit' : 'New' }} Album</div>
       </q-card-section>
 
-      <q-form @submit.prevent.stop="confirmUpdateAlbum">
+      <q-form @submit.prevent="confirmUpdateAlbum" @reset="resetAlbum">
         <q-card-section class="q-pt-none scroll" style="max-height: 50vh">
           <q-toggle
             v-model="privateAlbum"
@@ -24,6 +24,7 @@
             outlined
             :disable="getAlbumToBeUpdate.id !== ''"
             :rules="[(val: string) => !!val || 'Year is required']"
+            data-test-id="select-album-year"
           />
           <q-input
             v-model="albumId"
@@ -41,6 +42,7 @@
             maxlength="30"
             outlined
             stack-label
+            data-test-id="input-album-id"
           />
           <q-input
             v-model="albumName"
@@ -52,6 +54,7 @@
             maxlength="50"
             outlined
             stack-label
+            data-test-id="input-album-name"
           />
           <q-input
             v-model="albumDesc"
@@ -64,6 +67,7 @@
             outlined
             stack-label
             type="textarea"
+            data-test-id="input-album-desc"
           />
           <q-select
             v-model="selectedAlbumTags"
@@ -79,6 +83,8 @@
             stack-label
             use-chips
             use-input
+            new-value-mode="add-unique"
+            data-test-id="select-album-tags"
             @filter="filterTags"
           />
           <q-toggle
@@ -127,8 +133,9 @@
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
-          <q-btn :disable="isProcessing" flat label="Cancel" no-caps @click="resetAlbum" />
+          <q-btn :disable="isProcessing" flat label="Cancel" no-caps type="reset" />
           <q-btn
+            data-test-id="submit-button"
             :label="getAlbumToBeUpdate.id ? 'Update' : 'Create'"
             :loading="isProcessing"
             color="primary"
@@ -155,15 +162,19 @@ import { getYearOptions } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import AlbumTagService from 'src/services/album-tag-service';
 
 const locationService = new LocationService();
 const albumService = new AlbumService();
+const albumTagService = new AlbumTagService();
 const store = albumStore();
 const router = useRouter();
 
 const { getUpdateAlbumDialogState, setUpdateAlbumDialogState } = DialogStateComposable();
 const { getAlbumToBeUpdate, setAlbumToBeUpdated } = SelectedItemsComposable();
 const { albumTags, filterTags } = AlbumTagsFilterComposable();
+
+const storedTagsStringArray = computed(() => store.albumTags.map((tag) => tag.tag));
 
 const selectedYear = ref(String(new Date().getFullYear()));
 const albumId = ref('');
@@ -173,7 +184,6 @@ const privateAlbum = ref(false);
 const featuredAlbum = ref<boolean | null>(null);
 const selectedAlbumTags = ref([] as string[]);
 const isProcessing = ref(false);
-
 const selectedPlace = ref(null as Place | null);
 const placeSuggestions = ref([] as Place[]);
 const isSearching = ref(false);
@@ -195,13 +205,29 @@ const confirmUpdateAlbum = async () => {
   albumId.value = albumId.value.trim();
   albumName.value = albumName.value.trim();
 
-  if (isEmpty(albumId.value) || isEmpty(albumName.value)) {
+  if (isEmpty(selectedYear.value) || isEmpty(albumId.value) || isEmpty(albumName.value)) {
     return;
   }
 
   albumDesc.value = albumDesc.value.trim();
 
   isProcessing.value = true;
+
+  // Remove duplicate tags
+  if (!isEmpty(selectedAlbumTags.value)) {
+    const tagSet = new Set(selectedAlbumTags.value);
+    selectedAlbumTags.value = Array.from(tagSet);
+  } else {
+    selectedAlbumTags.value = [];
+  }
+
+  // Create tag
+  if (!isEmpty(selectedAlbumTags.value)) {
+    const findNewTags = selectedAlbumTags.value.filter((tag) => !storedTagsStringArray.value.includes(tag));
+    if (findNewTags.length > 0) {
+      await albumTagService.createAlbumTags(findNewTags.map((tag) => ({ tag })));
+    }
+  }
 
   const albumToBeUpdated: Album = {
     year: selectedYear.value,
@@ -212,7 +238,7 @@ const confirmUpdateAlbum = async () => {
     isPrivate: privateAlbum.value,
     isFeatured: featuredAlbum.value ?? undefined,
     place: selectedPlace.value,
-    tags: !isEmpty(selectedAlbumTags.value) ? selectedAlbumTags.value : [],
+    tags: selectedAlbumTags.value,
   };
 
   let result;

@@ -91,7 +91,7 @@ const confirmCreateTag = async () => {
     tag: tagName.value,
   };
 
-  const result = await albumTagService.createAlbumTag(tag);
+  const result = await albumTagService.createAlbumTags([tag]);
   if (result.code === 200) {
     await useAlbumStore.getAlbumsByYear(useAlbumStore.selectedYear, true);
   }

@@ -29,15 +29,19 @@ describe('album-tag-service.ts', () => {
   it('Call createAlbumTag API with correct parameters', () => {
     const albumTagService = new AlbumTagService();
 
-    albumTagService.createAlbumTag({
-      id: 'tag-id',
-      tag: 'test-tag',
-    });
-    expect(mockSetDisplayingParameters).toHaveBeenCalledWith(true, 'Tag "test-tag" created');
-    expect(mockPerform).toHaveBeenCalledWith('POST', '', {
-      id: 'tag-id',
-      tag: 'test-tag',
-    });
+    albumTagService.createAlbumTags([
+      {
+        id: 'tag-id',
+        tag: 'test-tag',
+      },
+    ]);
+    expect(mockSetDisplayingParameters).toHaveBeenCalledWith(true, 'Tag created');
+    expect(mockPerform).toHaveBeenCalledWith('POST', '', [
+      {
+        id: 'tag-id',
+        tag: 'test-tag',
+      },
+    ]);
   });
 
   it('Call deleteAlbumTag API with correct parameters', () => {

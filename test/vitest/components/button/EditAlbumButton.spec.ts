@@ -5,7 +5,6 @@ import { Notify, QDialog } from 'quasar';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import EditAlbumButton from '../../../../src/components/button/EditAlbumButton.vue';
 import DialogStateComposable from '../../../../src/composables/dialog-state-composable';
-import { albumStore } from '../../../../src/stores/album-store';
 
 installQuasarPlugin({ plugins: { Notify }, components: { QDialog } });
 
@@ -59,7 +58,6 @@ describe('EditAlbumButton.vue', () => {
   it('Set album to be updated', async () => {
     const { vm } = wrapper as any;
     await vm.$nextTick();
-    const store = albumStore();
     await wrapper.findComponent('[data-test-id="edit-album-button"]').trigger('click');
     await vm.$nextTick();
     await wrapper.findComponent('[data-test-id="set-album-button"]').trigger('click');
