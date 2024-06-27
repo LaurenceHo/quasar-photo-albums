@@ -7,6 +7,7 @@ export type AlbumsByYear = { year: string; count: number }[];
 type ValueMap = {
   ALBUMS_WITH_LOCATION: Album[];
   COUNT_ALBUMS_BY_YEAR: AlbumsByYear;
+  COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE: AlbumsByYear;
   FEATURED_ALBUMS: Album[];
 };
 
@@ -21,6 +22,7 @@ type ValueAttributes = Album[] | AlbumsByYear;
 
 export const ALBUMS_WITH_LOCATION = 'ALBUMS_WITH_LOCATION';
 export const COUNT_ALBUMS_BY_YEAR = 'COUNT_ALBUMS_BY_YEAR';
+export const COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE = 'COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE';
 export const FEATURED_ALBUMS = 'FEATURED_ALBUMS';
 
 export const DataAggregationEntity = new Entity(
@@ -32,7 +34,12 @@ export const DataAggregationEntity = new Entity(
     },
     attributes: {
       key: {
-        type: [ALBUMS_WITH_LOCATION, COUNT_ALBUMS_BY_YEAR, FEATURED_ALBUMS] as const,
+        type: [
+          ALBUMS_WITH_LOCATION,
+          COUNT_ALBUMS_BY_YEAR,
+          COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
+          FEATURED_ALBUMS,
+        ] as const,
         required: true,
         readOnly: true,
       },

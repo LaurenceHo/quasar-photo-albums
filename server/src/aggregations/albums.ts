@@ -1,8 +1,9 @@
-import { Handler, DynamoDBStreamEvent } from 'aws-lambda';
+import { DynamoDBStreamEvent, Handler } from 'aws-lambda';
 import {
   ALBUMS_WITH_LOCATION,
   AlbumsByYear,
   COUNT_ALBUMS_BY_YEAR,
+  COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
   DataAggregationEntity,
   FEATURED_ALBUMS,
 } from '../schemas/aggregation.js';
@@ -27,17 +28,21 @@ export const handler: Handler = async (event: DynamoDBStreamEvent, _context, cal
 
   const albumService = new AlbumService();
 
-  // Get all public albums
-  const albumList = await albumService.findAll(
-    'scan',
-    null,
-    ['year', 'id', 'albumName', 'albumCover', 'place', 'isFeatured'],
-    ({ isPrivate }: any, { eq }: any) => `${eq(isPrivate, false)}`
-  );
+  const albumList = await albumService.findAll('scan', null, [
+    'year',
+    'id',
+    'albumName',
+    'albumCover',
+    'place',
+    'isFeatured',
+    'isPrivate',
+  ]);
 
-  const albumsHavePlace = albumList.filter((album) => album.place != null);
-  const featuredAlbums = albumList.filter((album) => album.isFeatured);
+  const publicAlbums = albumList.filter((album) => album.isPrivate === false);
+  const albumsHavePlace = publicAlbums.filter((album) => album.place != null);
+  const featuredAlbums = publicAlbums.filter((album) => album.isFeatured);
   const albumsByYear = countAlbumsByYear(albumList);
+  const albumsByYearExcludePrivate = countAlbumsByYear(publicAlbums);
 
   try {
     await Promise.all([
@@ -58,6 +63,11 @@ export const handler: Handler = async (event: DynamoDBStreamEvent, _context, cal
         key: COUNT_ALBUMS_BY_YEAR,
       })
         .set({ value: albumsByYear, updatedAt: new Date().toISOString() })
+        .go({ response: 'none' }),
+      DataAggregationEntity.update({
+        key: COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
+      })
+        .set({ value: albumsByYearExcludePrivate, updatedAt: new Date().toISOString() })
         .go({ response: 'none' }),
     ]);
 
