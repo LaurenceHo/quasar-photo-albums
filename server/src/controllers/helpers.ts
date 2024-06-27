@@ -1,8 +1,10 @@
 import { DeleteObjectsCommandInput, PutObjectCommandInput } from '@aws-sdk/client-s3';
-import { isEmpty } from 'radash';
+import { get, isEmpty } from 'radash';
 import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
 import S3Service from '../services/s3-service.js';
+import jwt from 'jsonwebtoken';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 const s3BucketName = process.env['AWS_S3_BUCKET_NAME'];
 const albumService = new AlbumService();
@@ -111,4 +113,20 @@ export const perform = async (method: 'GET' | 'POST', urlPath: string, requestJs
 
   const response = await fetch(`https://places.googleapis.com/v1/places${urlPath}`, requestOptions);
   return await response.json();
+};
+
+export const verifyIfIsAdmin = (request: FastifyRequest, reply: FastifyReply) => {
+  let isAdmin = false;
+  const token = get(request, 'cookies.jwt', '');
+  const result = reply.unsignCookie(token);
+
+  if (result.valid && result.value != null) {
+    try {
+      const decodedPayload = jwt.verify(result.value, process.env['JWT_SECRET'] as string);
+      isAdmin = get(decodedPayload, 'role') === 'admin';
+    } catch (error) {
+      reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
+    }
+  }
+  return isAdmin;
 };

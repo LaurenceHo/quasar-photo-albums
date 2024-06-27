@@ -99,7 +99,7 @@ describe('album tag route without auth', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return correct tags', async () => {

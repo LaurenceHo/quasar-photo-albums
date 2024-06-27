@@ -4,11 +4,13 @@ import {
   ALBUMS_WITH_LOCATION,
   AlbumsByYear,
   COUNT_ALBUMS_BY_YEAR,
+  COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
   DataAggregation,
   FEATURED_ALBUMS,
 } from '../schemas/aggregation.js';
 import { Album } from '../schemas/album.js';
 import DataAggregationService from '../services/data-aggregation-service.js';
+import { verifyIfIsAdmin } from './helpers.js';
 
 const dataAggregationService = new DataAggregationService();
 
@@ -47,10 +49,19 @@ export default class AggregateController extends BaseController {
         return this.fail(reply, 'Failed to query aggregate data for photo album with location');
       }
     } else if (aggregateType === 'countAlbumsByYear') {
+      const isAdmin = verifyIfIsAdmin(request, reply);
+
       try {
-        const countData: DataAggregation<typeof COUNT_ALBUMS_BY_YEAR> = await dataAggregationService.findOne({
-          key: COUNT_ALBUMS_BY_YEAR,
-        });
+        let countData: DataAggregation<typeof COUNT_ALBUMS_BY_YEAR>;
+        if (!isAdmin) {
+          countData = await dataAggregationService.findOne({
+            key: COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
+          });
+        } else {
+          countData = await dataAggregationService.findOne({
+            key: COUNT_ALBUMS_BY_YEAR,
+          });
+        }
         return this.ok<AlbumsByYear>(reply, 'ok', countData?.value ?? []);
       } catch (err: any) {
         console.error(`Failed to query aggregate data for count albums by year: ${err}`);

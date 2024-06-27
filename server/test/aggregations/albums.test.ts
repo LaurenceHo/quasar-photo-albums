@@ -17,7 +17,7 @@ describe('aggregation albums', () => {
         id: 'demo-album1',
       },
       {
-        isPrivate: false,
+        isPrivate: true,
         year: '2000',
         albumName: 'demo-album 2',
         id: 'demo-album2',

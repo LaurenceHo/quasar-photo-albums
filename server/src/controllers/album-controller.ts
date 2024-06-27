@@ -1,11 +1,9 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import jwt from 'jsonwebtoken';
-import { get } from 'radash';
 import { RequestWithUser } from '../models.js';
 import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
 import { BaseController } from './base-controller.js';
-import { emptyS3Folder, updatePhotoAlbum, uploadObject } from './helpers.js';
+import { emptyS3Folder, updatePhotoAlbum, uploadObject, verifyIfIsAdmin } from './helpers.js';
 
 const albumService = new AlbumService();
 
@@ -14,18 +12,7 @@ export default class AlbumController extends BaseController {
     const year = (request.params as any)['year'] as string;
 
     try {
-      let isAdmin = false;
-      const token = get(request, 'cookies.jwt', '');
-      const result = reply.unsignCookie(token);
-
-      if (result.valid && result.value != null) {
-        try {
-          const decodedPayload = jwt.verify(result.value, process.env['JWT_SECRET'] as string);
-          isAdmin = get(decodedPayload, 'role') === 'admin';
-        } catch (error) {
-          reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
-        }
-      }
+      const isAdmin = verifyIfIsAdmin(request, reply);
 
       let query = null;
       if (!isAdmin) {

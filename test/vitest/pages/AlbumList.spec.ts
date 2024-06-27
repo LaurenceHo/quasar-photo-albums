@@ -1,6 +1,6 @@
 import { createTestingPinia } from '@pinia/testing';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { Loading, LoadingBar, Notify } from 'quasar';
 import { beforeEach, describe, expect, it } from 'vitest';
 import AlbumList from '../../../src/pages/AlbumList.vue';
@@ -14,7 +14,7 @@ installQuasarPlugin({ plugins: { Loading, LoadingBar, Notify } });
 describe('AlbumList.vue', () => {
   let wrapper: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     wrapper = mount(AlbumList, {
       global: {
         plugins: [
@@ -39,6 +39,10 @@ describe('AlbumList.vue', () => {
         stubs: ['Album'],
       },
     });
+
+    await router.push('/albums/2024');
+    await router.isReady();
+    await flushPromises();
   });
 
   it('Should display skeleton when loading', async () => {
@@ -78,12 +82,15 @@ describe('AlbumList.vue', () => {
     expect(wrapper.vm.totalItems).toEqual(11);
   });
 
-  it('Search album list by year', async () => {
+  it('Search album list by year when route change', async () => {
+    await router.push('/albums/2022');
+    await router.isReady();
+    await flushPromises();
+
     const { vm } = wrapper as any;
     const store = albumStore();
-    store.selectedYear = '2024';
     await vm.$nextTick();
-    expect(store.getAlbumsByYear).toBeCalledWith('2024');
+    expect(store.getAlbumsByYear).toBeCalledWith('2022');
   });
 
   it('Search album list by category', async () => {

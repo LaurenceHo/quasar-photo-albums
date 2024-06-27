@@ -35,7 +35,7 @@
         />
       </div>
       <div class="col-12 col-xl-1 col-lg-1 col-md-2 col-sm-2 q-mr-sm q-pb-sm">
-        <select-year :selected-year="selectedYear" @select-year="setSelectedYear" />
+        <select-year :selected-year="paramsYear || filteredAlbumsByYear?.year || 'na'" @select-year="setSelectedYear" />
       </div>
       <div class="col-12 col-xl-3 col-lg-3 col-md-3 col-sm-grow q-pb-sm">
         <q-select
@@ -105,10 +105,11 @@ import SelectYear from 'components/SelectYear.vue';
 import SkeletonAlbumList from 'pages/SkeletonAlbumList.vue';
 import { isEmpty } from 'radash';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
-import { albumStore } from 'src/stores/album-store';
+import { albumStore, FILTERED_ALBUMS_BY_YEAR, FilteredAlbumsByYear } from 'src/stores/album-store';
 import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { LocalStorage } from 'quasar';
 
 const route = useRoute();
 const router = useRouter();
@@ -126,7 +127,6 @@ const selectedTags = ref([]);
 const privateAlbum = ref(false);
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const selectedYear = computed(() => useAlbumStore.selectedYear);
 const loadingAllAlbumInformation = computed(() => useAlbumStore.loadingAllAlbumInformation);
 const sortOrder = computed(() => useAlbumStore.sortOrder);
 const searchKey = computed(() => useAlbumStore.searchKey);
@@ -150,6 +150,8 @@ const chunkAlbumList = computed(() => {
   }
 });
 
+const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(<string>LocalStorage.getItem(FILTERED_ALBUMS_BY_YEAR));
+
 const setAlbumStyle = (type: 'list' | 'grid') => {
   albumStyle.value = type;
   router.replace({ query: { ...route.query, albumStyle: type } });
@@ -160,25 +162,24 @@ const setPageParams = (params: { pageNumber: number; itemsPerPage: number }) => 
   itemsPerPage.value = params.itemsPerPage;
 };
 
-const setSelectedYear = (year: string) => useAlbumStore.$patch({ selectedYear: year });
+const setSelectedYear = (year: string) => router.push({ name: 'AlbumsByYear', params: { year: year } });
 
 const updateSortOrder = () => useAlbumStore.$patch({ sortOrder: sortOrder.value === 'desc' ? 'asc' : 'desc' });
 
-useAlbumStore.getAlbumsByYear(paramsYear.value);
+useAlbumStore.getAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year);
 
 // Only update the order of album list when user click sort button in order to prevent sorting multiple times
 watch(sortOrder, (newValue) => {
   useAlbumStore.sortByKey(newValue);
 });
 
-watch(selectedYear, (newValue) => {
+watch(paramsYear, (newValue) => {
   useAlbumStore.getAlbumsByYear(newValue);
-  router.push({ name: 'AlbumsByYear', params: { year: newValue } });
 });
 
 watch(loadingAllAlbumInformation, (newValue) => {
   if (!newValue && !paramsYear.value) {
-    router.push({ name: 'AlbumsByYear', params: { year: useAlbumStore.selectedYear || 'na' } });
+    router.push({ name: 'AlbumsByYear', params: { year: filteredAlbumsByYear?.year || 'na' } });
   }
 });
 </script>

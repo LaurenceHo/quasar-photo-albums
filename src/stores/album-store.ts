@@ -15,7 +15,6 @@ export interface AlbumState {
   searchKey: string;
   sortOrder: 'asc' | 'desc';
   selectedAlbumItem: Album;
-  selectedYear: string;
   countAlbumsByYear: AlbumsByYear;
 }
 
@@ -39,7 +38,6 @@ const initialState: AlbumState = {
     tags: [],
     isPrivate: false,
   },
-  selectedYear: 'na',
   countAlbumsByYear: [],
 };
 
@@ -47,7 +45,7 @@ export const UPDATED_DB_TIME_FILE = 'updateDatabaseAt.json';
 export const FILTERED_ALBUMS_BY_YEAR = 'FILTERED_ALBUMS_BY_YEAR';
 export const ALBUM_TAGS = 'ALBUM_TAGS';
 
-interface FilteredAlbumsByYear {
+export interface FilteredAlbumsByYear {
   dbUpdatedTime: string;
   year: string;
   albums: Album[];
@@ -183,7 +181,6 @@ export const albumStore = defineStore('albums', {
           LocalStorage.getItem(FILTERED_ALBUMS_BY_YEAR) || '{}'
         );
 
-        this.selectedYear = filteredAlbumsByYear.year;
         this.albumList = sortByKey(filteredAlbumsByYear.albums, 'albumName', this.sortOrder);
       } catch (error) {
         this.loadingAllAlbumInformation = false;
