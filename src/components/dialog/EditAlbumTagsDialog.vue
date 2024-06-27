@@ -71,19 +71,25 @@
 <script lang="ts" setup>
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumTagService from 'src/services/album-tag-service';
-import { albumStore } from 'stores/album-store';
+import { albumStore, FILTERED_ALBUMS_BY_YEAR, FilteredAlbumsByYear } from 'stores/album-store';
 import { computed, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { LocalStorage } from 'quasar';
 
 const albumTagService = new AlbumTagService();
 const useAlbumStore = albumStore();
 const { updateAlbumTagsDialogState } = DialogStateComposable();
+const route = useRoute();
 
 const isProcessing = ref(false);
 const createTagDialog = ref(false);
 const deleteTagDialog = ref(false);
 const tagName = ref('');
 
+const paramsYear = computed(() => route.params['year'] as string);
 const albumTags = computed(() => useAlbumStore.albumTags);
+
+const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(<string>LocalStorage.getItem(FILTERED_ALBUMS_BY_YEAR));
 
 const confirmCreateTag = async () => {
   isProcessing.value = true;
@@ -93,7 +99,7 @@ const confirmCreateTag = async () => {
 
   const result = await albumTagService.createAlbumTags([tag]);
   if (result.code === 200) {
-    await useAlbumStore.getAlbumsByYear(useAlbumStore.selectedYear, true);
+    await useAlbumStore.getAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year, true);
   }
   createTagDialog.value = false;
   isProcessing.value = false;
@@ -104,7 +110,7 @@ const confirmDeleteTag = async () => {
   isProcessing.value = true;
   const result = await albumTagService.deleteAlbumTag(tagName.value);
   if (result.code === 200) {
-    await useAlbumStore.getAlbumsByYear(useAlbumStore.selectedYear, true);
+    await useAlbumStore.getAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year, true);
   }
   deleteTagDialog.value = false;
   isProcessing.value = false;

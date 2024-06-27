@@ -16,6 +16,7 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
           Resource:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:PHOTO_ALBUMS_TABLE_NAME}
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:PHOTO_ALBUM_TAGS_TABLE_NAME}

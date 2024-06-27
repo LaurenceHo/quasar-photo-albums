@@ -28,7 +28,9 @@
     <q-card>
       <q-card-section class="row items-center">
         <q-icon color="primary" name="mdi-alert-circle" size="md" />
-        <span class="q-ml-sm text-h6">Do you want to delete album "{{ albumName }}"?</span>
+        <span class="q-ml-sm text-h6" data-test-id="confirm-delete-album-dialog-title">
+          Do you want to delete album "{{ albumName }}"?
+        </span>
         <span class="q-ma-sm text-subtitle2">
           All photos in this album will be deleted, and any new photos added while the delete action is in progress
           might also be deleted.
@@ -37,7 +39,15 @@
 
       <q-card-actions align="right">
         <q-btn v-close-popup :disable="isProcessing" color="primary" flat label="Cancel" no-caps />
-        <q-btn :loading="isProcessing" color="primary" label="Confirm" no-caps unelevated @click="confirmDeleteAlbum" />
+        <q-btn
+          :loading="isProcessing"
+          color="primary"
+          label="Confirm"
+          no-caps
+          unelevated
+          data-test-id="confirm-delete-album-button"
+          @click="confirmDeleteAlbum"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -49,7 +59,8 @@ import DialogStateComposable from 'src/composables/dialog-state-composable';
 import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import AlbumService from 'src/services/album-service';
 import { albumStore } from 'stores/album-store';
-import { ref, toRefs } from 'vue';
+import { computed, ref, toRefs } from 'vue';
+import { useRoute } from 'vue-router';
 
 const props = defineProps({
   albumStyle: {
@@ -65,10 +76,13 @@ const props = defineProps({
 });
 const { albumItem } = toRefs(props);
 
+const route = useRoute();
 const albumService = new AlbumService();
 const store = albumStore();
 const { setUpdateAlbumDialogState } = DialogStateComposable();
 const { setAlbumToBeUpdated } = SelectedItemsComposable();
+
+const paramsYear = computed(() => route.params['year'] as string);
 
 const deleteAlbum = ref(false);
 const albumName = ref(albumItem.value['albumName']);
@@ -83,7 +97,7 @@ const confirmDeleteAlbum = async () => {
   isProcessing.value = true;
   const result = await albumService.deleteAlbum(albumItem.value['id'], albumItem.value['year']);
   if (result.code === 200) {
-    await store.getAlbumsByYear(store.selectedYear, true);
+    await store.getAlbumsByYear(paramsYear.value, true);
   }
   deleteAlbum.value = false;
   isProcessing.value = false;
