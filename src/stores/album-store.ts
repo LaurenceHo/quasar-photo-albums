@@ -10,12 +10,14 @@ import { compareDbUpdatedTime, getStaticFileUrl, sortByKey } from 'src/utils/hel
 export interface AlbumState {
   loadingAllAlbumInformation: boolean;
   loadingCountAlbumsByYear: boolean;
+  loadingFeaturedAlbums: boolean;
   albumList: Album[];
   albumTags: AlbumTag[];
   searchKey: string;
   sortOrder: 'asc' | 'desc';
   selectedAlbumItem: Album;
   countAlbumsByYear: AlbumsByYear;
+  featuredAlbums: Album[];
 }
 
 const albumService = new AlbumService();
@@ -25,6 +27,7 @@ const aggregateService = new AggregateService();
 const initialState: AlbumState = {
   loadingAllAlbumInformation: true,
   loadingCountAlbumsByYear: true,
+  loadingFeaturedAlbums: true,
   albumList: [],
   albumTags: [],
   searchKey: '',
@@ -39,11 +42,13 @@ const initialState: AlbumState = {
     isPrivate: false,
   },
   countAlbumsByYear: [],
+  featuredAlbums: [],
 };
 
 export const UPDATED_DB_TIME_FILE = 'updateDatabaseAt.json';
 export const FILTERED_ALBUMS_BY_YEAR = 'FILTERED_ALBUMS_BY_YEAR';
 export const ALBUM_TAGS = 'ALBUM_TAGS';
+export const FEATURED_ALBUMS = 'FEATURED_ALBUMS';
 
 export interface FilteredAlbumsByYear {
   dbUpdatedTime: string;
@@ -62,7 +67,7 @@ const _fetchDbUpdatedTime = async () => {
   return dbUpdatedTimeJSON.time;
 };
 
-const _fetchAlbumAndSetToLocalStorage = async (year: string | undefined, dbUpdatedTime?: string) => {
+const _fetchAlbumsAndSetToLocalStorage = async (year: string | undefined, dbUpdatedTime?: string) => {
   let time = dbUpdatedTime;
   if (!time) {
     time = await _fetchDbUpdatedTime();
@@ -104,6 +109,28 @@ const _fetchAlbumTagsAndSetToLocalStorage = async (dbUpdatedTime?: string) => {
         dbUpdatedTime: time,
         tags: sortByKey(tags, 'tag', 'asc'),
       } as AlbumTags)
+    );
+  }
+};
+
+const _fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string) => {
+  let time = dbUpdatedTime;
+  if (!time) {
+    time = await _fetchDbUpdatedTime();
+  }
+
+  const { data: albums, code, message } = await aggregateService.getAggregateData('featuredAlbums');
+  if (code !== 200) {
+    throw Error(message);
+  }
+
+  if (albums) {
+    LocalStorage.set(
+      FEATURED_ALBUMS,
+      JSON.stringify({
+        dbUpdatedTime: time,
+        albums,
+      } as FilteredAlbumsByYear)
     );
   }
 };
@@ -163,7 +190,7 @@ export const albumStore = defineStore('albums', {
 
       try {
         if (!LocalStorage.getItem(FILTERED_ALBUMS_BY_YEAR)) {
-          await _fetchAlbumAndSetToLocalStorage(year);
+          await _fetchAlbumsAndSetToLocalStorage(year);
         } else {
           const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(
             <string>LocalStorage.getItem(FILTERED_ALBUMS_BY_YEAR)
@@ -172,7 +199,7 @@ export const albumStore = defineStore('albums', {
           // If local storage is not the latest data or request year is different from local storage (user selects year
           // from the dropdown),we should get albums from database
           if (forceUpdate || !compareResult.isLatest || (year !== undefined && year !== filteredAlbumsByYear.year)) {
-            await _fetchAlbumAndSetToLocalStorage(year, compareResult.dbUpdatedTime);
+            await _fetchAlbumsAndSetToLocalStorage(year, compareResult.dbUpdatedTime);
           }
         }
 
@@ -212,12 +239,39 @@ export const albumStore = defineStore('albums', {
 
       this.loadingAllAlbumInformation = false;
     },
+
     async getCountAlbumsByYear() {
       this.loadingCountAlbumsByYear = true;
 
       const { data } = await aggregateService.getAggregateData('countAlbumsByYear');
       this.countAlbumsByYear = data as AlbumsByYear;
       this.loadingCountAlbumsByYear = false;
+    },
+
+    async getFeaturedAlbums() {
+      this.loadingFeaturedAlbums = true;
+      try {
+        if (!LocalStorage.getItem(FEATURED_ALBUMS)) {
+          await _fetchFeaturedAlbumsAndSetToLocalStorage();
+        } else {
+          const compareResult = await compareDbUpdatedTime(
+            JSON.parse(<string>LocalStorage.getItem(FEATURED_ALBUMS)).dbUpdatedTime
+          );
+          if (!compareResult.isLatest) {
+            await _fetchFeaturedAlbumsAndSetToLocalStorage(compareResult.dbUpdatedTime);
+          }
+        }
+
+        this.featuredAlbums = get(
+          JSON.parse(LocalStorage.getItem(FEATURED_ALBUMS) || '{}') as AlbumTags,
+          'albums',
+          []
+        ) as Album[];
+      } catch (error) {
+        this.loadingFeaturedAlbums = false;
+      } finally {
+        this.loadingFeaturedAlbums = false;
+      }
     },
 
     sortByKey(sortOrder: 'asc' | 'desc') {

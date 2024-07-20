@@ -166,7 +166,9 @@ const setSelectedYear = (year: string) => router.push({ name: 'AlbumsByYear', pa
 
 const updateSortOrder = () => useAlbumStore.$patch({ sortOrder: sortOrder.value === 'desc' ? 'asc' : 'desc' });
 
+// Fetch all albums and featured albums and store them in the store
 useAlbumStore.getAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year);
+useAlbumStore.getFeaturedAlbums();
 
 // Only update the order of album list when user click sort button in order to prevent sorting multiple times
 watch(sortOrder, (newValue) => {

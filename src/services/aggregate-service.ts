@@ -10,7 +10,12 @@ export default class AggregateService extends HttpRequestService {
   public getAggregateData(
     type: 'albumsWithLocation' | 'countAlbumsByYear' | 'featuredAlbums'
   ): Promise<ApiResponse<DataAggregateValueMap[typeof type]>> {
-    this.setDisplayingParameters(false, undefined, true, 'Ooops, something went wrong, please try again later');
+    this.setDisplayingParameters(
+      type === 'albumsWithLocation',
+      undefined,
+      true,
+      'Ooops, something went wrong, please try again later'
+    );
     return this.perform('GET', `/${type}`);
   }
 }
