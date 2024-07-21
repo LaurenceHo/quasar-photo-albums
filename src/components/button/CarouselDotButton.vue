@@ -3,7 +3,7 @@
 </template>
 <script setup lang="ts">
 import { EmblaCarouselType } from 'embla-carousel';
-import { computed, ref, toRefs, watch } from 'vue';
+import { computed, onMounted, ref, toRefs, watch } from 'vue';
 
 const props = defineProps({
   carouselApi: {
@@ -19,19 +19,11 @@ const props = defineProps({
 const { dotIndex, carouselApi } = toRefs(props);
 
 const selectedIndex = ref(0);
-const scrollSnaps = ref<number[]>([]);
 
-const dotButtonClasses = computed(() => {
-  return {
-    embla__dot: true,
-    'embla__dot--selected': dotIndex.value === selectedIndex.value,
-  };
-});
-
-const onInit = (carouselApi: EmblaCarouselType) => {
-  if (!carouselApi) return;
-  scrollSnaps.value = carouselApi.scrollSnapList();
-};
+const dotButtonClasses = computed(() => ({
+  embla__dot: true,
+  'embla__dot--selected': dotIndex.value === selectedIndex.value,
+}));
 
 const onSelect = (carouselApi: EmblaCarouselType) => {
   if (!carouselApi) return;
@@ -44,11 +36,17 @@ const scrollTo = () => {
   carouselApi.value.scrollTo(dotIndex.value);
 };
 
+onMounted(() => {
+  if (carouselApi.value) {
+    onSelect(carouselApi.value);
+    carouselApi.value.on('reInit', onSelect).on('select', onSelect);
+  }
+});
+
 watch(carouselApi, (newVal) => {
   if (!newVal) return;
-  onInit(newVal);
   onSelect(newVal);
-  newVal.on('reInit', onInit).on('reInit', onSelect).on('select', onSelect);
+  newVal.on('reInit', onSelect).on('select', onSelect);
 });
 </script>
 
