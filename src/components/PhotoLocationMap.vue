@@ -1,5 +1,5 @@
 <template>
-  <div id="photo-location-map" class="rounded-borders-lg" :style="`width: ${width}; height: ${height};`"></div>
+  <div id="photo-location-map" class="rounded-borders" :style="`width: ${width}; height: ${height};`"></div>
 </template>
 
 <script lang="ts" setup>

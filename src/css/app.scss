@@ -13,13 +13,21 @@ body {
   padding-right: 15px;
 }
 
-.rounded-borders-lg {
-  border-radius: 8px !important;
-}
-
 .responsive-image {
   max-width: 100%;
   display: block;
+}
+
+.absolute-left-centre {
+  position: absolute;
+  left: 0;
+  top: 50%;
+}
+
+.absolute-right-centre {
+  position: absolute;
+  right: 0;
+  top: 50%;
 }
 
 // Quasar css override

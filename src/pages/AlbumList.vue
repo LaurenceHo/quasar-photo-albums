@@ -79,6 +79,10 @@
       label="Only show private album"
       left-label
     />
+    <template v-if="featuredAlbums.length > 0">
+      <div class="text-h5">Featured Albums</div>
+      <carousel />
+    </template>
     <template v-if="chunkAlbumList.length > 0">
       <div v-if="albumStyle === 'grid'" class="q-col-gutter-md row">
         <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
@@ -100,6 +104,7 @@
 <script lang="ts" setup>
 import Album from 'components/Album.vue';
 import ScrollToTopButton from 'components/button/ScrollToTopButton.vue';
+import Carousel from 'components/Carousel.vue';
 import Pagination from 'components/Pagination.vue';
 import SelectYear from 'components/SelectYear.vue';
 import SkeletonAlbumList from 'pages/SkeletonAlbumList.vue';
@@ -127,6 +132,7 @@ const selectedTags = ref([]);
 const privateAlbum = ref(false);
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
+const featuredAlbums = computed(() => useAlbumStore.featuredAlbums);
 const loadingAllAlbumInformation = computed(() => useAlbumStore.loadingAllAlbumInformation);
 const sortOrder = computed(() => useAlbumStore.sortOrder);
 const searchKey = computed(() => useAlbumStore.searchKey);
@@ -166,7 +172,9 @@ const setSelectedYear = (year: string) => router.push({ name: 'AlbumsByYear', pa
 
 const updateSortOrder = () => useAlbumStore.$patch({ sortOrder: sortOrder.value === 'desc' ? 'asc' : 'desc' });
 
+// Fetch all albums and featured albums and store them in the store
 useAlbumStore.getAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year);
+useAlbumStore.getFeaturedAlbums();
 
 // Only update the order of album list when user click sort button in order to prevent sorting multiple times
 watch(sortOrder, (newValue) => {

@@ -9,9 +9,9 @@
         :id="`photo-image-${photo['key']}`"
         :ratio="1"
         :src="`${photo['url']}?tr=w-${imageWidth},h-${imageWidth}`"
-        class="rounded-borders-lg cursor-pointer"
+        class="rounded-borders cursor-pointer"
         :alt="`photo image ${photo['key']}`"
-        @click="goToPhotoDetail()"
+        @click="goToPhotoDetail"
       />
       <div v-if="isAdminUser" class="absolute-top flex justify-between photo-top-button-container">
         <q-checkbox
@@ -38,7 +38,7 @@
       <q-card :flat="!isPhotoSelected" bordered data-test-id="detail-photo-item">
         <q-item class="q-px-sm" clickable>
           <q-item-section avatar @click="goToPhotoDetail()">
-            <q-avatar :size="`${thumbnailSize}px`" rounded class="q-ma-sm cursor-pointer">
+            <q-avatar :size="`${thumbnailSize}px`" rounded class="cursor-pointer">
               <q-img
                 :ratio="1"
                 :src="`${photo['url']}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
@@ -98,7 +98,7 @@ const { selectedPhotosList } = SelectedItemsComposable();
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const photoId = computed(() => photo.value['key'].split('/')[1]);
-const thumbnailSize = computed(() => (q.screen.lt.sm ? 60 : 80));
+const thumbnailSize = computed(() => (q.screen.lt.sm ? 80 : 100));
 const lastModified = computed(() => new Date(photo.value['lastModified']).toLocaleString());
 const fileSize = computed(() => {
   const size = photo.value['size'] / 1024;

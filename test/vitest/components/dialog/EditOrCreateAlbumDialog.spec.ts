@@ -67,7 +67,7 @@ describe('EditOrCreateAlbumDialog.vue', () => {
       albumCover: '',
       albumName: 'test-album-name',
       description: 'test-album-desc',
-      isFeatured: undefined,
+      isFeatured: false,
       isPrivate: true,
       place: null,
       tags: [],
@@ -94,6 +94,7 @@ describe('EditOrCreateAlbumDialog.vue', () => {
       albumName: 'test-album-name',
       description: '',
       isPrivate: true,
+      isFeatured: false,
       place: null,
       tags: ['aaa', 'bbb'],
     });

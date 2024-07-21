@@ -68,10 +68,18 @@ const props = defineProps({
     required: true,
   },
   albumItem: {
-    type: Object,
+    type: Object as () => Album,
     required: true,
     default: () =>
-      ({ year: '', id: '', albumName: '', desc: '', tags: [], isPrivate: false, order: 0, place: null }) as Album,
+      ({
+        year: '',
+        id: '',
+        albumCover: '',
+        albumName: '',
+        description: '',
+        tags: [],
+        isPrivate: true,
+      }) as Album,
   },
 });
 const { albumItem } = toRefs(props);

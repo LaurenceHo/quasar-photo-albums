@@ -82,8 +82,8 @@ const fetchAlbumsWithLocation = async (dbUpdatedTime?: string) => {
 const inspectCluster = (
   map: mapboxgl.Map,
   e: (mapboxgl.MapMouseEvent | mapboxgl.MapTouchEvent) & {
-    features?: mapboxgl.MapboxGeoJSONFeature[] | undefined;
-  } & mapboxgl.EventData
+    features?: mapboxgl.GeoJSONFeature[] | undefined;
+  }
 ) => {
   const features: Feature[] = map.queryRenderedFeatures(e.point, {
     layers: ['clusters'],

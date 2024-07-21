@@ -20,7 +20,7 @@
               v-show="!loadImage && selectedImage"
               :alt="photoFileName"
               :src="selectedImage?.url || ''"
-              class="rounded-borders-lg responsive-image"
+              class="rounded-borders responsive-image"
               style="margin: auto"
               :width="isPhotoLandscape ? `${imageDisplayWidth}px` : ''"
               :height="!isPhotoLandscape && $q.screen.lt.md && $q.screen.gt.xs ? `${imageDisplayHeight}px` : ''"
@@ -28,8 +28,8 @@
             />
           </div>
           <q-btn
-            class="absolute-right"
-            color="primary"
+            class="absolute-right-centre"
+            color="accent"
             icon="mdi-chevron-right"
             round
             style="height: 42px"
@@ -38,8 +38,8 @@
             @click="nextPhoto(1)"
           />
           <q-btn
-            class="absolute-left"
-            color="primary"
+            class="absolute-left-centre"
+            color="accent"
             icon="mdi-chevron-left"
             round
             style="height: 42px"
@@ -308,13 +308,5 @@ watch(
   .image-container {
     height: 80vh;
   }
-}
-
-.absolute-left {
-  top: 50% !important;
-}
-
-.absolute-right {
-  top: 50% !important;
 }
 </style>
