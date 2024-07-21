@@ -9,7 +9,7 @@
         :id="`photo-image-${photo['key']}`"
         :ratio="1"
         :src="`${photo['url']}?tr=w-${imageWidth},h-${imageWidth}`"
-        class="rounded-borders-lg cursor-pointer"
+        class="rounded-borders cursor-pointer"
         :alt="`photo image ${photo['key']}`"
         @click="goToPhotoDetail()"
       />

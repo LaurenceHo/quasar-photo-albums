@@ -5,10 +5,10 @@
         v-if="albumItem['albumCover']"
         :ratio="1"
         :src="`${thumbnail}?tr=w-250,h-250`"
-        class="rounded-borders-lg cursor-pointer"
+        class="rounded-borders cursor-pointer"
         @click="goToAlbum"
       />
-      <div v-else class="no-album-cover-square rounded-borders-lg cursor-pointer" @click="goToAlbum()">
+      <div v-else class="no-album-cover-square rounded-borders cursor-pointer" @click="goToAlbum">
         <q-icon class="absolute-center" name="mdi-image" size="48px" />
       </div>
       <q-icon
