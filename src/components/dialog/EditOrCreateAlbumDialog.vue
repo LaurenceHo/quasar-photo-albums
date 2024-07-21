@@ -288,4 +288,11 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+// If it's private album, it cannot be featured album
+watch(privateAlbum, (newValue) => {
+  if (newValue) {
+    featuredAlbum.value = false;
+  }
+});
 </script>
