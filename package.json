@@ -14,6 +14,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "embla-carousel-vue": "^8.1.7",
     "exifreader": "^4.23.3",
     "pinia": "^2.1.7",
     "quasar": "^2.16.6",

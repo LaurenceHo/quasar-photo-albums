@@ -79,6 +79,8 @@
       label="Only show private album"
       left-label
     />
+    <div class="text-h5">Featured Albums</div>
+    <carousel />
     <template v-if="chunkAlbumList.length > 0">
       <div v-if="albumStyle === 'grid'" class="q-col-gutter-md row">
         <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
@@ -100,6 +102,7 @@
 <script lang="ts" setup>
 import Album from 'components/Album.vue';
 import ScrollToTopButton from 'components/button/ScrollToTopButton.vue';
+import Carousel from 'components/Carousel.vue';
 import Pagination from 'components/Pagination.vue';
 import SelectYear from 'components/SelectYear.vue';
 import SkeletonAlbumList from 'pages/SkeletonAlbumList.vue';

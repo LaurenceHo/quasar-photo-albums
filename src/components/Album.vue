@@ -58,7 +58,6 @@
             </q-item-label>
             <div class="flex">
               <q-chip v-for="tag in tagsForDisplay" :key="tag" color="secondary" dense square>{{ tag }} </q-chip>
-              {{ albumItem['tags']?.length > 3 ? '...' : '' }}
             </div>
           </q-item-section>
 
@@ -88,7 +87,7 @@ const props = defineProps({
     required: true,
   },
   albumItem: {
-    type: Object,
+    type: Object as () => Album,
     required: true,
     default: () =>
       ({
@@ -107,7 +106,7 @@ const { albumItem } = toRefs(props);
 const userPermissionStore = userStore();
 const router = useRouter();
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.['albumCover'])}`);
+const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.['albumCover'] ?? '')}`);
 const thumbnailSize = computed(() => (q.screen.lt.sm ? 60 : 90));
 const tagsForDisplay = computed(() => (albumItem.value?.['tags'] ? albumItem.value?.['tags'].slice(0, 3) : []));
 
