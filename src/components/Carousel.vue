@@ -42,7 +42,7 @@
       class="absolute-right-centre"
       @click="scrollNext"
     />
-    <div class="embla__dots" v-if="emblaApi && !prevBtnDisabled && !nextBtnDisabled">
+    <div v-if="emblaApi && !prevBtnDisabled && !nextBtnDisabled" class="embla__dots">
       <carousel-dot-button
         v-for="(_, index) in scrollSnaps"
         :key="`dot-button-${index}`"
