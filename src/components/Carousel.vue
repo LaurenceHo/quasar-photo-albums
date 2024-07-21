@@ -3,7 +3,7 @@
     <div ref="emblaRef" class="embla__viewport">
       <div class="embla__container">
         <template v-for="albumItem in featuredAlbums" :key="albumItem.id">
-          <div class="embla__slide">
+          <div class="embla__slide" data-test-id="carousel-slide">
             <div class="relative-position">
               <q-img
                 v-if="albumItem['albumCover']"

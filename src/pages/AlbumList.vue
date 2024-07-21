@@ -79,8 +79,10 @@
       label="Only show private album"
       left-label
     />
-    <div class="text-h5">Featured Albums</div>
-    <carousel />
+    <template v-if="featuredAlbums.length > 0">
+      <div class="text-h5">Featured Albums</div>
+      <carousel />
+    </template>
     <template v-if="chunkAlbumList.length > 0">
       <div v-if="albumStyle === 'grid'" class="q-col-gutter-md row">
         <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
@@ -130,6 +132,7 @@ const selectedTags = ref([]);
 const privateAlbum = ref(false);
 
 const isAdminUser = computed(() => userPermissionStore.isAdminUser);
+const featuredAlbums = computed(() => useAlbumStore.featuredAlbums);
 const loadingAllAlbumInformation = computed(() => useAlbumStore.loadingAllAlbumInformation);
 const sortOrder = computed(() => useAlbumStore.sortOrder);
 const searchKey = computed(() => useAlbumStore.searchKey);
