@@ -40,7 +40,10 @@ export const handler: Handler = async (event: DynamoDBStreamEvent, _context, cal
 
   const publicAlbums = albumList.filter((album) => album.isPrivate === false);
   const albumsHavePlace = publicAlbums.filter((album) => album.place != null);
-  const featuredAlbums = publicAlbums.filter((album) => album.isFeatured);
+  const featuredAlbums = publicAlbums
+    .filter((album) => album.isFeatured)
+    .sort((a, b) => a.year.localeCompare(b.year)) // Sort by year
+    .sort((a, b) => a.albumName.localeCompare(b.albumName)); // Then sort by album name
   const albumsByYear = countAlbumsByYear(albumList);
   const albumsByYearExcludePrivate = countAlbumsByYear(publicAlbums);
 

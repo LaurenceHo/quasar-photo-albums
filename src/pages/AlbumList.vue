@@ -87,7 +87,7 @@
       <div v-if="albumStyle === 'grid'" class="q-col-gutter-md row">
         <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
       </div>
-      <div v-else :class="`row ${$q.screen.lt.xl ? 'justify-center' : ''}`">
+      <div v-else :class="`row ${$q.screen.lt.lg ? 'justify-center' : ''}`">
         <Album v-for="album in chunkAlbumList" :key="album.id" :album-item="album" :album-style="albumStyle" />
       </div>
     </template>

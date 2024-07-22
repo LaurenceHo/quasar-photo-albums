@@ -154,6 +154,13 @@ onUnmounted(() => {
   margin-right: calc((1rem) / 2 * -1);
 }
 
+@media (max-width: 600px) {
+  .embla {
+    --slide-height: 12rem;
+    --slide-spacing: 0.8rem;
+  }
+}
+
 .absolute-left-centre {
   top: 35% !important;
 }
