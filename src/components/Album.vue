@@ -52,7 +52,7 @@
             </q-avatar>
           </q-item-section>
 
-          <q-item-section @click="goToAlbum()">
+          <q-item-section @click="goToAlbum">
             <q-item-label class="text-subtitle2" lines="1">{{ albumItem['albumName'] }}</q-item-label>
             <q-item-label v-if="albumItem['description']" caption lines="1">
               {{ albumItem['description'] }}
