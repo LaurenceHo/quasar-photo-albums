@@ -80,8 +80,8 @@
       left-label
     />
     <template v-if="featuredAlbums.length > 0">
-      <div class="text-h5">Featured Albums</div>
-      <carousel />
+      <div class="text-h5">Featured</div>
+      <Carousel />
     </template>
     <template v-if="chunkAlbumList.length > 0">
       <div v-if="albumStyle === 'grid'" class="q-col-gutter-md row">
@@ -97,7 +97,7 @@
     <ScrollToTopButton />
   </div>
   <template v-else>
-    <skeleton-album-list />
+    <SkeletonAlbumList />
   </template>
 </template>
 
