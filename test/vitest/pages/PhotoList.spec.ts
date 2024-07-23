@@ -5,6 +5,8 @@ import { Loading, LoadingBar, Notify } from 'quasar';
 import { describe, expect, it } from 'vitest';
 import PhotoDetail from '../../../src/components/PhotoDetail.vue';
 import PhotoList from '../../../src/pages/PhotoList.vue';
+import SkeletonPhotoList from '../../../src/pages/SkeletonPhotoList.vue';
+import { photoStore } from '../../../src/stores/photo-store';
 import { mockAlbumList, mockPhotoList } from '../mock-data';
 import { mockRouter as router } from '../mock-router';
 
@@ -41,8 +43,11 @@ describe('PhotoList.vue', () => {
         ],
       },
     });
+    expect(wrapper.findComponent(SkeletonPhotoList).exists()).toBe(true);
 
-    await flushPromises();
+    const usePhotoStore = photoStore();
+    usePhotoStore.fetchingPhotos = false;
+
     const { vm } = wrapper as any;
     await vm.$nextTick();
 
@@ -92,9 +97,11 @@ describe('PhotoList.vue', () => {
       },
     });
 
+    const usePhotoStore = photoStore();
+    usePhotoStore.fetchingPhotos = false;
+
     const { vm } = wrapper as any;
     await vm.$nextTick();
-
     expect(wrapper.findComponent(PhotoDetail).exists()).toBeFalsy();
     expect(vm.photosInAlbum.length).toEqual(4);
     expect(wrapper.findAll('[data-test-id="photo-item"]').length).toEqual(4);
@@ -134,6 +141,9 @@ describe('PhotoList.vue', () => {
         ],
       },
     });
+
+    const usePhotoStore = photoStore();
+    usePhotoStore.fetchingPhotos = false;
 
     await flushPromises();
     const { vm } = wrapper as any;
