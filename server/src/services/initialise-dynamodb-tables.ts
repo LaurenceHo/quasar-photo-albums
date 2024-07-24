@@ -43,8 +43,9 @@ const initialiseAlbumTable = async () => {
             id: 'test-album-1',
             albumName: 'Test Album 1',
             description: 'This is a test album 1',
-            albumCover: '',
+            albumCover: 'test-album-1/example_photo1.webp',
             isPrivate: false,
+            isFeatured: true,
             place: {
               displayName: 'Sydney',
               formattedAddress: 'Sydney NSW, Australia',

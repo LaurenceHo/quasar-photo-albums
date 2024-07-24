@@ -28,9 +28,21 @@ export const initialiseS3Bucket = async () => {
     Key: 'updateDatabaseAt.json',
   });
   if (!exists) {
-    await uploadObject('test-album-1/example_photo1.webp', fs.readdirSync('../assets/example_photo1.webp'));
-    await uploadObject('test-album-1/example_photo1.webp', fs.readdirSync('../assets/example_photo2.webp'));
-    console.log(`Example photo uploaded to ${s3BucketName} bucket.`);
+    fs.readFile('./assets/example_photo1.webp', async (err, data) => {
+      if (err) {
+        throw err;
+      }
+      await uploadObject('test-album-1/example_photo1.webp', data);
+      console.log(`Example photo 1 uploaded to ${s3BucketName} bucket.`);
+    });
+
+    fs.readFile('./assets/example_photo2.webp', async (err, data) => {
+      if (err) {
+        throw err;
+      }
+      await uploadObject('test-album-1/example_photo2.webp', data);
+      console.log(`Example photo 2 uploaded to ${s3BucketName} bucket.`);
+    });
 
     await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
     console.log(`Uploaded updateDatabaseAt.json to ${s3BucketName} bucket.`);
