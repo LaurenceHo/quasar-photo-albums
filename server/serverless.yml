@@ -45,7 +45,7 @@ functions:
       - http: ANY /
       - http: ANY /{proxy+}
     environment:
-      AWS_REGION_NAME: ${self:provider.region}
+      AWS_REGION_NAME: ${env:AWS_REGION_NAME}
       GOOGLE_PLACES_API_KEY: ${env:GOOGLE_PLACES_API_KEY}
       GOOGLE_CLIENT_ID: ${env:GOOGLE_CLIENT_ID}
       ALBUM_URL: ${env:ALBUM_URL}
@@ -90,7 +90,12 @@ resources:
               AllowedMethods:
                 - GET
               AllowedOrigins:
-                - '*'
+                - 'http://localhost:9000'
+                - 'http://${env:AWS_S3_BUCKET_NAME}.s3-website-${env:AWS_REGION_NAME}.amazonaws.com'
+                - !Join
+                  - ''
+                  - - 'https://'
+                    - !GetAtt PhotoAlbumsDistribution.DomainName
               ExposedHeaders:
                 - Date
     BucketPolicy:
@@ -98,7 +103,7 @@ resources:
       Properties:
         PolicyDocument:
           Id: QuasarPhotoAlbumBucketPolicy
-          Version: "2008-10-17"
+          Version: "2012-10-17"
           Statement:
             - Sid: PublicReadForGetBucketObjects
               Effect: Allow
@@ -110,6 +115,30 @@ resources:
                   - !Ref QuasarPhotoAlbumBucket
                   - /*
         Bucket: !Ref QuasarPhotoAlbumBucket
+    PhotoAlbumsDistribution:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          IPV6Enabled: 'true'
+          Origins:
+            - Id: QuasarPhotoAlbumOrigin
+              DomainName: ${env:AWS_S3_BUCKET_NAME}.s3-website-${env:AWS_REGION_NAME}.amazonaws.com
+              CustomOriginConfig:
+                OriginProtocolPolicy: http-only
+                HTTPPort: '80'
+          Enabled: 'true'
+          DefaultCacheBehavior:
+            AllowedMethods:
+              - GET
+              - HEAD
+            TargetOriginId: QuasarPhotoAlbumOrigin
+            ForwardedValues:
+              QueryString: 'false'
+              Cookies:
+                Forward: none
+            ViewerProtocolPolicy: https-only
+          ViewerCertificate:
+            CloudFrontDefaultCertificate: 'true'
     AlbumTable:
       Type: AWS::DynamoDB::Table
       Properties:
