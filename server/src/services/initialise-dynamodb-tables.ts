@@ -28,7 +28,7 @@ const initialiseAlbumTable = async () => {
     await getTableStatus(albumTableName);
   } catch (error) {
     console.error(error);
-    throw Error(`Table ${albumTableName} does not exist. Please run 'npm run serverless:deploy' first.`);
+    throw Error(`Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`);
   }
 
   try {
@@ -72,7 +72,7 @@ const initialiseAlbumTagsTable = async () => {
     await getTableStatus(albumTagsTableName);
   } catch (error) {
     console.error(error);
-    throw Error(`Table ${albumTableName} does not exist. Please run 'npm run serverless:deploy' first.`);
+    throw Error(`Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`);
   }
 
   try {
@@ -100,7 +100,7 @@ const initialiseUserTable = async () => {
     await getTableStatus(userTableName);
   } catch (error) {
     console.error(error);
-    throw Error(`Table ${albumTableName} does not exist. Please run 'npm run serverless:deploy' first.`);
+    throw Error(`Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`);
   }
 
   try {

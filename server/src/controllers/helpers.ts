@@ -58,7 +58,7 @@ export const uploadObject = async (filePath: string, object: any) => {
 
 export const deleteObjects = async (objectKeys: string[]) => {
   const deleteParams: DeleteObjectsCommandInput = {
-    Bucket: process.env['AWS_S3_BUCKET_NAME'],
+    Bucket: s3BucketName,
     Delete: { Objects: [] },
   };
 
@@ -74,7 +74,7 @@ export const deleteObjects = async (objectKeys: string[]) => {
 
 export const emptyS3Folder = async (folderName: string) => {
   const listedObjects = await s3Service.listObjects({
-    Bucket: process.env['AWS_S3_BUCKET_NAME'],
+    Bucket: s3BucketName,
     Prefix: folderName,
   });
 
