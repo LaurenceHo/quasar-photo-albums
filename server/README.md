@@ -40,8 +40,8 @@ photos. Replace these properties `AWS_S3_BUCKET_NAME` along with `PHOTO_ALBUMS_T
 `PHOTO_USER_PERMISSION_TABLE_NAME` and `DATA_AGGREGATIONS_TABLE_NAME` with the table name you want to use in`.env.example`
 and modify file name to `.env`. When you run `bun run serverless:deploy`, it will use those environment variables to
 create S3 bucket and tables, so you don't have to create S3 bucket and tables manually. Once the S3 bucket and tables
-are created, you can check them in AWS console. You will also need to replace `IMAGEKIT_CDN_URL` with the bucket you
-created.
+are created, you can check them in AWS console. You will also need to replace `IMAGEKIT_CDN_URL` with the CloudFront Domain
+name URL Serverless Framework created for you.
 
 #### ElectroDB
 

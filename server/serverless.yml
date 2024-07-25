@@ -100,11 +100,6 @@ resources:
                 - GET
               AllowedOrigins:
                 - 'http://localhost:9000'
-                - 'http://${env:AWS_S3_BUCKET_NAME}.s3-website-${env:AWS_REGION_NAME}.amazonaws.com'
-                - !Join
-                  - ''
-                  - - 'https://'
-                    - !GetAtt PhotoAlbumsDistribution.DomainName
               ExposedHeaders:
                 - Date
               MaxAge: 3600

@@ -52,10 +52,10 @@ You will need the follows:
 1. Google Place API key (For admin manage albums)
 2. Google OAuth 2.0 Client ID (For admin access)
 3. AWS user and role with admin permission for your local development and deployment
-4. AWS S3 bucket (For SPA website hosting and storing photos. Serverless framework will create this for you once you run serverless deploy. )
-5. AWS DynamoDB table (For managing album information, Serverless framework will create 4 tables for you once you run serverless deploy)
-6. AWS Lambda Function with API Gateway (Serverless framework will create these for you once you run serverless deploy)
-7. AWS CloudFront (Serverless framework will create this for you once you run serverless deploy)
+4. AWS S3 bucket (For SPA website hosting and storing photos. **Serverless framework will create this for you once you run serverless deploy.** )
+5. AWS DynamoDB table (For managing album information. **Serverless framework will create 4 tables for you once you run serverless deploy**)
+6. AWS Lambda Function with API Gateway **(Serverless framework will create these for you once you run serverless deploy)**
+7. AWS CloudFront **(Serverless framework will create this for you once you run serverless deploy)**
 8. ImageKit account (It's optional)
 9. Mapbox API key (For displaying map)
 
@@ -64,19 +64,20 @@ You will need the follows:
 Before you start local development, you will need to do serverless deploy first. Please check further
 information in the `server` folder. [here](server/README.md)
 
-### Create S3 bucket
+### After deploying Serverless Framework
 
-After you created the S3 bucket by running `bun run serverless:deploy`, replace properties `STATIC_FILES_URL` and
-`IMAGEKIT_URL` with the bucket URL you created in`.env.example` and modify file name to `.env`. (the URL is like
-https://{YOUR_BUCKET_NAME}.s3.amazonaws.com)
+After deploying Serverless Framework by running `bun run serverless:deploy`, replace properties `STATIC_FILES_URL` and
+`IMAGEKIT_CDN_URL` (There are 2 `IMAGEKIT_CDN_URL` env variables, one is in the root folder, another one is in the server
+folder) with the CloudFront Domain name URL in`.env.example` and modify file name to `.env`. (the URL is like
+https://dq0ro94z2ck7q.cloudfront.net, you can find it from AWS console)
 
 ### Integrate with ImageKit
 
 In order to reduce the traffic with S3 bucket (to save money!), this project integrate with ImageKit CDN. ImageKit.io
-is a cloud-based image CDN with real-time image optimization and transformation features that help you deliver perfectly
+is a cloud-based image CDN with real-time image optimisation and transformation features that help you deliver perfectly
 optimized images across all devices[2]. You can follow this [documentation](https://imagekit.io/blog/image-optimization-resize-aws-s3-imagekit/)
 to create an account in the ImageKit. You will have 20GB bandwidth per month as a free user. Once you have your own ImageKit
-URL, replace this property `IMAGEKIT_URL` with your real information in`.env.example` and modify file name to `.env`. And
+URL, replace this property `IMAGEKIT_CDN_URL` with your real information in`.env.example` and modify file name to `.env`. And
 use the same URL in the `server` folder.
 
 #### Important

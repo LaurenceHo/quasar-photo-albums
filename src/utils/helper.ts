@@ -1,4 +1,5 @@
 import { Notify } from 'quasar';
+import { UPDATED_DB_TIME_FILE } from 'stores/album-store';
 
 export const getStaticFileUrl = (objectKey: string): string => {
   return `${process.env.STATIC_FILES_URL}/${objectKey}`;
@@ -13,11 +14,20 @@ export const getYearOptions = () => {
   return yearOptions;
 };
 
+export const fetchDbUpdatedTime = async () => {
+  let dbUpdatedTimeJSON: { time: string } = { time: '' };
+  try {
+    const response = await fetch(getStaticFileUrl(UPDATED_DB_TIME_FILE));
+    dbUpdatedTimeJSON = await response.json();
+  } catch (error) {
+    // Might encounter CORS issue. Do nothing
+  }
+  return dbUpdatedTimeJSON.time;
+};
+
 export const compareDbUpdatedTime = async (localDbUpdatedTime: string | null) => {
   // Get updated time from s3
-  const response = await fetch(getStaticFileUrl('updateDatabaseAt.json'));
-  const dbUpdatedTimeJSON = await response.json();
-  const time = dbUpdatedTimeJSON.time;
+  const time = await fetchDbUpdatedTime();
   return {
     isLatest: localDbUpdatedTime === time,
     dbUpdatedTime: time,
