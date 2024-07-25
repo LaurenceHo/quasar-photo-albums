@@ -1,5 +1,4 @@
 import { Notify } from 'quasar';
-import { UPDATED_DB_TIME_FILE } from 'stores/album-store';
 
 export const getStaticFileUrl = (objectKey: string): string => {
   return `${process.env.STATIC_FILES_URL}/${objectKey}`;
@@ -17,7 +16,7 @@ export const getYearOptions = () => {
 export const fetchDbUpdatedTime = async () => {
   let dbUpdatedTimeJSON: { time: string } = { time: '' };
   try {
-    const response = await fetch(getStaticFileUrl(UPDATED_DB_TIME_FILE));
+    const response = await fetch(getStaticFileUrl('updateDatabaseAt.json'));
     dbUpdatedTimeJSON = await response.json();
   } catch (error) {
     // Might encounter CORS issue. Do nothing

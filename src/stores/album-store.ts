@@ -45,7 +45,6 @@ const initialState: AlbumState = {
   featuredAlbums: [],
 };
 
-export const UPDATED_DB_TIME_FILE = 'updateDatabaseAt.json';
 export const FILTERED_ALBUMS_BY_YEAR = 'FILTERED_ALBUMS_BY_YEAR';
 export const ALBUM_TAGS = 'ALBUM_TAGS';
 export const FEATURED_ALBUMS = 'FEATURED_ALBUMS';
