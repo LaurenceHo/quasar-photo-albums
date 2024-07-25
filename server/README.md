@@ -31,13 +31,13 @@ I'd suggest this user has admin permission, and restrict it only be used in your
 ```
 
 Once you create it, download access key and replace this properties `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` with
-your real information in`.env.example` and modify file name to `.env`.
+your real information in `.env.example` and modify file name to `.env`.
 
 ### AWS DynamoDB and S3 bucket
 
 Before you start, you need create an AWS S3 bucket. This bucket will be for your SPA website hosting, and storing your
 photos. Replace these properties `AWS_S3_BUCKET_NAME` along with `PHOTO_ALBUMS_TABLE_NAME`, `PHOTO_ALBUM_TAGS_TABLE_NAME`,
-`PHOTO_USER_PERMISSION_TABLE_NAME` and `DATA_AGGREGATIONS_TABLE_NAME` with the table name you want to use in`.env.example`
+`PHOTO_USER_PERMISSION_TABLE_NAME` and `DATA_AGGREGATIONS_TABLE_NAME` with the table name you want to use in `.env.example`
 and modify file name to `.env`. When you run `bun run serverless:deploy`, it will use those environment variables to
 create S3 bucket and tables, so you don't have to create S3 bucket and tables manually. Once the S3 bucket and tables
 are created, you can check them in AWS console. You will also need to replace `IMAGEKIT_CDN_URL` with the CloudFront Domain
@@ -45,14 +45,14 @@ name URL Serverless Framework created for you.
 
 #### ElectroDB
 
-The server uses [ElectroDB](https://electrodb.dev) to operate documentations in DynamoDB.
-ElectroDB eases the use of having multiple entities and complex hierarchical relationships in a single DynamoDB table.
+The server uses [ElectroDB](https://electrodb.dev) to operate documentations in DynamoDB. ElectroDB eases the use of having multiple
+entities and complex hierarchical relationships in a single DynamoDB table.
 
 ### Get Google Places API key
 
 You need to create a Google Places API key, so you can find a location information and attach it to your album object in DynamoDB.
 Please check [here](https://developers.google.com/maps/documentation/places/web-service/get-api-key). Once you create it,
-replace this property `GOOGLE_PLACES_API_KEY` with your real information in`.env.example` and modify file name to `.env`.
+replace this property `GOOGLE_PLACES_API_KEY` with your real information in `.env.example` and modify file name to `.env`.
 
 ## Local development
 

@@ -8,12 +8,12 @@
       <q-skeleton
         type="QRange"
         :width="$q.screen.lt.md ? '200px' : $q.screen.lt.sm ? '100px' : '300px'"
-        class="q-mr-md q-mb-sm"
+        class="q-mr-md q-mr-xs-none q-mb-sm"
       />
     </div>
     <q-skeleton
       type="QRange"
-      :width="`${$q.screen.lt.md ? '200px' : $q.screen.lt.sm ? '100%' : '300px'}`"
+      :width="`${$q.screen.lt.sm ? '100%' : $q.screen.lt.md ? '200px' : '300px'}`"
       class="q-ml-auto q-ml-xs-none"
     />
   </div>

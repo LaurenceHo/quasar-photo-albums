@@ -71,9 +71,7 @@ const prevBtnDisabled = ref(true);
 const nextBtnDisabled = ref(true);
 
 const featuredAlbums = computed(() => useAlbumStore.featuredAlbums);
-const goToAlbum = (albumItem: Album) => {
-  router.push(`/album/${albumItem?.['year']}/${albumItem?.['id']}`);
-};
+const goToAlbum = (albumItem: Album) => router.push(`/album/${albumItem?.['year']}/${albumItem?.['id']}`);
 const scrollPrev = () => {
   if (!emblaApi.value) return;
   emblaApi.value.scrollPrev();

@@ -62,8 +62,8 @@ watch(carouselApi, (newVal) => {
   border: 0;
   padding: 0;
   margin: 0;
-  width: 2rem;
-  height: 2rem;
+  width: 1.5rem;
+  height: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,14 +71,14 @@ watch(carouselApi, (newVal) => {
 }
 .embla__dot:after {
   box-shadow: inset 0 0 0 0.2rem #ef6692;
-  width: 1rem;
-  height: 1rem;
+  width: 0.8rem;
+  height: 0.8rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   content: '';
 }
 .embla__dot--selected:after {
-  box-shadow: inset 0 0 0 1rem #ef6692;
+  box-shadow: inset 0 0 0 0.8rem #ef6692;
 }
 </style>

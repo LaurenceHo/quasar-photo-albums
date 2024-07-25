@@ -62,13 +62,13 @@ You will need the follows:
 ‼️ **️Important** ‼️
 
 Before you start local development, you will need to do serverless deploy first. Please check further
-information in the `server` folder. [here](server/README.md)
+information in the `server` folder [here](server/README.md).
 
 ### After deploying Serverless Framework
 
 After deploying Serverless Framework by running `bun run serverless:deploy`, replace properties `STATIC_FILES_URL` and
 `IMAGEKIT_CDN_URL` (There are 2 `IMAGEKIT_CDN_URL` env variables, one is in the root folder, another one is in the server
-folder) with the CloudFront Domain name URL in`.env.example` and modify file name to `.env`. (the URL is like
+folder) with the CloudFront Domain name URL in `.env.example` and modify file name to `.env`. (the URL is like
 https://dq0ro94z2ck7q.cloudfront.net, you can find it from AWS console)
 
 ### Integrate with ImageKit
@@ -88,12 +88,12 @@ If you change S3 bucket name, don't forget to update the configuration in ImageK
 
 This project uses Mapbox to display the [map](https://dq0ro94z2ck7q.cloudfront.net/map/albums). You can get your own
 Mapbox API key [here](https://account.mapbox.com/auth/signup/). Once you have your own Mapbox API key, replace this property `MAPBOX_API_KEY` with your
-real information in`.env.example` and modify file name to `.env`.
+real information in `.env.example` and modify file name to `.env`.
 
 ### Google OAuth 2.0 client ID
 
 Please check [here](https://developers.google.com/identity/protocols/oauth2) for further information. You will also need to set up OAuth consent screen. Please check [here](https://developers.google.com/identity/protocols/oauth2/openid-connect#consent-screen).
-Once you have Google OAuth 2.0 client ID, replace this property `GOOGLE_CLIENT_ID` with your real information in`.env.example`
+Once you have Google OAuth 2.0 client ID, replace this property `GOOGLE_CLIENT_ID` with your real information in `.env.example`
 and modify file name to `.env`. And use the same client ID in the `server` folder.
 
 #### Login UI
@@ -102,7 +102,7 @@ This project uses Google OAuth 2.0 to authenticate users. If you don't want to u
 implement login UI and authentication process by yourself. Once you set up Google OAuth 2.0 client ID and OAuth consent
 screen, you can access login UI by going to `http://localhost:9000/login`. You will also need to add your Google account
 information in the [DynamoDB table](server/README.md#aws-dynamodb) you created. If every thing is set up correctly, you should be able to login
-with your Google account and see the admin page as below:
+with your Google account and see the admin features including album and photo management as below:
 ![web-capture1](doc-images/Web_capture_1.webp)
 ![web-capture2](doc-images/Web_capture_2.webp)
 ![web-capture3](doc-images/Web_capture_3.webp)
