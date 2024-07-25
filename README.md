@@ -16,10 +16,6 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#create-s3-bucket">Create S3 bucket</a></li>
-          <ul>
-            <li><a href="#s3-bucket-policy">S3 bucket policy</a></li>
-            <li><a href="#s3-cors-policy">S3 CORS policy</a></li>
-          </ul>
         <li><a href="#integrate-with-imagekit">Integrate with ImageKit</a></li>
         <li><a href="#mapbox-api-key">Mapbox API key</a></li>
         <li><a href="#aws-lambda-function">AWS Lambda Function</a></li>
@@ -56,59 +52,23 @@ You will need the follows:
 1. Google Place API key (For admin manage albums)
 2. Google OAuth 2.0 Client ID (For admin access)
 3. AWS user and role with admin permission for your local development and deployment
-4. AWS S3 bucket (For SPA website hosting and storing photos)
-5. AWS DynamoDB table (For managing album information, Serverless framework will create 3 table for you once you run serverless deploy)
+4. AWS S3 bucket (For SPA website hosting and storing photos. Serverless framework will create this for you once you run serverless deploy. )
+5. AWS DynamoDB table (For managing album information, Serverless framework will create 4 tables for you once you run serverless deploy)
 6. AWS Lambda Function with API Gateway (Serverless framework will create these for you once you run serverless deploy)
-7. AWS CloudFront (It's optional)
+7. AWS CloudFront (Serverless framework will create this for you once you run serverless deploy)
 8. ImageKit account (It's optional)
 9. Mapbox API key (For displaying map)
 
+‼️ **️Important** ‼️
+
+Before you start local development, you will need to do serverless deploy first. Please check further
+information in the `server` folder. [here](server/README.md)
+
 ### Create S3 bucket
 
-Before you start, you need create an AWS S3 bucket. This bucket will be for your SPA website hosting, and storing your photos.
-Once you create them, replace properties `STATIC_FILES_URL` and `IMAGEKIT_URL` with the bucket URL you created in`.env.example`
-and modify file name to `.env`. (the URL is like https://{YOUR_BUCKET_NAME}.s3.amazonaws.com)
-
-You will also need to replace `IMAGEKIT_CDN_URL` and `AWS_S3_BUCKET_NAME` in`.env.example` in [./server](./lambda) folder
-with the bucket you created.
-
-#### S3 bucket policy
-
-You usually want to make your S3 bucket public so that your friends can see your photos and website. To achieve this,
-you need to add `getObject` in the bucket policy (under `Permissions` tab):
-
-```json
-{
-  "Version": "2012-10-17",
-  "Id": "Policy1548223592786",
-  "Statement": [
-    {
-      "Sid": "Read permission for every object in a bucket",
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::{YOUR_BUCKET_NAME}/*"
-    }
-  ]
-}
-```
-
-#### S3 CORS policy
-
-Don't forget to put CORS into S3 bucket configuration[1] to prevent other people link your photos from their websites directly.
-No matter where you deploy your app (AWS or Google Firebase), you should add those URLs for hosting your website into CORS configuration.
-For example:
-
-```json
-[
-  {
-    "AllowedHeaders": ["*"],
-    "AllowedMethods": ["GET"],
-    "AllowedOrigins": ["http://www.example1.com"],
-    "ExposeHeaders": []
-  }
-]
-```
+After you created the S3 bucket by running `bun run serverless:deploy`, replace properties `STATIC_FILES_URL` and
+`IMAGEKIT_URL` with the bucket URL you created in`.env.example` and modify file name to `.env`. (the URL is like
+https://{YOUR_BUCKET_NAME}.s3.amazonaws.com)
 
 ### Integrate with ImageKit
 
@@ -125,14 +85,13 @@ If you change S3 bucket name, don't forget to update the configuration in ImageK
 
 ### Mapbox API key
 
-This project uses Mapbox to display the [map](http://demo-quasar-photo-albums.s3-website-us-east-1.amazonaws.com/map). You can get your own Mapbox API key [here](https://account.mapbox.com/auth/signup/).
-Once you have your own Mapbox API key, replace this property `MAPBOX_API_KEY` with your real information in`.env.example`
-and modify file name to `.env`.
+This project uses Mapbox to display the [map](https://dq0ro94z2ck7q.cloudfront.net/map/albums). You can get your own
+Mapbox API key [here](https://account.mapbox.com/auth/signup/). Once you have your own Mapbox API key, replace this property `MAPBOX_API_KEY` with your
+real information in`.env.example` and modify file name to `.env`.
 
 ### Google OAuth 2.0 client ID
 
-Please check [here](https://developers.google.com/identity/protocols/oauth2) for further information. You will also need
-to set up OAuth consent screen. Please check [here](https://developers.google.com/identity/protocols/oauth2/openid-connect#consent-screen)
+Please check [here](https://developers.google.com/identity/protocols/oauth2) for further information. You will also need to set up OAuth consent screen. Please check [here](https://developers.google.com/identity/protocols/oauth2/openid-connect#consent-screen).
 Once you have Google OAuth 2.0 client ID, replace this property `GOOGLE_CLIENT_ID` with your real information in`.env.example`
 and modify file name to `.env`. And use the same client ID in the `server` folder.
 
@@ -148,7 +107,7 @@ with your Google account and see the admin page as below:
 ![web-capture3](doc-images/Web_capture_3.webp)
 ![web-capture4](doc-images/Web_capture_4.webp)
 ![web-capture5](doc-images/Web_capture_5.webp)
-![web-capture6](doc-images/Web_capture_6.jpeg)
+![web-capture6](doc-images/Web_capture_6.webp)
 ![web-capture7](doc-images/Web_capture_7.webp)
 
 ### AWS Lambda Function
@@ -156,10 +115,6 @@ with your Google account and see the admin page as below:
 This project uses AWS Lambda Function to handle all APIs (as BFF, backend for frontend) and authentication process
 once it's deployed to AWS. When you run serverless deploy, it will create necessary Lambda Functions, API Gateway and
 DynamoDB for you.
-
-‼️ **️Important** ‼️
-Before you start local development, you will need to do serverless deploy first. Please check further
-information in the `server` folder. [here](server/README.md)
 
 ## How to run locally
 

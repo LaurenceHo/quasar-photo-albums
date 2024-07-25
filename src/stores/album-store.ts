@@ -62,8 +62,13 @@ interface AlbumTags {
 }
 
 const _fetchDbUpdatedTime = async () => {
-  const response = await fetch(getStaticFileUrl(UPDATED_DB_TIME_FILE));
-  const dbUpdatedTimeJSON = await response.json();
+  let dbUpdatedTimeJSON: { time: string } = { time: '' };
+  try {
+    const response = await fetch(getStaticFileUrl(UPDATED_DB_TIME_FILE));
+    dbUpdatedTimeJSON = await response.json();
+  } catch (error) {
+    console.error(error);
+  }
   return dbUpdatedTimeJSON.time;
 };
 
