@@ -72,6 +72,15 @@ resources:
       UpdateReplacePolicy: Retain
       Properties:
         BucketName: ${env:AWS_S3_BUCKET_NAME}
+        VersioningConfiguration:
+          Status: Enabled
+        LifecycleConfiguration:
+          Rules:
+            - Id: DeleteNonCurrentVersions
+              Prefix: NonCurrentVersion
+              Status: Enabled
+              NoncurrentVersionExpiration:
+                NoncurrentDays: 60
         PublicAccessBlockConfiguration:
           BlockPublicAcls: false
           BlockPublicPolicy: false
@@ -98,6 +107,7 @@ resources:
                     - !GetAtt PhotoAlbumsDistribution.DomainName
               ExposedHeaders:
                 - Date
+              MaxAge: 3600
     BucketPolicy:
       Type: 'AWS::S3::BucketPolicy'
       Properties:
