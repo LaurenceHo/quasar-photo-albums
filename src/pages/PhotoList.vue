@@ -145,7 +145,7 @@
     </div>
   </template>
   <template v-else>
-    <skeleton-photo-list />
+    <SkeletonPhotoList />
   </template>
 
   <MovePhotoDialog

@@ -4,6 +4,8 @@ import {
   CopyObjectCommandInput,
   DeleteObjectsCommand,
   DeleteObjectsCommandInput,
+  HeadBucketCommand,
+  HeadBucketCommandInput,
   HeadObjectCommand,
   HeadObjectCommandInput,
   ListObjectsV2Command,
@@ -68,9 +70,18 @@ export default class S3Service implements BaseService<Photo> {
     return await this.s3Client.send(new ListObjectsV2Command(params));
   }
 
-  async checkObject(params: HeadObjectCommandInput): Promise<boolean> {
+  async checkIfFileExists(params: HeadObjectCommandInput): Promise<boolean> {
     try {
       const response = await this.s3Client.send(new HeadObjectCommand(params));
+      return response.$metadata.httpStatusCode === 200;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async checkIfBucketExists(params: HeadBucketCommandInput): Promise<boolean> {
+    try {
+      const response = await this.s3Client.send(new HeadBucketCommand(params));
       return response.$metadata.httpStatusCode === 200;
     } catch (error) {
       return false;

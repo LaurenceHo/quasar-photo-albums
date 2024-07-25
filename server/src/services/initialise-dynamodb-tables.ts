@@ -28,7 +28,7 @@ const initialiseAlbumTable = async () => {
     await getTableStatus(albumTableName);
   } catch (error) {
     console.error(error);
-    throw Error(`Table ${albumTableName} does not exist. Please run 'npm run serverless:deploy' first.`);
+    throw Error(`Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`);
   }
 
   try {
@@ -43,8 +43,9 @@ const initialiseAlbumTable = async () => {
             id: 'test-album-1',
             albumName: 'Test Album 1',
             description: 'This is a test album 1',
-            albumCover: '',
+            albumCover: 'test-album-1/example_photo1.webp',
             isPrivate: false,
+            isFeatured: true,
             place: {
               displayName: 'Sydney',
               formattedAddress: 'Sydney NSW, Australia',
@@ -72,7 +73,7 @@ const initialiseAlbumTagsTable = async () => {
     await getTableStatus(albumTagsTableName);
   } catch (error) {
     console.error(error);
-    throw Error(`Table ${albumTableName} does not exist. Please run 'npm run serverless:deploy' first.`);
+    throw Error(`Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`);
   }
 
   try {
@@ -100,7 +101,7 @@ const initialiseUserTable = async () => {
     await getTableStatus(userTableName);
   } catch (error) {
     console.error(error);
-    throw Error(`Table ${albumTableName} does not exist. Please run 'npm run serverless:deploy' first.`);
+    throw Error(`Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`);
   }
 
   try {

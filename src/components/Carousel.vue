@@ -16,8 +16,8 @@
               <div v-else class="no-album-cover-square rounded-borders cursor-pointer" @click="goToAlbum(albumItem)">
                 <q-icon class="absolute-center" name="mdi-image" size="48px" />
               </div>
-              <div class="q-px-sm absolute-top flex justify-between text-white album-top-container ellipsis">
-                {{ albumItem.albumName }}
+              <div class="q-px-sm absolute-top flex text-white album-top-container">
+                <div class="ellipsis">{{ albumItem.albumName }}</div>
               </div>
             </div>
           </div>
@@ -127,6 +127,7 @@ onUnmounted(() => {
   height: 2rem;
   display: flex;
   align-content: center;
+  overflow: hidden;
 }
 
 .embla {

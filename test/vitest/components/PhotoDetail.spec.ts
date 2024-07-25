@@ -25,6 +25,7 @@ describe('PhotoDetailDialog.vue', () => {
               },
               photos: {
                 photoList: mockPhotoList,
+                fetchingPhotos: false,
               },
               'user-permission': {
                 userPermission: {

@@ -20,6 +20,14 @@
         size="sm"
         style="top: 8px; left: 8px"
       />
+      <q-icon
+        v-if="albumItem['isFeatured']"
+        class="absolute"
+        color="accent"
+        name="mdi-heart"
+        size="sm"
+        style="top: 8px; left: 8px"
+      />
       <EditAlbumButton v-if="isAdminUser" :album-item="albumItem" :album-style="albumStyle" />
     </div>
     <div class="q-pt-sm text-subtitle2">{{ albumItem['albumName'] }}</div>
@@ -47,12 +55,20 @@
                 color="white"
                 name="mdi-lock"
                 size="xs"
-                style="top: 8px; left: 8px"
+                style="top: 4px; left: 4px"
+              />
+              <q-icon
+                v-if="albumItem['isFeatured']"
+                class="absolute"
+                color="accent"
+                name="mdi-heart"
+                size="sm"
+                style="top: 4px; left: 4px"
               />
             </q-avatar>
           </q-item-section>
 
-          <q-item-section @click="goToAlbum()">
+          <q-item-section @click="goToAlbum">
             <q-item-label class="text-subtitle2" lines="1">{{ albumItem['albumName'] }}</q-item-label>
             <q-item-label v-if="albumItem['description']" caption lines="1">
               {{ albumItem['description'] }}

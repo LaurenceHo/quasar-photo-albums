@@ -13,7 +13,7 @@ const photoService = new PhotoService();
 
 const initialState: PhotoStoreState = {
   photoList: [],
-  fetchingPhotos: false,
+  fetchingPhotos: true,
 };
 
 export const photoStore = defineStore('photos', {
