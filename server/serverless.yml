@@ -79,7 +79,7 @@ resources:
           RestrictPublicBuckets: false
         WebsiteConfiguration:
           IndexDocument: index.html
-          ErrorDocument: error.html
+          ErrorDocument: index.html
         OwnershipControls:
           Rules:
             - ObjectOwnership: ObjectWriter
