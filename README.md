@@ -16,10 +16,6 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#create-s3-bucket">Create S3 bucket</a></li>
-          <ul>
-            <li><a href="#s3-bucket-policy">S3 bucket policy</a></li>
-            <li><a href="#s3-cors-policy">S3 CORS policy</a></li>
-          </ul>
         <li><a href="#integrate-with-imagekit">Integrate with ImageKit</a></li>
         <li><a href="#mapbox-api-key">Mapbox API key</a></li>
         <li><a href="#aws-lambda-function">AWS Lambda Function</a></li>
@@ -56,67 +52,32 @@ You will need the follows:
 1. Google Place API key (For admin manage albums)
 2. Google OAuth 2.0 Client ID (For admin access)
 3. AWS user and role with admin permission for your local development and deployment
-4. AWS S3 bucket (For SPA website hosting and storing photos)
-5. AWS DynamoDB table (For managing album information, Serverless framework will create 3 table for you once you run serverless deploy)
-6. AWS Lambda Function with API Gateway (Serverless framework will create these for you once you run serverless deploy)
-7. AWS CloudFront (It's optional)
+4. AWS S3 bucket (For SPA website hosting and storing photos. **Serverless framework will create this for you once you run serverless deploy.** )
+5. AWS DynamoDB table (For managing album information. **Serverless framework will create 4 tables for you once you run serverless deploy**)
+6. AWS Lambda Function with API Gateway **(Serverless framework will create these for you once you run serverless deploy)**
+7. AWS CloudFront **(Serverless framework will create this for you once you run serverless deploy)**
 8. ImageKit account (It's optional)
 9. Mapbox API key (For displaying map)
 
-### Create S3 bucket
+‼️ **️Important** ‼️
 
-Before you start, you need create an AWS S3 bucket. This bucket will be for your SPA website hosting, and storing your photos.
-Once you create them, replace properties `STATIC_FILES_URL` and `IMAGEKIT_URL` with the bucket URL you created in`.env.example`
-and modify file name to `.env`. (the URL is like https://{YOUR_BUCKET_NAME}.s3.amazonaws.com)
+Before you start local development, you will need to do serverless deploy first. Please check further
+information in the `server` folder [here](server/README.md).
 
-You will also need to replace `IMAGEKIT_CDN_URL` and `AWS_S3_BUCKET_NAME` in`.env.example` in [./server](./lambda) folder
-with the bucket you created.
+### After deploying Serverless Framework
 
-#### S3 bucket policy
-
-You usually want to make your S3 bucket public so that your friends can see your photos and website. To achieve this,
-you need to add `getObject` in the bucket policy (under `Permissions` tab):
-
-```json
-{
-  "Version": "2012-10-17",
-  "Id": "Policy1548223592786",
-  "Statement": [
-    {
-      "Sid": "Read permission for every object in a bucket",
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::{YOUR_BUCKET_NAME}/*"
-    }
-  ]
-}
-```
-
-#### S3 CORS policy
-
-Don't forget to put CORS into S3 bucket configuration[1] to prevent other people link your photos from their websites directly.
-No matter where you deploy your app (AWS or Google Firebase), you should add those URLs for hosting your website into CORS configuration.
-For example:
-
-```json
-[
-  {
-    "AllowedHeaders": ["*"],
-    "AllowedMethods": ["GET"],
-    "AllowedOrigins": ["http://www.example1.com"],
-    "ExposeHeaders": []
-  }
-]
-```
+After deploying Serverless Framework by running `bun run serverless:deploy`, replace properties `STATIC_FILES_URL` and
+`IMAGEKIT_CDN_URL` (There are 2 `IMAGEKIT_CDN_URL` env variables, one is in the root folder, another one is in the server
+folder) with the CloudFront Domain name URL in `.env.example` and modify file name to `.env`. (the URL is like
+https://dq0ro94z2ck7q.cloudfront.net, you can find it from AWS console)
 
 ### Integrate with ImageKit
 
 In order to reduce the traffic with S3 bucket (to save money!), this project integrate with ImageKit CDN. ImageKit.io
-is a cloud-based image CDN with real-time image optimization and transformation features that help you deliver perfectly
+is a cloud-based image CDN with real-time image optimisation and transformation features that help you deliver perfectly
 optimized images across all devices[2]. You can follow this [documentation](https://imagekit.io/blog/image-optimization-resize-aws-s3-imagekit/)
 to create an account in the ImageKit. You will have 20GB bandwidth per month as a free user. Once you have your own ImageKit
-URL, replace this property `IMAGEKIT_URL` with your real information in`.env.example` and modify file name to `.env`. And
+URL, replace this property `IMAGEKIT_CDN_URL` with your real information in`.env.example` and modify file name to `.env`. And
 use the same URL in the `server` folder.
 
 #### Important
@@ -125,15 +86,14 @@ If you change S3 bucket name, don't forget to update the configuration in ImageK
 
 ### Mapbox API key
 
-This project uses Mapbox to display the [map](http://demo-quasar-photo-albums.s3-website-us-east-1.amazonaws.com/map). You can get your own Mapbox API key [here](https://account.mapbox.com/auth/signup/).
-Once you have your own Mapbox API key, replace this property `MAPBOX_API_KEY` with your real information in`.env.example`
-and modify file name to `.env`.
+This project uses Mapbox to display the [map](https://dq0ro94z2ck7q.cloudfront.net/map/albums). You can get your own
+Mapbox API key [here](https://account.mapbox.com/auth/signup/). Once you have your own Mapbox API key, replace this property `MAPBOX_API_KEY` with your
+real information in `.env.example` and modify file name to `.env`.
 
 ### Google OAuth 2.0 client ID
 
-Please check [here](https://developers.google.com/identity/protocols/oauth2) for further information. You will also need
-to set up OAuth consent screen. Please check [here](https://developers.google.com/identity/protocols/oauth2/openid-connect#consent-screen)
-Once you have Google OAuth 2.0 client ID, replace this property `GOOGLE_CLIENT_ID` with your real information in`.env.example`
+Please check [here](https://developers.google.com/identity/protocols/oauth2) for further information. You will also need to set up OAuth consent screen. Please check [here](https://developers.google.com/identity/protocols/oauth2/openid-connect#consent-screen).
+Once you have Google OAuth 2.0 client ID, replace this property `GOOGLE_CLIENT_ID` with your real information in `.env.example`
 and modify file name to `.env`. And use the same client ID in the `server` folder.
 
 #### Login UI
@@ -142,13 +102,13 @@ This project uses Google OAuth 2.0 to authenticate users. If you don't want to u
 implement login UI and authentication process by yourself. Once you set up Google OAuth 2.0 client ID and OAuth consent
 screen, you can access login UI by going to `http://localhost:9000/login`. You will also need to add your Google account
 information in the [DynamoDB table](server/README.md#aws-dynamodb) you created. If every thing is set up correctly, you should be able to login
-with your Google account and see the admin page as below:
+with your Google account and see the admin features including album and photo management as below:
 ![web-capture1](doc-images/Web_capture_1.webp)
 ![web-capture2](doc-images/Web_capture_2.webp)
 ![web-capture3](doc-images/Web_capture_3.webp)
 ![web-capture4](doc-images/Web_capture_4.webp)
 ![web-capture5](doc-images/Web_capture_5.webp)
-![web-capture6](doc-images/Web_capture_6.jpeg)
+![web-capture6](doc-images/Web_capture_6.webp)
 ![web-capture7](doc-images/Web_capture_7.webp)
 
 ### AWS Lambda Function
@@ -156,10 +116,6 @@ with your Google account and see the admin page as below:
 This project uses AWS Lambda Function to handle all APIs (as BFF, backend for frontend) and authentication process
 once it's deployed to AWS. When you run serverless deploy, it will create necessary Lambda Functions, API Gateway and
 DynamoDB for you.
-
-‼️ **️Important** ‼️
-Before you start local development, you will need to do serverless deploy first. Please check further
-information in the `server` folder. [here](server/README.md)
 
 ## How to run locally
 

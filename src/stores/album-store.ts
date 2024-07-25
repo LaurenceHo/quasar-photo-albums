@@ -5,7 +5,7 @@ import { Album, AlbumsByYear, AlbumTag } from 'src/components/models';
 import AggregateService from 'src/services/aggregate-service';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
-import { compareDbUpdatedTime, getStaticFileUrl, sortByKey } from 'src/utils/helper';
+import { compareDbUpdatedTime, fetchDbUpdatedTime, sortByKey } from 'src/utils/helper';
 
 export interface AlbumState {
   loadingAllAlbumInformation: boolean;
@@ -45,7 +45,6 @@ const initialState: AlbumState = {
   featuredAlbums: [],
 };
 
-export const UPDATED_DB_TIME_FILE = 'updateDatabaseAt.json';
 export const FILTERED_ALBUMS_BY_YEAR = 'FILTERED_ALBUMS_BY_YEAR';
 export const ALBUM_TAGS = 'ALBUM_TAGS';
 export const FEATURED_ALBUMS = 'FEATURED_ALBUMS';
@@ -61,16 +60,10 @@ interface AlbumTags {
   tags: AlbumTag[];
 }
 
-const _fetchDbUpdatedTime = async () => {
-  const response = await fetch(getStaticFileUrl(UPDATED_DB_TIME_FILE));
-  const dbUpdatedTimeJSON = await response.json();
-  return dbUpdatedTimeJSON.time;
-};
-
 const _fetchAlbumsAndSetToLocalStorage = async (year: string | undefined, dbUpdatedTime?: string) => {
   let time = dbUpdatedTime;
   if (!time) {
-    time = await _fetchDbUpdatedTime();
+    time = await fetchDbUpdatedTime();
   }
 
   const { data: albums, code, message } = await albumService.getAlbumsByYear(year);
@@ -93,7 +86,7 @@ const _fetchAlbumsAndSetToLocalStorage = async (year: string | undefined, dbUpda
 const _fetchAlbumTagsAndSetToLocalStorage = async (dbUpdatedTime?: string) => {
   let time = dbUpdatedTime;
   if (!time) {
-    time = await _fetchDbUpdatedTime();
+    time = await fetchDbUpdatedTime();
   }
 
   const { data: tags, code, message } = await albumTagService.getAlbumTags();
@@ -116,7 +109,7 @@ const _fetchAlbumTagsAndSetToLocalStorage = async (dbUpdatedTime?: string) => {
 const _fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string) => {
   let time = dbUpdatedTime;
   if (!time) {
-    time = await _fetchDbUpdatedTime();
+    time = await fetchDbUpdatedTime();
   }
 
   const { data: albums, code, message } = await aggregateService.getAggregateData('featuredAlbums');
@@ -207,7 +200,6 @@ export const albumStore = defineStore('albums', {
         const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(
           LocalStorage.getItem(FILTERED_ALBUMS_BY_YEAR) || '{}'
         );
-
         this.albumList = sortByKey(filteredAlbumsByYear.albums, 'albumName', this.sortOrder);
       } catch (error) {
         this.loadingAllAlbumInformation = false;

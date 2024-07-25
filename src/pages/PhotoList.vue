@@ -2,7 +2,7 @@
   <template v-if="!fetchingPhotos">
     <div v-if="!photoId" class="q-pt-md">
       <div class="row items-center">
-        <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated @click="goBack()" />
+        <q-btn color="primary" icon="mdi-arrow-left" round size="md" unelevated @click="goBack" />
         <q-btn-group outline class="q-pl-sm">
           <q-btn
             :outline="photoStyle === 'grid'"
@@ -66,7 +66,7 @@
         {{ albumItem?.description }}
       </div>
       <div v-if="albumItem?.tags?.length && albumItem?.tags?.length > 0" class="flex q-pb-md">
-        <q-chip v-for="(tag, i) in albumItem.tags" :key="i" color="secondary" data-test-id="album-tag">
+        <q-chip v-for="(tag, i) in albumItem.tags" :key="i" color="secondary" data-test-id="album-tag" square>
           {{ tag }}
         </q-chip>
       </div>
@@ -226,7 +226,13 @@ const photoId = computed(() => route.query['photo'] as string);
 
 const photoStyle = ref((route.query['photoStyle'] as string) || 'grid'); // Grid is default photo list style
 
-const goBack = () => router.back();
+const goBack = () => {
+  if (window.history.state.back === null) {
+    router.push({ name: 'AlbumsByYear', params: { year: albumYear.value } });
+  } else {
+    router.back();
+  }
+};
 
 const setPhotoListStyle = (type: 'detail' | 'grid') => {
   photoStyle.value = type;

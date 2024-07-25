@@ -9,8 +9,8 @@ import mapboxgl from 'mapbox-gl';
 import { LocalStorage } from 'quasar';
 import { get } from 'radash';
 import AggregateService from 'src/services/aggregate-service';
-import { compareDbUpdatedTime, getStaticFileUrl } from 'src/utils/helper';
-import { albumStore, UPDATED_DB_TIME_FILE } from 'stores/album-store';
+import { compareDbUpdatedTime, fetchDbUpdatedTime } from 'src/utils/helper';
+import { albumStore } from 'stores/album-store';
 import { computed, onMounted, ref } from 'vue';
 
 interface GeoJson {
@@ -65,9 +65,7 @@ const geoJson = computed(
 const fetchAlbumsWithLocation = async (dbUpdatedTime?: string) => {
   let time = dbUpdatedTime;
   if (!time) {
-    const response = await fetch(getStaticFileUrl(UPDATED_DB_TIME_FILE));
-    const dbUpdatedTimeJSON = await response.json();
-    time = dbUpdatedTimeJSON.time;
+    time = await fetchDbUpdatedTime();
   }
 
   const result = (await aggregateService.getAggregateData('albumsWithLocation')) as ApiResponse<AlbumItem[]>;

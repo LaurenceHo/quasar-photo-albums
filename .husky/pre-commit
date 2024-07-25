@@ -1,7 +1,5 @@
 bun run types
-bun run lint
-bun run format
+bun run lint-staged
 cd server
 bun run types
-bun run lint
-bun run format
+bun run lint-staged
