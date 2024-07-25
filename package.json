@@ -64,6 +64,6 @@
     "yarn": ">= 4"
   },
   "lint-staged": {
-    "*.{ts,vue}": ["eslint --fix", "prettier --write"]
+    "*.{ts,vue}": ["eslint --ext .vue,.ts ./src ./test --fix", "prettier --ignore-path .gitignore --write ./src ./test --ignore-unknown"]
   }
 }

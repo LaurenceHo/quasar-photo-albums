@@ -63,6 +63,6 @@
     "yarn": ">= 4"
   },
   "lint-staged": {
-    "*.ts": ["eslint --fix", "prettier --write"]
+    "*.ts": ["eslint --ext .ts ./src ./test --fix", "prettier --ignore-path .gitignore --write ./src ./test --ignore-unknown"]
   }
 }
