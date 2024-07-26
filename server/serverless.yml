@@ -100,6 +100,7 @@ resources:
                 - GET
               AllowedOrigins:
                 - 'http://localhost:9000'
+                - ${env:ALBUM_URL}
               ExposedHeaders:
                 - Date
               MaxAge: 3600
