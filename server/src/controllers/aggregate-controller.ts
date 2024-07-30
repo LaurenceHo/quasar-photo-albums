@@ -1,5 +1,4 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import { BaseController } from './base-controller.js';
 import {
   ALBUMS_WITH_LOCATION,
   AlbumsByYear,
@@ -10,6 +9,7 @@ import {
 } from '../schemas/aggregation.js';
 import { Album } from '../schemas/album.js';
 import DataAggregationService from '../services/data-aggregation-service.js';
+import { BaseController } from './base-controller.js';
 import { verifyIfIsAdmin } from './helpers.js';
 
 const dataAggregationService = new DataAggregationService();

@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import { RequestWithUser } from '../models.js';
 import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
+import { RequestWithUser } from '../types/models.js';
 import { BaseController } from './base-controller.js';
 import { emptyS3Folder, updatePhotoAlbum, uploadObject, verifyIfIsAdmin } from './helpers.js';
 

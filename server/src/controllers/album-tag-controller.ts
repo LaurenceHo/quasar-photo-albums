@@ -1,10 +1,10 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import { AlbumTag } from '../schemas/album-tag.js';
+import AlbumService from '../services/album-service.js';
 import AlbumTagService from '../services/album-tag-service.js';
+import { RequestWithUser } from '../types/models.js';
 import { BaseController } from './base-controller.js';
 import { uploadObject } from './helpers.js';
-import AlbumService from '../services/album-service.js';
-import { RequestWithUser } from '../models';
 
 const albumTagService = new AlbumTagService();
 const albumService = new AlbumService();

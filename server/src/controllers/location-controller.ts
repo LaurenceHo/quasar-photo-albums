@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import { Place } from '../models.js';
+import { Place } from '../types/place';
 import { BaseController } from './base-controller.js';
 import { perform } from './helpers.js';
 

@@ -1,6 +1,6 @@
 import { FastifyReply } from 'fastify';
 import { STATUS_BAD_REQUEST, STATUS_ERROR, STATUS_SUCCESS, STATUS_UNAUTHORIZED } from '../constants.js';
-import { ResponseStatus } from '../models.js';
+import { ResponseStatus } from '../types/models.js';
 
 export default class JsonResponse<T> {
   private readonly code: number;

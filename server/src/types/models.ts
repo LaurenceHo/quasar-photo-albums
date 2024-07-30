@@ -1,6 +1,7 @@
 import { FastifyRequest, RouteHandler } from 'fastify';
-import { Album } from './schemas/album';
-import { UserPermission } from './schemas/user-permission.js';
+import { Album } from '../schemas/album.js';
+import { UserPermission } from '../schemas/user-permission.js';
+import { Photo } from './photo.js';
 
 export type RequestWithUser = FastifyRequest & { user?: UserPermission | null };
 
@@ -27,22 +28,6 @@ export interface BaseController {
   update?: RouteHandler;
 
   delete?: RouteHandler;
-}
-
-export interface Photo {
-  url: string;
-  key: string;
-  size?: number;
-  lastModified?: Date;
-}
-
-export interface Place {
-  displayName: string;
-  formattedAddress: string;
-  location: {
-    latitude: number;
-    longitude: number;
-  };
 }
 
 export interface PhotoResponse {

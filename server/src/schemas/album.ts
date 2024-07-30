@@ -1,6 +1,6 @@
 import { CustomAttributeType, Entity, EntityRecord } from 'electrodb';
-import { Place } from '../models.js';
 import { ddbDocClient } from '../services/dynamodb-client.js';
+import { Place } from '../types/place';
 
 export type Album = EntityRecord<typeof AlbumEntity> & Place;
 
