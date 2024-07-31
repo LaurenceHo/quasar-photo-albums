@@ -13,7 +13,7 @@ const helperMock = vi.hoisted(() => ({
 
 vi.mock('../../src/services/data-aggregation-service', () => ({
   default: vi.fn().mockImplementation(() => ({
-    findOne: ({ key }) => {
+    findOne: ({ key }: { key: string }) => {
       if (key === ALBUMS_WITH_LOCATION) {
         return Promise.resolve({
           key: ALBUMS_WITH_LOCATION,

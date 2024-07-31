@@ -49,9 +49,9 @@ export default tsEslint.config(
         },
       ],
       'no-undef': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      'vue/multi-word-component-names': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': 'warn',
+      'vue/multi-word-component-names': 'warn',
     },
   },
   {

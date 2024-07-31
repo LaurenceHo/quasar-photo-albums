@@ -10,7 +10,7 @@
   "scripts": {
     "build:server": "tsc",
     "format": "prettier --ignore-path .gitignore --write ./src ./test --ignore-unknown",
-    "lint": "eslint --ext .ts ./src ./test --fix",
+    "lint": "eslint --fix",
     "serverless:deploy": "serverless deploy",
     "serverless:deploy:prod": "serverless deploy --stage prod",
     "start:server": "rimraf dist && tsc && node dist/index.js",
@@ -33,7 +33,7 @@
     "electrodb": "^2.14.3",
     "fastify": "^4.28.1",
     "fastify-plugin": "^4.5.1",
-    "google-auth-library": "^9.12.0",
+    "google-auth-library": "^9.13.0",
     "jsonwebtoken": "^9.0.2",
     "lint-staged": "^15.2.7",
     "radash": "^12.1.0",
@@ -41,22 +41,23 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@eslint/js": "^9.8.0",
     "@tsconfig/node20": "^20.1.4",
     "@tsconfig/strictest": "^2.0.5",
     "@types/aws-lambda": "^8.10.142",
     "@types/jsonwebtoken": "^9.0.6",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
-    "@vitest/coverage-v8": "^2.0.4",
-    "eslint": "8.57.0",
+    "@vitest/coverage-v8": "^2.0.5",
+    "eslint": "^9.8.0",
     "eslint-plugin-import": "^2.29.1",
     "form-auto-content": "^3.2.1",
+    "globals": "^15.8.0",
     "rimraf": "^6.0.1",
     "serverless": "^3.39.0",
     "serverless-dotenv-plugin": "^6.0.0",
     "serverless-plugin-typescript": "^2.1.5",
     "typescript": "^5.5.4",
-    "vitest": "^2.0.4"
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^2.0.5"
   },
   "engines": {
     "node": "^20",
@@ -64,6 +65,6 @@
     "yarn": ">= 4"
   },
   "lint-staged": {
-    "*.ts": ["eslint --ext .ts ./src ./test --fix", "prettier --ignore-path .gitignore --write ./src ./test --ignore-unknown"]
+    "*.ts": ["eslint --fix", "prettier --ignore-path .gitignore --write ./src ./test --ignore-unknown"]
   }
 }
