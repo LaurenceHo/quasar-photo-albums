@@ -53,7 +53,3 @@ export interface ResponseStatus {
   message?: string;
   data?: any;
 }
-
-export interface ApiResponse<T> extends ResponseStatus {
-  data?: T;
-}
