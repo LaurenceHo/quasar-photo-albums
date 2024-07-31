@@ -45,7 +45,7 @@ export default class AggregateController extends BaseController {
 
         return this.ok<Album[]>(reply, 'ok', albumData?.value ?? []);
       } catch (err: any) {
-        console.error(`Failed to query aggregate data for photo album with location: ${err}`);
+        request.log.error(`Failed to query aggregate data for photo album with location: ${err}`);
         return this.fail(reply, 'Failed to query aggregate data for photo album with location');
       }
     } else if (aggregateType === 'countAlbumsByYear') {
@@ -64,7 +64,7 @@ export default class AggregateController extends BaseController {
         }
         return this.ok<AlbumsByYear>(reply, 'ok', countData?.value ?? []);
       } catch (err: any) {
-        console.error(`Failed to query aggregate data for count albums by year: ${err}`);
+        request.log.error(`Failed to query aggregate data for count albums by year: ${err}`);
         return this.fail(reply, 'Failed to query aggregate data for count albums by year');
       }
     } else if (aggregateType === 'featuredAlbums') {
@@ -75,7 +75,7 @@ export default class AggregateController extends BaseController {
 
         return this.ok<Album[]>(reply, 'ok', featuredAlbums?.value ?? []);
       } catch (err: any) {
-        console.error(`Failed to query aggregate data for featured albums: ${err}`);
+        request.log.error(`Failed to query aggregate data for featured albums: ${err}`);
         return this.fail(reply, 'Failed to query aggregate data for featured albums');
       }
     }

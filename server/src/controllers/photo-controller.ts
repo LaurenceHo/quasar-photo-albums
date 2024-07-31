@@ -71,7 +71,7 @@ export default class PhotoController extends BaseController {
       }
       return this.notFoundError(reply, 'Album does not exist');
     } catch (err: any) {
-      console.error('Failed to get photos:', err);
+      request.log.error('Failed to get photos:', err);
       return this.fail(reply, 'Failed to get photos');
     }
   };
@@ -85,15 +85,15 @@ export default class PhotoController extends BaseController {
       const mimeType = data?.mimetype;
       const buffer = await data?.toBuffer();
 
-      console.log(`##### Uploading file: ${filename}, mimeType: ${mimeType}, file size: ${buffer?.length} bytes`);
+      request.log.info(`##### Uploading file: ${filename}, mimeType: ${mimeType}, file size: ${buffer?.length} bytes`);
       const result = await uploadObject(`${albumId}/${filename}`, buffer);
       if (result) {
-        console.log(`##### Photo uploaded: ${filename}`);
+        request.log.info(`##### Photo uploaded: ${filename}`);
         return this.ok(reply, 'Photo uploaded');
       }
       return this.fail(reply, 'Failed to upload photos');
     } catch (err: any) {
-      console.error('Failed to upload photos:', err);
+      request.log.error('Failed to upload photos:', err);
       return this.fail(reply, 'Failed to upload photos');
     }
   };
@@ -120,7 +120,7 @@ export default class PhotoController extends BaseController {
               deleteObjects([sourcePhotoKey])
                 .then((result) => {
                   if (result) {
-                    console.log('##### Photo moved:', sourcePhotoKey);
+                    request.log.info('##### Photo moved:', sourcePhotoKey);
                     resolve('Photo moved');
                   } else {
                     reject('Failed to delete photo');
@@ -143,7 +143,7 @@ export default class PhotoController extends BaseController {
       await Promise.all(promises);
       return this.ok(reply, 'Photo moved');
     } catch (err: any) {
-      console.error('Failed to move photos:', err);
+      request.log.error('Failed to move photos:', err);
       return this.fail(reply, 'Failed to move photos');
     }
   };
@@ -165,7 +165,7 @@ export default class PhotoController extends BaseController {
       }
       return this.fail(reply, 'Failed to rename photo');
     } catch (err: any) {
-      console.error('Failed to rename photo:', err);
+      request.log.error('Failed to rename photo:', err);
       return this.fail(reply, 'Failed to rename photo');
     }
   };
@@ -181,7 +181,7 @@ export default class PhotoController extends BaseController {
       }
       return this.fail(reply, 'Failed to delete photos');
     } catch (err: any) {
-      console.error('Failed to delete photos:', err);
+      request.log.error('Failed to delete photos:', err);
       return this.fail(reply, 'Failed to delete photos');
     }
   };

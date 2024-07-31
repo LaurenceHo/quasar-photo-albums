@@ -1,4 +1,5 @@
 import { DescribeTableCommand } from '@aws-sdk/client-dynamodb';
+import logger from 'pino';
 import { AlbumTag, AlbumTagEntity, albumTagsTableName } from '../schemas/album-tag.js';
 import { Album, AlbumEntity, albumTableName } from '../schemas/album.js';
 import { UserPermission, UserPermissionEntity, userTableName } from '../schemas/user-permission.js';
@@ -16,7 +17,7 @@ const waitForTable = async (tableName: string, cb: (value: boolean) => void) => 
   const tableDescription = await getTableStatus(tableName);
 
   if (tableDescription.Table?.TableStatus !== 'ACTIVE') {
-    console.log(`Waiting for ${tableName} table to become active......`);
+    logger().info(`Waiting for ${tableName} table to become active......`);
     setTimeout(() => waitForTable(tableName, cb), 5000);
   } else {
     cb(true);
@@ -27,17 +28,17 @@ const initialiseAlbumTable = async () => {
   try {
     await getTableStatus(albumTableName);
   } catch (error) {
-    console.error(error);
+    logger().error(error);
     throw Error(`Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`);
   }
 
   try {
-    console.log(`Checking ${albumTableName} has data......`);
+    logger().info(`Checking ${albumTableName} has data......`);
     await waitForTable(albumTableName, async (value) => {
       if (value) {
         const items = await AlbumEntity.scan.go({ limit: 1, ignoreOwnership: true });
         if (items.data.length === 0) {
-          console.log(`Insert mock data into ${albumTableName} table......`);
+          logger().info(`Insert mock data into ${albumTableName} table......`);
           await AlbumEntity.create({
             year: 'na',
             id: 'test-album-1',
@@ -58,13 +59,13 @@ const initialiseAlbumTable = async () => {
             createdBy: 'System',
             updatedBy: 'System',
           } as Album).go({ response: 'none' });
-          console.log(`Mock data inserted into ${albumTableName} table.`);
+          logger().info(`Mock data inserted into ${albumTableName} table.`);
         }
       }
     });
-    console.log(`${albumTableName} table all set.👍`);
+    logger().info(`${albumTableName} table all set.👍`);
   } catch (error) {
-    console.error(`Error when checking ${albumTableName}:`, error);
+    logger().error(`Error when checking ${albumTableName}:`, error);
   }
 };
 
@@ -72,27 +73,27 @@ const initialiseAlbumTagsTable = async () => {
   try {
     await getTableStatus(albumTagsTableName);
   } catch (error) {
-    console.error(error);
+    logger().error(error);
     throw Error(`Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`);
   }
 
   try {
-    console.log(`Checking ${albumTagsTableName} has data......`);
+    logger().info(`Checking ${albumTagsTableName} has data......`);
     await waitForTable(albumTagsTableName, async (value) => {
       if (value) {
         const items = await AlbumTagEntity.scan.go({ limit: 1, ignoreOwnership: true });
         if (items.data.length === 0) {
-          console.log(`Insert mock data into ${albumTagsTableName} table......`);
+          logger().info(`Insert mock data into ${albumTagsTableName} table......`);
           await AlbumTagEntity.create({
             tag: 'test-tag-1',
           } as AlbumTag).go({ response: 'none' });
-          console.log(`Mock data inserted into ${albumTagsTableName} table.`);
+          logger().info(`Mock data inserted into ${albumTagsTableName} table.`);
         }
       }
     });
-    console.log(`${albumTagsTableName} table all set.👍`);
+    logger().info(`${albumTagsTableName} table all set.👍`);
   } catch (error) {
-    console.error(`Error when checking ${albumTagsTableName}:`, error);
+    logger().error(`Error when checking ${albumTagsTableName}:`, error);
   }
 };
 
@@ -100,35 +101,35 @@ const initialiseUserTable = async () => {
   try {
     await getTableStatus(userTableName);
   } catch (error) {
-    console.error(error);
+    logger().error(error);
     throw Error(`Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`);
   }
 
   try {
-    console.log(`Checking ${userTableName} has data......`);
+    logger().info(`Checking ${userTableName} has data......`);
     await waitForTable(userTableName, async (value) => {
       if (value) {
         const items = await UserPermissionEntity.scan.go({ limit: 1, ignoreOwnership: true });
         if (items.data.length === 0) {
-          console.log(`Insert mock data into ${userTableName} table......`);
+          logger().info(`Insert mock data into ${userTableName} table......`);
           await UserPermissionEntity.create({
             uid: 'test-uid-1',
             email: 'test@example.com',
             displayName: 'Test User',
             role: 'admin',
           } as UserPermission).go({ response: 'none' });
-          console.log(`Mock data inserted into ${userTableName} table.`);
+          logger().info(`Mock data inserted into ${userTableName} table.`);
         }
       }
     });
-    console.log(`${userTableName} table all set.👍`);
+    logger().info(`${userTableName} table all set.👍`);
   } catch (error) {
-    console.error(`Error when checking ${userTableName}:`, error);
+    logger().error(`Error when checking ${userTableName}:`, error);
   }
 };
 
 export const initialiseDynamodbTables = async () => {
-  console.log('Verifying DynamoDB tables......');
+  logger().info('Verifying DynamoDB tables......');
 
   await Promise.all([initialiseAlbumTable(), initialiseAlbumTagsTable(), initialiseUserTable()]);
 };

@@ -1,6 +1,7 @@
 import { DeleteObjectsCommandInput, PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
+import logger from 'pino';
 import { get, isEmpty } from 'radash';
 import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
@@ -24,19 +25,19 @@ export const updatePhotoAlbum = async (album: Album, email = 'unknown') => {
     const result = await albumService.update({ id: album.id, year: album.year }, cloneAlbum);
 
     if (result) {
-      console.log('##### Album updated:', album.id);
+      logger().info('##### Album updated:', album.id);
       await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
     }
     return result;
   } catch (err) {
-    console.error(`Failed to update photo album: ${err}`);
+    logger().error(`Failed to update photo album: ${err}`);
     throw Error('Error when updating photo album');
   }
 };
 
 //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-photo-album-full.html
 export const uploadObject = async (filePath: string, object: any) => {
-  console.log('##### S3 destination file path:', filePath);
+  logger().info('##### S3 destination file path:', filePath);
 
   try {
     const putObject: PutObjectCommandInput = {
@@ -51,7 +52,7 @@ export const uploadObject = async (filePath: string, object: any) => {
 
     return await s3Service.create(putObject);
   } catch (err) {
-    console.error(`Failed to upload photo: ${err}`);
+    logger().error(`Failed to upload photo: ${err}`);
     throw Error('Error when uploading photo');
   }
 };
@@ -67,7 +68,7 @@ export const deleteObjects = async (objectKeys: string[]) => {
   try {
     return await s3Service.delete(deleteParams);
   } catch (err) {
-    console.error(`Failed to delete photos: ${err}`);
+    logger().error(`Failed to delete photos: ${err}`);
     throw Error('Error when deleting photos');
   }
 };
@@ -89,7 +90,7 @@ export const emptyS3Folder = async (folderName: string) => {
   try {
     return await deleteObjects(listedObjectArray);
   } catch (err) {
-    console.error(`Failed to empty S3 folder: ${err}`);
+    logger().error(`Failed to empty S3 folder: ${err}`);
     throw Error('Error when emptying S3 folder');
   }
 };

@@ -27,7 +27,7 @@ export default class AlbumController extends BaseController {
 
       return this.ok<Album[]>(reply, 'ok', albumList);
     } catch (err: any) {
-      console.error(`Failed to query photo album: ${err}`);
+      request.log.error(`Failed to query photo album: ${err}`);
       return this.fail(reply, 'Failed to query photo album');
     }
   };
@@ -58,7 +58,7 @@ export default class AlbumController extends BaseController {
       }
       return this.fail(reply, 'Failed to create photo album');
     } catch (err: any) {
-      console.error(`Failed to insert photo album: ${err}`);
+      request.log.error(`Failed to insert photo album: ${err}`);
       return this.fail(reply, 'Failed to create photo album');
     }
   };
@@ -81,7 +81,7 @@ export default class AlbumController extends BaseController {
   delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const requestBody = request.body as { id: string; year: string };
-      console.log('##### Delete album:', requestBody.id);
+      request.log.info('##### Delete album:', requestBody.id);
       // Empty S3 folder
       const result = await emptyS3Folder(requestBody.id);
 
@@ -98,7 +98,7 @@ export default class AlbumController extends BaseController {
         return this.fail(reply, 'Failed to delete photo album');
       }
     } catch (err: any) {
-      console.error(`Failed to delete photo album: ${err}`);
+      request.log.error(`Failed to delete photo album: ${err}`);
       return this.fail(reply, 'Failed to delete photo album');
     }
   };
