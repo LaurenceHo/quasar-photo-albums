@@ -8,14 +8,14 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build:server": "tsc",
     "format": "prettier --ignore-path .gitignore --write ./src ./test --ignore-unknown",
     "lint": "eslint --ext .ts ./src ./test --fix",
     "serverless:deploy": "serverless deploy",
     "serverless:deploy:prod": "serverless deploy --stage prod",
     "start:server": "rimraf dist && tsc && node dist/index.js",
     "test:server": "vitest run --coverage",
-    "types": "tsc --noEmit"
+    "types:server": "tsc --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.621.0",
