@@ -1,5 +1,5 @@
 import { FastifyReply, RouteHandler } from 'fastify';
-import { BaseController as IBaseController } from '../models.js';
+import { BaseController as IBaseController } from '../types/models.js';
 import JsonResponse from '../utils/json-response.js';
 
 export abstract class BaseController implements IBaseController {

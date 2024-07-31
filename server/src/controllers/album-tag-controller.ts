@@ -1,22 +1,22 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import { AlbumTag } from '../schemas/album-tag.js';
+import AlbumService from '../services/album-service.js';
 import AlbumTagService from '../services/album-tag-service.js';
+import { RequestWithUser } from '../types/models.js';
 import { BaseController } from './base-controller.js';
 import { uploadObject } from './helpers.js';
-import AlbumService from '../services/album-service.js';
-import { RequestWithUser } from '../models';
 
 const albumTagService = new AlbumTagService();
 const albumService = new AlbumService();
 
 export default class AlbumTagController extends BaseController {
-  findAll: RouteHandler = async (_request: FastifyRequest, reply: FastifyReply) => {
+  findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const albumTags = await albumTagService.findAll();
 
       return this.ok<AlbumTag[]>(reply, 'ok', albumTags);
     } catch (err: any) {
-      console.error(`Failed to query album tags: ${err}`);
+      request.log.error(`Failed to query album tags: ${err}`);
       return this.fail(reply, 'Failed to query album tags');
     }
   };
@@ -33,7 +33,7 @@ export default class AlbumTagController extends BaseController {
 
       return this.fail(reply, 'Failed to create album tag');
     } catch (err) {
-      console.error(`Failed to create album tag: ${err}`);
+      request.log.error(`Failed to create album tag: ${err}`);
       return this.fail(reply, 'Failed to create album tag');
     }
   };
@@ -72,7 +72,7 @@ export default class AlbumTagController extends BaseController {
 
       return this.fail(reply, 'Failed to delete album tag');
     } catch (err) {
-      console.error(`Failed to delete album tag: ${err}`);
+      request.log.error(`Failed to delete album tag: ${err}`);
       return this.fail(reply, 'Failed to delete album tag');
     }
   };

@@ -1,4 +1,5 @@
 import { DynamoDBStreamEvent, Handler } from 'aws-lambda';
+import logger from 'pino';
 import {
   ALBUMS_WITH_LOCATION,
   AlbumsByYear,
@@ -24,7 +25,7 @@ export const countAlbumsByYear = (albums: Album[]): AlbumsByYear =>
     .sort((a, b) => b.year.localeCompare(a.year));
 
 export const handler: Handler = async (event: DynamoDBStreamEvent, _context, callback) => {
-  console.log(JSON.stringify(event, null, 2));
+  logger().info(JSON.stringify(event, null, 2));
 
   const albumService = new AlbumService();
 

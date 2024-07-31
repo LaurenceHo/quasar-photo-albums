@@ -15,8 +15,10 @@ import {
   PutObjectCommandInput,
   S3Client,
 } from '@aws-sdk/client-s3';
+import logger from 'pino';
 import { get } from 'radash';
-import { BaseService, Photo } from '../models.js';
+import { BaseService } from '../types/models.js';
+import { Photo } from '../types/photo';
 import { configuration } from './config.js';
 
 export default class S3Service implements BaseService<Photo> {
@@ -53,7 +55,7 @@ export default class S3Service implements BaseService<Photo> {
   async delete(params: DeleteObjectsCommandInput): Promise<boolean> {
     const response = await this.s3Client.send(new DeleteObjectsCommand(params));
     if (response.$metadata.httpStatusCode === 200) {
-      console.log(
+      logger().info(
         '##### Delete objects:',
         response.Deleted?.map((deleted) => deleted.Key)
       );

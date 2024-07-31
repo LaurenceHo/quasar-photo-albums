@@ -29,7 +29,13 @@ await app.register(cors, {
   methods: ['GET, POST, PUT, DELETE, OPTIONS'],
   optionsSuccessStatus: 200,
   origin: (origin, cb) => {
-    const allowedOrigins = ['http://localhost:9000', process.env['ALBUM_URL']];
+    const allowedOrigins = [];
+    if (process.env['DEVELOPMENT'] === 'true') {
+      allowedOrigins.push('http://localhost:9000');
+    } else {
+      allowedOrigins.push(process.env['ALBUM_URL']);
+    }
+
     if (origin === undefined || allowedOrigins.indexOf(origin) > -1) {
       cb(null, true);
       return;
@@ -59,7 +65,7 @@ await app.register(throttle, {
 
 // Route
 app.addHook('onRequest', (request, _reply, done) => {
-  console.log('##### Request: ', request.method, request.url);
+  request.log.info('##### Request: ', request.method, request.url);
   done();
 });
 

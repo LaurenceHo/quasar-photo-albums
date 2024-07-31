@@ -1,6 +1,6 @@
 import { CreateEntityResponse, EntityIdentifiers, QueryOptions, QueryResponse } from 'electrodb';
 import { get, isEmpty, isEqual } from 'radash';
-import { BaseService } from '../models.js';
+import { BaseService } from '../types/models.js';
 import { ddbDocClient } from './dynamodb-client.js';
 
 export abstract class DynamodbService<T> implements BaseService<T> {

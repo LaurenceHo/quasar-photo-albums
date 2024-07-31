@@ -45,7 +45,7 @@ jobs:
           npm install
           cd ./server
           npm install
-          npm run types
+          npm run types:server
           npm run test:server
 
       - name: Write .env file

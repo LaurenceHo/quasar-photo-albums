@@ -37,7 +37,7 @@ export default class AuthController extends BaseController {
         return this.ok(reply, 'ok');
       }
     } catch (error) {
-      console.log(error);
+      request.log.error(error);
 
       reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
       return this.ok(reply, 'ok');
@@ -64,14 +64,14 @@ export default class AuthController extends BaseController {
           await setJwtCookies(reply, token);
           return this.ok<UserPermission>(reply, 'ok', userPermission);
         } else {
-          console.log(`User ${email} doesn't have permission`);
+          request.log.info(`User ${email} doesn't have permission`);
           return this.unauthorized(reply, `User ${email} doesn't have login permission`);
         }
       } else {
         return this.fail(reply, 'Error while user login');
       }
     } catch (err) {
-      console.error('Error while getting user permission:', err);
+      request.log.error('Error while getting user permission:', err);
       return this.fail(reply, 'Error while user login');
     }
   };
@@ -83,7 +83,7 @@ export default class AuthController extends BaseController {
 
       return this.ok(reply);
     } catch (err) {
-      console.error(err);
+      request.log.error(err);
       return this.fail(reply, '');
     }
   };
