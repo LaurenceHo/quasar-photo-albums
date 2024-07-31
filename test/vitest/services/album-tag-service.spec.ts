@@ -31,14 +31,12 @@ describe('album-tag-service.ts', () => {
 
     albumTagService.createAlbumTags([
       {
-        id: 'tag-id',
         tag: 'test-tag',
       },
     ]);
     expect(mockSetDisplayingParameters).toHaveBeenCalledWith(true, 'Tag created');
     expect(mockPerform).toHaveBeenCalledWith('POST', '', [
       {
-        id: 'tag-id',
         tag: 'test-tag',
       },
     ]);

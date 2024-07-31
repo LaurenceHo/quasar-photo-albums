@@ -1,18 +1,22 @@
 import { createTestingPinia } from '@pinia/testing';
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { flushPromises, mount } from '@vue/test-utils';
+import { QDialog } from 'quasar';
+import { albumStore } from 'stores/album-store';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import EditAlbumTagsDialog from '../../../../src/components/dialog/EditAlbumTagsDialog.vue';
+import AlbumTagService from '../../../../src/services/album-tag-service';
 import { mockAlbumTagList } from '../../mock-data';
 import { mockRouter as router } from '../../mock-router';
-import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
-import { QDialog } from 'quasar';
-import { albumStore } from '../../../../src/stores/album-store';
-import AlbumTagService from '../../../../src/services/album-tag-service';
-import EditAlbumTagsDialog from '../../../../src/components/dialog/EditAlbumTagsDialog.vue';
 
 installQuasarPlugin({ components: { QDialog } });
 
-const spyCreateTags = vi.spyOn(AlbumTagService.prototype, 'createAlbumTags').mockResolvedValue({ code: 200 });
-const spyDeleteTag = vi.spyOn(AlbumTagService.prototype, 'deleteAlbumTag').mockResolvedValue({ code: 200 });
+const spyCreateTags = vi
+  .spyOn(AlbumTagService.prototype, 'createAlbumTags')
+  .mockResolvedValue({ status: 'Success', code: 200 });
+const spyDeleteTag = vi
+  .spyOn(AlbumTagService.prototype, 'deleteAlbumTag')
+  .mockResolvedValue({ status: 'Success', code: 200 });
 
 describe('EditAlbumTagsDialog.vue', () => {
   let wrapper: any;

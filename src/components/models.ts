@@ -39,14 +39,14 @@ export interface Place {
   };
 }
 
-export interface ResponseStatus {
+export interface ResponseStatus<T> {
   code: number;
   status: string;
   message?: string;
-  data?: any;
+  data?: T;
 }
 
-export interface ApiResponse<T> extends ResponseStatus {
+export interface ApiResponse<T> extends ResponseStatus<T> {
   data?: T;
 }
 

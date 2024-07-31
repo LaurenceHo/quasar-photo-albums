@@ -5,8 +5,8 @@ import { Notify, QDialog } from 'quasar';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import EditAlbumButton from '../../../../src/components/button/EditAlbumButton.vue';
 import DialogStateComposable from '../../../../src/composables/dialog-state-composable';
-import { mockRouter as router } from '../../mock-router';
 import AlbumService from '../../../../src/services/album-service';
+import { mockRouter as router } from '../../mock-router';
 
 installQuasarPlugin({ plugins: { Notify }, components: { QDialog } });
 
@@ -17,7 +17,9 @@ vi.mock('../../../../src/composables/selected-items-composaable', () => ({
   })),
 }));
 
-const spyDeleteAlbum = vi.spyOn(AlbumService.prototype, 'deleteAlbum').mockResolvedValue({ code: 200 });
+const spyDeleteAlbum = vi
+  .spyOn(AlbumService.prototype, 'deleteAlbum')
+  .mockResolvedValue({ status: 'Success', code: 200 });
 
 describe('EditAlbumButton.vue', () => {
   let wrapper: any;

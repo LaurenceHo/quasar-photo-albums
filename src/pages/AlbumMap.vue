@@ -51,7 +51,7 @@ const geoJson = computed(
               `${album.place?.displayName ? `<div>${album.place?.displayName}</div>` : ''}` +
               `${
                 album.albumCover
-                  ? `<img src='${cdnURL}/${encodeURI(album.albumCover + '?tr=w-280' ?? '')}' alt='${album.albumName}' />`
+                  ? `<img src='${cdnURL}/${encodeURI(album.albumCover + '?tr=w-280' || '')}' alt='${album.albumName}' />`
                   : ''
               }` +
               `${album.description ? `<p>${album.description}</p>` : ''}` +

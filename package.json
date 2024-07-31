@@ -8,7 +8,7 @@
     "serve": "quasar dev",
     "build": "quasar build",
     "format": "prettier --ignore-path .gitignore --write ./src ./test --ignore-unknown",
-    "lint": "eslint --ext .vue,.ts ./src ./test --fix",
+    "lint": "eslint --fix",
     "test": "vitest run --coverage",
     "types": "vue-tsc --noEmit",
     "prepare": "husky"
@@ -23,27 +23,28 @@
     "vue-router": "^4.4.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.8.0",
     "@pinia/testing": "^0.1.4",
     "@quasar/app-vite": "^1.9.3",
     "@quasar/extras": "^1.16.12",
     "@quasar/quasar-app-extension-testing-unit-vitest": "^1.0.0",
     "@types/mapbox-gl": "^3.4.0",
     "@types/node": "^22.0.1",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
     "@vitest/coverage-v8": "^2.0.5",
     "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.19",
     "dotenv": "^16.4.5",
-    "eslint": "^8.57.0",
+    "eslint": "^9.8.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-vue": "^9.27.0",
+    "globals": "^15.8.0",
     "husky": "^9.1.4",
     "jsdom": "^24.1.1",
     "lint-staged": "^15.2.7",
     "mapbox-gl": "^3.5.2",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
+    "typescript-eslint": "^8.0.0",
     "vitest": "^2.0.5",
     "vue-tsc": "^2.0.29"
   },
@@ -64,6 +65,9 @@
     "yarn": ">= 4"
   },
   "lint-staged": {
-    "*.{ts,vue}": ["eslint --ext .vue,.ts ./src ./test --fix", "prettier --ignore-path .gitignore --write ./src ./test --ignore-unknown"]
+    "*.{ts,vue}": [
+      "eslint --fix",
+      "prettier --ignore-path .gitignore --write ./src ./test --ignore-unknown"
+    ]
   }
 }
