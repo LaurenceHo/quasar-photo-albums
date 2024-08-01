@@ -106,6 +106,6 @@ describe('UploadPhotosDialog.vue', () => {
     await vm.$nextTick();
     expect(vm.files.length).toEqual(0);
     // After uploading files and closing the dialog, emit refreshPhotoList event
-    expect(wrapper.emitted().refreshPhotoList[0]).toEqual([]);
+    expect(wrapper.emitted()['refreshPhotoList']?.[0]).toEqual([]);
   });
 });

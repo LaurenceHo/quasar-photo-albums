@@ -18,7 +18,7 @@ vi.mock('../../src/services/album-service', () => ({
   })),
 }));
 
-vi.mock('../../src/routes/auth-middleware', async (importOriginal) => ({
+vi.mock('../../src/routes/auth-middleware', async () => ({
   verifyJwtClaim: () => Promise.resolve(),
   verifyUserPermission: () => Promise.resolve(),
 }));

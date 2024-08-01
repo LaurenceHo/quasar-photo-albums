@@ -6,7 +6,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reportsDirectory: 'coverage',
-      exclude: ['**/**.js', '**/**.d.ts', '.serverless/**', '.eslintrc.mjs'],
+      exclude: ['**/**.js', '**/**.d.ts', '*.config.*', '.serverless/**', 'test/**/*.{test,spec}.ts'],
     },
     globals: true,
     include: [

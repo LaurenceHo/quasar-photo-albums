@@ -106,7 +106,7 @@ export const mockAlbumList: Album[] = [
   },
 ];
 
-export const mockAlbum = mockAlbumList[0];
+export const mockAlbum = mockAlbumList[0] as Album;
 
 export const mockGetAlbumsResponse = {
   code: 200,

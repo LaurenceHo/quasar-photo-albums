@@ -2,9 +2,9 @@ import { createTestingPinia } from '@pinia/testing';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { mount } from '@vue/test-utils';
 import { LoadingBar, Notify } from 'quasar';
+import { userStore } from 'stores/user-store';
 import { beforeEach, describe, expect, it } from 'vitest';
 import PhotoDetail from '../../../src/components/PhotoDetail.vue';
-import { userStore } from '../../../src/stores/user-store';
 import { mockAlbum, mockPhotoList } from '../mock-data';
 import { mockRouter as router } from '../mock-router';
 

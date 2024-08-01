@@ -2,9 +2,9 @@ import { createTestingPinia } from '@pinia/testing';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import { Notify } from 'quasar';
+import { albumStore } from 'stores/album-store';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import EditPhotoButton from '../../../../src/components/button/EditPhotoButton.vue';
-import { albumStore } from '../../../../src/stores/album-store';
 import { mockAlbum } from '../../mock-data';
 
 installQuasarPlugin({ plugins: { Notify } });

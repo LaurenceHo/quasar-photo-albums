@@ -74,6 +74,7 @@ export default class AlbumController extends BaseController {
       }
       return this.fail(reply, 'Failed to update photo album');
     } catch (err: any) {
+      request.log.error(`Failed to update photo album: ${err}`);
       return this.fail(reply, 'Failed to update photo album');
     }
   };

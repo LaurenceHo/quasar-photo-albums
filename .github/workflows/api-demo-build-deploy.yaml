@@ -40,8 +40,9 @@ jobs:
           node-version: 20
 
       - name: Install dependencies and test
+        #TODO: remove --force
         run: |
-          npm install
+          npm install --force
           cd ./server
           npm install
           npm run types:server
