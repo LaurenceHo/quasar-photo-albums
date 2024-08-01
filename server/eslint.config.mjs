@@ -3,7 +3,6 @@ import globals from 'globals';
 import eslint from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import tsEslint from 'typescript-eslint';
-import importPlugin from 'eslint-plugin-import';
 
 export default tsEslint.config(
   eslint.configs.recommended,
@@ -12,7 +11,6 @@ export default tsEslint.config(
   {
     plugins: {
       'typescript-eslint': tsEslint.plugin,
-      import: importPlugin,
     },
     languageOptions: {
       globals: {
