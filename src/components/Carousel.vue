@@ -42,7 +42,7 @@
       class="absolute-right-centre"
       @click="scrollNext"
     />
-    <div v-if="emblaApi && !prevBtnDisabled && !nextBtnDisabled" class="embla__dots">
+    <div v-if="emblaApi && !prevBtnDisabled && !nextBtnDisabled && $q.screen.gt.xs" class="embla__dots">
       <carousel-dot-button
         v-for="(_, index) in scrollSnaps"
         :key="`dot-button-${index}`"
@@ -54,7 +54,7 @@
 </template>
 <script setup lang="ts">
 import CarouselDotButton from 'components/button/CarouselDotButton.vue';
-import { Album } from 'components/models';
+import { Album } from 'src/types';
 import { EmblaCarouselType } from 'embla-carousel';
 import emblaCarouselVue from 'embla-carousel-vue';
 import { albumStore } from 'stores/album-store';

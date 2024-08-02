@@ -98,12 +98,12 @@
 </template>
 
 <script lang="ts" setup>
+import { LocalStorage } from 'quasar';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AlbumTagService from 'src/services/album-tag-service';
 import { albumStore, FILTERED_ALBUMS_BY_YEAR, FilteredAlbumsByYear } from 'stores/album-store';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { LocalStorage } from 'quasar';
 
 const albumTagService = new AlbumTagService();
 const useAlbumStore = albumStore();

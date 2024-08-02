@@ -89,9 +89,9 @@
 
 <script lang="ts" setup>
 import EditAlbumButton from 'components/button/EditAlbumButton.vue';
-import { Album } from 'components/models';
 import { useQuasar } from 'quasar';
 import { userStore } from 'src/stores/user-store';
+import { Album } from 'src/types';
 import { computed, onMounted, ref, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
 

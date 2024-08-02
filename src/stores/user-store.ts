@@ -1,4 +1,4 @@
-import { UserPermission } from 'components/models';
+import { UserPermission } from 'src/types';
 import { defineStore } from 'pinia';
 import { Loading } from 'quasar';
 import AuthService from 'src/services/auth-service';

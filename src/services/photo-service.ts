@@ -1,5 +1,6 @@
-import { Album, ApiResponse, Photo, ResponseStatus } from 'components/models';
 import HttpRequestService from 'src/services/http-request-service';
+import { ApiResponse, Photo, ResponseStatus } from 'src/types';
+import { Album } from 'src/types/album';
 
 export interface PhotoResponse {
   photos: Photo[];

@@ -179,7 +179,7 @@ import ConfirmDeletePhotosDialog from 'components/dialog/ConfirmDeletePhotosDial
 import MovePhotoDialog from 'components/dialog/MovePhotosDialog.vue';
 import RenamePhotoDialog from 'components/dialog/RenamePhotoDialog.vue';
 import UploadPhotosDialog from 'components/dialog/UploadPhotosDialog.vue';
-import { Album, Photo as IPhoto } from 'components/models';
+import { Album, Photo as IPhoto } from 'src/types';
 import Photo from 'components/Photo.vue';
 import PhotoDetail from 'components/PhotoDetail.vue';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';

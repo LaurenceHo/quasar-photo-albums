@@ -86,7 +86,7 @@
 <script lang="ts" setup>
 import EditAlbumTagsDialog from 'components/dialog/EditAlbumTagsDialog.vue';
 import EditOrCreateAlbumDialog from 'components/dialog/EditOrCreateAlbumDialog.vue';
-import { UserPermission } from 'components/models';
+import { UserPermission } from 'src/types';
 import { LocalStorage } from 'quasar';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import AuthService from 'src/services/auth-service';

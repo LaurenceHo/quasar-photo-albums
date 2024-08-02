@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
 import { LocalStorage } from 'quasar';
 import { get, isEmpty } from 'radash';
-import { Album, AlbumsByYear, AlbumTag } from 'src/components/models';
+import { AlbumsByYear, AlbumTag } from 'src/types';
+import { Album } from 'src/types/album';
 import AggregateService from 'src/services/aggregate-service';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';

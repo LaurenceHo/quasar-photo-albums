@@ -150,19 +150,19 @@
 </template>
 
 <script lang="ts" setup>
-import { Album, Place } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import { isEmpty } from 'radash';
 import AlbumTagsFilterComposable from 'src/composables/album-tags-filter-composable';
 import DialogStateComposable from 'src/composables/dialog-state-composable';
 import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import AlbumService from 'src/services/album-service';
+import AlbumTagService from 'src/services/album-tag-service';
 import LocationService from 'src/services/location-service';
+import { Album, Place } from 'src/types';
 import { getYearOptions } from 'src/utils/helper';
 import { albumStore } from 'stores/album-store';
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import AlbumTagService from 'src/services/album-tag-service';
 
 const locationService = new LocationService();
 const albumService = new AlbumService();
@@ -237,7 +237,7 @@ const confirmUpdateAlbum = async () => {
     description: albumDesc.value,
     isPrivate: privateAlbum.value,
     isFeatured: featuredAlbum.value ?? undefined,
-    place: selectedPlace.value,
+    place: selectedPlace.value ?? undefined,
     tags: selectedAlbumTags.value,
   };
 

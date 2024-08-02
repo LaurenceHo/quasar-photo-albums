@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Album as AlbumItem, ApiResponse } from 'components/models';
+import { Album as AlbumItem, ApiResponse } from 'src/types';
 import { Feature, Point } from 'geojson';
 import mapboxgl from 'mapbox-gl';
 import { LocalStorage } from 'quasar';

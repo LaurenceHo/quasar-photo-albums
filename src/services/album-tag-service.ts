@@ -1,5 +1,5 @@
-import { AlbumTag, ApiResponse, ResponseStatus } from 'src/components/models';
 import HttpRequestService from 'src/services/http-request-service';
+import { AlbumTag, ApiResponse, ResponseStatus } from 'src/types';
 
 export default class AlbumTagService extends HttpRequestService {
   constructor() {

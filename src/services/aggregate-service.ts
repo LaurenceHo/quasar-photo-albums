@@ -1,5 +1,5 @@
-import { AggregateType, ApiResponse, DataAggregateValueMap } from 'src/components/models';
 import HttpRequestService from 'src/services/http-request-service';
+import { AggregateType, ApiResponse, DataAggregateValueMap } from 'src/types';
 
 export default class AggregateService extends HttpRequestService {
   constructor() {
