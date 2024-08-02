@@ -237,7 +237,7 @@ const confirmUpdateAlbum = async () => {
     description: albumDesc.value,
     isPrivate: privateAlbum.value,
     isFeatured: featuredAlbum.value ?? undefined,
-    place: selectedPlace.value ?? undefined,
+    place: selectedPlace.value,
     tags: selectedAlbumTags.value,
   };
 

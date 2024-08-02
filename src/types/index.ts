@@ -1,5 +1,5 @@
-import { ApiResponse, ResponseStatus, PhotoResponse } from './api-response';
 import { Album, AlbumTag } from './album';
+import { ApiResponse, PhotoResponse, ResponseStatus } from './api-response';
 import { AggregateType, AlbumsByYear, DataAggregateValueMap } from './data-aggregate';
 import { Photo } from './photo';
 import { Place } from './place';
