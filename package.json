@@ -16,6 +16,7 @@
   "dependencies": {
     "embla-carousel-vue": "^8.1.7",
     "exifreader": "^4.23.3",
+    "mapbox-gl": "^3.5.2",
     "pinia": "^2.2.0",
     "quasar": "^2.16.6",
     "radash": "^12.1.0",
@@ -41,7 +42,6 @@
     "husky": "^9.1.4",
     "jsdom": "^24.1.1",
     "lint-staged": "^15.2.7",
-    "mapbox-gl": "^3.5.2",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.0.0",

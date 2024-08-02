@@ -39,14 +39,13 @@ export interface Place {
   };
 }
 
-export interface ResponseStatus<T> {
+export interface ResponseStatus {
   code: number;
   status: string;
   message?: string;
-  data?: T;
 }
 
-export interface ApiResponse<T> extends ResponseStatus<T> {
+export interface ApiResponse<T> extends ResponseStatus {
   data?: T;
 }
 
@@ -62,13 +61,10 @@ export interface UploadableFile {
 
 export type AlbumsByYear = { year: string; count: number }[];
 
+export type AggregateType = 'albumsWithLocation' | 'countAlbumsByYear' | 'featuredAlbums';
+
 export type DataAggregateValueMap = {
   albumsWithLocation: Album[];
   countAlbumsByYear: AlbumsByYear;
   featuredAlbums: Album[];
 };
-
-export interface DataAggregation<K extends keyof DataAggregateValueMap> {
-  key: K;
-  value: DataAggregateValueMap[K];
-}

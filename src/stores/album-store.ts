@@ -49,6 +49,11 @@ export const FILTERED_ALBUMS_BY_YEAR = 'FILTERED_ALBUMS_BY_YEAR';
 export const ALBUM_TAGS = 'ALBUM_TAGS';
 export const FEATURED_ALBUMS = 'FEATURED_ALBUMS';
 
+export interface FeaturedAlbums {
+  dbUpdatedTime: string;
+  albums: Album[];
+}
+
 export interface FilteredAlbumsByYear {
   dbUpdatedTime: string;
   year: string;
@@ -123,7 +128,7 @@ const _fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string) 
       JSON.stringify({
         dbUpdatedTime: time,
         albums,
-      } as FilteredAlbumsByYear)
+      } as FeaturedAlbums)
     );
   }
 };

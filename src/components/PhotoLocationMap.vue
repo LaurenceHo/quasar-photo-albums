@@ -35,7 +35,7 @@ onMounted(() => {
   if (container) {
     map = new mapboxgl.Map({
       container: 'photo-location-map',
-      style: 'mapbox://styles/mapbox/streets-v11',
+      style: 'mapbox://styles/mapbox/standard',
       center: [longitude.value, latitude.value],
       zoom: 11,
     });

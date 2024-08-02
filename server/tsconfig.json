@@ -11,10 +11,6 @@
     "resolveJsonModule": true,
     "sourceMap": true,
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "test/**/*.ts"
-  ],
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }

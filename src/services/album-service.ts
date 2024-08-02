@@ -12,17 +12,17 @@ export default class AlbumService extends HttpRequestService {
     return this.perform('GET', `/${year}`);
   }
 
-  public createAlbum(album: Album): Promise<ResponseStatus<Album>> {
+  public createAlbum(album: Album): Promise<ResponseStatus> {
     this.setDisplayingParameters(true, `Album "${album.albumName}" created`);
     return this.perform('POST', '', album);
   }
 
-  public updateAlbum(album: Album): Promise<ResponseStatus<Album>> {
+  public updateAlbum(album: Album): Promise<ResponseStatus> {
     this.setDisplayingParameters(true, `Album "${album.albumName}" updated`);
     return this.perform('PUT', '', album);
   }
 
-  public deleteAlbum(albumId: string, year: string): Promise<ResponseStatus<undefined>> {
+  public deleteAlbum(albumId: string, year: string): Promise<ResponseStatus> {
     this.setDisplayingParameters(true, 'Album deleted');
     return this.perform('DELETE', '', { id: albumId, year });
   }
