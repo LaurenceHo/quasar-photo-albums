@@ -1,7 +1,7 @@
 import HttpRequestService from 'src/services/http-request-service';
 import { Album, ApiResponse, ResponseStatus } from 'src/types';
 
-export default class AlbumService extends HttpRequestService {
+export default class AlbumService extends HttpRequestService<Album[]> {
   constructor() {
     super();
     this.baseUrl = this.baseUrl + '/albums';

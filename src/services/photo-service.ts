@@ -1,13 +1,7 @@
 import HttpRequestService from 'src/services/http-request-service';
-import { ApiResponse, Photo, ResponseStatus } from 'src/types';
-import { Album } from 'src/types/album';
+import { ApiResponse, PhotoResponse, ResponseStatus } from 'src/types';
 
-export interface PhotoResponse {
-  photos: Photo[];
-  album: Album;
-}
-
-export default class PhotoService extends HttpRequestService {
+export default class PhotoService extends HttpRequestService<PhotoResponse> {
   constructor() {
     super();
     this.baseUrl = this.baseUrl + '/photos';

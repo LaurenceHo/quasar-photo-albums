@@ -1,4 +1,4 @@
-import { ApiResponse, ResponseStatus } from './api-response';
+import { ApiResponse, ResponseStatus, PhotoResponse } from './api-response';
 import { Album, AlbumTag } from './album';
 import { AggregateType, AlbumsByYear, DataAggregateValueMap } from './data-aggregate';
 import { Photo } from './photo';
@@ -18,4 +18,5 @@ export type {
   AggregateType,
   AlbumsByYear,
   DataAggregateValueMap,
+  PhotoResponse,
 };
