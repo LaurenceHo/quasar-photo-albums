@@ -1,7 +1,7 @@
-import { ApiResponse, Place } from 'src/components/models';
 import HttpRequestService from 'src/services/http-request-service';
+import { ApiResponse, Place } from 'src/types';
 
-export default class LocationService extends HttpRequestService {
+export default class LocationService extends HttpRequestService<Place[]> {
   constructor() {
     super();
     this.baseUrl = this.baseUrl + '/location';

@@ -1,17 +1,17 @@
-import { UploadableFile as IUploadableFile } from 'components/models';
+import { UploadFile as IUploadFile } from 'src/types';
 import { ref } from 'vue';
 
 export default function () {
-  const files = ref<IUploadableFile[]>([]);
+  const files = ref<IUploadFile[]>([]);
 
-  const addFiles = (newFiles: IUploadableFile[]) => {
+  const addFiles = (newFiles: IUploadFile[]) => {
     const newUploadFiles = [...newFiles].map((file) => new UploadFile(file)).filter((file) => !fileExists(file.id));
     files.value = files.value.concat(newUploadFiles);
   };
 
   const fileExists = (otherId: string) => files.value.some(({ id }) => id === otherId);
 
-  const removeFile = (file: IUploadableFile) => {
+  const removeFile = (file: IUploadFile) => {
     const index = files.value.indexOf(file);
 
     if (index > -1) {
@@ -22,7 +22,7 @@ export default function () {
   return { files, addFiles, removeFile };
 }
 
-class UploadFile implements IUploadableFile {
+class UploadFile implements IUploadFile {
   id: string;
   file: File;
   url: string;

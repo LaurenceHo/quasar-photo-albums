@@ -1,4 +1,4 @@
-import { Album, Photo } from 'components/models';
+import { Album, Photo } from 'src/types';
 import { defineStore } from 'pinia';
 import { LocalStorage } from 'quasar';
 import PhotoService from 'src/services/photo-service';

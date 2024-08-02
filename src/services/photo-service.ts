@@ -1,12 +1,7 @@
-import { Album, ApiResponse, Photo, ResponseStatus } from 'components/models';
 import HttpRequestService from 'src/services/http-request-service';
+import { ApiResponse, PhotoResponse, ResponseStatus } from 'src/types';
 
-export interface PhotoResponse {
-  photos: Photo[];
-  album: Album;
-}
-
-export default class PhotoService extends HttpRequestService {
+export default class PhotoService extends HttpRequestService<PhotoResponse> {
   constructor() {
     super();
     this.baseUrl = this.baseUrl + '/photos';
@@ -17,7 +12,7 @@ export default class PhotoService extends HttpRequestService {
     return this.perform('GET', `/${year}/${albumId}`);
   }
 
-  uploadPhotos(file: any, albumId: string): Promise<ResponseStatus<undefined>> {
+  uploadPhotos(file: any, albumId: string): Promise<ResponseStatus> {
     this.setDisplayingParameters(true);
     return this.perform('POST', `/upload/${albumId}`, null, null, { file });
   }
@@ -28,17 +23,17 @@ export default class PhotoService extends HttpRequestService {
    * @param destinationAlbumId Destination album ID
    * @param photoKeys Keys of photos to be moved
    */
-  movePhotos(albumId: string, destinationAlbumId: string, photoKeys: string[]): Promise<ResponseStatus<undefined>> {
+  movePhotos(albumId: string, destinationAlbumId: string, photoKeys: string[]): Promise<ResponseStatus> {
     this.setDisplayingParameters(true, 'Photos moved');
     return this.perform('PUT', '', { albumId, destinationAlbumId, photoKeys });
   }
 
-  renamePhoto(albumId: string, newPhotoKey: string, currentPhotoKey: string): Promise<ResponseStatus<undefined>> {
+  renamePhoto(albumId: string, newPhotoKey: string, currentPhotoKey: string): Promise<ResponseStatus> {
     this.setDisplayingParameters(true, 'Photo renamed');
     return this.perform('PUT', '/rename', { albumId, newPhotoKey, currentPhotoKey });
   }
 
-  deletePhotos(albumId: string, photoKeys: string[]): Promise<ResponseStatus<undefined>> {
+  deletePhotos(albumId: string, photoKeys: string[]): Promise<ResponseStatus> {
     this.setDisplayingParameters(true, 'Photos deleted');
     return this.perform('DELETE', '', { albumId, photoKeys });
   }

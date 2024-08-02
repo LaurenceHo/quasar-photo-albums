@@ -1,8 +1,9 @@
 import { LoadingBar } from 'quasar';
 import { isEmpty } from 'radash';
+import { ApiResponse } from 'src/types';
 import { notify } from 'src/utils/helper';
 
-export default class HttpRequestService {
+export default class HttpRequestService<T> {
   baseUrl = process.env.NODE_ENV === 'production' ? process.env.AWS_API_GATEWAY_URL : 'http://localhost:3000/api';
   displayLoadingBar = false;
   customSuccessMessage: string | undefined;
@@ -77,7 +78,7 @@ export default class HttpRequestService {
     requestOptions.method = method.toUpperCase();
     requestOptions.headers = headers;
 
-    let data = {} as any;
+    let data = {} as ApiResponse<T>;
     const response = await fetch(urlPath, requestOptions);
     if (response.status >= 200 && response.status < 300) {
       if (this.customSuccessMessage) {
@@ -102,7 +103,7 @@ export default class HttpRequestService {
 
   private errorHandling = async (response: Response) => {
     // Catch error and handle it here. Don't throw it to UI.
-    let errorJson: { status: string; message: string } = { status: '', message: '' };
+    let errorJson: { code: number; status: string; message: string } = { code: 500, status: '', message: '' };
     try {
       errorJson = await response.json();
       // If we can parse error response to JSON, display error message from JSON
@@ -120,7 +121,7 @@ export default class HttpRequestService {
       if (this.displayErrorNotification) {
         notify('negative', `Error: ${response.statusText}`);
       }
-      return null;
+      return { code: response.status, status: 'error', message: 'error' };
     } finally {
       LoadingBar.stop();
     }

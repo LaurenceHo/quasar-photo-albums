@@ -1,7 +1,7 @@
-import { AlbumTag, ApiResponse, ResponseStatus } from 'src/components/models';
 import HttpRequestService from 'src/services/http-request-service';
+import { AlbumTag, ApiResponse, ResponseStatus } from 'src/types';
 
-export default class AlbumTagService extends HttpRequestService {
+export default class AlbumTagService extends HttpRequestService<AlbumTag[]> {
   constructor() {
     super();
     this.baseUrl = this.baseUrl + '/albumTags';
@@ -12,12 +12,12 @@ export default class AlbumTagService extends HttpRequestService {
     return this.perform('GET', '');
   }
 
-  createAlbumTags(tags: AlbumTag[]): Promise<ResponseStatus<AlbumTag[]>> {
+  createAlbumTags(tags: AlbumTag[]): Promise<ResponseStatus> {
     this.setDisplayingParameters(true, 'Tag created');
     return this.perform('POST', '', tags);
   }
 
-  deleteAlbumTag(tagId: string): Promise<ResponseStatus<undefined>> {
+  deleteAlbumTag(tagId: string): Promise<ResponseStatus> {
     this.setDisplayingParameters(true, 'Tag deleted');
     return this.perform('DELETE', `/${tagId}`);
   }

@@ -1,4 +1,4 @@
-import { Album } from 'components/models';
+import { Album } from 'src/types';
 import { computed, ref } from 'vue';
 
 const albumToBeUpdate = ref({

@@ -74,6 +74,7 @@ import DialogStateComposable from 'src/composables/dialog-state-composable';
 import SelectedItemsComposable from 'src/composables/selected-items-composaable';
 import AlbumService from 'src/services/album-service';
 import PhotoService from 'src/services/photo-service';
+import { Album, Photo } from 'src/types';
 import { albumStore } from 'stores/album-store';
 import { computed, ref, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -143,14 +144,14 @@ const confirmMovePhotos = async () => {
   let tempDuplicatedPhotoKeys: string[] = [];
   if (photosInSelectedAlbum.data?.photos) {
     tempDuplicatedPhotoKeys = photosInSelectedAlbum.data.photos
-      .filter((photo) => {
+      .filter((photo: Photo) => {
         const photoKey = photo.key.split('/')[1];
         if (photoKey) {
           return photoKeysArray.value.includes(photoKey);
         }
         return false;
       })
-      .map((photo) => photo.key.split('/')[1] || '');
+      .map((photo: Photo) => photo.key.split('/')[1] || '');
   }
 
   let filteredPhotoKeys = photoKeysArray.value;
@@ -194,8 +195,8 @@ watch(selectedYear, async (newValue) => {
     const { data } = await albumService.getAlbumsByYear(newValue);
     if (data && data.length > 0) {
       staticAlbums = data
-        .filter((album) => album.id !== albumId.value)
-        .map((album) => ({ label: album.albumName, value: album.id }));
+        .filter((album: Album) => album.id !== albumId.value)
+        .map((album: Album) => ({ label: album.albumName, value: album.id }));
       selectedAlbumModel.value = staticAlbums[0] ?? { label: '', value: '' };
     }
     isLoadingAlbums.value = false;

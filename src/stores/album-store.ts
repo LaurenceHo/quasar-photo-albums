@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
 import { LocalStorage } from 'quasar';
 import { get, isEmpty } from 'radash';
-import { Album, AlbumsByYear, AlbumTag } from 'src/components/models';
+import { AlbumsByYear, AlbumTag } from 'src/types';
+import { Album } from 'src/types/album';
 import AggregateService from 'src/services/aggregate-service';
 import AlbumService from 'src/services/album-service';
 import AlbumTagService from 'src/services/album-tag-service';
@@ -48,6 +49,11 @@ const initialState: AlbumState = {
 export const FILTERED_ALBUMS_BY_YEAR = 'FILTERED_ALBUMS_BY_YEAR';
 export const ALBUM_TAGS = 'ALBUM_TAGS';
 export const FEATURED_ALBUMS = 'FEATURED_ALBUMS';
+
+export interface FeaturedAlbums {
+  dbUpdatedTime: string;
+  albums: Album[];
+}
 
 export interface FilteredAlbumsByYear {
   dbUpdatedTime: string;
@@ -123,7 +129,7 @@ const _fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string) 
       JSON.stringify({
         dbUpdatedTime: time,
         albums,
-      } as FilteredAlbumsByYear)
+      } as FeaturedAlbums)
     );
   }
 };

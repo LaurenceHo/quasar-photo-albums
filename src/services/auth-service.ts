@@ -1,7 +1,7 @@
-import { ApiResponse, UserPermission } from 'components/models';
 import HttpRequestService from 'src/services/http-request-service';
+import { ApiResponse, UserPermission } from 'src/types';
 
-export default class AuthService extends HttpRequestService {
+export default class AuthService extends HttpRequestService<UserPermission> {
   constructor() {
     super();
     this.baseUrl = this.baseUrl + '/auth';

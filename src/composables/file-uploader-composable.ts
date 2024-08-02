@@ -1,5 +1,5 @@
-import { UploadableFile } from 'components/models';
 import PhotoService from 'src/services/photo-service';
+import { UploadFile } from 'src/types';
 import { notify } from 'src/utils/helper';
 import { photoStore } from 'stores/photo-store';
 import { ref } from 'vue';
@@ -15,7 +15,7 @@ export default function () {
     isCompleteUploading.value = state;
   };
 
-  const uploadFile = async (file: UploadableFile, albumId: string) => {
+  const uploadFile = async (file: UploadFile, albumId: string) => {
     file.exists = usePhotoStore.findPhotoIndex(file.file.name) !== -1;
     const photoService = new PhotoService();
     file.status = 'loading';

@@ -1,7 +1,5 @@
 import { FastifyRequest, RouteHandler } from 'fastify';
-import { Album } from '../schemas/album.js';
 import { UserPermission } from '../schemas/user-permission.js';
-import { Photo } from './photo.js';
 
 export type RequestWithUser = FastifyRequest & { user?: UserPermission | null };
 
@@ -28,28 +26,4 @@ export interface BaseController {
   update?: RouteHandler;
 
   delete?: RouteHandler;
-}
-
-export interface PhotoResponse {
-  photos: Photo[];
-  album: Album;
-}
-
-export interface PhotosRequest {
-  albumId: string;
-  destinationAlbumId?: string;
-  photoKeys: string[];
-}
-
-export interface RenamePhotoRequest {
-  albumId: string;
-  newPhotoKey: string;
-  currentPhotoKey: string;
-}
-
-export interface ResponseStatus {
-  code?: number;
-  status: string;
-  message?: string;
-  data?: any;
 }

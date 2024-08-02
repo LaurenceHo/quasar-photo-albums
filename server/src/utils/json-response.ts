@@ -1,6 +1,6 @@
 import { FastifyReply } from 'fastify';
 import { STATUS_BAD_REQUEST, STATUS_ERROR, STATUS_SUCCESS, STATUS_UNAUTHORIZED } from '../constants.js';
-import { ResponseStatus } from '../types/models.js';
+import { ApiResponse, ResponseStatus } from '../types';
 
 export default class JsonResponse<T> {
   private readonly code: number;
@@ -19,7 +19,7 @@ export default class JsonResponse<T> {
         status: this._status,
         message,
         data,
-      } satisfies ResponseStatus);
+      } satisfies ApiResponse<T>);
     } else {
       return reply.code(this.code).send({
         code: this.code,

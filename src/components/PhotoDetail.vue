@@ -124,15 +124,16 @@
 
 <script lang="ts" setup>
 import EditPhotoButton from 'components/button/EditPhotoButton.vue';
-import { ExifData } from 'components/models';
 import PhotoLocationMap from 'components/PhotoLocationMap.vue';
 import * as ExifReader from 'exifreader';
-import { NumberTag, StringArrayTag } from 'exifreader';
+import { ExifTags, FileTags, NumberTag, StringArrayTag } from 'exifreader';
 import { useQuasar } from 'quasar';
 import { photoStore } from 'stores/photo-store';
 import { userStore } from 'stores/user-store';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+
+type ExifData = ExifTags & FileTags;
 
 defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 const userPermissionStore = userStore();
