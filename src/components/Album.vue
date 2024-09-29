@@ -1,149 +1,63 @@
 <template>
-  <div v-if="albumStyle === 'grid'" class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6" data-test-id="grid-album-item">
-    <div class="relative-position">
-      <q-img
+  <div
+    class="flex items-center border border-gray-300 p-3 rounded-md cursor-pointer h-28 sm:h-32"
+    data-test-id="list-album-item"
+  >
+    <div class="relative flex-shrink-0" @click="goToAlbum">
+      <SquareImage
         v-if="albumItem['albumCover']"
-        :id="`album-${albumItem['id']}-cover-image`"
-        :ratio="1"
-        :src="`${thumbnail}?tr=w-${imageWidth},h-${imageWidth}`"
-        class="rounded-borders cursor-pointer"
-        @click="goToAlbum"
+        :alt="`photo album: ${albumItem.albumName}`"
+        :size="thumbnailSize"
+        :src="`${thumbnail}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
       />
-      <div v-else class="no-album-cover-square rounded-borders cursor-pointer" @click="goToAlbum">
-        <q-icon class="absolute-center" name="mdi-image" size="48px" />
+      <NoImagePlaceholder v-else :icon-size="30" :size="thumbnailSize" />
+      <IconLock v-if="albumItem?.isPrivate" :size="20" class="absolute top-1 left-1 text-gray-300" />
+      <IconStarFilled v-if="albumItem?.isFeatured" :size="20" class="absolute top-1 left-1 text-pink-400" />
+    </div>
+    <div class="flex-grow ml-3 min-w-0" @click="goToAlbum">
+      <h3 class="text-lg font-semibold truncate">{{ albumItem.albumName }}</h3>
+      <p v-if="albumItem.description" class="text-gray-600 truncate">{{ albumItem.description }}</p>
+      <div class="flex flex-wrap mt-1">
+        <Tag v-for="tag in tagsForDisplay" :key="tag" :value="tag" class="mr-2" severity="success" />
       </div>
-      <q-icon
-        v-if="albumItem['isPrivate']"
-        class="absolute"
-        color="white"
-        name="mdi-lock"
-        size="sm"
-        style="top: 8px; left: 8px"
-      />
-      <q-icon
-        v-if="albumItem['isFeatured']"
-        class="absolute"
-        color="accent"
-        name="mdi-heart"
-        size="sm"
-        style="top: 8px; left: 8px"
-      />
-      <EditAlbumButton v-if="isAdminUser" :album-item="albumItem" :album-style="albumStyle" />
     </div>
-    <div class="q-pt-sm text-subtitle2">{{ albumItem['albumName'] }}</div>
+    <div v-if="isAdmin" class="flex-shrink-0">
+      <EditAlbumButton :album-item="albumItem" />
+    </div>
   </div>
-  <template v-else>
-    <div class="col-xl-6 col-lg-6 col-md-8 col-sm-10 col-xs-12 q-pa-xs">
-      <q-card flat bordered data-test-id="list-album-item">
-        <q-item clickable class="q-px-sm">
-          <q-item-section avatar @click="goToAlbum">
-            <q-avatar
-              :class="{ 'no-album-cover-square': !albumItem['albumCover'] }"
-              :size="`${thumbnailSize}px`"
-              rounded
-            >
-              <q-img
-                v-if="albumItem['albumCover']"
-                :ratio="1"
-                :src="`${thumbnail}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
-                class="rounded-borders"
-              />
-              <q-icon v-else name="mdi-image" />
-              <q-icon
-                v-if="albumItem['isPrivate']"
-                class="absolute"
-                color="white"
-                name="mdi-lock"
-                size="xs"
-                style="top: 4px; left: 4px"
-              />
-              <q-icon
-                v-if="albumItem['isFeatured']"
-                class="absolute"
-                color="accent"
-                name="mdi-heart"
-                size="sm"
-                style="top: 4px; left: 4px"
-              />
-            </q-avatar>
-          </q-item-section>
-
-          <q-item-section @click="goToAlbum">
-            <q-item-label class="text-subtitle2" lines="1">{{ albumItem['albumName'] }}</q-item-label>
-            <q-item-label v-if="albumItem['description']" caption lines="1">
-              {{ albumItem['description'] }}
-            </q-item-label>
-            <div class="flex">
-              <q-chip v-for="tag in tagsForDisplay" :key="tag" color="secondary" dense square>{{ tag }} </q-chip>
-            </div>
-          </q-item-section>
-
-          <q-item-section v-if="isAdminUser" side>
-            <EditAlbumButton :album-item="albumItem" :album-style="albumStyle" />
-          </q-item-section>
-        </q-item>
-      </q-card>
-    </div>
-  </template>
 </template>
 
 <script lang="ts" setup>
-import EditAlbumButton from 'components/button/EditAlbumButton.vue';
-import { useQuasar } from 'quasar';
-import { userStore } from 'src/stores/user-store';
-import { Album } from 'src/types';
-import { computed, onMounted, ref, toRefs } from 'vue';
+import EditAlbumButton from '@/components/button/EditAlbumButton.vue';
+import NoImagePlaceholder from '@/components/NoImagePlaceholder.vue';
+import SquareImage from '@/components/SquareImage.vue';
+import { initialAlbum } from '@/composables/albums-context';
+import UserConfigContext from '@/composables/user-config-context';
+import type { Album } from '@/schema';
+import DeviceContext from '@/services/device-context';
+import { IconLock, IconStarFilled } from '@tabler/icons-vue';
+import Tag from 'primevue/tag';
+import { computed, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
 
-const q = useQuasar();
-const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
+const cdnURL = import.meta.env.VITE_IMAGEKIT_CDN_URL as string;
 
 const props = defineProps({
-  albumStyle: {
-    type: String,
-    required: true,
-  },
   albumItem: {
     type: Object as () => Album,
     required: true,
-    default: () =>
-      ({
-        year: '',
-        id: '',
-        albumCover: '',
-        albumName: '',
-        description: '',
-        tags: [],
-        isPrivate: true,
-      }) as Album,
+    default: () => initialAlbum,
   },
 });
 
+const { isAdmin } = UserConfigContext();
+const { isXSmallDevice } = DeviceContext();
 const { albumItem } = toRefs(props);
-const userPermissionStore = userStore();
 const router = useRouter();
 
-const imageWidth = ref(document.getElementById(`album-${albumItem.value['id']}-cover-image`)?.clientWidth ?? 0);
+const thumbnailSize = computed(() => (isXSmallDevice.value ? 80 : 100));
+const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.albumCover ?? '')}`);
+const tagsForDisplay = computed(() => (albumItem.value?.tags ? albumItem.value.tags.slice(0, 3) : []));
 
-const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.['albumCover'] ?? '')}`);
-const thumbnailSize = computed(() => (q.screen.lt.sm ? 80 : 100));
-const tagsForDisplay = computed(() => (albumItem.value?.['tags'] ? albumItem.value?.['tags'].slice(0, 3) : []));
-
-const goToAlbum = () => router.push(`/album/${albumItem.value?.['year']}/${albumItem.value?.['id']}`);
-
-onMounted(() => {
-  imageWidth.value = document.getElementById(`album-${albumItem.value['id']}-cover-image`)?.clientWidth ?? 250;
-});
+const goToAlbum = () => router.push(`/album/${albumItem.value?.year}/${albumItem.value?.id}`);
 </script>
-<style lang="scss" scoped>
-.no-album-cover-square {
-  border: gray dashed 1px;
-
-  &:after {
-    content: '';
-    display: block;
-    padding-bottom: 100%;
-  }
-}
-</style>

@@ -2,7 +2,7 @@
   <button type="button" :class="dotButtonClasses" @click="scrollTo" />
 </template>
 <script setup lang="ts">
-import { EmblaCarouselType } from 'embla-carousel';
+import type { EmblaCarouselType } from 'embla-carousel';
 import { computed, onMounted, ref, toRefs, watch } from 'vue';
 
 const props = defineProps({
@@ -70,7 +70,7 @@ watch(carouselApi, (newVal) => {
   border-radius: 50%;
 }
 .embla__dot:after {
-  box-shadow: inset 0 0 0 0.2rem #ef6692;
+  box-shadow: inset 0 0 0 0.2rem #0ea5e9;
   width: 0.8rem;
   height: 0.8rem;
   border-radius: 50%;
@@ -79,6 +79,6 @@ watch(carouselApi, (newVal) => {
   content: '';
 }
 .embla__dot--selected:after {
-  box-shadow: inset 0 0 0 0.8rem #ef6692;
+  box-shadow: inset 0 0 0 0.8rem #0ea5e9;
 }
 </style>

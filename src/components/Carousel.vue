@@ -1,77 +1,106 @@
 <template>
-  <div class="embla relative-position q-mb-xl-xl q-mb-lg-lg q-mb-md">
+  <div class="embla relative q-mb-xl-xl q-mb-lg-lg q-mb-md">
     <div ref="emblaRef" class="embla__viewport">
       <div class="embla__container">
         <template v-for="albumItem in featuredAlbums" :key="albumItem.id">
           <div class="embla__slide" data-test-id="carousel-slide">
-            <div class="relative-position">
-              <q-img
-                v-if="albumItem['albumCover']"
-                :ratio="1"
-                :src="`${cdnURL}/${encodeURI(albumItem?.['albumCover'])}?tr=w-240,h-240`"
-                class="rounded-borders cursor-pointer"
-                :alt="`photo album ${albumItem.albumName}`"
-                @click="goToAlbum(albumItem)"
-              />
-              <div v-else class="no-album-cover-square rounded-borders cursor-pointer" @click="goToAlbum(albumItem)">
-                <q-icon class="absolute-center" name="mdi-image" size="48px" />
+            <router-link :to="`/album/${albumItem?.['year']}/${albumItem?.['id']}`">
+              <div class="relative cursor-pointer">
+                <SquareImage
+                  v-if="albumItem['albumCover']"
+                  :src="`${cdnURL}/${encodeURI(albumItem?.['albumCover'])}?tr=w-240,h-240`"
+                  :alt="`photo album ${albumItem.albumName}`"
+                />
+                <NoImagePlaceholder v-else />
+                <div
+                  class="bg-black bg-opacity-50 opacity-100 transition-all duration-500 rounded-t-md h-8 flex items-center overflow-hidden absolute top-0 left-0 right-0 px-2 flex-wrap"
+                >
+                  <div class="truncate text-white">{{ albumItem.albumName }}</div>
+                </div>
               </div>
-              <div class="q-px-sm absolute-top flex text-white album-top-container">
-                <div class="ellipsis">{{ albumItem.albumName }}</div>
-              </div>
-            </div>
+            </router-link>
           </div>
         </template>
       </div>
     </div>
-    <q-btn
+    <Button
       v-if="!prevBtnDisabled && !nextBtnDisabled"
-      round
-      unelevated
-      color="accent"
-      icon="mdi-chevron-left"
-      class="absolute-left-centre"
+      :pt="{
+        root: {
+          style: {
+            position: 'absolute',
+            top: '35%',
+            left: 0,
+          },
+        },
+      }"
+      rounded
       @click="scrollPrev"
-    />
-    <q-btn
+    >
+      <template #icon>
+        <IconChevronLeft :size="24" />
+      </template>
+    </Button>
+
+    <Button
       v-if="!prevBtnDisabled && !nextBtnDisabled"
-      round
-      unelevated
-      color="accent"
-      icon="mdi-chevron-right"
-      class="absolute-right-centre"
+      :pt="{
+        root: {
+          style: {
+            position: 'absolute',
+            top: '35%',
+            right: 0,
+          },
+        },
+      }"
+      rounded
       @click="scrollNext"
-    />
-    <div v-if="emblaApi && !prevBtnDisabled && !nextBtnDisabled && $q.screen.gt.xs" class="embla__dots">
+    >
+      <template #icon>
+        <IconChevronRight :size="24" />
+      </template>
+    </Button>
+
+    <div
+      v-if="emblaApi && !prevBtnDisabled && !nextBtnDisabled"
+      class="hidden sm:flex flex-wrap justify-center items-center -mr-2"
+    >
       <carousel-dot-button
         v-for="(_, index) in scrollSnaps"
         :key="`dot-button-${index}`"
-        :dot-index="index"
         :carousel-api="emblaApi"
+        :dot-index="index"
       />
     </div>
   </div>
 </template>
-<script setup lang="ts">
-import CarouselDotButton from 'components/button/CarouselDotButton.vue';
-import { Album } from 'src/types';
-import { EmblaCarouselType } from 'embla-carousel';
+<script lang="ts" setup>
+import CarouselDotButton from '@/components/button/CarouselDotButton.vue';
+import NoImagePlaceholder from '@/components/NoImagePlaceholder.vue';
+import SquareImage from '@/components/SquareImage.vue';
+import type { Album } from '@/schema';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-vue';
+import type { EmblaCarouselType } from 'embla-carousel';
 import emblaCarouselVue from 'embla-carousel-vue';
-import { albumStore } from 'stores/album-store';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import Button from 'primevue/button';
+import { onMounted, onUnmounted, ref, toRefs, watch } from 'vue';
 
-const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
-const router = useRouter();
-const useAlbumStore = albumStore();
+const props = defineProps({
+  featuredAlbums: {
+    type: Array as () => Album[],
+    required: true,
+    default: () => [],
+  },
+});
+
+const cdnURL = import.meta.env.VITE_IMAGEKIT_CDN_URL as string;
 const [emblaRef, emblaApi] = emblaCarouselVue({ loop: true, slidesToScroll: 'auto' });
 
+const { featuredAlbums } = toRefs(props);
 const scrollSnaps = ref<number[]>([]);
 const prevBtnDisabled = ref(true);
 const nextBtnDisabled = ref(true);
 
-const featuredAlbums = computed(() => useAlbumStore.featuredAlbums);
-const goToAlbum = (albumItem: Album) => router.push(`/album/${albumItem?.['year']}/${albumItem?.['id']}`);
 const scrollPrev = () => {
   if (!emblaApi.value) return;
   emblaApi.value.scrollPrev();
@@ -114,57 +143,32 @@ onUnmounted(() => {
 });
 </script>
 
-<style scoped lang="scss">
-.album-top-container {
-  background: rgba(0, 0, 0, 0.5);
-  opacity: 1;
-  transition: all 0.5s;
-  -webkit-transition: all 0.5s;
-  -moz-transition: all 0.5s;
-  border-radius: 8px 8px 0 0;
-  height: 2rem;
-  display: flex;
-  align-content: center;
-  overflow: hidden;
-}
-
+<style lang="scss" scoped>
 .embla {
   --slide-height: 15rem;
   --slide-spacing: 1rem;
 }
+
 .embla__viewport {
   overflow: hidden;
   height: var(--slide-height);
 }
+
 .embla__container {
   display: flex;
   margin-left: calc(var(--slide-spacing) * -1);
 }
+
 .embla__slide {
   flex: 0 0 var(--slide-height);
   min-width: 0;
   padding-left: var(--slide-spacing);
 }
-.embla__dots {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  margin-right: calc((1rem) / 2 * -1);
-}
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .embla {
     --slide-height: 12rem;
     --slide-spacing: 0.8rem;
   }
-}
-
-.absolute-left-centre {
-  top: 35% !important;
-}
-
-.absolute-right-centre {
-  top: 35% !important;
 }
 </style>

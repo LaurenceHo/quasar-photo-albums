@@ -1,29 +1,37 @@
-import HttpRequestService from 'src/services/http-request-service';
-import { Album, ApiResponse, ResponseStatus } from 'src/types';
+import type { Album, ApiResponse, ResponseStatus } from '@/schema';
+import { ApiBaseUrl } from '@/services/api-base-url';
+import { BaseApiRequestService } from '@/services/base-api-request-service';
 
-export default class AlbumService extends HttpRequestService<Album[]> {
-  constructor() {
-    super();
-    this.baseUrl = this.baseUrl + '/albums';
-  }
+export const AlbumService = {
+  getAlbumsByYear: async (year = 'na'): Promise<ApiResponse<Album[]>> => {
+    const response = await BaseApiRequestService.perform('GET', `${ApiBaseUrl}/albums/${year}`);
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    return response.json();
+  },
 
-  public getAlbumsByYear(year = 'na'): Promise<ApiResponse<Album[]>> {
-    this.setDisplayingParameters(false, undefined, true, 'Ooops, can not get albums, please try again later');
-    return this.perform('GET', `/${year}`);
-  }
+  createAlbum: async (album: Album): Promise<ResponseStatus> => {
+    const response = await BaseApiRequestService.perform('POST', `${ApiBaseUrl}/albums`, album);
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    return response.json();
+  },
 
-  public createAlbum(album: Album): Promise<ResponseStatus> {
-    this.setDisplayingParameters(true, `Album "${album.albumName}" created`);
-    return this.perform('POST', '', album);
-  }
+  updateAlbum: async (album: Album): Promise<ResponseStatus> => {
+    const response = await BaseApiRequestService.perform('PUT', `${ApiBaseUrl}/albums`, album);
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    return response.json();
+  },
 
-  public updateAlbum(album: Album): Promise<ResponseStatus> {
-    this.setDisplayingParameters(true, `Album "${album.albumName}" updated`);
-    return this.perform('PUT', '', album);
-  }
-
-  public deleteAlbum(albumId: string, year: string): Promise<ResponseStatus> {
-    this.setDisplayingParameters(true, 'Album deleted');
-    return this.perform('DELETE', '', { id: albumId, year });
-  }
-}
+  deleteAlbum: async (id: string, year: string): Promise<ResponseStatus> => {
+    const response = await BaseApiRequestService.perform('DELETE', `${ApiBaseUrl}/albums`, { id, year });
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    return response.json();
+  },
+};

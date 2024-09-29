@@ -1,80 +1,75 @@
 <template>
   <div
     v-if="photoStyle === 'grid'"
-    class="photo-item col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6"
+    class="photo-item col-12 sm:col-6 md:col-4 lg:col-3 xl:col-2"
     data-test-id="photo-item"
   >
-    <div :class="`relative-position ${isPhotoSelected ? 'photo-selected' : ''}`">
-      <q-img
+    <div :class="['relative cursor-pointer', { 'photo-selected rounded-md': isPhotoSelected }]">
+      <SquareImage
         :id="`photo-image-${photo['key']}`"
-        :ratio="1"
-        :src="`${photo['url']}?tr=w-${imageWidth},h-${imageWidth}`"
-        class="rounded-borders cursor-pointer"
         :alt="`photo image ${photo['key']}`"
+        :src="`${photo['url']}?tr=w-${imageWidth},h-${imageWidth}`"
         @click="goToPhotoDetail"
       />
-      <div v-if="isAdminUser" class="absolute-top flex justify-between photo-top-button-container">
-        <q-checkbox
-          v-model="selectedPhotosList"
-          data-test-id="select-photo-checkbox"
-          :val="photo['key']"
-          checked-icon="mdi-check-circle"
-          color="positive"
-          unchecked-icon="mdi-check-circle"
+      <div v-if="isAdmin" class="absolute top-0 left-0 right-0 flex justify-between photo-top-button-container">
+        <Button
+          v-tooltip="'Select Photo'"
+          data-test-id="select-photo-button"
+          rounded
+          :severity="`${isPhotoSelected ? 'primary' : 'secondary'}`"
+          text
+          @click="selectPhoto(photo['key'])"
         >
-          <q-tooltip> Select photo</q-tooltip>
-        </q-checkbox>
+          <template #icon>
+            <IconCircleCheckFilled :size="24" />
+          </template>
+        </Button>
         <EditPhotoButton
-          data-test-id="edit-photo-button"
           :photo-key="photo['key']"
-          color="white"
-          @refresh-photo-list="$emit('refreshPhotoList')"
+          extra-class="text-white"
+          @refresh-photo-list="emit('refreshPhotoList')"
         />
       </div>
     </div>
   </div>
-  <template v-else>
-    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-xs">
-      <q-card :flat="!isPhotoSelected" bordered data-test-id="detail-photo-item">
-        <q-item class="q-px-sm" clickable>
-          <q-item-section avatar @click="goToPhotoDetail()">
-            <q-avatar :size="`${thumbnailSize}px`" rounded class="cursor-pointer">
-              <q-img
-                :ratio="1"
-                :src="`${photo['url']}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
-                class="rounded-borders"
-              />
-            </q-avatar>
-          </q-item-section>
-
-          <q-item-section @click="goToPhotoDetail()">
-            <q-item-label class="text-subtitle2" lines="1">{{ photoId }}</q-item-label>
-            <q-item-label caption>{{ lastModified }} </q-item-label>
-            <q-item-label caption>{{ fileSize }} </q-item-label>
-          </q-item-section>
-
-          <q-item-section v-if="isAdminUser" side>
-            <EditPhotoButton
-              data-test-id="edit-photo-button"
-              :photo-key="photo['key']"
-              @refresh-photo-list="$emit('refreshPhotoList')"
-            />
-          </q-item-section>
-        </q-item>
-      </q-card>
+  <div
+    v-else
+    :class="[
+      'flex items-center border border-gray-300 p-2 sm:p-3 rounded-md cursor-pointer h-26 sm:h-32',
+      { 'photo-selected': isPhotoSelected },
+    ]"
+    data-test-id="detail-photo-item"
+  >
+    <div class="relative flex-shrink-0" @click="goToPhotoDetail">
+      <SquareImage
+        :id="`photo-image-${photo['key']}`"
+        :alt="`photo image ${photo['key']}`"
+        :size="thumbnailSize"
+        :src="`${photo['url']}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
+      />
     </div>
-  </template>
+    <div class="flex-grow ml-3 min-w-0" @click="goToPhotoDetail">
+      <div class="text-lg truncate">{{ photoId }}</div>
+      <div class="text-sm text-gray-400">{{ lastModified }}</div>
+      <div class="text-sm text-gray-400">{{ fileSize }}</div>
+    </div>
+    <div v-if="isAdmin" class="flex-shrink-0 ml-2">
+      <EditPhotoButton :photo-key="photo['key']" @refresh-photo-list="refreshPhotoList" />
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import EditPhotoButton from 'components/button/EditPhotoButton.vue';
-import { useQuasar } from 'quasar';
-import SelectedItemsComposable from 'src/composables/selected-items-composaable';
-import { userStore } from 'stores/user-store';
+import EditPhotoButton from '@/components/button/EditPhotoButton.vue';
+import SquareImage from '@/components/SquareImage.vue';
+import PhotosContext from '@/composables/photos-context';
+import UserConfigContext from '@/composables/user-config-context';
+import DeviceContext from '@/services/device-context';
+import { IconCircleCheckFilled } from '@tabler/icons-vue';
+import Button from 'primevue/button';
 import { computed, onMounted, ref, toRefs } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-defineEmits(['refreshPhotoList']);
 const props = defineProps({
   photoStyle: {
     type: String,
@@ -87,55 +82,76 @@ const props = defineProps({
   },
 });
 
-const { photo } = toRefs(props);
-const imageWidth = ref(document.getElementById(`photo-image-${photo.value['key']}`)?.clientWidth ?? 0);
+const emit = defineEmits(['refreshPhotoList']);
 
-const q = useQuasar();
+const { photo } = toRefs(props);
+const imageWidth = ref(250);
+
 const route = useRoute();
 const router = useRouter();
-const userPermissionStore = userStore();
-const { selectedPhotosList } = SelectedItemsComposable();
+const { isAdmin } = UserConfigContext();
+const { selectedPhotos, setSelectedPhotos } = PhotosContext();
+const { isXSmallDevice } = DeviceContext();
 
-const isAdminUser = computed(() => userPermissionStore.isAdminUser);
 const photoId = computed(() => photo.value['key'].split('/')[1]);
-const thumbnailSize = computed(() => (q.screen.lt.sm ? 80 : 100));
+const thumbnailSize = computed(() => (isXSmallDevice.value ? 80 : 100));
 const lastModified = computed(() => new Date(photo.value['lastModified']).toLocaleString());
 const fileSize = computed(() => {
   const size = photo.value['size'] / 1024;
   return size < 1024 ? `${size.toFixed(2)} KB` : `${(size / 1024).toFixed(2)} MB`;
 });
-const isPhotoSelected = computed(() => selectedPhotosList.value.includes(photo.value['key']));
+const isPhotoSelected = computed(() => selectedPhotos.value.includes(photo.value['key']));
 
-const goToPhotoDetail = async () => await router.replace({ query: { ...route.query, photo: photoId.value } });
+const goToPhotoDetail = async () => {
+  await router.replace({ query: { ...route.query, photo: photoId.value } });
+};
+
+const selectPhoto = (key: string) => {
+  const newSelectedPhotos = isPhotoSelected.value
+    ? selectedPhotos.value.filter((photo) => photo !== key)
+    : [...selectedPhotos.value, key];
+  setSelectedPhotos(newSelectedPhotos);
+};
+
+const refreshPhotoList = () => {
+  emit('refreshPhotoList');
+};
 
 onMounted(() => {
-  imageWidth.value = document.getElementById(`photo-image-${photo.value['key']}`)?.clientWidth ?? 250;
+  const element = document.getElementById(`photo-image-${photo.value['key']}`);
+  if (element) {
+    imageWidth.value = element.clientWidth;
+  }
 });
 </script>
-<style lang="scss">
+
+<style lang="scss" scoped>
 .photo-item {
   .photo-top-button-container {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
     &:hover {
       cursor: pointer;
       background: rgba(0, 0, 0, 0.2);
       opacity: 1;
-      transition: all 0.5s;
-      -webkit-transition: all 0.5s;
-      -moz-transition: all 0.5s;
       border-radius: 8px 8px 0 0;
     }
   }
 
-  .q-checkbox,
-  .q-checkbox__inner--falsy {
-    color: white !important;
+  &:hover .photo-top-button-container {
+    opacity: 1;
   }
 }
+
 .photo-selected {
   box-shadow:
     0 1px 5px rgba(0, 0, 0, 0.2),
     0 2px 2px rgba(0, 0, 0, 0.14),
     0 3px 1px -2px rgba(0, 0, 0, 0.12);
-  border-radius: 8px;
+
+  .photo-top-button-container {
+    opacity: 1;
+  }
 }
 </style>

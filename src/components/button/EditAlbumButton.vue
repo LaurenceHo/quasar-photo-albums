@@ -1,113 +1,137 @@
 <template>
-  <q-btn
-    :class="{ 'absolute-top-right': albumStyle === 'grid' }"
-    :color="albumStyle === 'grid' ? 'white' : 'dark'"
-    flat
-    icon="mdi-dots-vertical"
-    round
-    data-test-id="edit-album-button"
-  >
-    <q-menu>
-      <q-list style="min-width: 100px">
-        <q-item v-close-popup clickable data-test-id="set-album-button" @click="setAlbum">
-          <q-item-section avatar>
-            <q-icon color="primary" name="mdi-pencil" />
-          </q-item-section>
-          <q-item-section>Edit Album</q-item-section>
-        </q-item>
-        <q-item v-close-popup clickable data-test-id="delete-album-button" @click="deleteAlbum = true">
-          <q-item-section avatar>
-            <q-icon color="primary" name="mdi-delete" />
-          </q-item-section>
-          <q-item-section>Delete Album</q-item-section>
-        </q-item>
-      </q-list>
-    </q-menu>
-  </q-btn>
-  <q-dialog v-model="deleteAlbum" persistent data-test-id="confirm-delete-album-dialog">
-    <q-card>
-      <q-card-section class="row items-center">
-        <q-icon color="primary" name="mdi-alert-circle" size="md" />
-        <span class="q-ml-sm text-h6" data-test-id="confirm-delete-album-dialog-title">
-          Do you want to delete album "{{ albumName }}"?
-        </span>
-        <span class="q-ma-sm text-subtitle2">
-          All photos in this album will be deleted, and any new photos added while the delete action is in progress
-          might also be deleted.
-        </span>
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn v-close-popup :disable="isProcessing" color="primary" flat label="Cancel" no-caps />
-        <q-btn
-          :loading="isProcessing"
-          color="primary"
-          label="Confirm"
-          no-caps
-          unelevated
+  <div>
+    <Button rounded severity="secondary" text @click="toggleMenu">
+      <template #icon>
+        <IconDotsVertical :size="24" />
+      </template>
+    </Button>
+    <Menu ref="menu" :model="menuItems" :popup="true">
+      <template #item="{ item }">
+        <button class="flex items-center p-2">
+          <component :is="item.icon" :size="24" />
+          <span class="ml-2">{{ item.label }}</span>
+        </button>
+      </template>
+    </Menu>
+    <Dialog v-model:visible="deleteAlbumDialog" class="max-w-96" data-test-id="confirm-delete-album-dialog" modal>
+      <template #header>
+        <div class="flex items-center">
+          <IconAlertCircle :size="40" class="text-red-400 pr-2 flex-shrink-0" />
+          <span class="text-xl font-bold" data-test-id="confirm-delete-album-dialog-title">
+            Do you want to delete album "{{ albumName }}"?
+          </span>
+        </div>
+      </template>
+      <div class="mb-4 text-gray-600">
+        All photos in this album will be deleted, and any new photos added while the delete action is in progress might
+        also be deleted.
+      </div>
+      <template #footer>
+        <Button
+          label="Cancel"
+          text
+          @click="
+            () => {
+              reset();
+              deleteAlbumDialog = false;
+            }
+          "
+        />
+        <Button
+          :loading="isPending"
           data-test-id="confirm-delete-album-button"
+          label="Confirm"
           @click="confirmDeleteAlbum"
         />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+      </template>
+    </Dialog>
+  </div>
+  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
-import DialogStateComposable from 'src/composables/dialog-state-composable';
-import SelectedItemsComposable from 'src/composables/selected-items-composaable';
-import AlbumService from 'src/services/album-service';
-import { Album } from 'src/types';
-import { albumStore } from 'stores/album-store';
-import { computed, ref, toRefs } from 'vue';
+import AlbumsContext, { initialAlbum } from '@/composables/albums-context';
+import DialogContext from '@/composables/dialog-context';
+import type { Album } from '@/schema';
+import { AlbumService } from '@/services/album-service';
+import { IconAlertCircle, IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-vue';
+import { useMutation } from '@tanstack/vue-query';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import Menu from 'primevue/menu';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
+import { ref, toRefs } from 'vue';
 import { useRoute } from 'vue-router';
 
 const props = defineProps({
-  albumStyle: {
-    type: String,
-    required: true,
-  },
   albumItem: {
     type: Object as () => Album,
     required: true,
-    default: () =>
-      ({
-        year: '',
-        id: '',
-        albumCover: '',
-        albumName: '',
-        description: '',
-        tags: [],
-        isPrivate: true,
-      }) as Album,
+    default: () => initialAlbum as Album,
   },
 });
+
 const { albumItem } = toRefs(props);
-
 const route = useRoute();
-const albumService = new AlbumService();
-const store = albumStore();
-const { setUpdateAlbumDialogState } = DialogStateComposable();
-const { setAlbumToBeUpdated } = SelectedItemsComposable();
+const toast = useToast();
+const { fetchAlbumsByYear, setAlbumToBeUpdated } = AlbumsContext();
+const { setUpdateAlbumDialogState } = DialogContext();
 
-const paramsYear = computed(() => route.params['year'] as string);
+const deleteAlbumDialog = ref(false);
+const albumName = ref(albumItem.value.albumName);
+const menu = ref();
 
-const deleteAlbum = ref(false);
-const albumName = ref(albumItem.value['albumName']);
-const isProcessing = ref(false);
+const toggleMenu = (event: any) => {
+  menu.value.toggle(event);
+};
 
 const setAlbum = () => {
-  setAlbumToBeUpdated(albumItem.value as Album);
+  setAlbumToBeUpdated(albumItem.value);
   setUpdateAlbumDialogState(true);
 };
 
-const confirmDeleteAlbum = async () => {
-  isProcessing.value = true;
-  const result = await albumService.deleteAlbum(albumItem.value['id'], albumItem.value['year']);
-  if (result.code === 200) {
-    await store.getAlbumsByYear(paramsYear.value, true);
-  }
-  deleteAlbum.value = false;
-  isProcessing.value = false;
+const {
+  isPending,
+  mutate: deleteAlbum,
+  reset,
+} = useMutation({
+  mutationFn: () => AlbumService.deleteAlbum(albumItem.value.id, albumItem.value.year),
+  onSuccess: async () => {
+    toast.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Album deleted.',
+      life: 3000,
+    });
+    await fetchAlbumsByYear(route.params.year as string, true);
+    deleteAlbumDialog.value = false;
+  },
+  onError: () => {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Error while deleting album. Please try again later.',
+      life: 3000,
+    });
+  },
+});
+
+const confirmDeleteAlbum = (e: MouseEvent) => {
+  e.preventDefault();
+  deleteAlbum();
 };
+
+const menuItems = [
+  {
+    label: 'Edit Album',
+    icon: IconEdit,
+    command: setAlbum,
+  },
+  {
+    label: 'Delete Album',
+    icon: IconTrash,
+    command: () => (deleteAlbumDialog.value = true),
+  },
+];
 </script>

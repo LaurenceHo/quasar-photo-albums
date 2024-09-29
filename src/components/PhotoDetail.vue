@@ -1,160 +1,164 @@
 <template>
-  <div
-    tabindex="0"
-    @keydown.left="nextPhoto(-1)"
-    @keydown.right="nextPhoto(1)"
-    @keydown.esc="$emit('closePhotoDetail')"
-  >
-    <div class="row items-center q-pb-none">
-      <q-space />
-      <q-btn data-test-id="close-button" flat icon="mdi-close" round @click="$emit('closePhotoDetail')" />
+  <div tabindex="0" @keydown.left="nextPhoto(-1)" @keydown.right="nextPhoto(1)" @keydown.esc="emit('closePhotoDetail')">
+    <div class="flex items-center justify-end">
+      <Button data-test-id="close-button" rounded severity="secondary" text @click="emit('closePhotoDetail')">
+        <template #icon>
+          <IconX :size="24" />
+        </template>
+      </Button>
     </div>
-    <div class="row">
-      <div class="col-12 col-xl-9 col-lg-9 col-md-9 column items-center">
-        <div class="text-subtitle1 text-grey-7">{{ photoFileName }}</div>
-        <div class="text-subtitle1 text-grey-7 q-pb-md">({{ selectedImageIndex + 1 }}/{{ photoList.length }})</div>
-        <div class="relative-position full-width image-container">
-          <div id="photo-image-detail" class="flex justify-center items-center full-height">
-            <q-spinner v-show="loadImage" color="primary" size="4rem" />
+    <div class="grid grid-cols-4 gap-3">
+      <div class="col-span-4 lg:col-span-3 flex flex-col items-center">
+        <div class="w-full text-center mb-3">
+          <div class="">{{ photoFileName }}</div>
+          <div class="">({{ selectedImageIndex + 1 }}/{{ photosInAlbum.length }})</div>
+        </div>
+        <div class="relative w-full sm:min-h-96 lg:h-[calc(80vh-80px)] h-auto min-h-80">
+          <div id="photo-image-detail" class="flex justify-center items-center h-full">
+            <ProgressSpinner v-if="loadImage" />
             <img
-              v-show="!loadImage && selectedImage"
+              v-else
               :alt="photoFileName"
+              :height="!isPhotoLandscape && windowSize < 1024 && windowSize > 640 ? `${imageDisplayHeight}px` : ''"
               :src="selectedImage?.url || ''"
-              class="rounded-borders responsive-image"
-              style="margin: auto"
               :width="isPhotoLandscape ? `${imageDisplayWidth}px` : ''"
-              :height="!isPhotoLandscape && $q.screen.lt.md && $q.screen.gt.xs ? `${imageDisplayHeight}px` : ''"
+              class="rounded-md max-h-full"
               @load="loadImage = false"
             />
           </div>
-          <q-btn
-            class="absolute-right-centre"
-            color="accent"
-            icon="mdi-chevron-right"
-            round
-            style="height: 42px"
-            unelevated
-            data-test-id="next-photo-button"
-            @click="nextPhoto(1)"
-          />
-          <q-btn
-            class="absolute-left-centre"
-            color="accent"
-            icon="mdi-chevron-left"
-            round
-            style="height: 42px"
-            unelevated
+          <Button
+            :pt="{
+              root: {
+                style: {
+                  position: 'absolute',
+                  top: '50%',
+                  left: 0,
+                },
+              },
+            }"
             data-test-id="previous-photo-button"
+            rounded
             @click="nextPhoto(-1)"
-          />
+          >
+            <template #icon>
+              <IconChevronLeft :size="24" />
+            </template>
+          </Button>
+          <Button
+            :pt="{
+              root: {
+                style: {
+                  position: 'absolute',
+                  top: '50%',
+                  right: 0,
+                },
+              },
+            }"
+            data-test-id="next-photo-button"
+            rounded
+            @click="nextPhoto(1)"
+          >
+            <template #icon>
+              <IconChevronRight :size="24" />
+            </template>
+          </Button>
         </div>
       </div>
-      <div class="col-12 col-xl-3 col-lg-3 col-md-3 q-pt-md q-pt-xl-none q-pt-lg-none q-pt-md-none">
-        <q-list separator>
-          <q-item>
-            <q-item-section class="text-h5"> Details</q-item-section>
-            <EditPhotoButton
-              v-if="isAdminUser && selectedImage"
-              :photo-key="selectedImage?.key"
-              @refresh-photo-list="$emit('refreshPhotoList')"
-            />
-          </q-item>
-          <q-item v-if="dateTime">
-            <q-item-section avatar>
-              <q-icon name="mdi-calendar-today" />
-            </q-item-section>
-
-            <q-item-section>
-              <q-item-label>
-                {{ dateTime }}
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-item v-if="exifTags['Image Height'] && exifTags['Image Width']">
-            <q-item-section avatar>
-              <q-icon name="mdi-image" />
-            </q-item-section>
-
-            <q-item-section>
-              <q-item-label>
-                {{
-                  isPhotoLandscape || exifTags.Orientation?.value === 0
-                    ? `${imageOriginalWidth} x ${imageOriginalHeight}`
-                    : `${imageOriginalHeight} x ${imageOriginalWidth}`
-                }}
-              </q-item-label>
-              <q-item-label caption>
-                <span> f/{{ aperture }} </span>
-                <span v-if="exifTags.ExposureTime"> | {{ (exifTags.ExposureTime as NumberTag).description }} </span>
-                <span v-if="exifTags.FocalLength"> | {{ (exifTags.FocalLength as NumberTag).description }} </span>
-                <span v-if="exifTags.ISOSpeedRatings">
-                  | ISO{{ (exifTags.ISOSpeedRatings as NumberTag).description }}
-                </span>
-                <span> | EV{{ exposureBias }} </span>
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-item v-if="exifTags.Model">
-            <q-item-section avatar>
-              <q-icon name="mdi-camera" />
-            </q-item-section>
-
-            <q-item-section>
-              <q-item-label>
-                {{ exifTags.Make?.description }} {{ (exifTags.Model as StringArrayTag).value[0] }}
-              </q-item-label>
-              <q-item-label v-if="exifTags.LensModel" caption>
-                {{ (exifTags.LensModel as StringArrayTag).value[0] }}
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-item v-if="exifTags.GPSLatitudeRef && exifTags.GPSLongitudeRef && longitude > -1000 && latitude > -1000">
-            <q-item-section>
-              <PhotoLocationMap :latitude="latitude" :longitude="longitude" />
-            </q-item-section>
-          </q-item>
-        </q-list>
+      <div class="col-span-4 lg:col-span-1 mt-3 lg:mt-0">
+        <div class="flex justify-between mx-4">
+          <span class="text-2xl text-semibold">Details</span>
+          <EditPhotoButton
+            v-if="isAdmin && selectedImage"
+            :photo-key="selectedImage?.key"
+            @refresh-photo-list="emit('refreshPhotoList')"
+          />
+        </div>
+        <Divider v-if="dateTime" />
+        <div v-if="dateTime" class="flex items-center mx-4">
+          <IconCalendarTime :size="24" class="mr-4" />
+          <span>{{ dateTime }}</span>
+        </div>
+        <Divider v-if="exifTags['Image Height'] && exifTags['Image Width']" />
+        <div v-if="exifTags['Image Height'] && exifTags['Image Width']" class="flex items-center mx-4">
+          <IconPhoto :size="24" class="mr-4" />
+          <div>
+            <div>
+              {{
+                isPhotoLandscape || exifTags.Orientation?.value === 0
+                  ? `${imageOriginalWidth} x ${imageOriginalHeight}`
+                  : `${imageOriginalHeight} x ${imageOriginalWidth}`
+              }}
+            </div>
+            <small class="text-gray-500">
+              <span>f/{{ aperture }}</span>
+              <span v-if="exifTags.ExposureTime"> | {{ (exifTags.ExposureTime as NumberTag).description }}</span>
+              <span v-if="exifTags.FocalLength"> | {{ (exifTags.FocalLength as NumberTag).description }}</span>
+              <span v-if="exifTags.ISOSpeedRatings">
+                | ISO{{ (exifTags.ISOSpeedRatings as NumberTag).description }}
+              </span>
+              <span> | EV{{ exposureBias }}</span>
+            </small>
+          </div>
+        </div>
+        <Divider v-if="exifTags.Model" />
+        <div v-if="exifTags.Model" class="flex items-center mx-4">
+          <IconCamera :size="24" class="mr-4" />
+          <div>
+            <div>{{ exifTags.Make?.description }} {{ (exifTags.Model as StringArrayTag).value[0] }}</div>
+            <small v-if="exifTags.LensModel" class="text-gray-500">
+              {{ (exifTags.LensModel as StringArrayTag).value[0] }}
+            </small>
+          </div>
+        </div>
+        <Divider v-if="exifTags.GPSLatitudeRef && exifTags.GPSLongitudeRef" />
+        <div
+          v-if="exifTags.GPSLatitudeRef && exifTags.GPSLongitudeRef && longitude > -1000 && latitude > -1000"
+          class="mx-4"
+        >
+          <PhotoLocationMap :latitude="latitude" :longitude="longitude" />
+        </div>
       </div>
     </div>
   </div>
+  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
-import EditPhotoButton from 'components/button/EditPhotoButton.vue';
-import PhotoLocationMap from 'components/PhotoLocationMap.vue';
+import EditPhotoButton from '@/components/button/EditPhotoButton.vue';
+import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
+import PhotosContext from '@/composables/photos-context';
+import UserConfigContext from '@/composables/user-config-context';
+import DeviceContext from '@/services/device-context';
+import { IconCalendarTime, IconCamera, IconChevronLeft, IconChevronRight, IconPhoto, IconX } from '@tabler/icons-vue';
+import type { ExifTags, FileTags, NumberTag, StringArrayTag } from 'exifreader';
 import * as ExifReader from 'exifreader';
-import { ExifTags, FileTags, NumberTag, StringArrayTag } from 'exifreader';
-import { useQuasar } from 'quasar';
-import { photoStore } from 'stores/photo-store';
-import { userStore } from 'stores/user-store';
+import Button from 'primevue/button';
+import Divider from 'primevue/divider';
+import ProgressSpinner from 'primevue/progressspinner';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 
 type ExifData = ExifTags & FileTags;
 
-defineEmits(['refreshPhotoList', 'closePhotoDetail']);
-const userPermissionStore = userStore();
-const usePhotoStore = photoStore();
+const emit = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 
-const q = useQuasar();
+const toast = useToast();
 const router = useRouter();
 const route = useRoute();
+const { isAdmin } = UserConfigContext();
+const { photosInAlbum, isFetchingPhotos, findPhotoByIndex, findPhotoIndex } = PhotosContext();
+const { windowSize } = DeviceContext();
 
 const selectedImageIndex = ref(-1);
 const photoFileName = ref('');
 const exifTags = ref({} as ExifData);
 const loadImage = ref(false);
-
 const imageContainerWidth = ref(0);
 const imageContainerHeight = ref(0);
 
-const isAdminUser = computed(() => userPermissionStore.isAdminUser);
-const selectedImage = computed(() => usePhotoStore.findPhotoByIndex(selectedImageIndex.value));
-const photoList = computed(() => usePhotoStore.photoList);
-const fetchingPhotos = computed(() => usePhotoStore.fetchingPhotos);
+const selectedImage = computed(() => findPhotoByIndex(selectedImageIndex.value));
 const albumId = computed(() => route.params['albumId'] as string);
 const albumYear = computed(() => route.params['year'] as string);
 const photoId = computed(() => route.query['photo'] as string);
@@ -165,7 +169,7 @@ const dateTime = computed(() => {
     const dateTime = exifTags.value.DateTime?.description.split(' ');
     const time = dateTime[1]?.split(':');
     const composeTime = time ? time[0] + ':' + time[1] : '';
-    return `${dateTime[0]?.replaceAll(':', '/')} ${composeTime} ${exifTags.value.OffsetTime?.value?.[0] ?? ''}`;
+    return `${dateTime[0]?.replace(':', '/')} ${composeTime} ${exifTags.value.OffsetTime?.value?.[0] ?? ''}`;
   }
   return '';
 });
@@ -194,8 +198,8 @@ const exposureBias = computed(() => parseFloat(exifTags.value.ExposureBiasValue?
 
 const aperture = computed(() =>
   parseFloat(exifTags.value.ApertureValue?.description ?? exifTags.value.MaxApertureValue?.description ?? '0').toFixed(
-    1
-  )
+    1,
+  ),
 );
 
 const imageOriginalWidth = computed(() => Number(exifTags.value['Image Width']?.value ?? 0));
@@ -206,7 +210,7 @@ const isPhotoLandscape = computed(
       exifTags.value.Orientation?.value === 0 ||
       exifTags.value.Orientation?.value === 1 ||
       exifTags.value.Orientation?.value === 3) &&
-    imageOriginalWidth.value > imageOriginalHeight.value
+    imageOriginalWidth.value > imageOriginalHeight.value,
 );
 /** Compute photo EXIF data end */
 
@@ -227,10 +231,9 @@ const imageDisplayHeight = computed(() => {
 });
 
 const nextPhoto = (dir: number) => {
-  q.loadingBar.start();
   exifTags.value = {};
 
-  const photoListLength = photoList.value.length;
+  const photoListLength = photosInAlbum.value.length;
   selectedImageIndex.value = (selectedImageIndex.value + (dir % photoListLength) + photoListLength) % photoListLength;
 
   if (selectedImage.value) {
@@ -248,24 +251,23 @@ watch(loadImage, () => {
 watch(
   photoId,
   (newId) => {
-    if (fetchingPhotos.value) return;
+    if (isFetchingPhotos.value) return;
 
     if (newId) {
-      selectedImageIndex.value = usePhotoStore.findPhotoIndex(newId);
+      selectedImageIndex.value = findPhotoIndex(newId);
 
       if (selectedImageIndex.value === -1) {
-        q.notify({
-          timeout: 2000,
-          progress: true,
-          color: 'negative',
-          icon: 'mdi-alert-circle',
-          message: 'Photo does not exist',
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Photo does not exist',
+          life: 3000,
         });
         setTimeout(() => router.push(`/album/${albumYear.value}/${albumId.value}`), 3000);
       }
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 );
 
 // If photo exists based on URL, get EXIF data from photo
@@ -282,32 +284,10 @@ watch(
       } catch (error) {
         console.error(error);
       } finally {
-        q.loadingBar.stop();
+        loadImage.value = false;
       }
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 );
 </script>
-
-<style lang="scss" scoped>
-@media only screen and (max-width: 599px) {
-  .image-container {
-    height: inherit;
-    min-height: 300px;
-  }
-}
-
-@media only screen and (min-width: 600px) and (max-width: 1023px) {
-  .image-container {
-    height: inherit;
-    min-height: 400px;
-  }
-}
-
-@media only screen and (min-width: 1024px) {
-  .image-container {
-    height: 80vh;
-  }
-}
-</style>

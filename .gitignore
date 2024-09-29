@@ -1,19 +1,23 @@
-.DS_Store
-.thumbs.db
-node_modules/
-
-# Quasar core related directories
-.quasar
-dist/
-coverage/
-# Log files
+# Logs
+logs
 *.log
 
+node_modules
+.DS_Store
+dist
+dist-ssr
+coverage
+*.local
+
 # Editor directories and files
+.vscode/*
+!.vscode/extensions.json
 .idea
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+*.sw?
 
+*.tsbuildinfo
 .env

@@ -1,24 +1,25 @@
-import HttpRequestService from 'src/services/http-request-service';
-import { ApiResponse, UserPermission } from 'src/types';
+import type { ApiResponse, UserPermission } from '@/schema';
+import { ApiBaseUrl } from '@/services/api-base-url';
+import { BaseApiRequestService } from '@/services/base-api-request-service';
 
-export default class AuthService extends HttpRequestService<UserPermission> {
-  constructor() {
-    super();
-    this.baseUrl = this.baseUrl + '/auth';
-  }
+export const AuthService = {
+  login: async (token: string): Promise<ApiResponse<UserPermission>> => {
+    const response = await BaseApiRequestService.perform('POST', `${ApiBaseUrl}/auth/verifyIdToken`, { token });
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    return response.json();
+  },
 
-  verifyIdToken(token: string): Promise<ApiResponse<UserPermission>> {
-    this.setDisplayingParameters(true);
-    return this.perform('POST', '/verifyIdToken', { token });
-  }
+  userInfo: async (): Promise<ApiResponse<UserPermission>> => {
+    const response = await BaseApiRequestService.perform('GET', `${ApiBaseUrl}/auth/userInfo`);
+    return response.json();
+  },
 
-  getUserInfo(): Promise<ApiResponse<UserPermission>> {
-    this.setDisplayingParameters(false);
-    return this.perform('GET', '/userInfo');
-  }
-
-  logout(): Promise<void> {
-    this.setDisplayingParameters(true);
-    return this.perform('POST', '/logout');
-  }
-}
+  logout: async (): Promise<void> => {
+    const response = await BaseApiRequestService.perform('POST', `${ApiBaseUrl}/auth/logout`);
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+  },
+};

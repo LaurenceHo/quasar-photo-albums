@@ -1,40 +1,27 @@
-import HttpRequestService from 'src/services/http-request-service';
-import { ApiResponse, PhotoResponse, ResponseStatus } from 'src/types';
+import type { ApiResponse, PhotoResponse, ResponseStatus } from '@/schema';
+import { ApiBaseUrl } from '@/services/api-base-url';
+import { BaseApiRequestService } from '@/services/base-api-request-service';
 
-export default class PhotoService extends HttpRequestService<PhotoResponse> {
-  constructor() {
-    super();
-    this.baseUrl = this.baseUrl + '/photos';
-  }
+export const PhotoService = {
+  getPhotosByAlbumId: async (albumId: string, year: string): Promise<ApiResponse<PhotoResponse>> => {
+    const response = await BaseApiRequestService.perform('GET', `${ApiBaseUrl}/photos/${year}/${albumId}`);
 
-  getPhotosByAlbumId(albumId: string, year: string): Promise<ApiResponse<PhotoResponse>> {
-    this.setDisplayingParameters(true);
-    return this.perform('GET', `/${year}/${albumId}`);
-  }
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
 
-  uploadPhotos(file: any, albumId: string): Promise<ResponseStatus> {
-    this.setDisplayingParameters(true);
-    return this.perform('POST', `/upload/${albumId}`, null, null, { file });
-  }
+    return response.json();
+  },
 
-  /**
-   * Move photos from one album to another
-   * @param albumId Original album ID
-   * @param destinationAlbumId Destination album ID
-   * @param photoKeys Keys of photos to be moved
-   */
-  movePhotos(albumId: string, destinationAlbumId: string, photoKeys: string[]): Promise<ResponseStatus> {
-    this.setDisplayingParameters(true, 'Photos moved');
-    return this.perform('PUT', '', { albumId, destinationAlbumId, photoKeys });
-  }
+  uploadPhotos: async (file: File, albumId: string): Promise<ResponseStatus> => {
+    const response = await BaseApiRequestService.perform('POST', `${ApiBaseUrl}/photos/upload/${albumId}`, null, null, {
+      file,
+    });
 
-  renamePhoto(albumId: string, newPhotoKey: string, currentPhotoKey: string): Promise<ResponseStatus> {
-    this.setDisplayingParameters(true, 'Photo renamed');
-    return this.perform('PUT', '/rename', { albumId, newPhotoKey, currentPhotoKey });
-  }
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
 
-  deletePhotos(albumId: string, photoKeys: string[]): Promise<ResponseStatus> {
-    this.setDisplayingParameters(true, 'Photos deleted');
-    return this.perform('DELETE', '', { albumId, photoKeys });
-  }
-}
+    return response.json();
+  },
+};
