@@ -1,4 +1,4 @@
-import { PlaceSchema } from 'src/types/place';
+import { PlaceSchema } from '@/schema/place';
 import { z } from 'zod';
 
 export const AlbumSchema = z.object({

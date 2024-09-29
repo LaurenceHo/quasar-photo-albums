@@ -18,7 +18,6 @@ export default function UserConfigContext() {
   };
 
   const setDarkMode = (mode: boolean) => {
-    console.log('### mode', mode);
     darkMode.value = mode;
     localStorage.setItem(DARK_MODE_ENABLED, mode ? 'true' : 'false');
   };

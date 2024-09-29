@@ -1,9 +1,9 @@
-import { UploadFile as IUploadFile } from 'src/types';
+import type { UploadFile as IUploadFile } from '@/schema';
 import { ref } from 'vue';
 
-export default function () {
-  const files = ref<IUploadFile[]>([]);
+const files = ref<IUploadFile[]>([]);
 
+export default function FileListContext() {
   const addFiles = (newFiles: IUploadFile[]) => {
     const newUploadFiles = [...newFiles].map((file) => new UploadFile(file)).filter((file) => !fileExists(file.id));
     files.value = files.value.concat(newUploadFiles);

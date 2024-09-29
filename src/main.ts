@@ -6,10 +6,10 @@ import Aura from '@primevue/themes/aura';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
+import Tooltip from 'primevue/tooltip';
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
-import Tooltip from 'primevue/tooltip';
 
 const prepareApp = async () => {
   const { worker } = await import('./mocks/browser');

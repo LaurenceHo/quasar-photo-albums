@@ -7,7 +7,7 @@ const uploadPhotoDialogState = ref(false);
 const updateAlbumDialogState = ref(false);
 const updateAlbumTagsDialogState = ref(false);
 
-export default function DialogStateComposable() {
+export default function DialogContext() {
   const setRenamePhotoDialogState = (state: boolean) => {
     renamePhotoDialogState.value = state;
   };

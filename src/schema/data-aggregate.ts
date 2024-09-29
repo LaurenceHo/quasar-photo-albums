@@ -1,11 +1,11 @@
-import { AlbumSchema } from 'src/types/album';
+import { AlbumSchema } from '@/schema/album';
 import { z } from 'zod';
 
 export const AlbumsByYearSchema = z.array(
   z.object({
     year: z.string(),
     count: z.number(),
-  })
+  }),
 );
 
 export const AggregateTypeSchema = z.enum(['albumsWithLocation', 'countAlbumsByYear', 'featuredAlbums']);

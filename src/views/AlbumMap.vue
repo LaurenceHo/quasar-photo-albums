@@ -1,43 +1,42 @@
 <template>
-  <div id="album-location-map"></div>
+  <ProgressBar v-if="isFetching" mode="indeterminate" style="height: 4px"></ProgressBar>
+  <div
+    id="album-location-map"
+    :class="`${isFetching ? 'mt-[72px]' : 'mt-16'} absolute top-0 bottom-0 left-0 right-0 w-full`"
+  ></div>
 </template>
 
 <script lang="ts" setup>
-import { Album as AlbumItem, ApiResponse } from 'src/types';
-import { Feature, Point } from 'geojson';
+import type { Album, Album as AlbumItem, ApiResponse } from '@/schema';
+import { AggregateService } from '@/services/aggregate-service';
+import { compareDbUpdatedTime, fetchDbUpdatedTime } from '@/utils/helper';
+import { ALBUMS_WITH_LOCATION } from '@/utils/local-storage-key';
+import { useQuery } from '@tanstack/vue-query';
+import type { Feature, Point } from 'geojson';
 import mapboxgl from 'mapbox-gl';
-import { LocalStorage } from 'quasar';
+import ProgressBar from 'primevue/progressbar';
 import { get } from 'radash';
-import AggregateService from 'src/services/aggregate-service';
-import { compareDbUpdatedTime, fetchDbUpdatedTime } from 'src/utils/helper';
-import { albumStore } from 'stores/album-store';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted } from 'vue';
 
 interface GeoJson {
   type: 'FeatureCollection';
   features: Feature[];
 }
+
 interface AlbumsWithLocation {
   dbUpdatedTime: string;
   albums: AlbumItem[];
 }
 
-const aggregateService = new AggregateService();
+const cdnURL = import.meta.env.VITE_IMAGEKIT_CDN_URL as string;
+const mapCentreLng = Number(import.meta.env.VITE_MAP_CENTRE_LNG ?? 174.7633);
+const mapCentreLat = Number(import.meta.env.VITE_MAP_CENTRE_LAT ?? -36.8484);
 
-const cdnURL = process.env.IMAGEKIT_CDN_URL as string;
-const mapCentreLng = Number(process.env.MAP_CENTRE_LNG ?? 174.7633);
-const mapCentreLat = Number(process.env.MAP_CENTRE_LAT ?? -36.8484);
-
-const store = albumStore();
-const albumsWithLocation = ref<AlbumItem[]>([]);
-const isFetching = ref(false);
-
-const albumsHaveLocationFromStore = computed(() => store.albumsHaveLocation);
 const geoJson = computed(
   () =>
     ({
       type: 'FeatureCollection',
-      features: albumsWithLocation.value.map((album: AlbumItem) => {
+      features: albumsWithLocation.value?.map((album: AlbumItem) => {
         return {
           type: 'Feature',
           geometry: {
@@ -59,29 +58,58 @@ const geoJson = computed(
           },
         };
       }),
-    }) as GeoJson
+    }) as GeoJson,
 );
 
+/** Get albums with location and set to local storage */
 const fetchAlbumsWithLocation = async (dbUpdatedTime?: string) => {
   let time = dbUpdatedTime;
   if (!time) {
     time = await fetchDbUpdatedTime();
   }
 
-  const result = (await aggregateService.getAggregateData('albumsWithLocation')) as ApiResponse<AlbumItem[]>;
-  if ((get(result, 'data') as AlbumItem[]).length > 0) {
-    LocalStorage.set(
-      'ALBUMS_WITH_LOCATION',
-      JSON.stringify({ dbUpdatedTime: time, albums: result.data } as AlbumsWithLocation)
-    );
+  const {
+    data: albums,
+    code,
+    message,
+  } = (await AggregateService.getAggregateData('albumsWithLocation')) as ApiResponse<AlbumItem[]>;
+
+  if (code !== 200) {
+    throw Error(message);
+  }
+
+  if (albums) {
+    localStorage.setItem(ALBUMS_WITH_LOCATION, JSON.stringify({ dbUpdatedTime: time, albums } as AlbumsWithLocation));
   }
 };
+
+const { data: albumsWithLocation, isFetching } = useQuery({
+  queryKey: ['albumsWithLocation'],
+  queryFn: async () => {
+    if (!localStorage.getItem(ALBUMS_WITH_LOCATION)) {
+      await fetchAlbumsWithLocation();
+    } else {
+      const compareResult = await compareDbUpdatedTime(
+        JSON.parse(<string>localStorage.getItem(ALBUMS_WITH_LOCATION)).dbUpdatedTime,
+      );
+      if (!compareResult.isLatest) {
+        await fetchAlbumsWithLocation(compareResult.dbUpdatedTime);
+      }
+    }
+
+    return get(
+      JSON.parse(localStorage.getItem(ALBUMS_WITH_LOCATION) || '{}') as AlbumsWithLocation,
+      'albums',
+      [],
+    ) as Album[];
+  },
+});
 
 const inspectCluster = (
   map: mapboxgl.Map,
   e: (mapboxgl.MapMouseEvent | mapboxgl.MapTouchEvent) & {
     features?: mapboxgl.GeoJSONFeature[] | undefined;
-  }
+  },
 ) => {
   const features: Feature[] = map.queryRenderedFeatures(e.point, {
     layers: ['clusters'],
@@ -116,25 +144,7 @@ const createPopup = (map: mapboxgl.Map, event: any, popup: mapboxgl.Popup) => {
 };
 
 onMounted(async () => {
-  isFetching.value = true;
-  if (!LocalStorage.getItem('ALBUMS_WITH_LOCATION')) {
-    await fetchAlbumsWithLocation();
-  } else {
-    const compareResult = await compareDbUpdatedTime(
-      JSON.parse(<string>LocalStorage.getItem('ALBUMS_WITH_LOCATION')).dbUpdatedTime
-    );
-    if (!compareResult.isLatest) {
-      await fetchAlbumsWithLocation(compareResult.dbUpdatedTime);
-    }
-  }
-  isFetching.value = false;
-
-  const albumsStringFromLocalStorage: string = LocalStorage.getItem('ALBUMS_WITH_LOCATION') || '';
-
-  albumsWithLocation.value =
-    get(JSON.parse(albumsStringFromLocalStorage), 'albums', albumsHaveLocationFromStore.value) || [];
-
-  mapboxgl.accessToken = process.env.MAPBOX_API_KEY as string;
+  mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY as string;
   const map = new mapboxgl.Map({
     container: 'album-location-map',
     style: 'mapbox://styles/mapbox/standard',
@@ -239,13 +249,6 @@ onMounted(async () => {
 </script>
 
 <style lang="scss">
-#album-location-map {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-}
-
 .mapboxgl-popup {
   max-width: 300px !important;
 }

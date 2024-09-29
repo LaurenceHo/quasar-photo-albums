@@ -1,5 +1,5 @@
-import { AlbumSchema } from 'src/types/album';
-import { PhotoSchema } from 'src/types/photo';
+import { AlbumSchema } from '@/schema/album';
+import { PhotoSchema } from '@/schema/photo';
 import { z } from 'zod';
 
 const PhotoResponseSchema = z.object({

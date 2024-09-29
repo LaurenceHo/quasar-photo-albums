@@ -45,20 +45,26 @@
     <template #header>
       <h6 class="text-xl font-semibold">New tag</h6>
     </template>
-    <form @submit.prevent="confirmCreateTag" @reset.prevent="onReset">
+    <form @submit.prevent="validateAndSubmit" @reset.prevent="onReset">
       <div class="mb-4">
         <InputText
           v-model="tagName"
-          :invalid="!tagName"
+          :invalid="v$.tagName.$invalid && v$.tagName.$dirty"
           class="w-full"
           data-test-id="input-album-tag"
           placeholder="Tag"
+          @input="v$.tagName.$touch"
         />
-        <small v-if="!tagName" class="text-red-500">This field is required</small>
+        <small v-if="v$.tagName.$error" class="text-red-500">
+          <span v-if="v$.tagName.required.$invalid">This field is required.</span>
+          <span v-else-if="v$.tagName.minLength.$invalid">Tag must be at least 2 characters long.</span>
+          <span v-else-if="v$.tagName.maxLength.$invalid">Tag cannot exceed 20 characters.</span>
+          <span v-else-if="v$.tagName.alphaNum.$invalid">Tag must contain only lowercase letters and numbers.</span>
+        </small>
       </div>
       <div class="flex justify-end">
         <Button :disabled="isCreatingTag" class="mr-2" label="Cancel" text @click="createTagDialog = false" />
-        <Button :loading="isCreatingTag" label="Confirm" type="submit" />
+        <Button :disabled="v$.$invalid" :loading="isCreatingTag" label="Confirm" type="submit" />
       </div>
     </form>
   </Dialog>
@@ -104,6 +110,8 @@ import { AlbumTagService } from '@/services/album-tag-service';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
+import { useVuelidate } from '@vuelidate/core';
+import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/InputText';
@@ -125,6 +133,24 @@ const tagName = ref('');
 const paramsYear = computed(() => route.params['year'] as string);
 const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(<string>localStorage.getItem(FILTERED_ALBUMS_BY_YEAR));
 
+const rules = {
+  tagName: {
+    required,
+    minLength: minLength(2),
+    maxLength: maxLength(20),
+    alphaNum: helpers.regex(/^[a-z0-9]+$/),
+  },
+};
+
+const v$ = useVuelidate(rules, { tagName });
+
+const validateAndSubmit = async () => {
+  const isFormCorrect = await v$.value.$validate();
+  if (isFormCorrect) {
+    confirmCreateTag();
+  }
+};
+
 const { isPending: isCreatingTag, mutate: createAlbumTag } = useMutation({
   mutationFn: () => AlbumTagService.createAlbumTags([{ tag: tagName.value }]),
   onSuccess: async () => {
@@ -135,7 +161,6 @@ const { isPending: isCreatingTag, mutate: createAlbumTag } = useMutation({
       life: 3000,
     });
     await fetchAlbumTags(true);
-    await fetchAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year, true);
     createTagDialog.value = false;
     tagName.value = '';
   },
