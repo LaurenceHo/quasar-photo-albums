@@ -14,10 +14,10 @@ export const initialiseS3Bucket = async () => {
   try {
     ifBucketExists = await s3Service.checkIfBucketExists({ Bucket: s3BucketName });
     if (ifBucketExists) {
-      logger().info(`Bucket ${s3BucketName} is ready👍`);
+      logger().info(`Bucket ${s3BucketName} is ready.`);
     } else {
       await waitUntilBucketExists({ client: s3Client, maxWaitTime: 20 }, { Bucket: s3BucketName });
-      logger().info(`Bucket ${s3BucketName} is finally ready👍`);
+      logger().info(`Bucket ${s3BucketName} is finally ready.`);
     }
   } catch (err) {
     logger().error(err);
@@ -26,7 +26,7 @@ export const initialiseS3Bucket = async () => {
 
   const exists = await s3Service.checkIfFileExists({
     Bucket: s3BucketName,
-    Key: 'updateDatabaseAt.json',
+    Key: 'updateDatabaseAt.json'
   });
   if (!exists) {
     fs.readFile('./assets/example_photo1.webp', async (err, data) => {

@@ -8,8 +8,8 @@
               <div class="relative cursor-pointer">
                 <SquareImage
                   v-if="albumItem['albumCover']"
-                  :src="`${cdnURL}/${encodeURI(albumItem?.['albumCover'])}?tr=w-240,h-240`"
                   :alt="`photo album ${albumItem.albumName}`"
+                  :src="`${cdnURL}/${encodeURI(albumItem?.['albumCover'])}?tr=w-240,h-240`"
                 />
                 <NoImagePlaceholder v-else />
                 <div
@@ -30,9 +30,9 @@
           style: {
             position: 'absolute',
             top: '35%',
-            left: 0,
-          },
-        },
+            left: 0
+          }
+        }
       }"
       rounded
       @click="scrollPrev"
@@ -49,9 +49,9 @@
           style: {
             position: 'absolute',
             top: '35%',
-            right: 0,
-          },
-        },
+            right: 0
+          }
+        }
       }"
       rounded
       @click="scrollNext"
@@ -89,8 +89,8 @@ const props = defineProps({
   featuredAlbums: {
     type: Array as () => Album[],
     required: true,
-    default: () => [],
-  },
+    default: () => []
+  }
 });
 
 const cdnURL = import.meta.env.VITE_IMAGEKIT_CDN_URL as string;

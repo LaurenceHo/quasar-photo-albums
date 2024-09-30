@@ -10,11 +10,11 @@ export const AlbumSchema = z.object({
   isPrivate: z.boolean(),
   isFeatured: z.boolean().optional().nullable(),
   tags: z.array(z.string()).optional(),
-  place: PlaceSchema.optional().nullable(),
+  place: PlaceSchema.optional().nullable()
 });
 
 export const AlbumTagSchema = z.object({
-  tag: z.string(),
+  tag: z.string()
 });
 
 export type AlbumTag = z.infer<typeof AlbumTagSchema>;

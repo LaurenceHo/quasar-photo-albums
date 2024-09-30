@@ -35,9 +35,9 @@
     <ToggleSwitch v-model="privateAlbum" class="ml-2" data-test-id="album-private-toggle" />
   </div>
   <div v-if="isFetchingFeaturedAlbums" class="py-4">
-    <Skeleton width="10rem" height="2rem" class="mb-4" />
+    <Skeleton class="mb-4" height="2rem" width="10rem" />
     <div class="flex">
-      <Skeleton class="mr-4" :size="isXSmallDevice ? '10rem' : '12rem'"></Skeleton>
+      <Skeleton :size="isXSmallDevice ? '10rem' : '12rem'" class="mr-4"></Skeleton>
       <Skeleton :size="isXSmallDevice ? '10rem' : '12rem'"></Skeleton>
     </div>
   </div>
@@ -120,7 +120,7 @@ const paramsYear = computed(() => route.params['year'] as string);
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
 const firstIndex = computed(() => (pageNumber.value - 1) * itemsPerPage.value);
 const lastIndex = computed(() =>
-  totalPages.value > pageNumber.value ? firstIndex.value + itemsPerPage.value : totalItems.value,
+  totalPages.value > pageNumber.value ? firstIndex.value + itemsPerPage.value : totalItems.value
 );
 const totalItems = computed(() => filteredAlbumList.value.length);
 const chunkAlbumList = computed(() => {
@@ -149,7 +149,7 @@ fetchAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year).catch(() => {
     severity: 'error',
     summary: 'Error',
     detail: 'Error while fetching albums. Please try again later.',
-    life: 3000,
+    life: 3000
   });
 });
 
@@ -163,7 +163,7 @@ const fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string) =
   const {
     data: albums,
     code,
-    message,
+    message
   } = (await AggregateService.getAggregateData('featuredAlbums')) as ApiResponse<AlbumItem[]>;
   if (code !== 200) {
     throw Error(message);
@@ -174,8 +174,8 @@ const fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string) =
       FEATURED_ALBUMS,
       JSON.stringify({
         dbUpdatedTime: time,
-        albums,
-      } as FeaturedAlbums),
+        albums
+      } as FeaturedAlbums)
     );
   }
 };
@@ -187,7 +187,7 @@ const { data: featuredAlbums, isFetching: isFetchingFeaturedAlbums } = useQuery(
       await fetchFeaturedAlbumsAndSetToLocalStorage();
     } else {
       const compareResult = await compareDbUpdatedTime(
-        JSON.parse(<string>localStorage.getItem(FEATURED_ALBUMS)).dbUpdatedTime,
+        JSON.parse(<string>localStorage.getItem(FEATURED_ALBUMS)).dbUpdatedTime
       );
       if (!compareResult.isLatest) {
         await fetchFeaturedAlbumsAndSetToLocalStorage(compareResult.dbUpdatedTime);
@@ -197,9 +197,9 @@ const { data: featuredAlbums, isFetching: isFetchingFeaturedAlbums } = useQuery(
     return get(
       JSON.parse(localStorage.getItem(FEATURED_ALBUMS) || '{}') as FeaturedAlbums,
       'albums',
-      [],
+      []
     ) as AlbumItem[];
-  },
+  }
 });
 
 watch(albumList, (newValue) => {
@@ -221,7 +221,7 @@ watch(
       filteredList = filteredList.filter(
         (album) =>
           album.albumName.toLowerCase().includes(lowerSearchKey) ||
-          album.description?.toLowerCase().includes(lowerSearchKey),
+          album.description?.toLowerCase().includes(lowerSearchKey)
       );
     }
     if (newSelectedTags.length > 0) {
@@ -236,7 +236,7 @@ watch(
       filteredList = filterByTags;
     }
     filteredAlbumList.value = sortByKey(filteredList, 'albumName', newSortOrder);
-  },
+  }
 );
 
 watch(paramsYear, (newValue) => {

@@ -13,7 +13,7 @@
         </button>
       </template>
     </Menu>
-    <Dialog v-model:visible="deleteAlbumDialog" class="max-w-96" data-test-id="confirm-delete-album-dialog" modal>
+    <Dialog v-model:visible="deleteAlbumDialog" class="w-96" data-test-id="confirm-delete-album-dialog" modal>
       <template #header>
         <div class="flex items-center">
           <IconAlertCircle :size="40" class="text-red-400 pr-2 flex-shrink-0" />
@@ -68,8 +68,8 @@ const props = defineProps({
   albumItem: {
     type: Object as () => Album,
     required: true,
-    default: () => initialAlbum as Album,
-  },
+    default: () => initialAlbum as Album
+  }
 });
 
 const { albumItem } = toRefs(props);
@@ -94,7 +94,7 @@ const setAlbum = () => {
 const {
   isPending,
   mutate: deleteAlbum,
-  reset,
+  reset
 } = useMutation({
   mutationFn: () => AlbumService.deleteAlbum(albumItem.value.id, albumItem.value.year),
   onSuccess: async () => {
@@ -102,7 +102,7 @@ const {
       severity: 'success',
       summary: 'Success',
       detail: 'Album deleted.',
-      life: 3000,
+      life: 3000
     });
     await fetchAlbumsByYear(route.params.year as string, true);
     deleteAlbumDialog.value = false;
@@ -112,9 +112,9 @@ const {
       severity: 'error',
       summary: 'Error',
       detail: 'Error while deleting album. Please try again later.',
-      life: 3000,
+      life: 3000
     });
-  },
+  }
 });
 
 const confirmDeleteAlbum = (e: MouseEvent) => {
@@ -126,12 +126,12 @@ const menuItems = [
   {
     label: 'Edit Album',
     icon: IconEdit,
-    command: setAlbum,
+    command: setAlbum
   },
   {
     label: 'Delete Album',
     icon: IconTrash,
-    command: () => (deleteAlbumDialog.value = true),
-  },
+    command: () => (deleteAlbumDialog.value = true)
+  }
 ];
 </script>

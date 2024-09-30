@@ -71,7 +71,7 @@
   },
   "lint-staged": {
     "*.{ts,vue}": [
-      "eslint --fix"
+      "eslint --fix", "prettier --write src/"
     ]
   },
   "msw": {

@@ -46,8 +46,8 @@ const props = defineProps({
   albumItem: {
     type: Object as () => Album,
     required: true,
-    default: () => initialAlbum,
-  },
+    default: () => initialAlbum
+  }
 });
 
 const { isAdmin } = UserConfigContext();

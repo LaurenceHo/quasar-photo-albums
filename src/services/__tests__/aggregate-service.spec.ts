@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { AggregateService } from '../aggregate-service';
-import { BaseApiRequestService } from '@/services/base-api-request-service';
 import { ApiBaseUrl } from '@/services/api-base-url';
+import { BaseApiRequestService } from '@/services/base-api-request-service';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { AggregateService } from '../aggregate-service';
 
 vi.mock('@/services/base-api-request-service', () => ({
   BaseApiRequestService: {
-    perform: vi.fn(),
-  },
+    perform: vi.fn()
+  }
 }));
 
 describe('AggregateService', () => {

@@ -1,6 +1,6 @@
 import PhotosContext from '@/composables/photos-context';
-import { PhotoService } from '@/services/photo-service';
 import type { UploadFile } from '@/schema';
+import { PhotoService } from '@/services/photo-service';
 import { ref } from 'vue';
 
 const isUploading = ref(false);
@@ -39,7 +39,7 @@ export default function FileUploaderContext() {
 
   const createUploader = (albumId: string) => ({
     uploadFile: (file: UploadFile) => uploadFile(file, albumId),
-    uploadFiles: (files: UploadFile[]) => uploadFiles(files, albumId),
+    uploadFiles: (files: UploadFile[]) => uploadFiles(files, albumId)
   });
 
   return { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, overwrite };

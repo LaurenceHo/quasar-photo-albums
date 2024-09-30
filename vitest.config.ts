@@ -10,10 +10,10 @@ export default mergeConfig(
       coverage: {
         provider: 'v8',
         reportsDirectory: 'coverage',
-        exclude: ['**/**.js', '**/**.d.ts', '*.config.*', '**/**/__tests__/**', 'src/mocks/**'],
+        exclude: ['**/**.js', '**/**.d.ts', '*.config.*', '**/**/__tests__/**', 'src/mocks/**', 'server/**'],
       },
       environment: 'jsdom',
-      exclude: [...configDefaults.exclude, 'e2e/**'],
+      exclude: [...configDefaults.exclude, 'e2e/**', 'server/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
     },
   }),

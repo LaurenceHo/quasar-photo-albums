@@ -6,5 +6,5 @@ export const AggregateService = {
   getAggregateData: async (type: AggregateType): Promise<ApiResponse<DataAggregateValueMap[typeof type]>> => {
     const response = await BaseApiRequestService.perform('GET', `${ApiBaseUrl}/aggregate/${type}`);
     return response.json();
-  },
+  }
 };

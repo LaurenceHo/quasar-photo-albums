@@ -11,7 +11,7 @@ export const initialAlbum: Album = {
   albumCover: '',
   description: '',
   tags: [],
-  isPrivate: true,
+  isPrivate: true
 };
 
 export interface FilteredAlbumsByYear {
@@ -42,8 +42,8 @@ const _fetchAlbumsAndSetToLocalStorage = async (year: string | undefined, dbUpda
       JSON.stringify({
         dbUpdatedTime: time,
         year,
-        albums,
-      } as FilteredAlbumsByYear),
+        albums
+      } as FilteredAlbumsByYear)
     );
   }
 };
@@ -68,7 +68,7 @@ export default function AlbumsContext() {
         await _fetchAlbumsAndSetToLocalStorage(year);
       } else {
         const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(
-          <string>localStorage.getItem(FILTERED_ALBUMS_BY_YEAR),
+          <string>localStorage.getItem(FILTERED_ALBUMS_BY_YEAR)
         );
         const compareResult = await compareDbUpdatedTime(filteredAlbumsByYear.dbUpdatedTime);
         // If local storage is not the latest data or request year is different from local storage (user selects year
@@ -80,7 +80,7 @@ export default function AlbumsContext() {
 
       // Get albums from local storage again
       const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(
-        localStorage.getItem(FILTERED_ALBUMS_BY_YEAR) || '{}',
+        localStorage.getItem(FILTERED_ALBUMS_BY_YEAR) || '{}'
       );
       albumList.value = sortByKey(filteredAlbumsByYear.albums, 'albumName', 'asc');
     } catch (error) {
@@ -114,6 +114,6 @@ export default function AlbumsContext() {
     fetchAlbumsByYear,
     setAlbumToBeUpdated,
     setCurrentAlbum,
-    isAlbumCover,
+    isAlbumCover
   };
 }

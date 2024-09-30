@@ -67,9 +67,9 @@
         :pt="{
           root: {
             style: {
-              padding: '0.5rem',
-            },
-          },
+              padding: '0.5rem'
+            }
+          }
         }"
         class="mb-4"
         data-test-id="photo-manage-panel"
@@ -145,7 +145,7 @@
           'grid',
           photoStyle === 'grid'
             ? 'gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6'
-            : 'gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+            : 'gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
         ]"
       >
         <Photo v-for="photo in photosInAlbum" :key="photo.key" :photo="photo" :photo-style="photoStyle" />
@@ -218,7 +218,7 @@ import {
   IconMap2,
   IconPhotoUp,
   IconTrash,
-  IconX,
+  IconX
 } from '@tabler/icons-vue';
 import Button from 'primevue/button';
 import Popover from 'primevue/popover';
@@ -239,7 +239,7 @@ const {
   setDeletePhotoDialogState,
   getMovePhotoDialogState,
   setMovePhotoDialogState,
-  getRenamePhotoDialogState,
+  getRenamePhotoDialogState
 } = DialogContext();
 const { isAdmin } = UserConfigContext();
 const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } = PhotosContext();

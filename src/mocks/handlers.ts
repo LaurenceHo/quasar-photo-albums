@@ -26,5 +26,5 @@ export const handlers = [
   getFeaturedAlbums,
   getCountAlbumsByYear,
   getAlbumWithLocation,
-  getPhotos,
+  getPhotos
 ];

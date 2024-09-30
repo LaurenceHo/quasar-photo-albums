@@ -23,8 +23,8 @@ const _fetchAlbumTagsAndSetToLocalStorage = async (dbUpdatedTime?: string) => {
       ALBUM_TAGS,
       JSON.stringify({
         dbUpdatedTime: time,
-        tags: sortByKey(tags, 'tag', 'asc'),
-      } as AlbumTags),
+        tags: sortByKey(tags, 'tag', 'asc')
+      } as AlbumTags)
     );
   }
 };
@@ -41,7 +41,7 @@ export default function AlbumTagsContext() {
         await _fetchAlbumTagsAndSetToLocalStorage();
       } else {
         const compareResult = await compareDbUpdatedTime(
-          JSON.parse(<string>localStorage.getItem(ALBUM_TAGS)).dbUpdatedTime,
+          JSON.parse(<string>localStorage.getItem(ALBUM_TAGS)).dbUpdatedTime
         );
         if (forceUpdate || !compareResult.isLatest) {
           await _fetchAlbumTagsAndSetToLocalStorage(compareResult.dbUpdatedTime);
@@ -52,7 +52,7 @@ export default function AlbumTagsContext() {
       albumTags.value = get(
         JSON.parse(localStorage.getItem(ALBUM_TAGS) || '{}') as AlbumTags,
         'tags',
-        [],
+        []
       ) as AlbumTag[];
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
@@ -67,6 +67,6 @@ export default function AlbumTagsContext() {
   return {
     fetchAlbumTags,
     albumTags: getAlbumTags,
-    isFetchingAlbumTags,
+    isFetchingAlbumTags
   };
 }

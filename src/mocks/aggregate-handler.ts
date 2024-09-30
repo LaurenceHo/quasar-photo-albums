@@ -18,11 +18,11 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
           displayName: 'Venice',
           location: {
             latitude: 45.440379,
-            longitude: 12.315954699999999,
-          },
+            longitude: 12.315954699999999
+          }
         },
         id: 'demo-album1',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: '2024 demo album5 super long long long album name',
@@ -33,11 +33,11 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
           displayName: 'Tokyo',
           location: {
             latitude: 35.6764225,
-            longitude: 139.650027,
-          },
+            longitude: 139.650027
+          }
         },
         id: 'demo-album5',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: 'demo-album 2',
@@ -49,11 +49,11 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
           displayName: 'Honolulu',
           location: {
             latitude: 21.3098845,
-            longitude: -157.85814009999999,
-          },
+            longitude: -157.85814009999999
+          }
         },
         id: 'demo-album2',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: 'Test Album 1',
@@ -65,11 +65,11 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
           displayName: 'Sydney',
           location: {
             latitude: -33.8688,
-            longitude: 151.2093,
-          },
+            longitude: 151.2093
+          }
         },
         id: 'test-album-1',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: 'this is demo-album-3',
@@ -81,11 +81,11 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
           displayName: 'George Town',
           location: {
             latitude: 5.414130699999999,
-            longitude: 100.3287506,
-          },
+            longitude: 100.3287506
+          }
         },
         id: 'demo-album3',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: '1 demo-album 1',
@@ -97,11 +97,11 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
           displayName: 'Venice',
           location: {
             latitude: 45.440379,
-            longitude: 12.315954699999999,
-          },
+            longitude: 12.315954699999999
+          }
         },
         id: 'demo-album1',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: '2024 demo album5 super long long long album name',
@@ -112,11 +112,11 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
           displayName: 'Tokyo',
           location: {
             latitude: 35.6764225,
-            longitude: 139.650027,
-          },
+            longitude: 139.650027
+          }
         },
         id: 'demo-album5',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: 'demo-album 2',
@@ -128,11 +128,11 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
           displayName: 'Honolulu',
           location: {
             latitude: 21.3098845,
-            longitude: -157.85814009999999,
-          },
+            longitude: -157.85814009999999
+          }
         },
         id: 'demo-album2',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: 'Test Album 1',
@@ -144,11 +144,11 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
           displayName: 'Sydney',
           location: {
             latitude: -33.8688,
-            longitude: 151.2093,
-          },
+            longitude: 151.2093
+          }
         },
         id: 'test-album-1',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: 'this is demo-album-3',
@@ -160,13 +160,13 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
           displayName: 'George Town',
           location: {
             latitude: 5.414130699999999,
-            longitude: 100.3287506,
-          },
+            longitude: 100.3287506
+          }
         },
         id: 'demo-album3',
-        isFeatured: true,
-      },
-    ],
+        isFeatured: true
+      }
+    ]
   });
 });
 
@@ -180,17 +180,17 @@ export const getCountAlbumsByYear = http.get('/api/aggregate/countAlbumsByYear',
     data: [
       {
         count: 5,
-        year: 'na',
+        year: 'na'
       },
       {
         count: 1,
-        year: '2024',
+        year: '2024'
       },
       {
         count: 1,
-        year: '2023',
-      },
-    ],
+        year: '2023'
+      }
+    ]
   });
 });
 
@@ -212,11 +212,11 @@ export const getAlbumWithLocation = http.get('/api/aggregate/albumsWithLocation'
           displayName: 'Tokyo',
           location: {
             latitude: 35.6764225,
-            longitude: 139.650027,
-          },
+            longitude: 139.650027
+          }
         },
         id: 'demo-album5',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: 'This is demo album 4',
@@ -228,11 +228,11 @@ export const getAlbumWithLocation = http.get('/api/aggregate/albumsWithLocation'
           displayName: 'Valencia',
           location: {
             latitude: 39.4699075,
-            longitude: -0.37628809999999996,
-          },
+            longitude: -0.37628809999999996
+          }
         },
         id: 'demo-album-4',
-        isFeatured: false,
+        isFeatured: false
       },
       {
         albumName: '1 demo-album 1',
@@ -244,11 +244,11 @@ export const getAlbumWithLocation = http.get('/api/aggregate/albumsWithLocation'
           displayName: 'Venice',
           location: {
             latitude: 45.440379,
-            longitude: 12.315954699999999,
-          },
+            longitude: 12.315954699999999
+          }
         },
         id: 'demo-album1',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: 'demo-album 2',
@@ -260,11 +260,11 @@ export const getAlbumWithLocation = http.get('/api/aggregate/albumsWithLocation'
           displayName: 'Honolulu',
           location: {
             latitude: 21.3098845,
-            longitude: -157.85814009999999,
-          },
+            longitude: -157.85814009999999
+          }
         },
         id: 'demo-album2',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: 'this is demo-album-3',
@@ -276,11 +276,11 @@ export const getAlbumWithLocation = http.get('/api/aggregate/albumsWithLocation'
           displayName: 'George Town',
           location: {
             latitude: 5.414130699999999,
-            longitude: 100.3287506,
-          },
+            longitude: 100.3287506
+          }
         },
         id: 'demo-album3',
-        isFeatured: true,
+        isFeatured: true
       },
       {
         albumName: 'Test Album 1',
@@ -292,12 +292,12 @@ export const getAlbumWithLocation = http.get('/api/aggregate/albumsWithLocation'
           displayName: 'Sydney',
           location: {
             latitude: -33.8688,
-            longitude: 151.2093,
-          },
+            longitude: 151.2093
+          }
         },
         id: 'test-album-1',
-        isFeatured: true,
-      },
-    ],
+        isFeatured: true
+      }
+    ]
   });
 });

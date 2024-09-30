@@ -10,8 +10,8 @@ export const getUserPermission = http.get('/api/auth/userInfo', async () => {
       displayName: 'TestUser124',
       role: 'admin',
       email: 'testUser@test.com',
-      uid: '1234567890',
-    },
+      uid: '1234567890'
+    }
   });
 });
 
@@ -25,8 +25,8 @@ export const userLogin = http.post('/api/auth/verifyIdToken', async () => {
       displayName: 'TestUser124',
       role: 'admin',
       email: 'testUser@test.com',
-      uid: '1234567890',
-    },
+      uid: '1234567890'
+    }
   });
 });
 

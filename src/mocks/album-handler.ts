@@ -17,14 +17,14 @@ export const getAlbumsByYear = http.get('/api/albums/**', async () => {
           displayName: 'Valencia',
           location: {
             latitude: 39.4699075,
-            longitude: -0.37628809999999996,
-          },
+            longitude: -0.37628809999999996
+          }
         },
         year: 'na',
         albumName: 'This is demo album 4',
         description: 'This used to be a private album',
         id: 'demo-album-4',
-        tags: ['tag1'],
+        tags: ['tag1']
       },
       {
         isFeatured: true,
@@ -35,14 +35,14 @@ export const getAlbumsByYear = http.get('/api/albums/**', async () => {
           displayName: 'Venice',
           location: {
             latitude: 45.440379,
-            longitude: 12.315954699999999,
-          },
+            longitude: 12.315954699999999
+          }
         },
         year: 'na',
         albumName: '1 demo-album 1',
         description: 'This is demo album 1',
         id: 'demo-album1',
-        tags: [],
+        tags: []
       },
       {
         isFeatured: false,
@@ -52,14 +52,14 @@ export const getAlbumsByYear = http.get('/api/albums/**', async () => {
           displayName: 'Honolulu',
           location: {
             latitude: 21.3098845,
-            longitude: -157.85814009999999,
-          },
+            longitude: -157.85814009999999
+          }
         },
         year: 'na',
         albumName: 'demo-album 2',
         description: 'This is demo album 2',
         id: 'demo-album2',
-        tags: ['tag2', 'tag3'],
+        tags: ['tag2', 'tag3']
       },
       {
         isFeatured: true,
@@ -70,14 +70,14 @@ export const getAlbumsByYear = http.get('/api/albums/**', async () => {
           displayName: 'George Town',
           location: {
             latitude: 5.414130699999999,
-            longitude: 100.3287506,
-          },
+            longitude: 100.3287506
+          }
         },
         year: 'na',
         albumName: 'this is demo-album-3',
         description: '',
         id: 'demo-album3',
-        tags: [],
+        tags: []
       },
       {
         isFeatured: true,
@@ -88,14 +88,14 @@ export const getAlbumsByYear = http.get('/api/albums/**', async () => {
           displayName: 'Sydney',
           location: {
             latitude: -33.8688,
-            longitude: 151.2093,
-          },
+            longitude: 151.2093
+          }
         },
         year: 'na',
         albumName: 'aaaTest Album 1',
         description: 'This is a test album 1',
         id: 'test-album-1',
-        tags: ['test-tag-1'],
+        tags: ['test-tag-1']
       },
       {
         isFeatured: true,
@@ -106,16 +106,16 @@ export const getAlbumsByYear = http.get('/api/albums/**', async () => {
           displayName: 'Sydney',
           location: {
             latitude: -33.8688,
-            longitude: 151.2093,
-          },
+            longitude: 151.2093
+          }
         },
         year: 'na',
         albumName: 'Some Album',
         description: 'Some Album',
         id: 'some-album-1',
-        tags: ['test-tag-1'],
-      },
-    ],
+        tags: ['test-tag-1']
+      }
+    ]
   });
 });
 
@@ -125,7 +125,7 @@ export const deleteAlbum = http.delete('/api/albums', async () => {
   return HttpResponse.json({
     code: 200,
     status: 'Success',
-    message: 'ok',
+    message: 'ok'
   });
 
   // return new HttpResponse(null, {

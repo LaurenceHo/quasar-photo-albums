@@ -41,7 +41,7 @@ const geoJson = computed(
           type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: [album.place?.location.longitude, album.place?.location.latitude],
+            coordinates: [album.place?.location.longitude, album.place?.location.latitude]
           } as Point,
           properties: {
             name: album.albumName,
@@ -54,11 +54,11 @@ const geoJson = computed(
                   : ''
               }` +
               `${album.description ? `<p>${album.description}</p>` : ''}` +
-              `<a href='/album/${album.year}/${album.id}'>View Album</a>`,
-          },
+              `<a href='/album/${album.year}/${album.id}'>View Album</a>`
+          }
         };
-      }),
-    }) as GeoJson,
+      })
+    }) as GeoJson
 );
 
 /** Get albums with location and set to local storage */
@@ -71,7 +71,7 @@ const fetchAlbumsWithLocation = async (dbUpdatedTime?: string) => {
   const {
     data: albums,
     code,
-    message,
+    message
   } = (await AggregateService.getAggregateData('albumsWithLocation')) as ApiResponse<AlbumItem[]>;
 
   if (code !== 200) {
@@ -90,7 +90,7 @@ const { data: albumsWithLocation, isFetching } = useQuery({
       await fetchAlbumsWithLocation();
     } else {
       const compareResult = await compareDbUpdatedTime(
-        JSON.parse(<string>localStorage.getItem(ALBUMS_WITH_LOCATION)).dbUpdatedTime,
+        JSON.parse(<string>localStorage.getItem(ALBUMS_WITH_LOCATION)).dbUpdatedTime
       );
       if (!compareResult.isLatest) {
         await fetchAlbumsWithLocation(compareResult.dbUpdatedTime);
@@ -100,19 +100,19 @@ const { data: albumsWithLocation, isFetching } = useQuery({
     return get(
       JSON.parse(localStorage.getItem(ALBUMS_WITH_LOCATION) || '{}') as AlbumsWithLocation,
       'albums',
-      [],
+      []
     ) as Album[];
-  },
+  }
 });
 
 const inspectCluster = (
   map: mapboxgl.Map,
   e: (mapboxgl.MapMouseEvent | mapboxgl.MapTouchEvent) & {
     features?: mapboxgl.GeoJSONFeature[] | undefined;
-  },
+  }
 ) => {
   const features: Feature[] = map.queryRenderedFeatures(e.point, {
-    layers: ['clusters'],
+    layers: ['clusters']
   });
   const clusterId = features[0]?.properties?.['cluster_id'];
   (map.getSource('albums') as any).getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
@@ -120,7 +120,7 @@ const inspectCluster = (
 
     map.easeTo({
       center: (features[0]?.geometry as Point).coordinates as [number, number],
-      zoom: zoom,
+      zoom: zoom
     });
   });
 };
@@ -149,7 +149,7 @@ onMounted(async () => {
     container: 'album-location-map',
     style: 'mapbox://styles/mapbox/standard',
     center: [mapCentreLng, mapCentreLat],
-    zoom: 4,
+    zoom: 4
   });
 
   map.on('idle', () => {
@@ -162,7 +162,7 @@ onMounted(async () => {
       data: geoJson.value,
       cluster: true,
       clusterMaxZoom: 14, // Max zoom to cluster points on
-      clusterRadius: 50, // Radius of each cluster when clustering points (defaults to 50)
+      clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
     } as any);
 
     map.addLayer({
@@ -172,8 +172,8 @@ onMounted(async () => {
       filter: ['has', 'point_count'],
       paint: {
         'circle-color': '#637A90',
-        'circle-radius': 20,
-      },
+        'circle-radius': 20
+      }
     });
 
     map.addLayer({
@@ -184,11 +184,11 @@ onMounted(async () => {
       layout: {
         'text-field': ['get', 'point_count_abbreviated'],
         'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-        'text-size': 12,
+        'text-size': 12
       },
       paint: {
-        'text-color': 'white',
-      },
+        'text-color': 'white'
+      }
     });
 
     // Load custom marker image
@@ -205,8 +205,8 @@ onMounted(async () => {
         filter: ['!', ['has', 'point_count']],
         layout: {
           'icon-image': 'custom-marker', // reference the image
-          'icon-size': 0.25,
-        },
+          'icon-size': 0.25
+        }
       });
     });
 

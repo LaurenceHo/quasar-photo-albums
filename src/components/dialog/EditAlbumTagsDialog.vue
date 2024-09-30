@@ -1,9 +1,5 @@
 <template>
-  <Dialog
-    v-model:visible="updateAlbumTagsDialogState"
-    :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
-    :style="{ width: '400px' }"
-  >
+  <Dialog v-model:visible="updateAlbumTagsDialogState" :breakpoints="{ '960px': '75vw', '641px': '90vw' }" class="w-96">
     <template #header>
       <div class="flex items-center">
         <Button
@@ -41,7 +37,7 @@
     </div>
   </Dialog>
 
-  <Dialog v-model:visible="createTagDialog" class="max-w-80" data-test-id="create-tag-dialog" modal>
+  <Dialog v-model:visible="createTagDialog" class="w-80" data-test-id="create-tag-dialog" modal>
     <template #header>
       <h6 class="text-xl font-semibold">New tag</h6>
     </template>
@@ -69,7 +65,7 @@
     </form>
   </Dialog>
 
-  <Dialog v-model:visible="deleteTagDialog" class="max-w-96" data-test-id="delete-tag-dialog" modal>
+  <Dialog v-model:visible="deleteTagDialog" class="w-96" data-test-id="delete-tag-dialog" modal>
     <template #header>
       <div class="flex items-center">
         <IconAlertCircle :size="40" class="text-red-400 pr-2 flex-shrink-0" />
@@ -138,8 +134,8 @@ const rules = {
     required,
     minLength: minLength(2),
     maxLength: maxLength(20),
-    alphaNum: helpers.regex(/^[a-z0-9]+$/),
-  },
+    alphaNum: helpers.regex(/^[a-z0-9]+$/)
+  }
 };
 
 const v$ = useVuelidate(rules, { tagName });
@@ -158,7 +154,7 @@ const { isPending: isCreatingTag, mutate: createAlbumTag } = useMutation({
       severity: 'success',
       summary: 'Success',
       detail: `Tag "${tagName.value}" created.`,
-      life: 3000,
+      life: 3000
     });
     await fetchAlbumTags(true);
     createTagDialog.value = false;
@@ -169,15 +165,15 @@ const { isPending: isCreatingTag, mutate: createAlbumTag } = useMutation({
       severity: 'error',
       summary: 'Error',
       detail: 'Error while creating tag. Please try again later.',
-      life: 3000,
+      life: 3000
     });
-  },
+  }
 });
 
 const {
   isPending: isDeletingTag,
   mutate: deleteAlbumTag,
-  reset,
+  reset
 } = useMutation({
   mutationFn: () => AlbumTagService.deleteAlbumTag(tagName.value),
   onSuccess: async () => {
@@ -185,7 +181,7 @@ const {
       severity: 'success',
       summary: 'Success',
       detail: `Tag "${tagName.value}" deleted.`,
-      life: 3000,
+      life: 3000
     });
     await fetchAlbumTags(true);
     await fetchAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year, true);
@@ -197,9 +193,9 @@ const {
       severity: 'error',
       summary: 'Error',
       detail: 'Error while deleting tag. Please try again later.',
-      life: 3000,
+      life: 3000
     });
-  },
+  }
 });
 
 const confirmCreateTag = () => {

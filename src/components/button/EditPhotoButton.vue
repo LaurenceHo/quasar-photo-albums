@@ -30,12 +30,12 @@ import { ref, toRefs } from 'vue';
 const props = defineProps({
   extraClass: {
     type: String,
-    default: '',
+    default: ''
   },
   photoKey: {
     type: String,
-    required: true,
-  },
+    required: true
+  }
 });
 
 const menu = ref();
@@ -78,7 +78,7 @@ const copyPhotoLink = () => {
     severity: 'info',
     summary: 'Photo link copied!',
     detail: photoLink,
-    life: 3000,
+    life: 3000
   });
 };
 
@@ -90,28 +90,28 @@ const items = [
   {
     label: 'Copy Link',
     icon: IconLink,
-    command: copyPhotoLink,
+    command: copyPhotoLink
   },
   {
     label: 'Delete Photo',
     icon: IconTrash,
-    command: deletePhoto,
+    command: deletePhoto
   },
   {
     label: 'Move Photo',
     icon: IconFileExport,
-    command: movePhoto,
+    command: movePhoto
   },
   {
     label: 'Rename Photo',
     icon: IconEdit,
-    command: renamePhoto,
+    command: renamePhoto
   },
   {
     label: 'Make Album Cover',
     icon: IconPhotoStar,
     command: makeCoverPhoto,
-    visible: !isAlbumCover(photoKey.value),
-  },
+    visible: !isAlbumCover(photoKey.value)
+  }
 ];
 </script>

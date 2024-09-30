@@ -15,11 +15,11 @@ const authRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done)
         required: ['token'],
         properties: {
           token: {
-            type: 'string',
-          },
-        },
-      },
-    },
+            type: 'string'
+          }
+        }
+      }
+    }
   });
 
   instance.post('/api/auth/logout', controller.logout);

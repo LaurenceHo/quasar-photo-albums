@@ -4,9 +4,9 @@
       :pt="{
         header: {
           style: {
-            justifyContent: 'center',
-          },
-        },
+            justifyContent: 'center'
+          }
+        }
       }"
       class="w-[300px]"
       header="Header"
@@ -58,7 +58,7 @@ onMounted(() => {
           severity: 'success',
           summary: 'Welcome',
           detail: `Hello, ${userPermission.displayName}`,
-          life: 3000,
+          life: 3000
         });
         setTimeout(() => window.location.assign('/'), 1000);
       } else {
@@ -66,7 +66,7 @@ onMounted(() => {
           severity: 'error',
           summary: 'Permission denied',
           detail: "You don't have permission to login.",
-          life: 3000,
+          life: 3000
         });
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -75,7 +75,7 @@ onMounted(() => {
         severity: 'error',
         summary: 'Permission denied',
         detail: "You don't have permission to login.",
-        life: 3000,
+        life: 3000
       });
     } finally {
       loading.value = false;
@@ -85,12 +85,12 @@ onMounted(() => {
   if (google) {
     google.accounts.id.initialize({
       client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '',
-      callback: handleCredentialResponse,
+      callback: handleCredentialResponse
     });
     google.accounts.id.renderButton(document.getElementById('google-login-button'), {
       theme: 'outline',
       size: 'large',
-      width: '240',
+      width: '240'
     });
   }
 });

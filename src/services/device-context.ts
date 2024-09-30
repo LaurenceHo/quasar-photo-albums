@@ -23,6 +23,6 @@ export default function DeviceContext() {
     isSmallDevice: computed(() => windowWidth.value >= 640),
     isMediumDevice: computed(() => windowWidth.value >= 768),
     isLargeDevice: computed(() => windowWidth.value >= 1024),
-    isXLargeDevice: computed(() => windowWidth.value >= 1280),
+    isXLargeDevice: computed(() => windowWidth.value >= 1280)
   };
 }

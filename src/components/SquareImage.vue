@@ -10,20 +10,20 @@
 defineProps({
   id: {
     type: String,
-    default: null,
+    default: null
   },
   alt: {
     type: String,
-    default: '',
+    default: ''
   },
   src: {
     type: String,
     default: '',
-    required: true,
+    required: true
   },
   size: {
     type: Number,
-    default: null,
-  },
+    default: null
+  }
 });
 </script>

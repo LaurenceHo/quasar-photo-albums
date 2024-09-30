@@ -6,7 +6,7 @@ const initialState: UserPermission = {
   uid: '',
   email: '',
   role: '',
-  displayName: '',
+  displayName: ''
 };
 
 const darkMode = ref(false);
@@ -33,6 +33,6 @@ export default function UserConfigContext() {
     userPermission: getUserPermission,
     darkMode: getDarkMode,
     setUserPermission,
-    setDarkMode,
+    setDarkMode
   };
 }

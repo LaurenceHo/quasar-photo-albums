@@ -18,5 +18,5 @@ export type {
   AggregateType,
   AlbumsByYear,
   DataAggregateValueMap,
-  PhotoResponse,
+  PhotoResponse
 };

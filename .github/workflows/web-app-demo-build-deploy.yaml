@@ -18,45 +18,39 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     env:
-      ALBUM_APP_TITLE: ${{ vars.ALBUM_APP_TITLE }}
-      STATIC_FILES_URL: ${{ vars.STATIC_FILES_URL }}
-      IMAGEKIT_CDN_URL: ${{ vars.IMAGEKIT_CDN_URL }}
-      MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
-      AWS_API_GATEWAY_URL: ${{ vars.AWS_API_GATEWAY_URL }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
-      MAP_CENTRE_LNG: ${{ vars.MAP_CENTRE_LNG }}
-      MAP_CENTRE_LAT: ${{ vars.MAP_CENTRE_LAT }}
+      VITE_ALBUM_APP_TITLE: ${{ vars.VITE_ALBUM_APP_TITLE }}
+      VITE_STATIC_FILES_URL: ${{ vars.VITE_STATIC_FILES_URL }}
+      VITE_IMAGEKIT_CDN_URL: ${{ vars.VITE_IMAGEKIT_CDN_URL }}
+      VITE_MAPBOX_API_KEY: ${{ secrets.VITE_MAPBOX_API_KEY }}
+      VITE_AWS_API_GATEWAY_URL: ${{ vars.VITE_AWS_API_GATEWAY_URL }}
+      VITE_MAP_CENTRE_LNG: ${{ vars.VITE_MAP_CENTRE_LNG }}
+      VITE_MAP_CENTRE_LAT: ${{ vars.VITE_MAP_CENTRE_LAT }}
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm install --force #TODO: remove --force
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
 
       - name: Write .env file
         run: |
           tee .env <<EOF
-          ALBUM_APP_TITLE=$ALBUM_APP_TITLE
-          STATIC_FILES_URL=$STATIC_FILES_URL
-          IMAGEKIT_CDN_URL=$IMAGEKIT_CDN_URL
-          MAPBOX_API_KEY=$MAPBOX_API_KEY
-          AWS_API_GATEWAY_URL=$AWS_API_GATEWAY_URL
-          GOOGLE_CLIENT_ID=DEMO_GOOGLE_CLIENT_ID
-          MAP_CENTRE_LNG=$MAP_CENTRE_LNG
-          MAP_CENTRE_LAT=$MAP_CENTRE_LAT
+          VITE_ALBUM_APP_TITLE=$VITE_ALBUM_APP_TITLE
+          VITE_STATIC_FILES_URL=$VITE_STATIC_FILES_URL
+          VITE_IMAGEKIT_CDN_URL=$VITE_IMAGEKIT_CDN_URL
+          VITE_MAPBOX_API_KEY=$VITE_MAPBOX_API_KEY
+          VITE_AWS_API_GATEWAY_URL=$VITE_AWS_API_GATEWAY_URL
+          VITE_GOOGLE_CLIENT_ID=DEMO_GOOGLE_CLIENT_ID
+          VITE_MAP_CENTRE_LNG=$VITE_MAP_CENTRE_LNG
+          VITE_MAP_CENTRE_LAT=$VITE_MAP_CENTRE_LAT
           EOF
 
       - name: Test and build
         run: |
-          npm run types
-          npm run test
-          npm run build
+          bun run type-check
+          bun run test:unit
+          bun run build
 
       - name: Clean up old files
         uses: keithweaver/aws-s3-github-action@master
@@ -71,7 +65,7 @@ jobs:
       - name: Upload to S3
         uses: keithweaver/aws-s3-github-action@master
         with:
-          source: dist/spa
+          source: dist
           destination: s3://${{ vars.AWS_S3_BUCKET_NAME }}
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}

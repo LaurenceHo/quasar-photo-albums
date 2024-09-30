@@ -32,9 +32,9 @@
                 style: {
                   position: 'absolute',
                   top: '50%',
-                  left: 0,
-                },
-              },
+                  left: 0
+                }
+              }
             }"
             data-test-id="previous-photo-button"
             rounded
@@ -50,9 +50,9 @@
                 style: {
                   position: 'absolute',
                   top: '50%',
-                  right: 0,
-                },
-              },
+                  right: 0
+                }
+              }
             }"
             data-test-id="next-photo-button"
             rounded
@@ -135,10 +135,10 @@ import * as ExifReader from 'exifreader';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
 import ProgressSpinner from 'primevue/progressspinner';
-import { computed, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 type ExifData = ExifTags & FileTags;
 
@@ -198,8 +198,8 @@ const exposureBias = computed(() => parseFloat(exifTags.value.ExposureBiasValue?
 
 const aperture = computed(() =>
   parseFloat(exifTags.value.ApertureValue?.description ?? exifTags.value.MaxApertureValue?.description ?? '0').toFixed(
-    1,
-  ),
+    1
+  )
 );
 
 const imageOriginalWidth = computed(() => Number(exifTags.value['Image Width']?.value ?? 0));
@@ -210,7 +210,7 @@ const isPhotoLandscape = computed(
       exifTags.value.Orientation?.value === 0 ||
       exifTags.value.Orientation?.value === 1 ||
       exifTags.value.Orientation?.value === 3) &&
-    imageOriginalWidth.value > imageOriginalHeight.value,
+    imageOriginalWidth.value > imageOriginalHeight.value
 );
 /** Compute photo EXIF data end */
 
@@ -261,13 +261,13 @@ watch(
           severity: 'error',
           summary: 'Error',
           detail: 'Photo does not exist',
-          life: 3000,
+          life: 3000
         });
         setTimeout(() => router.push(`/album/${albumYear.value}/${albumId.value}`), 3000);
       }
     }
   },
-  { deep: true, immediate: true },
+  { deep: true, immediate: true }
 );
 
 // If photo exists based on URL, get EXIF data from photo
@@ -288,6 +288,6 @@ watch(
       }
     }
   },
-  { deep: true, immediate: true },
+  { deep: true, immediate: true }
 );
 </script>

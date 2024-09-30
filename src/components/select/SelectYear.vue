@@ -26,12 +26,12 @@ const emits = defineEmits(['selectYear']);
 const props = defineProps({
   selectedYear: {
     type: String,
-    required: true,
+    required: true
   },
   extraClass: {
     type: String,
-    default: '',
-  },
+    default: ''
+  }
 });
 
 const { selectedYear } = toRefs(props);
@@ -40,10 +40,10 @@ const internalSelectedYear = ref(selectedYear.value);
 const {
   data: countAlbumsByYear,
   isFetching,
-  isError,
+  isError
 } = useQuery({
   queryKey: ['countAlbumsByYear'],
-  queryFn: () => AggregateService.getAggregateData('countAlbumsByYear'),
+  queryFn: () => AggregateService.getAggregateData('countAlbumsByYear')
 });
 
 watch(internalSelectedYear, (value) => {

@@ -21,8 +21,8 @@ const emits = defineEmits(['selectTags']);
 defineProps({
   extraClass: {
     type: String,
-    default: '',
-  },
+    default: ''
+  }
 });
 
 const selectedTag = ref();

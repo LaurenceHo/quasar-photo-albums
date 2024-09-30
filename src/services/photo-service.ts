@@ -15,7 +15,7 @@ export const PhotoService = {
 
   uploadPhotos: async (file: File, albumId: string): Promise<ResponseStatus> => {
     const response = await BaseApiRequestService.perform('POST', `${ApiBaseUrl}/photos/upload/${albumId}`, null, null, {
-      file,
+      file
     });
 
     if (!response.ok) {
@@ -23,5 +23,5 @@ export const PhotoService = {
     }
 
     return response.json();
-  },
+  }
 };

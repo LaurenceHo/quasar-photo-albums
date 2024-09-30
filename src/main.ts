@@ -31,18 +31,18 @@ const myThemePreset = definePreset(Aura, {
       700: '{sky.700}',
       800: '{sky.800}',
       900: '{sky.900}',
-      950: '{sky.950}',
-    },
-  },
+      950: '{sky.950}'
+    }
+  }
 });
 
 app.use(PrimeVue, {
   theme: {
     preset: myThemePreset,
     options: {
-      darkModeSelector: '.dark-theme',
-    },
-  },
+      darkModeSelector: '.dark-theme'
+    }
+  }
 });
 app.use(router);
 app.use(VueQueryPlugin);

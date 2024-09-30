@@ -5,7 +5,7 @@ import {
   COUNT_ALBUMS_BY_YEAR,
   COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
   DataAggregation,
-  FEATURED_ALBUMS,
+  FEATURED_ALBUMS
 } from '../schemas/aggregation.js';
 import { Album } from '../schemas/album.js';
 import DataAggregationService from '../services/data-aggregation-service.js';
@@ -40,7 +40,7 @@ export default class AggregateController extends BaseController {
     if (aggregateType === 'albumsWithLocation') {
       try {
         const albumData: DataAggregation<typeof ALBUMS_WITH_LOCATION> = await dataAggregationService.findOne({
-          key: ALBUMS_WITH_LOCATION,
+          key: ALBUMS_WITH_LOCATION
         });
 
         return this.ok<Album[]>(reply, 'ok', albumData?.value ?? []);
@@ -55,11 +55,11 @@ export default class AggregateController extends BaseController {
         let countData: DataAggregation<typeof COUNT_ALBUMS_BY_YEAR>;
         if (!isAdmin) {
           countData = await dataAggregationService.findOne({
-            key: COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
+            key: COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE
           });
         } else {
           countData = await dataAggregationService.findOne({
-            key: COUNT_ALBUMS_BY_YEAR,
+            key: COUNT_ALBUMS_BY_YEAR
           });
         }
         return this.ok<AlbumsByYear>(reply, 'ok', countData?.value ?? []);
@@ -70,7 +70,7 @@ export default class AggregateController extends BaseController {
     } else if (aggregateType === 'featuredAlbums') {
       try {
         const featuredAlbums: DataAggregation<typeof FEATURED_ALBUMS> = await dataAggregationService.findOne({
-          key: FEATURED_ALBUMS,
+          key: FEATURED_ALBUMS
         });
 
         return this.ok<Album[]>(reply, 'ok', featuredAlbums?.value ?? []);

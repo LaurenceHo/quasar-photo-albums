@@ -54,6 +54,6 @@ export default function DialogContext() {
 
     getUpdateAlbumTagsDialogState: computed(() => updateAlbumTagsDialogState.value),
     setUpdateAlbumTagsDialogState,
-    updateAlbumTagsDialogState,
+    updateAlbumTagsDialogState
   };
 }

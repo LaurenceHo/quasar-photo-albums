@@ -14,7 +14,7 @@ export const setJwtCookies = async (reply: FastifyReply, token: string) => {
     httpOnly: true,
     secure: true,
     signed: true,
-    path: '/',
+    path: '/'
   };
   reply.setCookie('jwt', token, options);
   reply.header('Cache-Control', 'private');

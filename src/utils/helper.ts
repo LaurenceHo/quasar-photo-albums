@@ -28,7 +28,7 @@ export const compareDbUpdatedTime = async (localDbUpdatedTime: string | null) =>
   const time = await fetchDbUpdatedTime();
   return {
     isLatest: localDbUpdatedTime === time,
-    dbUpdatedTime: time,
+    dbUpdatedTime: time
   };
 };
 

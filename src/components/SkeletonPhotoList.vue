@@ -2,11 +2,12 @@
   <template v-if="!photoId">
     <div class="flex items-center pt-4" data-test-id="skeleton-page-list">
       <Skeleton class="mr-2" shape="circle" size="3rem" />
-      <Skeleton height="2rem" width="100%" />
+      <Skeleton class="mr-2" height="3rem" width="5rem" />
+      <Skeleton height="3rem" width="80%" />
     </div>
     <div class="flex gap-2 mt-3">
-      <Skeleton height="2rem" width="5rem" />
-      <Skeleton height="2rem" width="5rem" />
+      <Skeleton height="2rem" width="4rem" />
+      <Skeleton height="2rem" width="4rem" />
     </div>
     <div class="grid mt-4 gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
       <div v-for="n in 4" :key="n">

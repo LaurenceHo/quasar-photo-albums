@@ -8,7 +8,7 @@ import { ddbDocClient } from './dynamodb-client.js';
 const getTableStatus = async (tableName: string) => {
   return await ddbDocClient.send(
     new DescribeTableCommand({
-      TableName: tableName,
+      TableName: tableName
     })
   );
 };
@@ -52,18 +52,18 @@ const initialiseAlbumTable = async () => {
               formattedAddress: 'Sydney NSW, Australia',
               location: {
                 latitude: -33.8688,
-                longitude: 151.2093,
-              },
+                longitude: 151.2093
+              }
             } as any,
             tags: ['test-tag-1'],
             createdBy: 'System',
-            updatedBy: 'System',
+            updatedBy: 'System'
           } as Album).go({ response: 'none' });
           logger().info(`Mock data inserted into ${albumTableName} table.`);
         }
       }
     });
-    logger().info(`${albumTableName} table all set.👍`);
+    logger().info(`${albumTableName} table all set.`);
   } catch (error) {
     logger().error(`Error when checking ${albumTableName}:`, error);
   }
@@ -85,13 +85,13 @@ const initialiseAlbumTagsTable = async () => {
         if (items.data.length === 0) {
           logger().info(`Insert mock data into ${albumTagsTableName} table......`);
           await AlbumTagEntity.create({
-            tag: 'test-tag-1',
+            tag: 'test-tag-1'
           } as AlbumTag).go({ response: 'none' });
           logger().info(`Mock data inserted into ${albumTagsTableName} table.`);
         }
       }
     });
-    logger().info(`${albumTagsTableName} table all set.👍`);
+    logger().info(`${albumTagsTableName} table all set.`);
   } catch (error) {
     logger().error(`Error when checking ${albumTagsTableName}:`, error);
   }
@@ -116,13 +116,13 @@ const initialiseUserTable = async () => {
             uid: 'test-uid-1',
             email: 'test@example.com',
             displayName: 'Test User',
-            role: 'admin',
+            role: 'admin'
           } as UserPermission).go({ response: 'none' });
           logger().info(`Mock data inserted into ${userTableName} table.`);
         }
       }
     });
-    logger().info(`${userTableName} table all set.👍`);
+    logger().info(`${userTableName} table all set.`);
   } catch (error) {
     logger().error(`Error when checking ${userTableName}:`, error);
   }

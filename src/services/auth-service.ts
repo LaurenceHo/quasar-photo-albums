@@ -21,5 +21,5 @@ export const AuthService = {
     if (!response.ok) {
       throw new Error(response.statusText);
     }
-  },
+  }
 };

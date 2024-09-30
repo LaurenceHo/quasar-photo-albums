@@ -14,9 +14,9 @@
       <div v-if="isAdmin" class="absolute top-0 left-0 right-0 flex justify-between photo-top-button-container">
         <Button
           v-tooltip="'Select Photo'"
+          :severity="`${isPhotoSelected ? 'primary' : 'secondary'}`"
           data-test-id="select-photo-button"
           rounded
-          :severity="`${isPhotoSelected ? 'primary' : 'secondary'}`"
           text
           @click="selectPhoto(photo['key'])"
         >
@@ -36,7 +36,7 @@
     v-else
     :class="[
       'flex items-center border border-gray-300 p-2 sm:p-3 rounded-md cursor-pointer h-26 sm:h-32',
-      { 'photo-selected': isPhotoSelected },
+      { 'photo-selected': isPhotoSelected }
     ]"
     data-test-id="detail-photo-item"
   >
@@ -73,13 +73,13 @@ import { useRoute, useRouter } from 'vue-router';
 const props = defineProps({
   photoStyle: {
     type: String,
-    required: true,
+    required: true
   },
   photo: {
     type: Object,
     required: true,
-    default: () => ({ key: '', url: '' }),
-  },
+    default: () => ({ key: '', url: '' })
+  }
 });
 
 const emit = defineEmits(['refreshPhotoList']);

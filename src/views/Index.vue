@@ -7,9 +7,9 @@
           root: {
             style: {
               paddingRight: '0',
-              paddingLeft: '0',
-            },
-          },
+              paddingLeft: '0'
+            }
+          }
         }"
       >
         <template #item="{ item }">
@@ -45,7 +45,7 @@ const breadcrumbs = computed((): { label: string }[] => {
   if (route.name === 'photosByAlbum') {
     routes.push({
       label: currentAlbum.value.albumName,
-      icon: IconLibraryPhoto,
+      icon: IconLibraryPhoto
     });
   }
   return routes;

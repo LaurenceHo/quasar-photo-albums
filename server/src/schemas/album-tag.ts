@@ -10,22 +10,22 @@ export const AlbumTagEntity = new Entity(
     model: {
       entity: 'albumTag',
       version: '1',
-      service: 'albumService',
+      service: 'albumService'
     },
     attributes: {
       tag: {
         type: 'string',
-        required: true,
-      },
+        required: true
+      }
     },
     indexes: {
       byTag: {
         pk: {
           field: 'tag',
-          composite: ['tag'],
-        },
-      },
-    },
+          composite: ['tag']
+        }
+      }
+    }
   },
   { client: ddbDocClient, table: albumTagsTableName }
 );

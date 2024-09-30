@@ -13,12 +13,11 @@ import {
   ListObjectsV2CommandOutput,
   PutObjectCommand,
   PutObjectCommandInput,
-  S3Client,
+  S3Client
 } from '@aws-sdk/client-s3';
 import logger from 'pino';
 import { get } from 'radash';
-import { BaseService } from '../types/models.js';
-import { Photo } from '../types/photo';
+import { BaseService, Photo } from '../types';
 import { configuration } from './config.js';
 
 export default class S3Service implements BaseService<Photo> {
@@ -76,6 +75,7 @@ export default class S3Service implements BaseService<Photo> {
     try {
       const response = await this.s3Client.send(new HeadObjectCommand(params));
       return response.$metadata.httpStatusCode === 200;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       return false;
     }
@@ -85,6 +85,7 @@ export default class S3Service implements BaseService<Photo> {
     try {
       const response = await this.s3Client.send(new HeadBucketCommand(params));
       return response.$metadata.httpStatusCode === 200;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       return false;
     }

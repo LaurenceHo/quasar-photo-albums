@@ -2,7 +2,7 @@
   <Toolbar class="custom-toolbar sticky top-0 z-50">
     <template #start>
       <router-link class="flex" to="/">
-        <img alt="Vue logo" class="logo" height="48" src="@/assets/logo.svg" width="48" />
+        <img alt="Vue logo" class="logo" height="48" width="48" src="/logo.png" />
         <h1 class="hidden sm:block text-2xl font-bold">{{ appName }}</h1>
       </router-link>
     </template>
@@ -103,7 +103,7 @@ import {
   IconSearch,
   IconSun,
   IconTags,
-  IconUser,
+  IconUser
 } from '@tabler/icons-vue';
 import { useQuery } from '@tanstack/vue-query';
 import Button from 'primevue/button';
@@ -133,13 +133,13 @@ const items = ref([
   {
     label: 'New Album',
     icon: IconFolderPlus,
-    visible: () => routeName.value === 'albumsByYear',
+    visible: () => routeName.value === 'albumsByYear'
   },
   {
     label: 'Manage Album Tags',
     icon: IconTags,
     visible: () => routeName.value === 'albumsByYear',
-    command: () => setUpdateAlbumTagsDialogState(true),
+    command: () => setUpdateAlbumTagsDialogState(true)
   },
   {
     label: 'Logout',
@@ -148,8 +148,8 @@ const items = ref([
       AuthService.logout().then(() => {
         localStorage.clear();
         location.reload();
-      }),
-  },
+      })
+  }
 ]);
 
 const toggle = (event: any) => {
@@ -191,7 +191,7 @@ isDarkModeEnabled();
 const { isFetching, data: userData } = useQuery({
   queryKey: ['fetchApplications'],
   enabled: !userPermission.value.uid,
-  queryFn: AuthService.userInfo,
+  queryFn: AuthService.userInfo
 });
 
 watch(userData, (data) => {

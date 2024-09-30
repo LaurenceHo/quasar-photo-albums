@@ -69,6 +69,6 @@ export default function PhotosContext() {
     setCurrentPhotoToBeRenamed,
     setSelectedPhotos,
     findPhotoByIndex,
-    findPhotoIndex,
+    findPhotoIndex
   };
 }

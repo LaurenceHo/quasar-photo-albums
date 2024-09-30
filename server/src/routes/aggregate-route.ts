@@ -11,11 +11,11 @@ const aggregateRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, 
         type: 'object',
         properties: {
           year: {
-            type: 'string',
-          },
-        },
-      },
-    },
+            type: 'string'
+          }
+        }
+      }
+    }
   });
 
   done();

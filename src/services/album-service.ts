@@ -33,5 +33,5 @@ export const AlbumService = {
       throw new Error(response.statusText);
     }
     return response.json();
-  },
+  }
 };

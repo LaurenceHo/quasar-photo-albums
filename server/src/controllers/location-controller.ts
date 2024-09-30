@@ -20,7 +20,7 @@ export default class LocationController extends BaseController {
         return {
           displayName: displayName.text,
           formattedAddress,
-          location,
+          location
         };
       });
     }
