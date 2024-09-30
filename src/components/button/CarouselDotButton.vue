@@ -1,19 +1,19 @@
 <template>
-  <button type="button" :class="dotButtonClasses" @click="scrollTo" />
+  <button :class="dotButtonClasses" type="button" @click="scrollTo" />
 </template>
-<script setup lang="ts">
-import { EmblaCarouselType } from 'embla-carousel';
+<script lang="ts" setup>
+import type { EmblaCarouselType } from 'embla-carousel';
 import { computed, onMounted, ref, toRefs, watch } from 'vue';
 
 const props = defineProps({
   carouselApi: {
     type: Object as () => EmblaCarouselType | undefined,
-    required: true,
+    required: true
   },
   dotIndex: {
     type: Number,
-    required: true,
-  },
+    required: true
+  }
 });
 
 const { dotIndex, carouselApi } = toRefs(props);
@@ -22,7 +22,7 @@ const selectedIndex = ref(0);
 
 const dotButtonClasses = computed(() => ({
   embla__dot: true,
-  'embla__dot--selected': dotIndex.value === selectedIndex.value,
+  'embla__dot--selected': dotIndex.value === selectedIndex.value
 }));
 
 const onSelect = (carouselApi: EmblaCarouselType) => {
@@ -50,7 +50,7 @@ watch(carouselApi, (newVal) => {
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .embla__dot {
   -webkit-tap-highlight-color: transparent;
   -webkit-appearance: none;
@@ -69,8 +69,9 @@ watch(carouselApi, (newVal) => {
   justify-content: center;
   border-radius: 50%;
 }
+
 .embla__dot:after {
-  box-shadow: inset 0 0 0 0.2rem #ef6692;
+  box-shadow: inset 0 0 0 0.2rem #0ea5e9;
   width: 0.8rem;
   height: 0.8rem;
   border-radius: 50%;
@@ -78,7 +79,8 @@ watch(carouselApi, (newVal) => {
   align-items: center;
   content: '';
 }
+
 .embla__dot--selected:after {
-  box-shadow: inset 0 0 0 0.8rem #ef6692;
+  box-shadow: inset 0 0 0 0.8rem #0ea5e9;
 }
 </style>

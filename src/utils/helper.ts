@@ -1,7 +1,5 @@
-import { Notify } from 'quasar';
-
 export const getStaticFileUrl = (objectKey: string): string => {
-  return `${process.env.STATIC_FILES_URL}/${objectKey}`;
+  return `${import.meta.env.VITE_STATIC_FILES_URL}/${objectKey}`;
 };
 
 export const getYearOptions = () => {
@@ -18,6 +16,7 @@ export const fetchDbUpdatedTime = async () => {
   try {
     const response = await fetch(getStaticFileUrl('updateDatabaseAt.json'));
     dbUpdatedTimeJSON = await response.json();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // Might encounter CORS issue. Do nothing
   }
@@ -29,7 +28,7 @@ export const compareDbUpdatedTime = async (localDbUpdatedTime: string | null) =>
   const time = await fetchDbUpdatedTime();
   return {
     isLatest: localDbUpdatedTime === time,
-    dbUpdatedTime: time,
+    dbUpdatedTime: time
   };
 };
 
@@ -45,40 +44,5 @@ export const sortByKey = <T>(array: T[], key: keyof T, sortOrder: 'asc' | 'desc'
     } else {
       return 0;
     }
-  });
-};
-
-type Position =
-  | 'top-left'
-  | 'top'
-  | 'top-right'
-  | 'left'
-  | 'center'
-  | 'right'
-  | 'bottom-left'
-  | 'bottom'
-  | 'bottom-right';
-
-export const notify = (
-  status: 'negative' | 'positive' | 'info' | 'warning',
-  message: string,
-  progress = false,
-  position: Position = 'bottom',
-  timeout: number = 2000
-) => {
-  Notify.create({
-    progress,
-    message,
-    position,
-    timeout,
-    color: status,
-    icon:
-      status === 'negative'
-        ? 'mdi-alert-circle'
-        : status === 'positive'
-          ? 'mdi-check-circle-outline'
-          : status === 'warning'
-            ? 'mdi-alert'
-            : 'mdi-information',
   });
 };

@@ -1,97 +1,68 @@
 <template>
-  <q-btn :color="color" flat icon="mdi-dots-vertical" round data-test-id="edit-photo-button">
-    <q-menu>
-      <q-list style="min-width: 100px">
-        <q-item v-close-popup clickable @click="copyPhotoLink">
-          <q-item-section avatar>
-            <q-icon color="primary" name="mdi-link-variant" />
-          </q-item-section>
-          <q-item-section>Copy Link</q-item-section>
-        </q-item>
-        <q-item v-close-popup clickable @click="deletePhoto">
-          <q-item-section avatar>
-            <q-icon color="primary" name="mdi-delete" />
-          </q-item-section>
-          <q-item-section>Delete Photo</q-item-section>
-        </q-item>
-        <q-item v-close-popup clickable @click="movePhoto">
-          <q-item-section avatar>
-            <q-icon color="primary" name="mdi-image-move" />
-          </q-item-section>
-          <q-item-section>Move Photo</q-item-section>
-        </q-item>
-        <q-item v-close-popup clickable @click="renamePhoto">
-          <q-item-section avatar>
-            <q-icon color="primary" name="mdi-rename" />
-          </q-item-section>
-          <q-item-section>Rename Photo</q-item-section>
-        </q-item>
-        <q-item
-          v-if="!isAlbumCover"
-          v-close-popup
-          clickable
-          data-test-id="make-album-cover-button"
-          @click="makeCoverPhoto"
-        >
-          <q-item-section avatar>
-            <q-icon color="primary" name="mdi-folder-image" />
-          </q-item-section>
-          <q-item-section>Make Album Cover</q-item-section>
-        </q-item>
-      </q-list>
-    </q-menu>
-  </q-btn>
+  <Button :class="extraClass" data-test-id="edit-photo-button" rounded severity="secondary" text @click="toggle">
+    <template #icon>
+      <IconDotsVertical :size="24" />
+    </template>
+  </Button>
+  <Menu ref="menu" :model="items" :popup="true">
+    <template #item="{ item }">
+      <button class="flex items-center p-2">
+        <component :is="item.icon" :size="24" />
+        <span class="ml-2">{{ item.label }}</span>
+      </button>
+    </template>
+  </Menu>
 </template>
 
 <script lang="ts" setup>
-import { copyToClipboard, useQuasar } from 'quasar';
-import DialogStateComposable from 'src/composables/dialog-state-composable';
-import SelectedItemsComposable from 'src/composables/selected-items-composaable';
-import AlbumService from 'src/services/album-service';
-import { Album } from 'src/types';
-import { getStaticFileUrl } from 'src/utils/helper';
-import { albumStore } from 'stores/album-store';
-import { computed, toRefs } from 'vue';
+import AlbumsContext from '@/composables/albums-context';
+import DialogContext from '@/composables/dialog-context';
+import PhotosContext from '@/composables/photos-context';
+import type { Album } from '@/schema';
+import { AlbumService } from '@/services/album-service';
+import { getStaticFileUrl } from '@/utils/helper';
+import { IconDotsVertical, IconEdit, IconFileExport, IconLink, IconPhotoStar, IconTrash } from '@tabler/icons-vue';
+import Button from 'primevue/button';
+import Menu from 'primevue/menu';
+import { useToast } from 'primevue/usetoast';
+import { ref, toRefs } from 'vue';
 
 const props = defineProps({
-  color: {
+  extraClass: {
     type: String,
-    default: () => 'black',
+    default: ''
   },
   photoKey: {
     type: String,
-    required: true,
-  },
+    required: true
+  }
 });
 
-const albumService = new AlbumService();
-const useAlbumStore = albumStore();
-const q = useQuasar();
-
+const menu = ref();
+const toast = useToast();
 const { photoKey } = toRefs(props);
 
-const albumItem = computed(() => useAlbumStore.selectedAlbumItem);
-const isAlbumCover = computed(() => useAlbumStore.isAlbumCover(photoKey.value));
+const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = PhotosContext();
+const { currentAlbum, fetchAlbumsByYear, setCurrentAlbum, isAlbumCover } = AlbumsContext();
 
-const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } = DialogStateComposable();
-const { setSelectedPhotosList, setCurrentPhotoToBeRenamed } = SelectedItemsComposable();
+const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } = DialogContext();
 
 const makeCoverPhoto = async () => {
-  const albumToBeUpdated = { ...(albumItem.value as Album), albumCover: photoKey.value as string };
-  const response = await albumService.updateAlbum(albumToBeUpdated);
+  const albumToBeUpdated = { ...(currentAlbum.value as Album), albumCover: photoKey.value as string };
+  const response = await AlbumService.updateAlbum(albumToBeUpdated);
   if (response.code === 200) {
-    await useAlbumStore.getAlbumsByYear(albumToBeUpdated.year, true);
-    useAlbumStore.$patch({ selectedAlbumItem: albumToBeUpdated });
+    await fetchAlbumsByYear(albumToBeUpdated.year, true);
+    setCurrentAlbum(albumToBeUpdated);
   }
 };
 
 const deletePhoto = () => {
-  setSelectedPhotosList([photoKey.value]);
+  setSelectedPhotos([photoKey.value]);
   setDeletePhotoDialogState(true);
 };
 
 const movePhoto = () => {
-  setSelectedPhotosList([photoKey.value]);
+  setSelectedPhotos([photoKey.value]);
   setMovePhotoDialogState(true);
 };
 
@@ -102,15 +73,45 @@ const renamePhoto = () => {
 
 const copyPhotoLink = () => {
   const photoLink = getStaticFileUrl(photoKey.value);
-  copyToClipboard(photoLink).then(() => {
-    q.notify({
-      color: 'white',
-      textColor: 'dark',
-      message: `<strong>Photo link copied!</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${photoLink}`,
-      position: 'top',
-      html: true,
-      timeout: 3000,
-    });
+  // copy(photoLink);
+  toast.add({
+    severity: 'info',
+    summary: 'Photo link copied!',
+    detail: photoLink,
+    life: 3000
   });
 };
+
+const toggle = (event: Event) => {
+  menu.value.toggle(event);
+};
+
+const items = [
+  {
+    label: 'Copy Link',
+    icon: IconLink,
+    command: copyPhotoLink
+  },
+  {
+    label: 'Delete Photo',
+    icon: IconTrash,
+    command: deletePhoto
+  },
+  {
+    label: 'Move Photo',
+    icon: IconFileExport,
+    command: movePhoto
+  },
+  {
+    label: 'Rename Photo',
+    icon: IconEdit,
+    command: renamePhoto
+  },
+  {
+    label: 'Make Album Cover',
+    icon: IconPhotoStar,
+    command: makeCoverPhoto,
+    visible: !isAlbumCover(photoKey.value)
+  }
+];
 </script>
