@@ -27,6 +27,7 @@ export default class AuthController extends BaseController {
           try {
             const decodedPayload = jwt.verify(result.value, process.env['JWT_SECRET'] as string) as UserPermission;
             return this.ok<UserPermission>(reply, 'ok', decodedPayload);
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
           } catch (error) {
             reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
             return this.ok(reply, 'ok');
@@ -109,7 +110,7 @@ const _verifyIdToken = async (token: string) => {
   // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
   const ticket = await client.verifyIdToken({
     idToken: token,
-    audience: process.env['GOOGLE_CLIENT_ID'] ?? '',
+    audience: process.env['GOOGLE_CLIENT_ID'] ?? ''
   });
   return ticket.getPayload();
 };

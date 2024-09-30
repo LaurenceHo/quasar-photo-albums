@@ -1,6 +1,6 @@
 import { CreateEntityResponse, EntityIdentifiers, QueryOptions, QueryResponse } from 'electrodb';
 import { get, isEmpty, isEqual } from 'radash';
-import { BaseService } from '../types/models.js';
+import { BaseService } from '../types';
 import { ddbDocClient } from './dynamodb-client.js';
 
 export abstract class DynamodbService<T> implements BaseService<T> {
@@ -22,7 +22,7 @@ export abstract class DynamodbService<T> implements BaseService<T> {
     whereClause?: ((_val1: any, _val2: any) => string) | null
   ): Promise<T[]> {
     const options: QueryOptions & { attributes?: Array<keyof T> } = {
-      ignoreOwnership: true,
+      ignoreOwnership: true
     };
     if (method === 'query' && !filter) {
       throw new Error('Filter is required for query method');
@@ -47,7 +47,7 @@ export abstract class DynamodbService<T> implements BaseService<T> {
 
   async findOne(objectKey: { [key: string]: string | number }, attributes?: Array<keyof T>): Promise<T> {
     const options: QueryOptions & { attributes?: Array<keyof T> } = {
-      ignoreOwnership: true,
+      ignoreOwnership: true
     };
 
     if (attributes) {
@@ -75,7 +75,7 @@ export abstract class DynamodbService<T> implements BaseService<T> {
       entity.where(whereClause);
     }
     const response = await entity.go({
-      ignoreOwnership: true,
+      ignoreOwnership: true
     });
 
     return isEqual(response.data, objectKey);

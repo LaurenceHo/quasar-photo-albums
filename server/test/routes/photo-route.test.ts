@@ -1,31 +1,31 @@
+import formAutoContent from 'form-auto-content';
+import fs from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { app } from '../../src/app';
 import { mockAlbumList, mockPhotoList } from '../mock-data';
-import formAutoContent from 'form-auto-content';
-import fs from 'node:fs';
 
 vi.mock('../../src/services/s3-service', () => ({
   default: vi.fn().mockImplementation(() => ({
     findAll: () => Promise.resolve(mockPhotoList),
-    copy: () => Promise.resolve(true),
-  })),
+    copy: () => Promise.resolve(true)
+  }))
 }));
 
 vi.mock('../../src/routes/auth-middleware', async () => ({
   verifyJwtClaim: () => Promise.resolve(),
-  verifyUserPermission: () => Promise.resolve(),
+  verifyUserPermission: () => Promise.resolve()
 }));
 
 vi.mock('../../src/controllers/helpers', async () => ({
   deleteObjects: () => Promise.resolve(true),
   updatePhotoAlbum: () => Promise.resolve(true),
-  uploadObject: () => Promise.resolve(true),
+  uploadObject: () => Promise.resolve(true)
 }));
 
 vi.mock('../../src/services/album-service', () => ({
   default: vi.fn().mockImplementation(() => ({
-    findOne: () => Promise.resolve(mockAlbumList[0]),
-  })),
+    findOne: () => Promise.resolve(mockAlbumList[0])
+  }))
 }));
 
 describe('photo route', () => {
@@ -43,8 +43,8 @@ describe('photo route', () => {
         message: 'ok',
         data: {
           album: mockAlbumList[0],
-          photos: mockPhotoList,
-        },
+          photos: mockPhotoList
+        }
       })
     );
   });
@@ -53,20 +53,20 @@ describe('photo route', () => {
     it('should return 200', async () => {
       const form = formAutoContent({
         myField: 'hello',
-        myFile: fs.createReadStream('../doc-images/AWS-Architecture.png'),
+        myFile: fs.createReadStream('../doc-images/AWS-Architecture.png')
       });
 
       const response = await app.inject({
         method: 'post',
         url: '/api/photos/upload/test',
-        ...form,
+        ...form
       });
       expect(response.statusCode).toBe(200);
       expect(response.payload).toBe(
         JSON.stringify({
           code: 200,
           status: 'Success',
-          message: 'Photo uploaded',
+          message: 'Photo uploaded'
         })
       );
     });
@@ -80,15 +80,15 @@ describe('photo route', () => {
         payload: {
           albumId: 'Test-album',
           destinationAlbumId: 'test-album-1',
-          photoKeys: ['test-photo-1'],
-        },
+          photoKeys: ['test-photo-1']
+        }
       });
       expect(response.statusCode).toBe(200);
       expect(response.payload).toBe(
         JSON.stringify({
           code: 200,
           status: 'Success',
-          message: 'Photo moved',
+          message: 'Photo moved'
         })
       );
     });
@@ -107,15 +107,15 @@ describe('photo route', () => {
         payload: {
           albumId: 'Test-album',
           newPhotoKey: 'test-photo-1',
-          currentPhotoKey: 'test-photo-2',
-        },
+          currentPhotoKey: 'test-photo-2'
+        }
       });
       expect(response.statusCode).toBe(200);
       expect(response.payload).toBe(
         JSON.stringify({
           code: 200,
           status: 'Success',
-          message: 'Photo renamed',
+          message: 'Photo renamed'
         })
       );
     });
@@ -133,15 +133,15 @@ describe('photo route', () => {
         url: '/api/photos',
         payload: {
           albumId: 'Test-album',
-          photoKeys: ['test-photo-1'],
-        },
+          photoKeys: ['test-photo-1']
+        }
       });
       expect(response.statusCode).toBe(200);
       expect(response.payload).toBe(
         JSON.stringify({
           code: 200,
           status: 'Success',
-          message: 'Photo deleted',
+          message: 'Photo deleted'
         })
       );
     });

@@ -35,6 +35,7 @@ export default class PhotoController extends BaseController {
               if (!isAdmin) {
                 return cleanJwtCookie(reply, 'Unauthorized action.', 403);
               }
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
               return cleanJwtCookie(reply, 'Authentication failed.');
             }
@@ -47,7 +48,7 @@ export default class PhotoController extends BaseController {
           Prefix: folderNameKey,
           Bucket: bucketName,
           MaxKeys: 1000,
-          StartAfter: folderNameKey,
+          StartAfter: folderNameKey
         });
 
         // If photo list is not empty and doesn't have album cover, set album cover
@@ -56,7 +57,7 @@ export default class PhotoController extends BaseController {
             ...album,
             albumCover: photos[0]?.key || '',
             updatedBy: 'System',
-            updatedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
           });
           // Remove album cover photo when photo list is empty
         } else if (isEmpty(photos) && !isEmpty(album.albumCover)) {
@@ -64,7 +65,7 @@ export default class PhotoController extends BaseController {
             ...album,
             albumCover: '',
             updatedBy: 'System',
-            updatedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
           });
         }
         return this.ok<PhotoResponse>(reply, 'ok', { album, photos });
@@ -113,7 +114,7 @@ export default class PhotoController extends BaseController {
           .copy({
             Bucket: process.env['AWS_S3_BUCKET_NAME'],
             CopySource: `/${bucketName}/${sourcePhotoKey}`,
-            Key: `${destinationAlbumId}/${photoKey}`,
+            Key: `${destinationAlbumId}/${photoKey}`
           })
           .then((result) => {
             if (result) {
@@ -157,7 +158,7 @@ export default class PhotoController extends BaseController {
       const result = await s3Service.copy({
         Bucket: bucketName,
         CopySource: `/${bucketName}/${albumId}/${currentPhotoKey}`,
-        Key: `${albumId}/${newPhotoKey}`,
+        Key: `${albumId}/${newPhotoKey}`
       });
       if (result) {
         await deleteObjects([`${albumId}/${currentPhotoKey}`]);

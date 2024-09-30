@@ -43,7 +43,7 @@ export const uploadObject = async (filePath: string, object: any) => {
     const putObject: PutObjectCommandInput = {
       Body: object,
       Bucket: s3BucketName,
-      Key: filePath,
+      Key: filePath
     };
 
     if (filePath === 'updateDatabaseAt.json') {
@@ -60,7 +60,7 @@ export const uploadObject = async (filePath: string, object: any) => {
 export const deleteObjects = async (objectKeys: string[]) => {
   const deleteParams: DeleteObjectsCommandInput = {
     Bucket: s3BucketName,
-    Delete: { Objects: [] },
+    Delete: { Objects: [] }
   };
 
   objectKeys.forEach((objectKeys) => deleteParams.Delete?.Objects?.push({ Key: objectKeys }));
@@ -76,7 +76,7 @@ export const deleteObjects = async (objectKeys: string[]) => {
 export const emptyS3Folder = async (folderName: string) => {
   const listedObjects = await s3Service.listObjects({
     Bucket: s3BucketName,
-    Prefix: folderName,
+    Prefix: folderName
   });
 
   if (!listedObjects.Contents || listedObjects.Contents?.length === 0) return true;
@@ -125,6 +125,7 @@ export const verifyIfIsAdmin = (request: FastifyRequest, reply: FastifyReply) =>
     try {
       const decodedPayload = jwt.verify(result.value, process.env['JWT_SECRET'] as string);
       isAdmin = get(decodedPayload, 'role') === 'admin';
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
     }

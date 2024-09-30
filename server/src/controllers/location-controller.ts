@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import { Place } from '../types/place';
+import { Place } from '../types';
 import { BaseController } from './base-controller.js';
 import { perform } from './helpers.js';
 
@@ -20,7 +20,7 @@ export default class LocationController extends BaseController {
         return {
           displayName: displayName.text,
           formattedAddress,
-          location,
+          location
         };
       });
     }

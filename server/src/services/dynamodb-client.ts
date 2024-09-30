@@ -10,15 +10,15 @@ const marshallOptions = {
   // Whether to remove undefined values while marshalling.
   removeUndefinedValues: true, // false, by default.
   // Whether to convert typeof object to map attribute.
-  convertClassInstanceToMap: false, // false, by default.
+  convertClassInstanceToMap: false // false, by default.
 };
 
 const unmarshallOptions = {
   // Whether to return numbers as a string instead of converting them to native JavaScript numbers.
-  wrapNumbers: false, // false, by default.
+  wrapNumbers: false // false, by default.
 };
 
 export const ddbDocClient = DynamoDBDocumentClient.from(dynamoClient, {
   marshallOptions,
-  unmarshallOptions,
+  unmarshallOptions
 });

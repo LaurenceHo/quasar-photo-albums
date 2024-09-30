@@ -4,29 +4,30 @@ import { PhotoSchema } from './photo';
 
 export const PhotoResponseSchema = z.object({
   photos: z.array(PhotoSchema),
-  album: z.custom<Album>(),
+  album: z.custom<Album>()
 });
 
 export const PhotosRequestSchema = z.object({
   albumId: z.string(),
   destinationAlbumId: z.string().optional(),
-  photoKeys: z.array(z.string()),
+  photoKeys: z.array(z.string())
 });
 
 export const RenamePhotoRequestSchema = z.object({
   albumId: z.string(),
   newPhotoKey: z.string(),
-  currentPhotoKey: z.string(),
+  currentPhotoKey: z.string()
 });
 
 const ResponseStatusSchema = z.object({
   code: z.number(),
   status: z.string(),
-  message: z.string().optional(),
+  message: z.string().optional()
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ApiResponseSchema = ResponseStatusSchema.extend({
-  data: z.any().optional(),
+  data: z.any().optional()
 });
 
 export type RenamePhotoRequest = z.infer<typeof RenamePhotoRequestSchema>;

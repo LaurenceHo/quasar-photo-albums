@@ -4,7 +4,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { get } from 'radash';
 import { UserPermission } from '../schemas/user-permission';
-import { RequestWithUser } from '../types/models.js';
+import { RequestWithUser } from '../types';
 import JsonResponse from '../utils/json-response.js';
 
 export const setJwtCookies = async (reply: FastifyReply, token: string) => {
@@ -14,7 +14,7 @@ export const setJwtCookies = async (reply: FastifyReply, token: string) => {
     httpOnly: true,
     secure: true,
     signed: true,
-    path: '/',
+    path: '/'
   };
   reply.setCookie('jwt', token, options);
   reply.header('Cache-Control', 'private');
@@ -46,6 +46,7 @@ export const verifyJwtClaim: FastifyAuthFunction = async (request: FastifyReques
         result.value,
         process.env['JWT_SECRET'] as string
       ) as UserPermission;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
       done(new Error('Authentication failed. Please login.'));
