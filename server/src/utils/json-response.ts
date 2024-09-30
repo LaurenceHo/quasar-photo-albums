@@ -18,13 +18,13 @@ export default class JsonResponse<T> {
         code: 200,
         status: this._status,
         message,
-        data,
+        data
       } satisfies ApiResponse<T>);
     } else {
       return reply.code(this.code).send({
         code: this.code,
         status: this._status,
-        message,
+        message
       } satisfies ResponseStatus);
     }
   }
@@ -34,7 +34,7 @@ export default class JsonResponse<T> {
     return reply.code(this.code).send({
       code: this.code,
       status: this._status,
-      message,
+      message
     } satisfies ResponseStatus);
   }
 
@@ -43,7 +43,7 @@ export default class JsonResponse<T> {
     return reply.code(this.code).send({
       code: this.code,
       status: this._status,
-      message,
+      message
     } satisfies ResponseStatus);
   }
 
@@ -52,7 +52,7 @@ export default class JsonResponse<T> {
     return reply.code(this.code).send({
       code: this.code,
       status: this._status,
-      message,
+      message
     } satisfies ResponseStatus);
   }
 

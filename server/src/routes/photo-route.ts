@@ -13,19 +13,19 @@ const photoRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
         type: 'object',
         properties: {
           year: {
-            type: 'string',
+            type: 'string'
           },
           albumId: {
-            type: 'string',
-          },
-        },
-      },
-    },
+            type: 'string'
+          }
+        }
+      }
+    }
   });
 
   instance.post('/api/photos/upload/:albumId', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
+      relation: 'and'
     }),
     handler: controller.create,
     schema: {
@@ -33,16 +33,16 @@ const photoRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
         type: 'object',
         properties: {
           albumId: {
-            type: 'string',
-          },
-        },
-      },
-    },
+            type: 'string'
+          }
+        }
+      }
+    }
   });
 
   instance.put('/api/photos', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
+      relation: 'and'
     }),
     handler: controller.update,
     schema: {
@@ -51,25 +51,25 @@ const photoRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
         required: ['albumId', 'destinationAlbumId', 'photoKeys'],
         properties: {
           albumId: {
-            type: 'string',
+            type: 'string'
           },
           destinationAlbumId: {
-            type: 'string',
+            type: 'string'
           },
           photoKeys: {
             type: 'array',
             items: {
-              type: 'string',
-            },
-          },
-        },
-      },
-    },
+              type: 'string'
+            }
+          }
+        }
+      }
+    }
   });
 
   instance.put('/api/photos/rename', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
+      relation: 'and'
     }),
     handler: controller.rename,
     schema: {
@@ -78,22 +78,22 @@ const photoRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
         required: ['albumId', 'newPhotoKey', 'currentPhotoKey'],
         properties: {
           albumId: {
-            type: 'string',
+            type: 'string'
           },
           newPhotoKey: {
-            type: 'string',
+            type: 'string'
           },
           currentPhotoKey: {
-            type: 'string',
-          },
-        },
-      },
-    },
+            type: 'string'
+          }
+        }
+      }
+    }
   });
 
   instance.delete('/api/photos', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
+      relation: 'and'
     }),
     handler: controller.delete,
     schema: {
@@ -102,17 +102,17 @@ const photoRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
         required: ['albumId', 'photoKeys'],
         properties: {
           albumId: {
-            type: 'string',
+            type: 'string'
           },
           photoKeys: {
             type: 'array',
             items: {
-              type: 'string',
-            },
-          },
-        },
-      },
-    },
+              type: 'string'
+            }
+          }
+        }
+      }
+    }
   });
 
   done();

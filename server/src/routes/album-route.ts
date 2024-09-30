@@ -11,55 +11,55 @@ const albumSchema = {
   properties: {
     year: {
       type: 'string',
-      minLength: 1,
+      minLength: 1
     },
     id: {
       type: 'string',
-      minLength: 1,
+      minLength: 1
     },
     albumName: {
       type: 'string',
-      minLength: 1,
+      minLength: 1
     },
     description: {
-      type: 'string',
+      type: 'string'
     },
     albumCover: {
-      type: 'string',
+      type: 'string'
     },
     isPrivate: {
-      type: 'boolean',
+      type: 'boolean'
     },
     isFeatured: {
-      type: 'boolean',
+      type: 'boolean'
     },
     tags: {
       type: 'array',
-      items: { type: 'string' },
+      items: { type: 'string' }
     },
     place: {
       type: ['object', 'null'],
       properties: {
         displayName: {
-          type: 'string',
+          type: 'string'
         },
         formattedAddress: {
-          type: 'string',
+          type: 'string'
         },
         location: {
           type: 'object',
           properties: {
             latitude: {
-              type: 'number',
+              type: 'number'
             },
             longitude: {
-              type: 'number',
-            },
-          },
-        },
-      },
-    },
-  },
+              type: 'number'
+            }
+          }
+        }
+      }
+    }
+  }
 };
 
 const albumRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
@@ -70,36 +70,36 @@ const albumRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
         type: 'object',
         properties: {
           year: {
-            type: 'string',
-          },
-        },
-      },
-    },
+            type: 'string'
+          }
+        }
+      }
+    }
   });
 
   instance.post('/api/albums', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
+      relation: 'and'
     }),
     handler: controller.create,
     schema: {
-      body: albumSchema,
-    },
+      body: albumSchema
+    }
   });
 
   instance.put('/api/albums', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
+      relation: 'and'
     }),
     handler: controller.update,
     schema: {
-      body: albumSchema,
-    },
+      body: albumSchema
+    }
   });
 
   instance.delete('/api/albums', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
+      relation: 'and'
     }),
     handler: controller.delete,
     schema: {
@@ -108,14 +108,14 @@ const albumRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
         required: ['year', 'id'],
         properties: {
           year: {
-            type: 'string',
+            type: 'string'
           },
           id: {
-            type: 'string',
-          },
-        },
-      },
-    },
+            type: 'string'
+          }
+        }
+      }
+    }
   });
 
   done();

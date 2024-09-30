@@ -10,4 +10,4 @@ await initialiseDynamodbTables();
 logger().info('Finish verifying DynamoDB tables.');
 
 await app.listen({ port: 3000 });
-logger().info('App is listening on port 3000.🚀🚀🚀');
+logger().info('App is listening on port 3000.');

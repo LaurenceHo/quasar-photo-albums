@@ -34,20 +34,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies and test
-        #TODO: remove --force
         run: |
-          npm install --force
+          bun install
           cd ./server
-          npm install
-          npm run types:server
-          npm run test:server
+          bun install
+          bun run types:server
+          bun run test:server
 
       - name: Write .env file
         run: |

@@ -8,10 +8,10 @@ vi.mock('../../src/controllers/helpers', async () => ({
         {
           formattedAddress: 'Auckland, New Zealand',
           location: { latitude: -36.85088270000001, longitude: 174.7644881 },
-          displayName: { text: 'Auckland', languageCode: 'en' },
-        },
-      ],
-    }),
+          displayName: { text: 'Auckland', languageCode: 'en' }
+        }
+      ]
+    })
 }));
 
 describe('location route', () => {
@@ -33,9 +33,9 @@ describe('location route', () => {
           {
             displayName: 'Auckland',
             formattedAddress: 'Auckland, New Zealand',
-            location: { latitude: -36.85088270000001, longitude: 174.7644881 },
-          },
-        ],
+            location: { latitude: -36.85088270000001, longitude: 174.7644881 }
+          }
+        ]
       })
     );
   });
