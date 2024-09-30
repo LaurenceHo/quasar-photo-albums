@@ -109,7 +109,7 @@ import { useQuery } from '@tanstack/vue-query';
 import Button from 'primevue/button';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
-import InputText from 'primevue/InputText';
+import InputText from 'primevue/inputtext';
 import Menu from 'primevue/menu';
 import ProgressSpinner from 'primevue/progressspinner';
 import Toolbar from 'primevue/toolbar';
