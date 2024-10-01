@@ -163,41 +163,32 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <PhotoDetail
-          @refresh-photo-list="refreshPhotoList"
-          @close-photo-detail="router.replace({ query: { ...route.query, photo: undefined } })"
-        />
+        <PhotoDetail @refresh-photo-list="refreshPhotoList" @close-photo-detail="closePhotoDetail" />
       </transition>
     </div>
   </template>
 
-  <!--  <Dialog v-model:visible="getMovePhotoDialogState">-->
   <!--    <MovePhotoDialog-->
   <!--      :album-id="currentAlbum?.id"-->
   <!--      @close-photo-detail="closePhotoDetail"-->
   <!--      @refresh-photo-list="refreshPhotoList"-->
   <!--    />-->
-  <!--  </Dialog>-->
-  <!--  <Dialog v-model:visible="getDeletePhotoDialogState">-->
-  <!--    <ConfirmDeletePhotosDialog-->
-  <!--      :album-id="currentAlbum?.id"-->
-  <!--      @close-photo-detail="closePhotoDetail"-->
-  <!--      @refresh-photo-list="refreshPhotoList"-->
-  <!--    />-->
-  <!--  </Dialog>-->
-  <!--  <Dialog v-model:visible="getUploadPhotoDialogState">-->
+  <DeletePhotos
+    v-if="getDeletePhotoDialogState"
+    :album-id="currentAlbum?.id"
+    @close-photo-detail="closePhotoDetail"
+    @refresh-photo-list="refreshPhotoList"
+  />
   <!--    <UploadPhotosDialog :album-id="currentAlbum?.id" @refresh-photo-list="refreshPhotoList" />-->
-  <!--  </Dialog>-->
-  <!--  <Dialog v-model:visible="getRenamePhotoDialogState">-->
   <!--    <RenamePhotoDialog-->
   <!--      :album-id="currentAlbum?.id"-->
   <!--      @close-photo-detail="closePhotoDetail"-->
   <!--      @refresh-photo-list="refreshPhotoList"-->
   <!--    />-->
-  <!--  </Dialog>-->
 </template>
 
 <script lang="ts" setup>
+import DeletePhotos from '@/components/dialog/DeletePhotos.vue';
 import Photo from '@/components/Photo.vue';
 import PhotoDetail from '@/components/PhotoDetail.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
@@ -265,6 +256,8 @@ const goBack = () => {
     router.back();
   }
 };
+
+const closePhotoDetail = async () => await router.replace({ query: { ...route.query, photo: undefined } });
 
 const refreshPhotoList = async () => {
   const isPrevAlbumEmpty = photosInAlbum.value.length === 0;

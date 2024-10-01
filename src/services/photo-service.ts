@@ -23,5 +23,49 @@ export const PhotoService = {
     }
 
     return response.json();
+  },
+
+  /**
+   * Move photos from one album to another
+   * @param albumId Original album ID
+   * @param destinationAlbumId Destination album ID
+   * @param photoKeys Keys of photos to be moved
+   */
+  movePhotos: async (albumId: string, destinationAlbumId: string, photoKeys: string[]): Promise<ResponseStatus> => {
+    const response = await BaseApiRequestService.perform('PUT', `${ApiBaseUrl}/photos`, {
+      albumId,
+      destinationAlbumId,
+      photoKeys
+    });
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    return response.json();
+  },
+
+  deletePhotos: async (albumId: string, photoKeys: string[]): Promise<ResponseStatus> => {
+    const response = await BaseApiRequestService.perform('DELETE', `${ApiBaseUrl}/photos`, { albumId, photoKeys });
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    return response.json();
+  },
+
+  renamePhoto: async (albumId: string, newPhotoKey: string, currentPhotoKey: string): Promise<ResponseStatus> => {
+    const response = await BaseApiRequestService.perform('PUT', `${ApiBaseUrl}/photos/rename`, {
+      albumId,
+      newPhotoKey,
+      currentPhotoKey
+    });
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    return response.json();
   }
 };

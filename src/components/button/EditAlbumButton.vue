@@ -13,7 +13,7 @@
         </button>
       </template>
     </Menu>
-    <Dialog v-model:visible="deleteAlbumDialog" class="w-96" data-test-id="confirm-delete-album-dialog" modal>
+    <Dialog v-model:visible="deleteAlbumDialog" class="w-[450px]" data-test-id="confirm-delete-album-dialog" modal>
       <template #header>
         <div class="flex items-center">
           <IconAlertCircle :size="40" class="text-red-400 pr-2 flex-shrink-0" />
@@ -22,7 +22,7 @@
           </span>
         </div>
       </template>
-      <div class="mb-4 text-gray-600">
+      <div class="mb-4">
         All photos in this album will be deleted, and any new photos added while the delete action is in progress might
         also be deleted.
       </div>

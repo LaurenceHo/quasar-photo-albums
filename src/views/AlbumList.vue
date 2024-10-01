@@ -67,20 +67,20 @@
   </template>
   <ScrollTop />
   <Toast position="bottom-center" />
-  <EditAlbumTagsDialog />
+  <EditAlbumTags />
 </template>
 
 <script lang="ts" setup>
 import Album from '@/components/Album.vue';
 import Carousel from '@/components/Carousel.vue';
-import EditAlbumTagsDialog from '@/components/dialog/EditAlbumTagsDialog.vue';
+import EditAlbumTags from '@/components/dialog/EditAlbumTags.vue';
 import SelectTags from '@/components/select/SelectTags.vue';
 import SelectYear from '@/components/select/SelectYear.vue';
 import AlbumsContext, { type FilteredAlbumsByYear } from '@/composables/albums-context';
+import DeviceContext from '@/composables/device-context';
 import UserConfigContext from '@/composables/user-config-context';
 import type { Album as AlbumItem, ApiResponse } from '@/schema';
 import { AggregateService } from '@/services/aggregate-service';
-import DeviceContext from '@/services/device-context';
 import { compareDbUpdatedTime, fetchDbUpdatedTime, sortByKey } from '@/utils/helper';
 import { FEATURED_ALBUMS, FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
 import { IconSortAscendingLetters, IconSortDescendingLetters } from '@tabler/icons-vue';

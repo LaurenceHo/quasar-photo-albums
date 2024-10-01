@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import DeviceContext from '@/services/device-context';
+import DeviceContext from '@/composables/device-context';
 import Skeleton from 'primevue/skeleton';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';

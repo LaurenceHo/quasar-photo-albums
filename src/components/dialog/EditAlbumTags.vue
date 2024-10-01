@@ -1,5 +1,10 @@
 <template>
-  <Dialog v-model:visible="updateAlbumTagsDialogState" :breakpoints="{ '960px': '75vw', '641px': '90vw' }" class="w-96">
+  <Dialog
+    v-model:visible="updateAlbumTagsDialogState"
+    :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
+    class="w-96"
+    modal
+  >
     <template #header>
       <div class="flex items-center">
         <Button
@@ -39,7 +44,7 @@
 
   <Dialog v-model:visible="createTagDialog" class="w-80" data-test-id="create-tag-dialog" modal>
     <template #header>
-      <h6 class="text-xl font-semibold">New tag</h6>
+      <span class="text-xl font-semibold">New tag</span>
     </template>
     <form @submit.prevent="validateAndSubmit" @reset.prevent="onReset">
       <div class="mb-4">
@@ -89,6 +94,7 @@
       />
       <Button
         :loading="isDeletingTag"
+        autofocus
         data-test-id="confirm-delete-tag-button"
         label="Confirm"
         @click="confirmDeleteTag"

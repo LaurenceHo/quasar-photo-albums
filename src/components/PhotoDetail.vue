@@ -126,9 +126,9 @@
 <script lang="ts" setup>
 import EditPhotoButton from '@/components/button/EditPhotoButton.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
+import DeviceContext from '@/composables/device-context';
 import PhotosContext from '@/composables/photos-context';
 import UserConfigContext from '@/composables/user-config-context';
-import DeviceContext from '@/services/device-context';
 import { IconCalendarTime, IconCamera, IconChevronLeft, IconChevronRight, IconPhoto, IconX } from '@tabler/icons-vue';
 import type { ExifTags, FileTags, NumberTag, StringArrayTag } from 'exifreader';
 import * as ExifReader from 'exifreader';

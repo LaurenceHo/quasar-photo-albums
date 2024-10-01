@@ -12,6 +12,7 @@
       </button>
     </template>
   </Menu>
+  <Toast position="top-center" />
 </template>
 
 <script lang="ts" setup>
@@ -24,6 +25,7 @@ import { getStaticFileUrl } from '@/utils/helper';
 import { IconDotsVertical, IconEdit, IconFileExport, IconLink, IconPhotoStar, IconTrash } from '@tabler/icons-vue';
 import Button from 'primevue/button';
 import Menu from 'primevue/menu';
+import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { ref, toRefs } from 'vue';
 
@@ -44,7 +46,6 @@ const { photoKey } = toRefs(props);
 
 const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = PhotosContext();
 const { currentAlbum, fetchAlbumsByYear, setCurrentAlbum, isAlbumCover } = AlbumsContext();
-
 const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } = DialogContext();
 
 const makeCoverPhoto = async () => {
@@ -73,12 +74,13 @@ const renamePhoto = () => {
 
 const copyPhotoLink = () => {
   const photoLink = getStaticFileUrl(photoKey.value);
-  // copy(photoLink);
-  toast.add({
-    severity: 'info',
-    summary: 'Photo link copied!',
-    detail: photoLink,
-    life: 3000
+  navigator.clipboard.writeText(photoLink).then(() => {
+    toast.add({
+      severity: 'secondary',
+      summary: 'Photo link copied!',
+      detail: photoLink,
+      life: 2000
+    });
   });
 };
 

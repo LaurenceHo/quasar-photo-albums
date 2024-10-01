@@ -24,11 +24,7 @@
             <IconCircleCheckFilled :size="24" />
           </template>
         </Button>
-        <EditPhotoButton
-          :photo-key="photo['key']"
-          extra-class="text-white"
-          @refresh-photo-list="emit('refreshPhotoList')"
-        />
+        <EditPhotoButton :photo-key="photo['key']" extra-class="text-white" />
       </div>
     </div>
   </div>
@@ -54,7 +50,7 @@
       <div class="text-sm text-gray-400">{{ fileSize }}</div>
     </div>
     <div v-if="isAdmin" class="flex-shrink-0 ml-2">
-      <EditPhotoButton :photo-key="photo['key']" @refresh-photo-list="refreshPhotoList" />
+      <EditPhotoButton :photo-key="photo['key']" />
     </div>
   </div>
 </template>
@@ -62,9 +58,9 @@
 <script lang="ts" setup>
 import EditPhotoButton from '@/components/button/EditPhotoButton.vue';
 import SquareImage from '@/components/SquareImage.vue';
+import DeviceContext from '@/composables/device-context';
 import PhotosContext from '@/composables/photos-context';
 import UserConfigContext from '@/composables/user-config-context';
-import DeviceContext from '@/services/device-context';
 import { IconCircleCheckFilled } from '@tabler/icons-vue';
 import Button from 'primevue/button';
 import { computed, onMounted, ref, toRefs } from 'vue';
@@ -111,10 +107,6 @@ const selectPhoto = (key: string) => {
     ? selectedPhotos.value.filter((photo) => photo !== key)
     : [...selectedPhotos.value, key];
   setSelectedPhotos(newSelectedPhotos);
-};
-
-const refreshPhotoList = () => {
-  emit('refreshPhotoList');
 };
 
 onMounted(() => {

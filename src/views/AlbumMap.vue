@@ -7,6 +7,7 @@
 </template>
 
 <script lang="ts" setup>
+import UserConfigContext from '@/composables/user-config-context';
 import type { Album, Album as AlbumItem, ApiResponse } from '@/schema';
 import { AggregateService } from '@/services/aggregate-service';
 import { compareDbUpdatedTime, fetchDbUpdatedTime } from '@/utils/helper';
@@ -31,6 +32,7 @@ interface AlbumsWithLocation {
 const cdnURL = import.meta.env.VITE_IMAGEKIT_CDN_URL as string;
 const mapCentreLng = Number(import.meta.env.VITE_MAP_CENTRE_LNG ?? 174.7633);
 const mapCentreLat = Number(import.meta.env.VITE_MAP_CENTRE_LAT ?? -36.8484);
+const { darkMode } = UserConfigContext();
 
 const geoJson = computed(
   () =>
@@ -141,6 +143,12 @@ const createPopup = (map: mapboxgl.Map, event: any, popup: mapboxgl.Popup) => {
   // Populate the popup and set its coordinates
   // based on the feature found.
   popup.setLngLat(coordinates).setHTML(description).addTo(map);
+
+  // Change the background if it's dark mode
+  const popupContent = document.querySelector('.mapboxgl-popup-content');
+  if (popupContent) {
+    popupContent.classList.toggle('bg-zinc-900', darkMode.value);
+  }
 };
 
 onMounted(async () => {
@@ -250,12 +258,12 @@ onMounted(async () => {
 
 <style lang="scss">
 .mapboxgl-popup {
-  max-width: 300px !important;
+  max-width: 320px !important;
 }
 
 .mapboxgl-popup-content {
   text-align: center;
-  padding: 10px;
+  padding: 1rem;
 
   img {
     padding-top: 10px;

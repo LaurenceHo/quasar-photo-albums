@@ -2,7 +2,7 @@ import { getAlbumWithLocation, getCountAlbumsByYear, getFeaturedAlbums } from '@
 import { deleteAlbum, getAlbumsByYear } from '@/mocks/album-handler';
 import { createAlbumTag, deleteAlbumTag, getAlbumTags } from '@/mocks/album-tag-handler';
 import { getUserPermission, userLogin, userLogout } from '@/mocks/auth-handler';
-import { getPhotos } from '@/mocks/photos-handler';
+import { deletePhotos, getPhotos } from '@/mocks/photos-handler';
 import { http, passthrough } from 'msw';
 
 const imageCDNUrl = import.meta.env.VITE_IMAGEKIT_CDN_URL;
@@ -15,16 +15,22 @@ export const handlers = [
   http.get(`${staticFilesUrl}/**`, () => {
     return passthrough();
   }),
+  /** User **/
   getUserPermission,
   userLogout,
   userLogin,
+  /** Album **/
   getAlbumsByYear,
   deleteAlbum,
+  /** Album Tag **/
   getAlbumTags,
   createAlbumTag,
   deleteAlbumTag,
+  /** Aggregate **/
   getFeaturedAlbums,
   getCountAlbumsByYear,
   getAlbumWithLocation,
-  getPhotos
+  /** Photo **/
+  getPhotos,
+  deletePhotos
 ];
