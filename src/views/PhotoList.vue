@@ -168,11 +168,12 @@
     </div>
   </template>
 
-  <!--    <MovePhotoDialog-->
-  <!--      :album-id="currentAlbum?.id"-->
-  <!--      @close-photo-detail="closePhotoDetail"-->
-  <!--      @refresh-photo-list="refreshPhotoList"-->
-  <!--    />-->
+  <MovePhotos
+    v-if="getMovePhotoDialogState"
+    :album-id="currentAlbum?.id"
+    @close-photo-detail="closePhotoDetail"
+    @refresh-photo-list="refreshPhotoList"
+  />
   <DeletePhotos
     v-if="getDeletePhotoDialogState"
     :album-id="currentAlbum?.id"
@@ -189,6 +190,7 @@
 
 <script lang="ts" setup>
 import DeletePhotos from '@/components/dialog/DeletePhotos.vue';
+import MovePhotos from '@/components/dialog/MovePhotos.vue';
 import Photo from '@/components/Photo.vue';
 import PhotoDetail from '@/components/PhotoDetail.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
@@ -281,6 +283,7 @@ const refreshPhotoList = async () => {
   setSelectedPhotos([]);
 };
 
+fetchAlbumsByYear(albumYear.value);
 fetchPhotos(albumId.value, albumYear.value);
 
 watch(albumId, (newValue) => {

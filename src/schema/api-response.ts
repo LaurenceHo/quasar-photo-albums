@@ -14,7 +14,7 @@ const ResponseStatusSchema = z.object({
 });
 
 const ApiResponseSchema = ResponseStatusSchema.extend({
-  data: z.any().optional()
+  data: z.unknown().optional()
 });
 
 export type ResponseStatus = z.infer<typeof ResponseStatusSchema>;

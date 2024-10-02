@@ -1,9 +1,9 @@
 <template>
   <Dialog v-model:visible="deletePhotoDialogState" class="w-[450px]" header="Confirm" modal>
     <template #header>
-      <div class="flex items-center">
+      <div class="flex">
         <IconAlertCircle :size="40" class="text-red-400 pr-2 flex-shrink-0" />
-        <span class="text-xl font-bold" data-test-id="confirm-delete-photos-dialog-title">
+        <span class="text-xl font-semibold" data-test-id="confirm-delete-photos-dialog-title">
           Do you want to delete photo{{ selectedPhotos.length > 1 ? 's' : '' }} as below?
         </span>
       </div>

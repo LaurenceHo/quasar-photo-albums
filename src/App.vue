@@ -195,7 +195,7 @@ const { isFetching, data: userData } = useQuery({
 });
 
 watch(userData, (data) => {
-  if (data) {
+  if (data && data.data) {
     setUserPermission(data.data);
   }
 });

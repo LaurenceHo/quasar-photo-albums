@@ -72,9 +72,9 @@
 
   <Dialog v-model:visible="deleteTagDialog" class="w-96" data-test-id="delete-tag-dialog" modal>
     <template #header>
-      <div class="flex items-center">
+      <div class="flex">
         <IconAlertCircle :size="40" class="text-red-400 pr-2 flex-shrink-0" />
-        <span class="text-xl font-bold" data-test-id="confirm-delete-album-dialog-title">
+        <span class="text-xl font-semibold" data-test-id="confirm-delete-album-dialog-title">
           Do you want to delete tag "{{ tagName }}"?
         </span>
       </div>

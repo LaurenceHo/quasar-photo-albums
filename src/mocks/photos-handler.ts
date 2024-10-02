@@ -158,6 +158,21 @@ export const getPhotos = http.get('/api/photos/**', async () => {
   });
 });
 
+export const movePhotos = http.put('/api/photos', async () => {
+  await delay();
+
+  return HttpResponse.json({
+    code: 200,
+    status: 'Success',
+    message: 'ok'
+  });
+
+  // return new HttpResponse(null, {
+  //   status: 500,
+  //   statusText: 'Error',
+  // });
+});
+
 export const deletePhotos = http.delete('/api/photos', async () => {
   await delay();
 

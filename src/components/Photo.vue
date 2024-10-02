@@ -32,7 +32,8 @@
     v-else
     :class="[
       'flex items-center border border-gray-300 p-2 sm:p-3 rounded-md cursor-pointer h-26 sm:h-32',
-      { 'photo-selected': isPhotoSelected }
+      { 'photo-selected': isPhotoSelected },
+      { 'border-primary-400': darkMode && isPhotoSelected }
     ]"
     data-test-id="detail-photo-item"
   >
@@ -44,7 +45,7 @@
         :src="`${photo['url']}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
       />
     </div>
-    <div class="flex-grow ml-3 min-w-0" @click="goToPhotoDetail">
+    <div class="flex-grow ml-3 min-w-0" @click="selectPhoto(photo['key'])">
       <div class="text-lg truncate">{{ photoId }}</div>
       <div class="text-sm text-gray-400">{{ lastModified }}</div>
       <div class="text-sm text-gray-400">{{ fileSize }}</div>
@@ -78,14 +79,12 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['refreshPhotoList']);
-
 const { photo } = toRefs(props);
 const imageWidth = ref(250);
 
 const route = useRoute();
 const router = useRouter();
-const { isAdmin } = UserConfigContext();
+const { isAdmin, darkMode } = UserConfigContext();
 const { selectedPhotos, setSelectedPhotos } = PhotosContext();
 const { isXSmallDevice } = DeviceContext();
 
@@ -103,6 +102,10 @@ const goToPhotoDetail = async () => {
 };
 
 const selectPhoto = (key: string) => {
+  if (!isAdmin.value) {
+    goToPhotoDetail();
+    return;
+  }
   const newSelectedPhotos = isPhotoSelected.value
     ? selectedPhotos.value.filter((photo) => photo !== key)
     : [...selectedPhotos.value, key];
