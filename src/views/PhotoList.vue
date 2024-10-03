@@ -180,17 +180,19 @@
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
+  <RenamePhoto
+    v-if="getRenamePhotoDialogState"
+    :album-id="currentAlbum?.id"
+    @close-photo-detail="closePhotoDetail"
+    @refresh-photo-list="refreshPhotoList"
+  />
   <!--    <UploadPhotosDialog :album-id="currentAlbum?.id" @refresh-photo-list="refreshPhotoList" />-->
-  <!--    <RenamePhotoDialog-->
-  <!--      :album-id="currentAlbum?.id"-->
-  <!--      @close-photo-detail="closePhotoDetail"-->
-  <!--      @refresh-photo-list="refreshPhotoList"-->
-  <!--    />-->
 </template>
 
 <script lang="ts" setup>
 import DeletePhotos from '@/components/dialog/DeletePhotos.vue';
 import MovePhotos from '@/components/dialog/MovePhotos.vue';
+import RenamePhoto from '@/components/dialog/RenamePhoto.vue';
 import Photo from '@/components/Photo.vue';
 import PhotoDetail from '@/components/PhotoDetail.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';

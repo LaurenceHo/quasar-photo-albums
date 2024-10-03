@@ -49,7 +49,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
+const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 
 const toast = useToast();
 const { deletePhotoDialogState, setDeletePhotoDialogState } = DialogContext();
@@ -68,7 +68,7 @@ const {
   mutate: deletePhoto,
   reset
 } = useMutation({
-  mutationFn: () => PhotoService.deletePhotos(albumId.value, photoKeysArray.value),
+  mutationFn: async () => await PhotoService.deletePhotos(albumId.value, photoKeysArray.value),
   onSuccess: async () => {
     toast.add({
       severity: 'success',
@@ -78,8 +78,8 @@ const {
     });
     setTimeout(() => {
       setDeletePhotoDialogState(false);
-      emit('closePhotoDetail');
-      emit('refreshPhotoList');
+      emits('closePhotoDetail');
+      emits('refreshPhotoList');
     }, 2000);
   },
   onError: () => {

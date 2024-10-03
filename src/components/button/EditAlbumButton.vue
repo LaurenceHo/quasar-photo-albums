@@ -96,7 +96,7 @@ const {
   mutate: deleteAlbum,
   reset
 } = useMutation({
-  mutationFn: () => AlbumService.deleteAlbum(albumItem.value.id, albumItem.value.year),
+  mutationFn: async () => await AlbumService.deleteAlbum(albumItem.value.id, albumItem.value.year),
   onSuccess: async () => {
     toast.add({
       severity: 'success',

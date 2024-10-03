@@ -55,13 +55,14 @@
           data-test-id="input-album-tag"
           placeholder="Tag"
           @input="v$.tagName.$touch"
+          @blur="v$.tagName.$touch"
         />
-        <small v-if="v$.tagName.$error" class="text-red-500">
-          <span v-if="v$.tagName.required.$invalid">This field is required.</span>
-          <span v-else-if="v$.tagName.minLength.$invalid">Tag must be at least 2 characters long.</span>
-          <span v-else-if="v$.tagName.maxLength.$invalid">Tag cannot exceed 20 characters.</span>
-          <span v-else-if="v$.tagName.alphaNum.$invalid">Tag must contain only lowercase letters and numbers.</span>
-        </small>
+        <div class="flex justify-between items-center mt-1">
+          <small v-if="v$.tagName.$error" class="text-red-600">
+            {{ v$.tagName.$errors[0].$message }}
+          </small>
+          <small class="text-gray-500 ml-auto">{{ tagName.length }}/20</small>
+        </div>
       </div>
       <div class="flex justify-end">
         <Button :disabled="isCreatingTag" class="mr-2" label="Cancel" text @click="createTagDialog = false" />
@@ -124,6 +125,7 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const toast = useToast();
+
 const { updateAlbumTagsDialogState } = DialogContext();
 const { albumTags, fetchAlbumTags } = AlbumTagsContext();
 const { fetchAlbumsByYear } = AlbumsContext();
@@ -135,26 +137,26 @@ const tagName = ref('');
 const paramsYear = computed(() => route.params['year'] as string);
 const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(<string>localStorage.getItem(FILTERED_ALBUMS_BY_YEAR));
 
-const rules = {
+const rules = computed(() => ({
   tagName: {
-    required,
-    minLength: minLength(2),
-    maxLength: maxLength(20),
-    alphaNum: helpers.regex(/^[a-z0-9]+$/)
+    required: helpers.withMessage('This field is required.', required),
+    minLength: helpers.withMessage('Tag must be at least 2 characters long.', minLength(2)),
+    maxLength: helpers.withMessage('Tag cannot exceed 20 characters.', maxLength(20)),
+    alphaNum: helpers.withMessage('Tag must contain only lowercase letters and numbers.', helpers.regex(/^[a-z0-9]+$/))
   }
-};
+}));
 
 const v$ = useVuelidate(rules, { tagName });
 
 const validateAndSubmit = async () => {
   const isFormCorrect = await v$.value.$validate();
   if (isFormCorrect) {
-    confirmCreateTag();
+    createAlbumTag();
   }
 };
 
 const { isPending: isCreatingTag, mutate: createAlbumTag } = useMutation({
-  mutationFn: () => AlbumTagService.createAlbumTags([{ tag: tagName.value }]),
+  mutationFn: async () => await AlbumTagService.createAlbumTags([{ tag: tagName.value }]),
   onSuccess: async () => {
     toast.add({
       severity: 'success',
@@ -181,7 +183,7 @@ const {
   mutate: deleteAlbumTag,
   reset
 } = useMutation({
-  mutationFn: () => AlbumTagService.deleteAlbumTag(tagName.value),
+  mutationFn: async () => await AlbumTagService.deleteAlbumTag(tagName.value),
   onSuccess: async () => {
     toast.add({
       severity: 'success',
@@ -203,10 +205,6 @@ const {
     });
   }
 });
-
-const confirmCreateTag = () => {
-  createAlbumTag();
-};
 
 const confirmDeleteTag = (e: MouseEvent) => {
   e.preventDefault();

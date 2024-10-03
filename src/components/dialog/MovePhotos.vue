@@ -2,12 +2,13 @@
   <Dialog
     v-model:visible="movePhotoDialogState"
     :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
-    :style="{ width: '400px' }"
+    class="w-[450px]"
+    modal
   >
     <template #header>
-      <div v-if="duplicatedPhotoKeys.length === 0" class="text-xl font-bold">
+      <span v-if="duplicatedPhotoKeys.length === 0" class="text-xl font-semibold">
         Move photo{{ selectedPhotos.length > 1 ? 's' : '' }} to another album
-      </div>
+      </span>
       <div v-else class="flex">
         <IconFileAlert :size="40" class="text-yellow-600 mr-2" />
         <span class="text-xl font-semibold">
@@ -51,21 +52,22 @@
 
     <template #footer>
       <Button
-        :disabled="isProcessing"
+        :disabled="isPending"
         :label="duplicatedPhotoKeys.length === 0 ? 'Cancel' : 'Close'"
         text
         @click="closeMovePhotoDialog"
       />
       <Button
         v-if="duplicatedPhotoKeys.length === 0"
-        :disabled="!selectedAlbum || isProcessing || photoKeysArray.length === 0"
-        :loading="isProcessing"
+        :disabled="!selectedAlbum || isPending || photoKeysArray.length === 0"
+        :loading="isPending"
         data-test-id="move-photos-button"
         label="Move"
         @click="confirmMovePhotos"
       />
     </template>
   </Dialog>
+  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
@@ -76,10 +78,12 @@ import type { Photo } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
 import { IconFileAlert } from '@tabler/icons-vue';
-import { useQuery } from '@tanstack/vue-query';
+import { useMutation, useQuery } from '@tanstack/vue-query';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 import { computed, ref, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -92,9 +96,10 @@ const props = defineProps({
 });
 const { albumId } = toRefs(props);
 
+const route = useRoute();
+const toast = useToast();
 const { movePhotoDialogState, setMovePhotoDialogState } = DialogContext();
 const { selectedPhotos } = PhotosContext();
-const route = useRoute();
 
 const selectedYear = ref<string>((route.params['year'] as string) || 'na');
 
@@ -123,7 +128,6 @@ const photoKeysArray = computed(
 const duplicatedPhotoKeys = ref<string[]>([]);
 const filteredAlbumsList = ref<{ label: string; value: string }[]>(mappedAlbumList.value ?? []);
 const selectedAlbum = ref<string>(filteredAlbumsList.value[0]?.value ?? '');
-const isProcessing = ref(false);
 const needToRefreshPhotoList = ref(false);
 
 const setSelectedYear = (year: string) => {
@@ -136,51 +140,79 @@ const filterAlbumsFunction = (event: { filter: string }) => {
   );
 };
 
-const confirmMovePhotos = async () => {
-  isProcessing.value = true;
-  const photosInSelectedAlbum = await PhotoService.getPhotosByAlbumId(selectedAlbum.value, selectedYear.value);
-  let tempDuplicatedPhotoKeys: string[] = [];
-  if (photosInSelectedAlbum.data?.photos) {
-    tempDuplicatedPhotoKeys = photosInSelectedAlbum.data.photos
-      .filter((photo: Photo) => {
-        const photoKey = photo.key.split('/')[1];
-        if (photoKey) {
-          return photoKeysArray.value.includes(photoKey);
-        }
-        return false;
-      })
-      .map((photo: Photo) => photo.key.split('/')[1] || '');
-  }
+const {
+  isPending,
+  mutate: movePhoto,
+  reset
+} = useMutation({
+  mutationFn: async () => {
+    const photosInSelectedAlbum = await PhotoService.getPhotosByAlbumId(selectedAlbum.value, selectedYear.value);
+    let duplicatedPhotoKeys: string[] = [];
+    if (photosInSelectedAlbum.data?.photos) {
+      duplicatedPhotoKeys = photosInSelectedAlbum.data.photos
+        .filter((photo: Photo) => {
+          const photoKey = photo.key.split('/')[1];
+          if (photoKey) {
+            return photoKeysArray.value.includes(photoKey);
+          }
+          return false;
+        })
+        .map((photo: Photo) => photo.key.split('/')[1] || '');
+    }
 
-  let filteredPhotoKeys = photoKeysArray.value;
-  if (tempDuplicatedPhotoKeys.length > 0) {
-    filteredPhotoKeys = photoKeysArray.value.filter((photoKey) => !tempDuplicatedPhotoKeys.includes(photoKey));
-  }
-  if (filteredPhotoKeys.length === 0) {
+    let photoKeysNotDuplicate = photoKeysArray.value.filter((photoKey) => !duplicatedPhotoKeys.includes(photoKey));
+    if (photoKeysNotDuplicate.length === 0) {
+      throw new Error('All photos are duplicates');
+    }
+
+    const result = await PhotoService.movePhotos(albumId?.value, selectedAlbum.value, photoKeysNotDuplicate);
+    return { result, tempDuplicatedPhotoKeys: duplicatedPhotoKeys };
+  },
+  onSuccess: ({ result, tempDuplicatedPhotoKeys }) => {
     duplicatedPhotoKeys.value = tempDuplicatedPhotoKeys;
-    isProcessing.value = false;
-    return;
-  }
-
-  const result = await PhotoService.movePhotos(albumId?.value, selectedAlbum.value, filteredPhotoKeys);
-  isProcessing.value = false;
-  duplicatedPhotoKeys.value = tempDuplicatedPhotoKeys;
-
-  if (result.code === 200) {
-    if (duplicatedPhotoKeys.value.length === 0) {
-      setMovePhotoDialogState(false);
-      emits('closePhotoDetail');
-      emits('refreshPhotoList');
+    if (result?.code === 200) {
+      if (duplicatedPhotoKeys.value.length === 0) {
+        toast.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Photos moved',
+          life: 3000
+        });
+        setTimeout(() => {
+          setMovePhotoDialogState(false);
+          emits('closePhotoDetail');
+          emits('refreshPhotoList');
+        }, 2000);
+      } else {
+        needToRefreshPhotoList.value = true;
+      }
+    }
+  },
+  onError: (error) => {
+    if (error.message === 'All photos are duplicates') {
+      duplicatedPhotoKeys.value = photoKeysArray.value;
     } else {
-      needToRefreshPhotoList.value = true;
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while moving photos. Please try again later.',
+        life: 3000
+      });
     }
   }
+});
+
+const confirmMovePhotos = (e: MouseEvent) => {
+  e.preventDefault();
+  movePhoto();
 };
 
-const closeMovePhotoDialog = () => {
+const closeMovePhotoDialog = (e: MouseEvent) => {
+  e.preventDefault();
   if (needToRefreshPhotoList.value) {
     emits('refreshPhotoList');
   }
+  reset();
   setMovePhotoDialogState(false);
 };
 

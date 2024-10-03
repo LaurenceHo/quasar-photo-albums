@@ -4,15 +4,20 @@
       <IconDotsVertical :size="24" />
     </template>
   </Button>
-  <Menu ref="menu" :model="items" :popup="true">
+  <Menu ref="menu" :model="items" popup>
     <template #item="{ item }">
       <button class="flex items-center p-2">
         <component :is="item.icon" :size="24" />
         <span class="ml-2">{{ item.label }}</span>
+        <Tag
+          v-if="showPhotoCopiedTag && item.label === 'Copy link'"
+          class="ml-2"
+          severity="success"
+          value="Copied!"
+        ></Tag>
       </button>
     </template>
   </Menu>
-  <Toast position="top-center" />
 </template>
 
 <script lang="ts" setup>
@@ -25,8 +30,7 @@ import { getStaticFileUrl } from '@/utils/helper';
 import { IconDotsVertical, IconEdit, IconFileExport, IconLink, IconPhotoStar, IconTrash } from '@tabler/icons-vue';
 import Button from 'primevue/button';
 import Menu from 'primevue/menu';
-import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
+import Tag from 'primevue/tag';
 import { ref, toRefs } from 'vue';
 
 const props = defineProps({
@@ -41,8 +45,8 @@ const props = defineProps({
 });
 
 const menu = ref();
-const toast = useToast();
 const { photoKey } = toRefs(props);
+const showPhotoCopiedTag = ref(false);
 
 const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = PhotosContext();
 const { currentAlbum, fetchAlbumsByYear, setCurrentAlbum, isAlbumCover } = AlbumsContext();
@@ -75,12 +79,9 @@ const renamePhoto = () => {
 const copyPhotoLink = () => {
   const photoLink = getStaticFileUrl(photoKey.value);
   navigator.clipboard.writeText(photoLink).then(() => {
-    toast.add({
-      severity: 'secondary',
-      summary: 'Photo link copied!',
-      detail: photoLink,
-      life: 2000
-    });
+    // TODO: should show menu when clicking copy link button
+    showPhotoCopiedTag.value = true;
+    setTimeout(() => (showPhotoCopiedTag.value = false), 2000);
   });
 };
 

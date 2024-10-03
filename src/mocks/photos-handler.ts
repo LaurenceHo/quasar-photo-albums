@@ -187,3 +187,18 @@ export const deletePhotos = http.delete('/api/photos', async () => {
   //   statusText: 'Error',
   // });
 });
+
+export const renamePhoto = http.put('/api/photos/rename', async () => {
+  await delay();
+
+  return HttpResponse.json({
+    code: 200,
+    status: 'Success',
+    message: 'ok'
+  });
+
+  // return new HttpResponse(null, {
+  //   status: 500,
+  //   statusText: 'Error',
+  // });
+});
