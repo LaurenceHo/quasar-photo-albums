@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import EditAlbumButton from '@/components/button/EditAlbumButton.vue';
+import { EditAlbumButton } from '@/components/button';
 import NoImagePlaceholder from '@/components/NoImagePlaceholder.vue';
 import SquareImage from '@/components/SquareImage.vue';
 import { initialAlbum } from '@/composables/albums-context';

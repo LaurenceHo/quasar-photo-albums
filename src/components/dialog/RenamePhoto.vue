@@ -44,6 +44,7 @@
         data-test-id="rename-photos-button"
         label="Save"
         type="submit"
+        @click="validateAndSubmit"
       />
     </template>
   </Dialog>
@@ -100,7 +101,7 @@ const findFileTypeIndex = computed(() => currentPhotoToBeRenamed.value.lastIndex
 const fileType = computed(() => currentPhotoToBeRenamed.value.slice(findFileTypeIndex.value));
 const currentFileNameWithoutExtension = computed(
   () => currentPhotoToBeRenamed.value.slice(0, findFileTypeIndex.value).split('/')[1]
-);
+); // Without album id
 
 const isExistedPhotoKey = ref(false);
 const newPhotoNameWithoutExtension = ref(currentFileNameWithoutExtension.value || ''); // It's used in the input text
@@ -120,7 +121,11 @@ const {
       return;
     }
 
-    return await PhotoService.renamePhoto(albumId.value, newPhotoId.value, currentPhotoToBeRenamed.value);
+    return await PhotoService.renamePhoto(
+      albumId.value,
+      newPhotoId.value,
+      `${currentFileNameWithoutExtension.value}${fileType.value}`
+    );
   },
   onSuccess: async (result) => {
     if (result?.code === 200) {

@@ -73,7 +73,7 @@
 <script lang="ts" setup>
 import Album from '@/components/Album.vue';
 import Carousel from '@/components/Carousel.vue';
-import EditAlbumTags from '@/components/dialog/EditAlbumTags.vue';
+import { EditAlbumTags } from '@/components/dialog';
 import SelectTags from '@/components/select/SelectTags.vue';
 import SelectYear from '@/components/select/SelectYear.vue';
 import AlbumsContext, { type FilteredAlbumsByYear } from '@/composables/albums-context';

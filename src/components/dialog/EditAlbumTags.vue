@@ -54,8 +54,8 @@
           class="w-full"
           data-test-id="input-album-tag"
           placeholder="Tag"
-          @input="v$.tagName.$touch"
           @blur="v$.tagName.$touch"
+          @input="v$.tagName.$touch"
         />
         <div class="flex justify-between items-center mt-1">
           <small v-if="v$.tagName.$error" class="text-red-600">
@@ -66,7 +66,13 @@
       </div>
       <div class="flex justify-end">
         <Button :disabled="isCreatingTag" class="mr-2" label="Cancel" text @click="createTagDialog = false" />
-        <Button :disabled="v$.$invalid" :loading="isCreatingTag" label="Confirm" type="submit" />
+        <Button
+          :disabled="v$.$invalid"
+          :loading="isCreatingTag"
+          label="Confirm"
+          type="submit"
+          @click="validateAndSubmit"
+        />
       </div>
     </form>
   </Dialog>

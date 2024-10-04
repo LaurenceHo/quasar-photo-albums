@@ -2,7 +2,7 @@
 export default {
   content: ['./index.html', './src/**/*.{vue,ts}'],
   theme: {
-    extend: {},
+    extend: {}
   },
-  plugins: [require('tailwindcss-primeui')],
+  plugins: [require('tailwindcss-primeui')]
 };

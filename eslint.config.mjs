@@ -12,7 +12,7 @@ export default tsEslint.config(
   eslintConfigPrettier,
   {
     plugins: {
-      'typescript-eslint': tsEslint.plugin,
+      'typescript-eslint': tsEslint.plugin
     },
     languageOptions: {
       globals: {
@@ -21,36 +21,36 @@ export default tsEslint.config(
         process: 'readonly',
         defineProps: 'readonly',
         defineEmits: 'readonly',
-        defineExpose: 'readonly',
+        defineExpose: 'readonly'
       },
       parserOptions: {
         parser: tsEslint.parser,
         extraFileExtensions: ['.vue'],
         sourceType: 'module',
         tsconfigRootDir: import.meta.dirname,
-        projectService: true,
-      },
+        projectService: true
+      }
     },
     rules: {
       quotes: [
         'warn',
         'single',
         {
-          avoidEscape: true,
-        },
+          avoidEscape: true
+        }
       ],
       'no-undef': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': 'warn',
-      'vue/multi-word-component-names': 'off',
-    },
+      'vue/multi-word-component-names': 'off'
+    }
   },
   {
     files: ['**/*.js'],
-    ...tsEslint.configs.disableTypeChecked,
+    ...tsEslint.configs.disableTypeChecked
   },
   {
-    files: ['**/*.ts', '**/*.vue'],
+    files: ['**/*.ts', '**/*.vue']
   },
   {
     ignores: [
@@ -61,6 +61,7 @@ export default tsEslint.config(
       'node_modules',
       'src/assets/**/*',
       'vitest-setup.ts',
-    ],
+      'server'
+    ]
   }
 );

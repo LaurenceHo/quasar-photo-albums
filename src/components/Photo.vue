@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-import EditPhotoButton from '@/components/button/EditPhotoButton.vue';
+import { EditPhotoButton } from '@/components/button';
 import SquareImage from '@/components/SquareImage.vue';
 import DeviceContext from '@/composables/device-context';
 import PhotosContext from '@/composables/photos-context';

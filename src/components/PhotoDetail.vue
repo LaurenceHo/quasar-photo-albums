@@ -1,12 +1,11 @@
 <template>
   <div tabindex="0" @keydown.left="nextPhoto(-1)" @keydown.right="nextPhoto(1)" @keydown.esc="emit('closePhotoDetail')">
-    <div class="flex items-center justify-end">
-      <Button data-test-id="close-button" rounded severity="secondary" text @click="emit('closePhotoDetail')">
-        <template #icon>
-          <IconX :size="24" />
-        </template>
-      </Button>
-    </div>
+    <Button class="mb-2" rounded @click="emit('closePhotoDetail')">
+      <template #icon>
+        <IconX :size="24" />
+      </template>
+    </Button>
+
     <div class="grid grid-cols-4 gap-3">
       <div class="col-span-4 lg:col-span-3 flex flex-col items-center">
         <div class="w-full text-center mb-3">
@@ -91,8 +90,8 @@
             </div>
             <small class="text-gray-500">
               <span>f/{{ aperture }}</span>
-              <span v-if="exifTags.ExposureTime"> | {{ (exifTags.ExposureTime as NumberTag).description }}</span>
-              <span v-if="exifTags.FocalLength"> | {{ (exifTags.FocalLength as NumberTag).description }}</span>
+              <span v-if="exifTags.ExposureTime"> | {{ (exifTags.ExposureTime as RationalTag).description }}</span>
+              <span v-if="exifTags.FocalLength"> | {{ (exifTags.FocalLength as RationalTag).description }}</span>
               <span v-if="exifTags.ISOSpeedRatings">
                 | ISO{{ (exifTags.ISOSpeedRatings as NumberTag).description }}
               </span>
@@ -124,13 +123,13 @@
 </template>
 
 <script lang="ts" setup>
-import EditPhotoButton from '@/components/button/EditPhotoButton.vue';
+import { EditPhotoButton } from '@/components/button';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import DeviceContext from '@/composables/device-context';
 import PhotosContext from '@/composables/photos-context';
 import UserConfigContext from '@/composables/user-config-context';
 import { IconCalendarTime, IconCamera, IconChevronLeft, IconChevronRight, IconPhoto, IconX } from '@tabler/icons-vue';
-import type { ExifTags, FileTags, NumberTag, StringArrayTag } from 'exifreader';
+import type { ExifTags, FileTags, NumberTag, RationalTag, StringArrayTag } from 'exifreader';
 import * as ExifReader from 'exifreader';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';

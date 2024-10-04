@@ -4,7 +4,7 @@ import { ref } from 'vue';
 const files = ref<IUploadFile[]>([]);
 
 export default function FileListContext() {
-  const addFiles = (newFiles: IUploadFile[]) => {
+  const addFiles = (newFiles: File[]) => {
     const newUploadFiles = [...newFiles].map((file) => new UploadFile(file)).filter((file) => !fileExists(file.id));
     files.value = files.value.concat(newUploadFiles);
   };

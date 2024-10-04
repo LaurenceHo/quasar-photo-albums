@@ -58,8 +58,8 @@ export const PhotoService = {
   renamePhoto: async (albumId: string, newPhotoKey: string, currentPhotoKey: string): Promise<ResponseStatus> => {
     const response = await BaseApiRequestService.perform('PUT', `${ApiBaseUrl}/photos/rename`, {
       albumId,
-      newPhotoKey,
-      currentPhotoKey
+      newPhotoKey, // Without album id
+      currentPhotoKey // Without album id
     });
 
     if (!response.ok) {

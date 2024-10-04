@@ -3,12 +3,12 @@
     <SkeletonPhotoList />
   </template>
   <template v-else>
-    <div v-if="!photoId" class="py-4">
+    <div v-if="!photoId && !getUploadPhotoDialogState" class="py-4">
       <div class="flex flex-col sm:flex-row items-start sm:items-center pb-4">
         <div class="flex items-center w-full sm:w-auto">
           <Button class="flex-shrink-0" rounded @click="goBack">
             <template #icon>
-              <IconChevronLeft :size="24" />
+              <IconArrowNarrowLeft :size="24" />
             </template>
           </Button>
           <SelectButton
@@ -153,7 +153,7 @@
       <h2 v-if="photosInAlbum.length === 0">No results.</h2>
       <ScrollTop />
     </div>
-    <div v-else>
+    <div v-else class="py-4">
       <transition
         appear
         enter-active-class="transition ease-out duration-300"
@@ -163,7 +163,12 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <PhotoDetail @refresh-photo-list="refreshPhotoList" @close-photo-detail="closePhotoDetail" />
+        <PhotoDetail v-if="photoId" @refresh-photo-list="refreshPhotoList" @close-photo-detail="closePhotoDetail" />
+        <UploadPhotos
+          v-else-if="getUploadPhotoDialogState"
+          :album-id="currentAlbum?.id"
+          @refresh-photo-list="refreshPhotoList"
+        />
       </transition>
     </div>
   </template>
@@ -186,17 +191,15 @@
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
-  <!--    <UploadPhotosDialog :album-id="currentAlbum?.id" @refresh-photo-list="refreshPhotoList" />-->
 </template>
 
 <script lang="ts" setup>
-import DeletePhotos from '@/components/dialog/DeletePhotos.vue';
-import MovePhotos from '@/components/dialog/MovePhotos.vue';
-import RenamePhoto from '@/components/dialog/RenamePhoto.vue';
+import { DeletePhotos, MovePhotos, RenamePhoto } from '@/components/dialog';
 import Photo from '@/components/Photo.vue';
 import PhotoDetail from '@/components/PhotoDetail.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SkeletonPhotoList from '@/components/SkeletonPhotoList.vue';
+import UploadPhotos from '@/components/UploadPhotos.vue';
 import AlbumsContext from '@/composables/albums-context';
 import DialogContext from '@/composables/dialog-context';
 import PhotosContext from '@/composables/photos-context';
@@ -204,8 +207,8 @@ import UserConfigContext from '@/composables/user-config-context';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import {
+  IconArrowNarrowLeft,
   IconChecks,
-  IconChevronLeft,
   IconFileExport,
   IconLayoutGrid,
   IconList,

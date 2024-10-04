@@ -75,7 +75,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import CarouselDotButton from '@/components/button/CarouselDotButton.vue';
+import { CarouselDotButton } from '@/components/button';
 import NoImagePlaceholder from '@/components/NoImagePlaceholder.vue';
 import SquareImage from '@/components/SquareImage.vue';
 import type { Album } from '@/schema';
