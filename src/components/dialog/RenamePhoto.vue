@@ -9,18 +9,16 @@
           <InputText
             id="photoName"
             v-model="newPhotoNameWithoutExtension"
-            :invalid="v$.newPhotoNameWithoutExtension.$invalid && v$.newPhotoNameWithoutExtension.$dirty"
+            :invalid="v$.newPhotoNameWithoutExtension.$invalid"
             autofocus
             class="w-full"
             maxlength="30"
-            @blur="v$.newPhotoNameWithoutExtension.$touch"
-            @input="v$.newPhotoNameWithoutExtension.$touch"
           />
           <span class="ml-2">{{ fileType }}</span>
         </div>
         <div class="flex justify-between items-center mt-1">
-          <small v-if="v$.newPhotoNameWithoutExtension.$error" class="text-red-600">
-            {{ v$.newPhotoNameWithoutExtension.$errors[0].$message }}
+          <small v-if="v$.$invalid" class="text-red-600">
+            {{ v$.$silentErrors[0]?.$message }}
           </small>
           <small class="text-gray-500 ml-auto">{{ newPhotoNameWithoutExtension.length }}/30</small>
         </div>

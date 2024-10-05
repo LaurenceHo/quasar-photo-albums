@@ -109,11 +109,6 @@ export const deleteAlbum = http.delete('/api/albums', async () => {
     status: 'Success',
     message: 'ok'
   });
-
-  // return new HttpResponse(null, {
-  //   status: 500,
-  //   statusText: 'Error',
-  // });
 });
 
 export const updateAlbum = http.put('/api/albums', async () => {
@@ -124,9 +119,19 @@ export const updateAlbum = http.put('/api/albums', async () => {
     status: 'Success',
     message: 'ok'
   });
+});
+
+export const createAlbum = http.post('/api/albums', async () => {
+  await delay();
 
   // return new HttpResponse(null, {
   //   status: 500,
   //   statusText: 'Error',
   // });
+
+  return HttpResponse.json({
+    code: 200,
+    status: 'Success',
+    message: 'ok'
+  });
 });

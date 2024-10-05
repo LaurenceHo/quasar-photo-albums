@@ -1,10 +1,12 @@
 <template>
   <div tabindex="0" @keydown.left="nextPhoto(-1)" @keydown.right="nextPhoto(1)" @keydown.esc="emit('closePhotoDetail')">
-    <Button class="mb-2" rounded @click="emit('closePhotoDetail')">
-      <template #icon>
-        <IconX :size="24" />
-      </template>
-    </Button>
+    <div class="flex justify-end">
+      <Button class="mb-2" outlined rounded @click="emit('closePhotoDetail')">
+        <template #icon>
+          <IconX :size="24" />
+        </template>
+      </Button>
+    </div>
 
     <div class="grid grid-cols-4 gap-3">
       <div class="col-span-4 lg:col-span-3 flex flex-col items-center">

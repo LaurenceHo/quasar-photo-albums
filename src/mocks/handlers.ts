@@ -1,7 +1,8 @@
 import { getAlbumWithLocation, getCountAlbumsByYear, getFeaturedAlbums } from '@/mocks/aggregate-handler';
-import { deleteAlbum, getAlbumsByYear, updateAlbum } from '@/mocks/album-handler';
+import { createAlbum, deleteAlbum, getAlbumsByYear, updateAlbum } from '@/mocks/album-handler';
 import { createAlbumTag, deleteAlbumTag, getAlbumTags } from '@/mocks/album-tag-handler';
 import { getUserPermission, userLogin, userLogout } from '@/mocks/auth-handler';
+import { searchPlaces } from '@/mocks/location-handler';
 import { deletePhotos, getPhotos, movePhotos, renamePhoto, uploadPhotos } from '@/mocks/photos-handler';
 import { http, passthrough } from 'msw';
 
@@ -15,6 +16,7 @@ export const handlers = [
   http.get(`${staticFilesUrl}/**`, () => {
     return passthrough();
   }),
+  searchPlaces,
   /** User **/
   getUserPermission,
   userLogout,
@@ -23,6 +25,7 @@ export const handlers = [
   getAlbumsByYear,
   deleteAlbum,
   updateAlbum,
+  createAlbum,
   /** Album Tag **/
   getAlbumTags,
   createAlbumTag,

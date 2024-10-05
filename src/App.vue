@@ -121,7 +121,7 @@ const route = useRoute();
 const routeName = computed(() => route.name);
 const { albumSearchKey } = AlbumsContext();
 const { userPermission, setUserPermission, darkMode, setDarkMode } = UserConfigContext();
-const { setUpdateAlbumTagsDialogState } = DialogContext();
+const { setUpdateAlbumDialogState, setUpdateAlbumTagsDialogState } = DialogContext();
 const appName = import.meta.env.VITE_ALBUM_APP_TITLE;
 const title = document.getElementsByTagName('title')?.[0];
 if (title) {
@@ -133,7 +133,8 @@ const items = ref([
   {
     label: 'New Album',
     icon: IconFolderPlus,
-    visible: () => routeName.value === 'albumsByYear'
+    visible: () => routeName.value === 'albumsByYear',
+    command: () => setUpdateAlbumDialogState(true)
   },
   {
     label: 'Manage Album Tags',

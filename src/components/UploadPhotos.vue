@@ -1,10 +1,12 @@
 <template>
   <div class="w-full h-full">
-    <Button class="mb-2" rounded @click="closeDialog">
-      <template #icon>
-        <IconX :size="24" />
-      </template>
-    </Button>
+    <div class="flex justify-end">
+      <Button class="mb-2" outlined rounded @click="closeDialog">
+        <template #icon>
+          <IconX :size="24" />
+        </template>
+      </Button>
+    </div>
 
     <div class="flex justify-center items-center">
       <DropZone v-slot="{ dropZoneActive }" @files-dropped="addFiles">

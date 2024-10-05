@@ -19,7 +19,7 @@
         extra-class="ml-2 grow sm:w-28 sm:flex-none"
         @select-year="setSelectedYear"
       />
-      <SelectTags extra-class="ml-2 grow sm:flex-none sm:w-40" @select-tags="setSelectedTags" />
+      <SelectTags extra-class="ml-2 grow sm:flex-none sm:w-auto" @select-tags="setSelectedTags" />
     </div>
     <div class="album-list-paginator pt-2 sm:pt-0 grow sm:flex-none">
       <Paginator
@@ -66,18 +66,22 @@
     </template>
   </template>
   <ScrollTop />
+
+  <CreateAlbum v-if="getUpdateAlbumDialogState" />
+  <CreateAlbumTags v-if="getUpdateAlbumTagsDialogState" />
+
   <Toast position="bottom-center" />
-  <EditAlbumTags />
 </template>
 
 <script lang="ts" setup>
 import Album from '@/components/Album.vue';
 import Carousel from '@/components/Carousel.vue';
-import { EditAlbumTags } from '@/components/dialog';
+import { CreateAlbum, CreateAlbumTags } from '@/components/dialog';
 import SelectTags from '@/components/select/SelectTags.vue';
 import SelectYear from '@/components/select/SelectYear.vue';
 import AlbumsContext, { type FilteredAlbumsByYear } from '@/composables/albums-context';
 import DeviceContext from '@/composables/device-context';
+import DialogContext from '@/composables/dialog-context';
 import UserConfigContext from '@/composables/user-config-context';
 import type { Album as AlbumItem, ApiResponse } from '@/schema';
 import { AggregateService } from '@/services/aggregate-service';
@@ -108,6 +112,7 @@ const router = useRouter();
 const { isAdmin } = UserConfigContext();
 const { albumSearchKey, albumList, isFetchingAlbums, fetchAlbumsByYear } = AlbumsContext();
 const { isXSmallDevice } = DeviceContext();
+const { getUpdateAlbumTagsDialogState, getUpdateAlbumDialogState } = DialogContext();
 
 const pageNumber = ref(1);
 const itemsPerPage = ref(20);
@@ -224,7 +229,7 @@ watch(
           album.description?.toLowerCase().includes(lowerSearchKey)
       );
     }
-    if (newSelectedTags.length > 0) {
+    if (newSelectedTags && newSelectedTags.length > 0) {
       const filterByTags: AlbumItem[] = [];
 
       filteredList.forEach((album) => {
