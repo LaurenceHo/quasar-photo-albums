@@ -26,6 +26,12 @@
         </Button>
         <EditPhotoButton :photo-key="photo['key']" extra-class="text-white" />
       </div>
+      <IconInfoCircle
+        v-if="isAlbumCover(photo['key'])"
+        v-tooltip="'Album cover'"
+        :size="24"
+        class="absolute bottom-1 left-1 text-primary-600"
+      />
     </div>
   </div>
   <div
@@ -59,10 +65,11 @@
 <script lang="ts" setup>
 import { EditPhotoButton } from '@/components/button';
 import SquareImage from '@/components/SquareImage.vue';
+import AlbumsContext from '@/composables/albums-context';
 import DeviceContext from '@/composables/device-context';
 import PhotosContext from '@/composables/photos-context';
 import UserConfigContext from '@/composables/user-config-context';
-import { IconCircleCheckFilled } from '@tabler/icons-vue';
+import { IconCircleCheckFilled, IconInfoCircle } from '@tabler/icons-vue';
 import Button from 'primevue/button';
 import { computed, onMounted, ref, toRefs } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -87,6 +94,7 @@ const router = useRouter();
 const { isAdmin, darkMode } = UserConfigContext();
 const { selectedPhotos, setSelectedPhotos } = PhotosContext();
 const { isXSmallDevice } = DeviceContext();
+const { isAlbumCover } = AlbumsContext();
 
 const photoId = computed(() => photo.value['key'].split('/')[1]);
 const thumbnailSize = computed(() => (isXSmallDevice.value ? 80 : 100));

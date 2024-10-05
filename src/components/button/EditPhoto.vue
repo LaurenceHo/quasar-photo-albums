@@ -18,6 +18,7 @@
       </button>
     </template>
   </Menu>
+  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
@@ -28,9 +29,12 @@ import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { getStaticFileUrl } from '@/utils/helper';
 import { IconDotsVertical, IconEdit, IconFileExport, IconLink, IconPhotoStar, IconTrash } from '@tabler/icons-vue';
+import { useMutation } from '@tanstack/vue-query';
 import Button from 'primevue/button';
 import Menu from 'primevue/menu';
 import Tag from 'primevue/tag';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 import { ref, toRefs } from 'vue';
 
 const props = defineProps({
@@ -48,18 +52,40 @@ const menu = ref();
 const { photoKey } = toRefs(props);
 const showPhotoCopiedTag = ref(false);
 
+const toast = useToast();
+
 const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = PhotosContext();
 const { currentAlbum, fetchAlbumsByYear, setCurrentAlbum, isAlbumCover } = AlbumsContext();
 const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } = DialogContext();
 
-const makeCoverPhoto = async () => {
-  const albumToBeUpdated = { ...(currentAlbum.value as Album), albumCover: photoKey.value as string };
-  const response = await AlbumService.updateAlbum(albumToBeUpdated);
-  if (response.code === 200) {
-    await fetchAlbumsByYear(albumToBeUpdated.year, true);
-    setCurrentAlbum(albumToBeUpdated);
+const { mutate: makeCoverPhoto } = useMutation({
+  mutationFn: async () => {
+    // TODO: should show menu when clicking assign photo cover button
+    const albumToBeUpdated = { ...(currentAlbum.value as Album), albumCover: photoKey.value as string };
+    const result = await AlbumService.updateAlbum(albumToBeUpdated);
+    return { result, album: albumToBeUpdated };
+  },
+  onSuccess: async ({ result, album }) => {
+    if (result?.code === 200) {
+      await fetchAlbumsByYear(album.year, true);
+      setCurrentAlbum(album);
+    }
+    toast.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: `Album "${album.albumName}" cover photo updated.`,
+      life: 3000
+    });
+  },
+  onError: () => {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Error while updating album. Please try again later.',
+      life: 3000
+    });
   }
-};
+});
 
 const deletePhoto = () => {
   setSelectedPhotos([photoKey.value]);

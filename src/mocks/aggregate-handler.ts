@@ -27,6 +27,7 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
       {
         albumName: '2024 demo album5 super long long long album name',
         year: '2024',
+        albumCover: 'demo-album5/batch_2017-05-14 13.15.16.jpg',
         isPrivate: false,
         place: {
           formattedAddress: 'Tokyo, Japan',
@@ -58,7 +59,7 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
       {
         albumName: 'Test Album 1',
         year: 'na',
-        albumCover: 'test-album-1/example_photo1.webp',
+        albumCover: 'test-album-1/example_photo2.webp',
         isPrivate: false,
         place: {
           formattedAddress: 'Sydney NSW, Australia',
@@ -74,7 +75,7 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
       {
         albumName: 'this is demo-album-3',
         year: 'na',
-        albumCover: 'demo-album3/batch_elks-8430545.jpg',
+        albumCover: 'demo-album3/batch_dog-8378909.jpg',
         isPrivate: false,
         place: {
           formattedAddress: 'George Town, Penang, Malaysia',
@@ -137,7 +138,7 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
       {
         albumName: 'Test Album 1',
         year: 'na',
-        albumCover: 'test-album-1/example_photo1.webp',
+        albumCover: 'test-album-1/example_photo2.webp',
         isPrivate: false,
         place: {
           formattedAddress: 'Sydney NSW, Australia',
@@ -153,7 +154,7 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
       {
         albumName: 'this is demo-album-3',
         year: 'na',
-        albumCover: 'demo-album3/batch_elks-8430545.jpg',
+        albumCover: 'demo-album3/batch_dog-8378909.jpg',
         isPrivate: false,
         place: {
           formattedAddress: 'George Town, Penang, Malaysia',

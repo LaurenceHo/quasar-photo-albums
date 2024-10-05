@@ -6,12 +6,13 @@
     ]"
   >
     <template #content>
-      <ProgressBar v-if="isUploading" class="mb-4" mode="indeterminate" style="height: 6px" />
-
       <div class="flex items-center">
         <Checkbox v-model="overwrite" binary class="mr-2" />
         <span>Overwrite existing photos</span>
       </div>
+
+      <Divider :pt="{ root: { style: { marginBottom: 0 } } }" />
+      <ProgressBar v-if="isUploading" class="mb-4" mode="indeterminate" style="height: 6px" />
 
       <div
         class="p-4"
@@ -29,6 +30,7 @@
 <script lang="ts" setup>
 import FileUploaderContext from '@/composables/file-uploader-context';
 import Card from 'primevue/card';
+import Divider from 'primevue/divider';
 import Checkbox from 'primevue/checkbox';
 import ProgressBar from 'primevue/progressbar';
 import { onMounted, onUnmounted, ref } from 'vue';

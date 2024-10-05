@@ -65,7 +65,7 @@ const initialiseAlbumTable = async () => {
     });
     logger().info(`${albumTableName} table all set.`);
   } catch (error) {
-    logger().error(`Error when checking ${albumTableName}:`, error);
+    logger().error(`Error when checking ${albumTableName}: ${error}`);
   }
 };
 
@@ -93,7 +93,7 @@ const initialiseAlbumTagsTable = async () => {
     });
     logger().info(`${albumTagsTableName} table all set.`);
   } catch (error) {
-    logger().error(`Error when checking ${albumTagsTableName}:`, error);
+    logger().error(`Error when checking ${albumTagsTableName}: ${error}`);
   }
 };
 
@@ -124,7 +124,7 @@ const initialiseUserTable = async () => {
     });
     logger().info(`${userTableName} table all set.`);
   } catch (error) {
-    logger().error(`Error when checking ${userTableName}:`, error);
+    logger().error(`Error when checking ${userTableName}: ${error}`);
   }
 };
 

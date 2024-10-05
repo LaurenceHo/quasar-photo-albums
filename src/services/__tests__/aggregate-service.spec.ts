@@ -16,7 +16,10 @@ describe('AggregateService', () => {
 
   describe('getAggregateData', () => {
     it('should call BaseApiRequestService.perform with correct parameters', async () => {
-      const mockResponse = { json: vi.fn().mockResolvedValue({ data: 'mock data' }) };
+      const mockResponse = {
+        ok: true,
+        json: vi.fn().mockResolvedValue({ data: 'mock data' })
+      };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
       await AggregateService.getAggregateData('albumsWithLocation');
@@ -26,7 +29,7 @@ describe('AggregateService', () => {
 
     it('should return the JSON response from the API', async () => {
       const mockData = { data: 'mock data' };
-      const mockResponse = { json: vi.fn().mockResolvedValue(mockData) };
+      const mockResponse = { ok: true, json: vi.fn().mockResolvedValue(mockData) };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
       const result = await AggregateService.getAggregateData('featuredAlbums');
@@ -42,7 +45,7 @@ describe('AggregateService', () => {
     });
 
     it('should handle different aggregate types', async () => {
-      const mockResponse = { json: vi.fn().mockResolvedValue({ data: 'mock data' }) };
+      const mockResponse = { ok: true, json: vi.fn().mockResolvedValue({ data: 'mock data' }) };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
       await AggregateService.getAggregateData('albumsWithLocation');

@@ -1,5 +1,5 @@
 import { getAlbumWithLocation, getCountAlbumsByYear, getFeaturedAlbums } from '@/mocks/aggregate-handler';
-import { deleteAlbum, getAlbumsByYear } from '@/mocks/album-handler';
+import { deleteAlbum, getAlbumsByYear, updateAlbum } from '@/mocks/album-handler';
 import { createAlbumTag, deleteAlbumTag, getAlbumTags } from '@/mocks/album-tag-handler';
 import { getUserPermission, userLogin, userLogout } from '@/mocks/auth-handler';
 import { deletePhotos, getPhotos, movePhotos, renamePhoto } from '@/mocks/photos-handler';
@@ -22,6 +22,7 @@ export const handlers = [
   /** Album **/
   getAlbumsByYear,
   deleteAlbum,
+  updateAlbum,
   /** Album Tag **/
   getAlbumTags,
   createAlbumTag,

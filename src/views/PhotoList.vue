@@ -165,7 +165,7 @@
       >
         <PhotoDetail v-if="photoId" @refresh-photo-list="refreshPhotoList" @close-photo-detail="closePhotoDetail" />
         <UploadPhotos
-          v-else-if="getUploadPhotoDialogState"
+          v-else-if="getUploadPhotoDialogState && isAdmin"
           :album-id="currentAlbum?.id"
           @refresh-photo-list="refreshPhotoList"
         />

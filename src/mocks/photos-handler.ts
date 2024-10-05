@@ -2,9 +2,66 @@ import { delay, http, HttpResponse } from 'msw';
 
 const imageCDNUrl = import.meta.env.VITE_IMAGEKIT_CDN_URL;
 
-export const getPhotos = http.get('/api/photos/**', async () => {
+export const getPhotos = http.get('/api/photos/**', async ({ params }) => {
   await delay();
 
+  if (params[0] === 'na/test-album-1') {
+    return HttpResponse.json({
+      code: 200,
+      status: 'Success',
+      message: 'ok',
+      data: {
+        album: {
+          albumCover: 'test-album-1/example_photo2.webp',
+          isPrivate: false,
+          createdAt: '2024-07-24T21:07:57.876Z',
+          updatedBy: 'bluegray1015@gmail.com',
+          createdBy: 'System',
+          isFeatured: true,
+          updatedAt: '2024-10-05T06:10:18.369Z',
+          place: {
+            formattedAddress: 'Sydney NSW, Australia',
+            displayName: 'Sydney',
+            location: {
+              latitude: -33.8688,
+              longitude: 151.2093
+            }
+          },
+          year: 'na',
+          albumName: 'Test Album 1',
+          description: 'This is a test album 1',
+          id: 'test-album-1',
+          tags: ['test-tag-1']
+        },
+        photos: [
+          {
+            url: `${imageCDNUrl}/test-album-1/batch_berlin-8429780.jpg`,
+            key: 'test-album-1/batch_berlin-8429780.jpg',
+            size: 180940,
+            lastModified: '2024-10-04T21:22:04.000Z'
+          },
+          {
+            url: `${imageCDNUrl}/test-album-1/example_photo1.webp`,
+            key: 'test-album-1/example_photo1.webp',
+            size: 88254,
+            lastModified: '2024-07-24T21:07:55.000Z'
+          },
+          {
+            url: `${imageCDNUrl}/test-album-1/example_photo2.webp`,
+            key: 'test-album-1/example_photo2.webp',
+            size: 114404,
+            lastModified: '2024-07-24T21:07:55.000Z'
+          },
+          {
+            url: `${imageCDNUrl}/test-album-1/village-8501168_6401111.jpg`,
+            key: 'test-album-1/village-8501168_6401111.jpg',
+            size: 66599,
+            lastModified: '2024-10-05T05:17:21.000Z'
+          }
+        ]
+      }
+    });
+  }
   return HttpResponse.json({
     code: 200,
     status: 'Success',

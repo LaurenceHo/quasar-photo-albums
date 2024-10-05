@@ -63,7 +63,7 @@ export const getAlbumsByYear = http.get('/api/albums/**', async () => {
       },
       {
         isFeatured: true,
-        albumCover: 'demo-album3/batch_elks-8430545.jpg',
+        albumCover: 'demo-album3/batch_dog-8378909.jpg',
         isPrivate: false,
         place: {
           formattedAddress: 'George Town, Penang, Malaysia',
@@ -81,7 +81,7 @@ export const getAlbumsByYear = http.get('/api/albums/**', async () => {
       },
       {
         isFeatured: true,
-        albumCover: 'test-album-1/example_photo1.webp',
+        albumCover: 'test-album-1/example_photo2.webp',
         isPrivate: false,
         place: {
           formattedAddress: 'Sydney NSW, Australia',
@@ -92,27 +92,9 @@ export const getAlbumsByYear = http.get('/api/albums/**', async () => {
           }
         },
         year: 'na',
-        albumName: 'aaaTest Album 1',
+        albumName: 'Test Album 1',
         description: 'This is a test album 1',
         id: 'test-album-1',
-        tags: ['test-tag-1']
-      },
-      {
-        isFeatured: true,
-        albumCover: 'demo-album2/batch_bird-8360220.jpg',
-        isPrivate: false,
-        place: {
-          formattedAddress: 'Sydney NSW, Australia',
-          displayName: 'Sydney',
-          location: {
-            latitude: -33.8688,
-            longitude: 151.2093
-          }
-        },
-        year: 'na',
-        albumName: 'Some Album',
-        description: 'Some Album',
-        id: 'some-album-1',
         tags: ['test-tag-1']
       }
     ]
@@ -120,6 +102,21 @@ export const getAlbumsByYear = http.get('/api/albums/**', async () => {
 });
 
 export const deleteAlbum = http.delete('/api/albums', async () => {
+  await delay();
+
+  return HttpResponse.json({
+    code: 200,
+    status: 'Success',
+    message: 'ok'
+  });
+
+  // return new HttpResponse(null, {
+  //   status: 500,
+  //   statusText: 'Error',
+  // });
+});
+
+export const updateAlbum = http.put('/api/albums', async () => {
   await delay();
 
   return HttpResponse.json({
