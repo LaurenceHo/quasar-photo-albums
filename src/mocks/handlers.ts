@@ -2,7 +2,7 @@ import { getAlbumWithLocation, getCountAlbumsByYear, getFeaturedAlbums } from '@
 import { deleteAlbum, getAlbumsByYear, updateAlbum } from '@/mocks/album-handler';
 import { createAlbumTag, deleteAlbumTag, getAlbumTags } from '@/mocks/album-tag-handler';
 import { getUserPermission, userLogin, userLogout } from '@/mocks/auth-handler';
-import { deletePhotos, getPhotos, movePhotos, renamePhoto } from '@/mocks/photos-handler';
+import { deletePhotos, getPhotos, movePhotos, renamePhoto, uploadPhotos } from '@/mocks/photos-handler';
 import { http, passthrough } from 'msw';
 
 const imageCDNUrl = import.meta.env.VITE_IMAGEKIT_CDN_URL;
@@ -35,5 +35,6 @@ export const handlers = [
   getPhotos,
   movePhotos,
   deletePhotos,
+  uploadPhotos,
   renamePhoto
 ];

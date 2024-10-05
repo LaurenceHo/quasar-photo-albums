@@ -119,14 +119,13 @@
       </div>
     </div>
   </div>
-  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
 import { EditPhotoButton } from '@/components/button';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import DeviceContext from '@/composables/device-context';
-import PhotosContext from '@/composables/photos-context';
+import { PhotosContext } from '@/composables/photos-context';
 import UserConfigContext from '@/composables/user-config-context';
 import { IconCalendarTime, IconCamera, IconChevronLeft, IconChevronRight, IconPhoto, IconX } from '@tabler/icons-vue';
 import type { ExifTags, FileTags, NumberTag, RationalTag, StringArrayTag } from 'exifreader';
@@ -134,7 +133,6 @@ import * as ExifReader from 'exifreader';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
 import ProgressSpinner from 'primevue/progressspinner';
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';

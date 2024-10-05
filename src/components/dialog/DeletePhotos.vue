@@ -27,18 +27,16 @@
       <Button :loading="isPending" autofocus label="Confirm" @click="confirmDeletePhotos" />
     </template>
   </Dialog>
-  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
 import DialogContext from '@/composables/dialog-context';
-import PhotosContext from '@/composables/photos-context';
+import { PhotosContext } from '@/composables/photos-context';
 import { PhotoService } from '@/services/photo-service';
 import { IconAlertCircle } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { computed, toRefs } from 'vue';
 

@@ -12,6 +12,7 @@
       </div>
 
       <Divider :pt="{ root: { style: { marginBottom: 0 } } }" />
+      <!-- TODO: Should show the percentage of upload progress here -->
       <ProgressBar v-if="isUploading" class="mb-4" mode="indeterminate" style="height: 6px" />
 
       <div

@@ -49,7 +49,7 @@
               />
             </div>
           </Popover>
-          <IconLock v-if="currentAlbum?.isPrivate" v-tooltip="'This is a private album'" :size="24" class="mr-2" />
+          <IconLock v-if="currentAlbum?.isPrivate" v-tooltip="'This is a private album'" :size="24" class="ml-2" />
         </div>
         <p
           v-if="currentAlbum?.description"
@@ -191,6 +191,8 @@
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
+
+  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
@@ -202,7 +204,7 @@ import SkeletonPhotoList from '@/components/SkeletonPhotoList.vue';
 import UploadPhotos from '@/components/UploadPhotos.vue';
 import AlbumsContext from '@/composables/albums-context';
 import DialogContext from '@/composables/dialog-context';
-import PhotosContext from '@/composables/photos-context';
+import { FetchPhotos, PhotosContext } from '@/composables/photos-context';
 import UserConfigContext from '@/composables/user-config-context';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
@@ -223,10 +225,13 @@ import Popover from 'primevue/popover';
 import ScrollTop from 'primevue/scrolltop';
 import SelectButton from 'primevue/selectbutton';
 import Tag from 'primevue/tag';
+import Toast from 'primevue/toast';
 import Toolbar from 'primevue/toolbar';
+import { useToast } from 'primevue/usetoast';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 
@@ -240,7 +245,7 @@ const {
   getRenamePhotoDialogState
 } = DialogContext();
 const { isAdmin } = UserConfigContext();
-const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } = PhotosContext();
+const { photosInAlbum, selectedPhotos, setSelectedPhotos, isFetchingPhotos } = PhotosContext();
 const { currentAlbum, fetchAlbumsByYear } = AlbumsContext();
 
 const albumId = computed(() => route.params['albumId'] as string);
@@ -248,6 +253,8 @@ const albumYear = computed(() => route.params['year'] as string);
 const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.key).slice(0, 50)); // Max 50 photos
 const photoAmount = computed(() => photosInAlbum.value.length);
 const photoId = computed(() => route.query['photo'] as string);
+
+const { refreshPhotos, isFetchingPhotosError } = FetchPhotos(albumId.value, albumYear.value);
 
 const showMap = ref();
 const photoStyle = ref((route.query['photoStyle'] as string) || 'grid'); // Grid is default photo list style
@@ -266,9 +273,13 @@ const goBack = () => {
 
 const closePhotoDetail = async () => await router.replace({ query: { ...route.query, photo: undefined } });
 
+fetchAlbumsByYear(albumYear.value);
+
 const refreshPhotoList = async () => {
   const isPrevAlbumEmpty = photosInAlbum.value.length === 0;
-  await fetchPhotos(albumId.value, albumYear.value, true);
+
+  refreshPhotos();
+
   const isCurrentAlbumEmpty = photosInAlbum.value.length === 0;
 
   let albumToBeUpdated = null;
@@ -288,12 +299,19 @@ const refreshPhotoList = async () => {
   setSelectedPhotos([]);
 };
 
-fetchAlbumsByYear(albumYear.value);
-fetchPhotos(albumId.value, albumYear.value);
+watch(isFetchingPhotosError, (newValue) => {
+  if (newValue) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Error while fetching photos. Please try again later.',
+      life: 3000
+    });
+  }
+});
 
 watch(albumId, (newValue) => {
   if (newValue) {
-    fetchPhotos(newValue, albumYear.value);
     setSelectedPhotos([]);
   }
 });

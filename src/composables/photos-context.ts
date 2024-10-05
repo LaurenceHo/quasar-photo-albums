@@ -2,35 +2,65 @@ import AlbumsContext, { initialAlbum } from '@/composables/albums-context';
 import type { Photo } from '@/schema';
 import { PhotoService } from '@/services/photo-service';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
-import { computed, ref } from 'vue';
+import { useQuery } from '@tanstack/vue-query';
+import { computed, ref, watch } from 'vue';
 
 const photosInAlbum = ref([] as Photo[]);
-const isFetchingPhotos = ref(false);
 const selectedPhotos = ref([] as string[]);
 const currentPhotoToBeRenamed = ref('');
+const isFetchingPhotos = ref(false);
 
-export default function PhotosContext() {
-  const { currentAlbum, setCurrentAlbum } = AlbumsContext();
+const { currentAlbum, setCurrentAlbum } = AlbumsContext();
 
+export const PhotosContext = () => {
+  const getPhotosInAlbum = computed(() => photosInAlbum.value);
+  const getCurrentPhotoToBeRenamed = computed(() => currentPhotoToBeRenamed.value);
+  const getSelectedPhotos = computed(() => selectedPhotos.value);
   const getIsFetchingPhotos = computed(() => isFetchingPhotos.value);
 
-  const getPhotosInAlbum = computed(() => photosInAlbum.value);
+  const findPhotoByIndex = (index: number): Photo | undefined => photosInAlbum.value[index];
 
-  const fetchPhotos = async (albumId: string, albumYear: string, refreshPhotosList?: boolean) => {
-    // Only fetch photos when album id is updated
-    if (albumId !== currentAlbum.value.id || refreshPhotosList) {
-      isFetchingPhotos.value = true;
+  const findPhotoIndex = (photoId: string): number =>
+    photosInAlbum.value.findIndex((photo) => photo.key === `${currentAlbum.value.id}/${photoId}`);
+
+  const setCurrentPhotoToBeRenamed = (photoKey: string) => {
+    currentPhotoToBeRenamed.value = photoKey;
+  };
+
+  const setSelectedPhotos = (photos: string[]) => {
+    selectedPhotos.value = photos;
+  };
+
+  const setPhotosInAlbum = (photos: Photo[]) => {
+    photosInAlbum.value = photos;
+  };
+
+  return {
+    photosInAlbum: getPhotosInAlbum,
+    currentPhotoToBeRenamed: getCurrentPhotoToBeRenamed,
+    selectedPhotos: getSelectedPhotos,
+    isFetchingPhotos: getIsFetchingPhotos,
+    setPhotosInAlbum,
+    setCurrentPhotoToBeRenamed,
+    setSelectedPhotos,
+    findPhotoByIndex,
+    findPhotoIndex
+  };
+};
+
+export const FetchPhotos = (albumId: string, albumYear: string) => {
+  const enabled = computed(() => !!albumId && !!albumYear);
+  const queryKey = ['getPhotosByAlbumId', albumId, albumYear];
+
+  const { isLoading, refetch, isError } = useQuery({
+    queryKey,
+    queryFn: async () => {
       setCurrentAlbum(initialAlbum);
-
-      if (!refreshPhotosList) {
-        photosInAlbum.value = [];
-      }
 
       const { data, code } = await PhotoService.getPhotosByAlbumId(albumId, albumYear);
 
       setCurrentAlbum(data?.album ?? initialAlbum);
       photosInAlbum.value = data?.photos ?? [];
-      isFetchingPhotos.value = false;
 
       if (code && code !== 200) {
         if (code === 401 || code === 403) {
@@ -40,35 +70,26 @@ export default function PhotosContext() {
         }
         setTimeout(() => window.location.assign('/'), 3000);
       }
-    }
+      return data;
+    },
+    enabled
+  });
+
+  const refreshPhotos = () => {
+    photosInAlbum.value = [];
+    refetch();
   };
 
-  const findPhotoByIndex = (index: number): Photo | undefined => photosInAlbum.value[index];
-
-  const findPhotoIndex = (photoId: string): number =>
-    photosInAlbum.value.findIndex((photo) => photo.key === `${currentAlbum.value.id}/${photoId}`);
-
-  const getCurrentPhotoToBeRenamed = computed(() => currentPhotoToBeRenamed.value);
-
-  const setCurrentPhotoToBeRenamed = (photoKey: string) => {
-    currentPhotoToBeRenamed.value = photoKey;
-  };
-
-  const getSelectedPhotos = computed(() => selectedPhotos.value);
-
-  const setSelectedPhotos = (photos: string[]) => {
-    selectedPhotos.value = photos;
-  };
+  watch(
+    isLoading,
+    (newValue) => {
+      isFetchingPhotos.value = newValue;
+    },
+    { immediate: true }
+  );
 
   return {
-    photosInAlbum: getPhotosInAlbum,
-    currentPhotoToBeRenamed: getCurrentPhotoToBeRenamed,
-    selectedPhotos: getSelectedPhotos,
-    isFetchingPhotos: getIsFetchingPhotos,
-    fetchPhotos,
-    setCurrentPhotoToBeRenamed,
-    setSelectedPhotos,
-    findPhotoByIndex,
-    findPhotoIndex
+    isFetchingPhotosError: isError,
+    refreshPhotos
   };
-}
+};

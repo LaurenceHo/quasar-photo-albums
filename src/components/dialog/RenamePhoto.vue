@@ -48,13 +48,12 @@
       />
     </template>
   </Dialog>
-  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
 import AlbumsContext from '@/composables/albums-context';
 import DialogContext from '@/composables/dialog-context';
-import PhotosContext from '@/composables/photos-context';
+import { PhotosContext } from '@/composables/photos-context';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
 import { useMutation } from '@tanstack/vue-query';
@@ -63,7 +62,6 @@ import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { isEmpty } from 'radash';
 import { computed, ref, toRefs, watch } from 'vue';

@@ -67,13 +67,12 @@
       />
     </template>
   </Dialog>
-  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
 import SelectYear from '@/components/select/SelectYear.vue';
 import DialogContext from '@/composables/dialog-context';
-import PhotosContext from '@/composables/photos-context';
+import { PhotosContext } from '@/composables/photos-context';
 import type { Photo } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
@@ -82,7 +81,6 @@ import { useMutation, useQuery } from '@tanstack/vue-query';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { computed, ref, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -104,9 +102,9 @@ const { selectedPhotos } = PhotosContext();
 const selectedYear = ref<string>((route.params['year'] as string) || 'na');
 
 const { data: albumsData, isLoading: isFetchingAlbums } = useQuery({
+  enabled: computed(() => !!selectedYear.value),
   queryKey: ['getAlbumsByYear', selectedYear],
-  queryFn: () => AlbumService.getAlbumsByYear(selectedYear.value),
-  enabled: computed(() => !!selectedYear.value)
+  queryFn: () => AlbumService.getAlbumsByYear(selectedYear.value)
 });
 
 const mappedAlbumList = computed(() => {

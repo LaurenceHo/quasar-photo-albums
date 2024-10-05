@@ -50,15 +50,15 @@ const _fetchAlbumsAndSetToLocalStorage = async (year: string | undefined, dbUpda
 
 const currentAlbum = ref(initialAlbum as Album);
 const albumToBeUpdate = ref(initialAlbum as Album);
-
 const isFetchingAlbums = ref(false);
 const albumList = ref<Album[]>([]);
 const albumSearchKey = ref('');
 
 export default function AlbumsContext() {
   const getAlbumList = computed(() => albumList.value);
-
   const getIsFetchingAlbums = computed(() => isFetchingAlbums.value);
+  const getAlbumToBeUpdate = computed(() => albumToBeUpdate.value);
+  const getCurrentAlbum = computed(() => currentAlbum.value);
 
   const fetchAlbumsByYear = async (year?: string, forceUpdate = false) => {
     isFetchingAlbums.value = true;
@@ -91,13 +91,9 @@ export default function AlbumsContext() {
     isFetchingAlbums.value = false;
   };
 
-  const getAlbumToBeUpdate = computed(() => albumToBeUpdate.value);
-
   const setAlbumToBeUpdated = (album: Album) => {
     albumToBeUpdate.value = album;
   };
-
-  const getCurrentAlbum = computed(() => currentAlbum.value);
 
   const setCurrentAlbum = (album: Album) => {
     currentAlbum.value = album;

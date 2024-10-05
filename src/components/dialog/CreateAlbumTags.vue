@@ -108,7 +108,6 @@
       />
     </template>
   </Dialog>
-  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
@@ -124,7 +123,6 @@ import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';

@@ -13,6 +13,10 @@ const darkMode = ref(false);
 const userPermission = ref(initialState);
 
 export default function UserConfigContext() {
+  const getUserPermission = computed(() => userPermission.value);
+  const getDarkMode = computed(() => darkMode.value);
+  const isAdmin = computed(() => userPermission.value?.role === 'admin');
+
   const setUserPermission = (user: UserPermission) => {
     userPermission.value = user;
   };
@@ -21,12 +25,6 @@ export default function UserConfigContext() {
     darkMode.value = mode;
     localStorage.setItem(DARK_MODE_ENABLED, mode ? 'true' : 'false');
   };
-
-  const getUserPermission = computed(() => userPermission.value);
-
-  const getDarkMode = computed(() => darkMode.value);
-
-  const isAdmin = computed(() => userPermission.value?.role === 'admin');
 
   return {
     isAdmin,

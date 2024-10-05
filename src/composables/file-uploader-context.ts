@@ -1,4 +1,4 @@
-import PhotosContext from '@/composables/photos-context';
+import { PhotosContext } from '@/composables/photos-context';
 import type { UploadFile } from '@/schema';
 import { PhotoService } from '@/services/photo-service';
 import { ref } from 'vue';

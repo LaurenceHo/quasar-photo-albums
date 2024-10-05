@@ -14,9 +14,6 @@ export const getPhotos = http.get('/api/photos/**', async ({ params }) => {
         album: {
           albumCover: 'test-album-1/example_photo2.webp',
           isPrivate: false,
-          createdAt: '2024-07-24T21:07:57.876Z',
-          updatedBy: 'bluegray1015@gmail.com',
-          createdBy: 'System',
           isFeatured: true,
           updatedAt: '2024-10-05T06:10:18.369Z',
           place: {
@@ -70,9 +67,6 @@ export const getPhotos = http.get('/api/photos/**', async ({ params }) => {
       album: {
         albumCover: 'demo-album3/batch_elks-8430545.jpg',
         isPrivate: false,
-        createdAt: '2024-05-08T08:32:04.364Z',
-        updatedBy: 'bluegray1015@gmail.com',
-        createdBy: 'System',
         isFeatured: true,
         updatedAt: '2024-07-20T21:47:57.009Z',
         place: {
@@ -238,11 +232,6 @@ export const deletePhotos = http.delete('/api/photos', async () => {
     status: 'Success',
     message: 'ok'
   });
-
-  // return new HttpResponse(null, {
-  //   status: 500,
-  //   statusText: 'Error',
-  // });
 });
 
 export const renamePhoto = http.put('/api/photos/rename', async () => {
@@ -253,9 +242,14 @@ export const renamePhoto = http.put('/api/photos/rename', async () => {
     status: 'Success',
     message: 'ok'
   });
+});
 
-  // return new HttpResponse(null, {
-  //   status: 500,
-  //   statusText: 'Error',
-  // });
+export const uploadPhotos = http.post('/api/photos/upload/**', async () => {
+  await delay();
+
+  return HttpResponse.json({
+    code: 200,
+    status: 'Success',
+    message: 'ok'
+  });
 });
