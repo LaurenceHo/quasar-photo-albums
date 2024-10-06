@@ -1,8 +1,8 @@
 <template>
   <Toolbar class="custom-toolbar sticky top-0 z-50">
     <template #start>
-      <router-link class="flex" to="/">
-        <img alt="Vue logo" class="logo" height="48" width="48" src="/logo.png" />
+      <router-link class="flex items-center" to="/">
+        <img alt="Website logo" class="logo" height="48" width="48" src="/logo.png" />
         <h1 class="hidden sm:block text-2xl font-bold">{{ appName }}</h1>
       </router-link>
     </template>

@@ -46,7 +46,11 @@ const {
   queryFn: () => AggregateService.getAggregateData('countAlbumsByYear')
 });
 
-watch(internalSelectedYear, (value) => {
-  emits('selectYear', value);
-});
+watch(
+  internalSelectedYear,
+  (value) => {
+    emits('selectYear', value);
+  },
+  { immediate: true }
+);
 </script>

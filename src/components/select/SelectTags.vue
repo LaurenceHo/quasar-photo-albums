@@ -1,6 +1,6 @@
 <template>
   <MultiSelect
-    v-model="selectedTag"
+    v-model="internalSelectedTags"
     :class="extraClass"
     :loading="isFetchingAlbumTags"
     :options="albumTags"
@@ -9,29 +9,35 @@
     option-value="tag"
     placeholder="Album Tag"
     display="chip"
+    input-id="select-tags"
   />
 </template>
 
 <script lang="ts" setup>
 import AlbumTagsContext from '@/composables/album-tags-context';
 import MultiSelect from 'primevue/multiselect';
-import { ref, watch } from 'vue';
+import { ref, toRefs, watch } from 'vue';
 
 const emits = defineEmits(['selectTags']);
-defineProps({
+const props = defineProps({
+  selectedTags: {
+    type: Array as () => string[],
+    default: () => []
+  },
   extraClass: {
     type: String,
     default: ''
   }
 });
 
-const selectedTag = ref();
+const { selectedTags } = toRefs(props);
+const internalSelectedTags = ref(selectedTags.value);
 const { fetchAlbumTags, isFetchingAlbumTags, albumTags } = AlbumTagsContext();
 
 fetchAlbumTags();
 
 watch(
-  selectedTag,
+  internalSelectedTags,
   (value) => {
     emits('selectTags', value);
   },

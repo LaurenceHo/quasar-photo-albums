@@ -17,10 +17,10 @@
       </Button>
       <SelectYear
         :selected-year="paramsYear || filteredAlbumsByYear?.year || 'na'"
-        extra-class="ml-2 grow sm:w-28 sm:flex-none"
+        extra-class="ml-2 grow sm:w-auto sm:flex-none"
         @select-year="setSelectedYear"
       />
-      <SelectTags extra-class="ml-2 grow sm:flex-none sm:w-auto" @select-tags="setSelectedTags" />
+      <SelectTags extra-class="ml-2 grow sm:w-auto sm:flex-none" @select-tags="setSelectedTags" />
     </div>
     <div class="album-list-paginator pt-2 sm:pt-0 grow sm:flex-none">
       <Paginator

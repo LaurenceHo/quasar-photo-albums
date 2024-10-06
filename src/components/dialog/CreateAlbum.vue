@@ -13,34 +13,40 @@
     </template>
 
     <form @reset.prevent="resetAlbum" @submit.prevent="validateAndSubmit">
-      <div class="overflow-y-auto mb-4" style="max-height: 50vh">
-        <div class="mb-4 flex items-center">
+      <div class="overflow-y-auto mb-4" style="max-height: 80vh">
+        <div class="mb-4 pb-4 flex items-center">
           Private album
           <ToggleSwitch v-model="privateAlbum" :disable="isCreatingAlbum" class="ml-2" />
         </div>
 
-        <div class="mb-4">
-          <Select
-            v-model="selectedYear"
-            :disabled="albumToBeUpdate.id !== ''"
-            :invalid="v$.selectedYear.$invalid"
-            :options="yearOptions"
-            class="w-full"
-            data-test-id="select-album-year"
-            placeholder="Select Year"
-          />
+        <div class="mb-4 pb-4">
+          <FloatLabel>
+            <Select
+              v-model="selectedYear"
+              :disabled="albumToBeUpdate.id !== ''"
+              :invalid="v$.selectedYear.$invalid"
+              :options="yearOptions"
+              class="w-full"
+              data-test-id="select-album-year"
+              input-id="select-year"
+            />
+            <label for="select-year">Select Year</label>
+          </FloatLabel>
           <small v-if="v$.selectedYear.$invalid" class="p-error">Year is required</small>
         </div>
 
-        <div class="mb-4">
-          <InputText
-            v-model="albumId"
-            :disabled="albumToBeUpdate.id !== '' || isCreatingAlbum"
-            :invalid="v$.albumId.$invalid"
-            class="w-full"
-            data-test-id="input-album-id"
-            placeholder="Album ID"
-          />
+        <div class="mb-4 pb-4">
+          <FloatLabel>
+            <InputText
+              v-model="albumId"
+              :disabled="albumToBeUpdate.id !== '' || isCreatingAlbum"
+              :invalid="v$.albumId.$invalid"
+              class="w-full"
+              data-test-id="input-album-id"
+              input-id="album-id"
+            />
+            <label for="album-id">Album ID</label>
+          </FloatLabel>
           <small v-if="v$.albumId.$invalid" class="text-red-600">
             {{ v$.albumId.$silentErrors[0]?.$message }}
           </small>
@@ -50,15 +56,18 @@
           </div>
         </div>
 
-        <div class="mb-4">
-          <InputText
-            v-model="albumName"
-            :disabled="isCreatingAlbum"
-            :invalid="v$.albumName.$invalid"
-            class="w-full"
-            data-test-id="input-album-name"
-            placeholder="Album Name"
-          />
+        <div class="mb-4 pb-4">
+          <FloatLabel>
+            <InputText
+              v-model="albumName"
+              :disabled="isCreatingAlbum"
+              :invalid="v$.albumName.$invalid"
+              class="w-full"
+              data-test-id="input-album-name"
+              input-id="album-name"
+            />
+            <label for="album-name">Album Name</label>
+          </FloatLabel>
           <div class="flex justify-between items-center mt-1 text-gray-500">
             <small v-if="v$.albumName.$invalid" class="text-red-600">
               {{ v$.albumName.$silentErrors[0]?.$message }}
@@ -67,15 +76,18 @@
           </div>
         </div>
 
-        <div class="mb-4">
-          <Textarea
-            v-model="albumDesc"
-            :disabled="isCreatingAlbum"
-            :rows="3"
-            class="w-full"
-            data-test-id="input-album-desc"
-            placeholder="Album Description"
-          />
+        <div class="mb-4 pb-4">
+          <FloatLabel>
+            <Textarea
+              v-model="albumDesc"
+              :disabled="isCreatingAlbum"
+              :rows="3"
+              class="w-full"
+              data-test-id="input-album-desc"
+              input-id="album-desc"
+            />
+            <label for="album-desc">Album Description</label>
+          </FloatLabel>
           <div class="flex justify-between items-center mt-1 text-gray-500">
             <small v-if="v$.albumDesc.$invalid" class="text-red-600">
               {{ v$.albumDesc.$silentErrors[0]?.$message }}
@@ -85,10 +97,13 @@
         </div>
 
         <div class="mb-4">
-          <SelectTags extra-class="w-full" @select-tags="setSelectedTags" />
+          <FloatLabel>
+            <SelectTags :selected-tags="selectedAlbumTags" extra-class="w-full" @select-tags="setSelectedTags" />
+            <label for="select-tags">Album Tag</label>
+          </FloatLabel>
         </div>
 
-        <div class="mb-4">
+        <div class="mb-4 pb-4">
           <div class="flex items-center">
             Featured album
             <ToggleSwitch v-model="featuredAlbum" :disabled="isCreatingAlbum || privateAlbum" class="ml-2" />
@@ -97,30 +112,33 @@
         </div>
 
         <div class="mb-4">
-          <AutoComplete
-            v-model="selectedPlace"
-            :disabled="isCreatingAlbum"
-            :loading="isSearching"
-            :suggestions="placeSuggestions"
-            class="w-full"
-            input-class="w-full"
-            option-label="displayName"
-            placeholder="Search Location"
-            @complete="searchPlace"
-          >
-            <template #option="slotProps">
-              <div class="flex flex-col">
-                <span class="font-bold">{{ slotProps.option.displayName }}</span>
-                <span class="text-sm text-gray-600">{{ slotProps.option.formattedAddress }}</span>
-              </div>
-            </template>
-            <template #empty>
-              <div class="text-gray-500 italic">No suggestion found</div>
-            </template>
-          </AutoComplete>
+          <FloatLabel>
+            <AutoComplete
+              v-model="selectedPlace"
+              :disabled="isCreatingAlbum"
+              :loading="isSearching"
+              :suggestions="placeSuggestions"
+              class="w-full"
+              input-class="w-full"
+              input-id="search-location"
+              option-label="displayName"
+              @complete="searchPlace"
+            >
+              <template #option="slotProps">
+                <div class="flex flex-col">
+                  <span class="font-bold">{{ slotProps.option.displayName }}</span>
+                  <span class="text-sm text-gray-600">{{ slotProps.option.formattedAddress }}</span>
+                </div>
+              </template>
+              <template #empty>
+                <div class="text-gray-500 italic">No suggestion found</div>
+              </template>
+            </AutoComplete>
+            <label for="search-location">Search Location</label>
+          </FloatLabel>
         </div>
 
-        <div v-if="selectedPlace" class="mt-4">
+        <div v-if="selectedPlace && locationLatitude !== 0 && locationLongitude !== 0" class="mt-4">
           <PhotoLocationMap :latitude="locationLatitude" :longitude="locationLongitude" />
         </div>
       </div>
@@ -157,6 +175,7 @@ import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
 import AutoComplete from 'primevue/autocomplete';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
+import FloatLabel from 'primevue/floatlabel';
 import InputText from 'primevue/inputtext';
 import Select from 'primevue/select';
 import Textarea from 'primevue/textarea';
@@ -184,7 +203,6 @@ const selectedPlace = ref(null as Place | null);
 const placeSuggestions = ref([] as Place[]);
 const isSearching = ref(false);
 
-// FIXME: Cannot display correct location on the map
 const storedTagsStringArray = computed(() => albumTags.value.map((tag) => tag.tag));
 const locationLatitude = computed(() => selectedPlace.value?.location?.latitude || 0);
 const locationLongitude = computed(() => selectedPlace.value?.location?.longitude || 0);
