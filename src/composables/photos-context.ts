@@ -2,21 +2,52 @@ import AlbumsContext, { initialAlbum } from '@/composables/albums-context';
 import type { Photo } from '@/schema';
 import { PhotoService } from '@/services/photo-service';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
-import { useQuery } from '@tanstack/vue-query';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 
 const photosInAlbum = ref([] as Photo[]);
+const isFetchingPhotos = ref(false);
 const selectedPhotos = ref([] as string[]);
 const currentPhotoToBeRenamed = ref('');
-const isFetchingPhotos = ref(false);
 
-const { currentAlbum, setCurrentAlbum } = AlbumsContext();
+export default function PhotosContext() {
+  const { currentAlbum, setCurrentAlbum } = AlbumsContext();
 
-export const PhotosContext = () => {
+  const getIsFetchingPhotos = computed(() => isFetchingPhotos.value);
   const getPhotosInAlbum = computed(() => photosInAlbum.value);
   const getCurrentPhotoToBeRenamed = computed(() => currentPhotoToBeRenamed.value);
   const getSelectedPhotos = computed(() => selectedPhotos.value);
-  const getIsFetchingPhotos = computed(() => isFetchingPhotos.value);
+
+  const fetchPhotos = async (albumId: string, albumYear: string, refreshPhotosList?: boolean) => {
+    // Only fetch photos when album id is updated
+    if (albumId !== currentAlbum.value.id || refreshPhotosList) {
+      isFetchingPhotos.value = true;
+      setCurrentAlbum(initialAlbum);
+
+      if (!refreshPhotosList) {
+        photosInAlbum.value = [];
+      }
+
+      try {
+        const { data, code } = await PhotoService.getPhotosByAlbumId(albumId, albumYear);
+
+        setCurrentAlbum(data?.album ?? initialAlbum);
+        photosInAlbum.value = data?.photos ?? [];
+
+        if (code && code !== 200) {
+          if (code === 401 || code === 403) {
+            // Temporarily set selected album id to the album id from URL to avoid re-fetching photos
+            setCurrentAlbum({ ...currentAlbum.value, id: albumId });
+            localStorage.removeItem(FILTERED_ALBUMS_BY_YEAR);
+          }
+          setTimeout(() => window.location.assign('/'), 3000);
+        }
+      } catch (error) {
+        isFetchingPhotos.value = false;
+        throw error;
+      }
+      isFetchingPhotos.value = false;
+    }
+  };
 
   const findPhotoByIndex = (index: number): Photo | undefined => photosInAlbum.value[index];
 
@@ -31,65 +62,15 @@ export const PhotosContext = () => {
     selectedPhotos.value = photos;
   };
 
-  const setPhotosInAlbum = (photos: Photo[]) => {
-    photosInAlbum.value = photos;
-  };
-
   return {
     photosInAlbum: getPhotosInAlbum,
     currentPhotoToBeRenamed: getCurrentPhotoToBeRenamed,
     selectedPhotos: getSelectedPhotos,
     isFetchingPhotos: getIsFetchingPhotos,
-    setPhotosInAlbum,
+    fetchPhotos,
     setCurrentPhotoToBeRenamed,
     setSelectedPhotos,
     findPhotoByIndex,
     findPhotoIndex
   };
-};
-
-export const FetchPhotos = (albumId: string, albumYear: string) => {
-  const enabled = computed(() => !!albumId && !!albumYear);
-  const queryKey = ['getPhotosByAlbumId', albumId, albumYear];
-
-  const { isLoading, refetch, isError } = useQuery({
-    queryKey,
-    queryFn: async () => {
-      setCurrentAlbum(initialAlbum);
-
-      const { data, code } = await PhotoService.getPhotosByAlbumId(albumId, albumYear);
-
-      setCurrentAlbum(data?.album ?? initialAlbum);
-      photosInAlbum.value = data?.photos ?? [];
-
-      if (code && code !== 200) {
-        if (code === 401 || code === 403) {
-          // Temporarily set selected album id to the album id from URL to avoid re-fetching photos
-          setCurrentAlbum({ ...currentAlbum.value, id: albumId });
-          localStorage.removeItem(FILTERED_ALBUMS_BY_YEAR);
-        }
-        setTimeout(() => window.location.assign('/'), 3000);
-      }
-      return data;
-    },
-    enabled
-  });
-
-  const refreshPhotos = () => {
-    photosInAlbum.value = [];
-    refetch();
-  };
-
-  watch(
-    isLoading,
-    (newValue) => {
-      isFetchingPhotos.value = newValue;
-    },
-    { immediate: true }
-  );
-
-  return {
-    isFetchingPhotosError: isError,
-    refreshPhotos
-  };
-};
+}

@@ -12,8 +12,8 @@
       </span>
     </template>
 
-    <form @reset="resetAlbum" @submit.prevent="validateAndSubmit">
-      <div class="overflow-y-auto" style="max-height: 50vh">
+    <form @reset.prevent="resetAlbum" @submit.prevent="validateAndSubmit">
+      <div class="overflow-y-auto mb-4" style="max-height: 50vh">
         <div class="mb-4 flex items-center">
           Private album
           <ToggleSwitch v-model="privateAlbum" :disable="isCreatingAlbum" class="ml-2" />
@@ -99,6 +99,7 @@
         <div class="mb-4">
           <AutoComplete
             v-model="selectedPlace"
+            :disabled="isCreatingAlbum"
             :loading="isSearching"
             :suggestions="placeSuggestions"
             class="w-full"
@@ -123,19 +124,19 @@
           <PhotoLocationMap :latitude="locationLatitude" :longitude="locationLongitude" />
         </div>
       </div>
-    </form>
 
-    <template #footer>
-      <Button :disabled="isCreatingAlbum" class="mr-2" label="Cancel" text @click="resetAlbum" />
-      <Button
-        :disabled="v$.$invalid"
-        :label="albumToBeUpdate.id ? 'Update' : 'Create'"
-        :loading="isCreatingAlbum"
-        autofocus
-        data-test-id="submit-album-button"
-        @click="validateAndSubmit"
-      />
-    </template>
+      <div class="flex justify-end">
+        <Button :disabled="isCreatingAlbum" class="mr-2" label="Cancel" text @click="resetAlbum" />
+        <Button
+          :disabled="v$.$invalid"
+          :label="albumToBeUpdate.id ? 'Update' : 'Create'"
+          :loading="isCreatingAlbum"
+          autofocus
+          data-test-id="submit-album-button"
+          type="submit"
+        />
+      </div>
+    </form>
   </Dialog>
 </template>
 
@@ -172,10 +173,6 @@ const { getUpdateAlbumDialogState, setUpdateAlbumDialogState } = DialogContext()
 const { albumToBeUpdate, setAlbumToBeUpdated, fetchAlbumsByYear } = AlbumsContext();
 const { albumTags } = AlbumTagsContext();
 
-const storedTagsStringArray = computed(() => albumTags.value.map((tag) => tag.tag));
-const locationLatitude = computed(() => selectedPlace.value?.location?.latitude || 0);
-const locationLongitude = computed(() => selectedPlace.value?.location?.longitude || 0);
-
 const selectedYear = ref(String(new Date().getFullYear()));
 const albumId = ref('');
 const albumName = ref('');
@@ -186,6 +183,11 @@ const selectedAlbumTags = ref([] as string[]);
 const selectedPlace = ref(null as Place | null);
 const placeSuggestions = ref([] as Place[]);
 const isSearching = ref(false);
+
+// FIXME: Cannot display correct location on the map
+const storedTagsStringArray = computed(() => albumTags.value.map((tag) => tag.tag));
+const locationLatitude = computed(() => selectedPlace.value?.location?.latitude || 0);
+const locationLongitude = computed(() => selectedPlace.value?.location?.longitude || 0);
 
 // Validation rules
 const rules = computed(() => ({
@@ -277,7 +279,7 @@ const { isPending: isCreatingAlbum, mutate: createAlbum } = useMutation({
       toast.add({
         severity: 'success',
         summary: 'Success',
-        detail: `Album "${album.albumName}" ${albumToBeUpdate.value.id ? 'updated.' : 'created.'}.`,
+        detail: `Album "${album.albumName}" ${albumToBeUpdate.value.id ? 'updated' : 'created'}.`,
         life: 3000
       });
 

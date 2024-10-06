@@ -22,7 +22,7 @@ import { configuration } from './config.js';
 
 export default class S3Service implements BaseService<Photo> {
   public readonly s3Client = new S3Client(configuration);
-  public readonly cdnURL = process.env['IMAGEKIT_CDN_URL'];
+  public readonly cdnURL = process.env['VITE_IMAGEKIT_CDN_URL'];
 
   async findAll(params: ListObjectsV2CommandInput): Promise<Photo[]> {
     const response = await this.s3Client.send(new ListObjectsV2Command(params));

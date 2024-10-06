@@ -45,7 +45,7 @@ import { IconX } from '@tabler/icons-vue';
 import Button from 'primevue/button';
 import { computed, toRefs } from 'vue';
 
-defineEmits<{ (e: 'remove', file: IUploadFile): void }>();
+defineEmits<(e: 'remove', file: IUploadFile) => void>();
 
 const props = defineProps({
   file: { type: Object as () => IUploadFile, required: true },

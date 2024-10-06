@@ -23,35 +23,34 @@
           <small class="text-gray-500 ml-auto">{{ newPhotoNameWithoutExtension.length }}/30</small>
         </div>
       </div>
+      <div class="flex justify-end">
+        <Button
+          :disabled="isPending"
+          label="Cancel"
+          text
+          @click="
+            () => {
+              reset();
+              setRenamePhotoDialogState(false);
+            }
+          "
+        />
+        <Button
+          :disabled="v$.$invalid || isPending || newPhotoNameWithoutExtension === currentFileNameWithoutExtension"
+          :loading="isPending"
+          data-test-id="rename-photos-button"
+          label="Save"
+          type="submit"
+        />
+      </div>
     </form>
-    <template #footer>
-      <Button
-        :disabled="isPending"
-        label="Cancel"
-        text
-        @click="
-          () => {
-            reset();
-            setRenamePhotoDialogState(false);
-          }
-        "
-      />
-      <Button
-        :disabled="v$.$invalid || isPending || newPhotoNameWithoutExtension === currentFileNameWithoutExtension"
-        :loading="isPending"
-        data-test-id="rename-photos-button"
-        label="Save"
-        type="submit"
-        @click="validateAndSubmit"
-      />
-    </template>
   </Dialog>
 </template>
 
 <script lang="ts" setup>
 import AlbumsContext from '@/composables/albums-context';
 import DialogContext from '@/composables/dialog-context';
-import { PhotosContext } from '@/composables/photos-context';
+import PhotosContext from '@/composables/photos-context';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
 import { useMutation } from '@tanstack/vue-query';

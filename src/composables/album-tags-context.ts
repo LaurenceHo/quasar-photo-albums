@@ -41,7 +41,7 @@ export default function AlbumTagsContext() {
         await _fetchAlbumTagsAndSetToLocalStorage();
       } else {
         const compareResult = await compareDbUpdatedTime(
-          JSON.parse(<string>localStorage.getItem(ALBUM_TAGS)).dbUpdatedTime
+          get(JSON.parse(localStorage.getItem(ALBUM_TAGS) || '{}') as AlbumTags, 'dbUpdatedTime', null)
         );
         if (forceUpdate || !compareResult.isLatest) {
           await _fetchAlbumTagsAndSetToLocalStorage(compareResult.dbUpdatedTime);

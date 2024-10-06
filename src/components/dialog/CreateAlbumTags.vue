@@ -50,6 +50,7 @@
       <div class="mb-4">
         <InputText
           v-model="tagName"
+          :disabled="isCreatingTag"
           :invalid="v$.tagName.$invalid && v$.tagName.$dirty"
           class="w-full"
           data-test-id="input-album-tag"
@@ -66,13 +67,7 @@
       </div>
       <div class="flex justify-end">
         <Button :disabled="isCreatingTag" class="mr-2" label="Cancel" text @click="createTagDialog = false" />
-        <Button
-          :disabled="v$.$invalid"
-          :loading="isCreatingTag"
-          label="Confirm"
-          type="submit"
-          @click="validateAndSubmit"
-        />
+        <Button :disabled="v$.$invalid" :loading="isCreatingTag" label="Confirm" type="submit" />
       </div>
     </form>
   </Dialog>

@@ -18,13 +18,12 @@
       </button>
     </template>
   </Menu>
-  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
 import AlbumsContext from '@/composables/albums-context';
 import DialogContext from '@/composables/dialog-context';
-import { PhotosContext } from '@/composables/photos-context';
+import PhotosContext from '@/composables/photos-context';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { getStaticFileUrl } from '@/utils/helper';
@@ -33,7 +32,6 @@ import { useMutation } from '@tanstack/vue-query';
 import Button from 'primevue/button';
 import Menu from 'primevue/menu';
 import Tag from 'primevue/tag';
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { ref, toRefs } from 'vue';
 

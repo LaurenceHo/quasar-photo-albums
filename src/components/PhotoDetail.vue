@@ -68,11 +68,7 @@
       <div class="col-span-4 lg:col-span-1 mt-3 lg:mt-0">
         <div class="flex justify-between mx-4">
           <span class="text-2xl text-semibold">Details</span>
-          <EditPhotoButton
-            v-if="isAdmin && selectedImage"
-            :photo-key="selectedImage?.key"
-            @refresh-photo-list="emit('refreshPhotoList')"
-          />
+          <EditPhotoButton v-if="isAdmin && selectedImage" :photo-key="selectedImage?.key" />
         </div>
         <Divider v-if="dateTime" />
         <div v-if="dateTime" class="flex items-center mx-4">
@@ -127,7 +123,7 @@
 import { EditPhotoButton } from '@/components/button';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import DeviceContext from '@/composables/device-context';
-import { PhotosContext } from '@/composables/photos-context';
+import PhotosContext from '@/composables/photos-context';
 import UserConfigContext from '@/composables/user-config-context';
 import { IconCalendarTime, IconCamera, IconChevronLeft, IconChevronRight, IconPhoto, IconX } from '@tabler/icons-vue';
 import type { ExifTags, FileTags, NumberTag, RationalTag, StringArrayTag } from 'exifreader';

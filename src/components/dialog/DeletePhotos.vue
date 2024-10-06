@@ -31,7 +31,7 @@
 
 <script lang="ts" setup>
 import DialogContext from '@/composables/dialog-context';
-import { PhotosContext } from '@/composables/photos-context';
+import PhotosContext from '@/composables/photos-context';
 import { PhotoService } from '@/services/photo-service';
 import { IconAlertCircle } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';

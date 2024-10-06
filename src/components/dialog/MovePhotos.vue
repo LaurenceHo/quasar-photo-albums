@@ -72,7 +72,7 @@
 <script lang="ts" setup>
 import SelectYear from '@/components/select/SelectYear.vue';
 import DialogContext from '@/composables/dialog-context';
-import { PhotosContext } from '@/composables/photos-context';
+import PhotosContext from '@/composables/photos-context';
 import type { Photo } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';

@@ -36,7 +36,7 @@ import Checkbox from 'primevue/checkbox';
 import ProgressBar from 'primevue/progressbar';
 import { onMounted, onUnmounted, ref } from 'vue';
 
-const emit = defineEmits<{ (e: 'files-dropped', files: File[]): void }>();
+const emits = defineEmits<(e: 'files-dropped', files: File[]) => void>();
 
 const { overwrite, isUploading } = FileUploaderContext();
 const active = ref(false);
@@ -61,7 +61,7 @@ const setInactive = () => {
 const onDrop = (e: DragEvent) => {
   setInactive();
   if (e.dataTransfer?.files) {
-    emit('files-dropped', [...e.dataTransfer.files]);
+    emits('files-dropped', [...e.dataTransfer.files]);
   }
 };
 

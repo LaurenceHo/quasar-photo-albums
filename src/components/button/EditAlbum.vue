@@ -46,7 +46,6 @@
       </template>
     </Dialog>
   </div>
-  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
@@ -59,7 +58,6 @@ import { useMutation } from '@tanstack/vue-query';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Menu from 'primevue/menu';
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { ref, toRefs } from 'vue';
 import { useRoute } from 'vue-router';

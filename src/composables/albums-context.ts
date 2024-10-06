@@ -48,8 +48,8 @@ const _fetchAlbumsAndSetToLocalStorage = async (year: string | undefined, dbUpda
   }
 };
 
-const currentAlbum = ref(initialAlbum as Album);
-const albumToBeUpdate = ref(initialAlbum as Album);
+const currentAlbum = ref(initialAlbum);
+const albumToBeUpdate = ref(initialAlbum);
 const isFetchingAlbums = ref(false);
 const albumList = ref<Album[]>([]);
 const albumSearchKey = ref('');
@@ -68,7 +68,7 @@ export default function AlbumsContext() {
         await _fetchAlbumsAndSetToLocalStorage(year);
       } else {
         const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(
-          <string>localStorage.getItem(FILTERED_ALBUMS_BY_YEAR)
+          localStorage.getItem(FILTERED_ALBUMS_BY_YEAR) || '{}'
         );
         const compareResult = await compareDbUpdatedTime(filteredAlbumsByYear.dbUpdatedTime);
         // If local storage is not the latest data or request year is different from local storage (user selects year

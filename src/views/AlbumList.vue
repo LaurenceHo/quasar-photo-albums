@@ -3,6 +3,7 @@
     <div class="flex grow sm:flex-none">
       <Button
         outlined
+        severity="secondary"
         @click="() => (albumSortOrder === 'desc' ? (albumSortOrder = 'asc') : (albumSortOrder = 'desc'))"
       >
         <template #icon>
