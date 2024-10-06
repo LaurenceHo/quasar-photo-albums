@@ -38,7 +38,7 @@ I've written the detailed tutorial on dev.to, you can check [here](https://dev.t
 
 ### Built With
 
-[![Vue][Vue.js]][Vue-url][![TypeScript][typescript]][type-url][![Vite][vite]][vite-url][![Fastify][fastify]][fastify-url][![AWS][aws]][aws-url]
+[![Vite][vite]][vite-url][![Vue][Vue.js]][Vue-url][![Tailwind CSS][tailwindcss]][tailwindcss-url][![TypeScript][typescript]][type-url][![Vitest][vitest]][vitest-url][![Fastify][fastify]][fastify-url][![AWS][aws]][aws-url]
 
 ### Architecture
 
@@ -167,6 +167,8 @@ See [Configuring quasar.conf.js](https://v2.quasar.dev/quasar-cli/quasar-conf-js
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
+[vitest]: https://img.shields.io/badge/Vitest-%236E9F18?style=for-the-badge&logo=Vitest&logoColor=%23fcd703
+[vitest-url]: https://vitest.dev/
 [Vue.js]: https://img.shields.io/badge/Vue%20js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
 [Vue-url]: https://vuejs.org/
 [aws]: https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white
@@ -177,3 +179,5 @@ See [Configuring quasar.conf.js](https://v2.quasar.dev/quasar-cli/quasar-conf-js
 [vite-url]: https://vitejs.dev/
 [fastify]: https://img.shields.io/badge/fastify-202020?style=for-the-badge&logo=fastify&logoColor=white
 [fastify-url]: https://fastify.dev/
+[tailwindcss]: https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white
+[tailwindcss-url]: https://tailwindcss.com/
