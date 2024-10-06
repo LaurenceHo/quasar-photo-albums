@@ -3,7 +3,7 @@
     <SkeletonPhotoList />
   </template>
   <template v-else>
-    <div v-if="!photoId && !getUploadPhotoDialogState" class="py-4">
+    <div v-if="!photoId && !showPhotoUploader" class="py-4">
       <div class="flex flex-col sm:flex-row items-start sm:items-center pb-4">
         <div class="flex items-center w-full sm:w-auto">
           <Button class="flex-shrink-0" rounded @click="goBack">
@@ -91,7 +91,7 @@
             data-test-id="upload-photos-button"
             severity="secondary"
             text
-            @click="setUploadPhotoDialogState(true)"
+            @click="showPhotoUploader = true"
           >
             <template #icon>
               <IconPhotoUp :size="24" />
@@ -176,28 +176,29 @@
       >
         <PhotoDetail v-if="photoId" @refresh-photo-list="refreshPhotoList" @close-photo-detail="closePhotoDetail" />
         <UploadPhotos
-          v-else-if="getUploadPhotoDialogState && isAdmin"
+          v-else-if="showPhotoUploader && isAdmin"
           :album-id="currentAlbum?.id"
           @refresh-photo-list="refreshPhotoList"
+          @close-photo-uploader="showPhotoUploader = false"
         />
       </transition>
     </div>
   </template>
 
   <MovePhotos
-    v-if="getMovePhotoDialogState"
+    v-if="movePhotoDialogState"
     :album-id="currentAlbum?.id"
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
   <DeletePhotos
-    v-if="getDeletePhotoDialogState"
+    v-if="deletePhotoDialogState"
     :album-id="currentAlbum?.id"
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
   <RenamePhoto
-    v-if="getRenamePhotoDialogState"
+    v-if="renamePhotoDialogState"
     :album-id="currentAlbum?.id"
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
@@ -248,13 +249,11 @@ const route = useRoute();
 const router = useRouter();
 
 const {
-  getUploadPhotoDialogState,
-  setUploadPhotoDialogState,
-  getDeletePhotoDialogState,
+  deletePhotoDialogState,
   setDeletePhotoDialogState,
-  getMovePhotoDialogState,
+  movePhotoDialogState,
   setMovePhotoDialogState,
-  getRenamePhotoDialogState
+  renamePhotoDialogState
 } = DialogContext();
 const { isAdmin } = UserConfigContext();
 const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } = PhotosContext();
@@ -266,6 +265,7 @@ const photoKeysList = computed(() => photosInAlbum.value.map((photo) => photo.ke
 const photoAmount = computed(() => photosInAlbum.value.length);
 const photoId = computed(() => route.query['photo'] as string);
 
+const showPhotoUploader = ref(false);
 const showMap = ref();
 const photoStyle = ref((route.query['photoStyle'] as string) || 'grid'); // Grid is default photo list style
 

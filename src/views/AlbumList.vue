@@ -68,8 +68,9 @@
   </template>
   <ScrollTop />
 
-  <CreateAlbum v-if="getUpdateAlbumDialogState" />
-  <CreateAlbumTags v-if="getUpdateAlbumTagsDialogState" />
+  <CreateAlbum v-if="updateAlbumDialogState" />
+  <CreateAlbumTag v-if="createAlbumTagDialogState" />
+  <UpdateAlbumTags v-if="updateAlbumTagsDialogState" />
 
   <Toast position="bottom-center" />
 </template>
@@ -77,7 +78,8 @@
 <script lang="ts" setup>
 import Album from '@/components/Album.vue';
 import Carousel from '@/components/Carousel.vue';
-import { CreateAlbum, CreateAlbumTags } from '@/components/dialog';
+import { CreateAlbum, UpdateAlbumTags } from '@/components/dialog';
+import CreateAlbumTag from '@/components/dialog/CreateAlbumTag.vue';
 import SelectTags from '@/components/select/SelectTags.vue';
 import SelectYear from '@/components/select/SelectYear.vue';
 import AlbumsContext, { type FilteredAlbumsByYear } from '@/composables/albums-context';
@@ -113,7 +115,7 @@ const router = useRouter();
 const { isAdmin } = UserConfigContext();
 const { albumSearchKey, albumList, isFetchingAlbums, fetchAlbumsByYear } = AlbumsContext();
 const { isXSmallDevice } = DeviceContext();
-const { getUpdateAlbumTagsDialogState, getUpdateAlbumDialogState } = DialogContext();
+const { updateAlbumTagsDialogState, updateAlbumDialogState, createAlbumTagDialogState } = DialogContext();
 
 const pageNumber = ref(1);
 const itemsPerPage = ref(20);

@@ -4,6 +4,7 @@
     :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
     class="w-[450px]"
     modal
+    :closable="false"
   >
     <template #header>
       <span v-if="duplicatedPhotoKeys.length === 0" class="text-xl font-semibold">

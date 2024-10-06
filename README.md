@@ -103,14 +103,8 @@ This project uses Google OAuth 2.0 to authenticate users. If you don't want to u
 implement login UI and authentication process by yourself. Once you set up Google OAuth 2.0 client ID and OAuth consent
 screen, you can access login UI by going to `http://localhost:9000/login`. You will also need to add your Google account
 information in the [DynamoDB table](server/README.md#aws-dynamodb) you created. If every thing is set up correctly, you should be able to login
-with your Google account and see the admin features including album and photo management as below:
-![web-capture1](doc-images/Web_capture_1.webp)
-![web-capture2](doc-images/Web_capture_2.webp)
-![web-capture3](doc-images/Web_capture_3.webp)
-![web-capture4](doc-images/Web_capture_4.webp)
-![web-capture5](doc-images/Web_capture_5.webp)
-![web-capture6](doc-images/Web_capture_6.webp)
-![web-capture7](doc-images/Web_capture_7.webp)
+with your Google account and see the admin features including album and photo management. If you just want to have a
+quick glance of UI, you can simply run `bun run msw`, it will launch UI on http://localhost:5173.
 
 ### AWS Lambda Function
 

@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="getUpdateAlbumDialogState"
+    v-model:visible="updateAlbumDialogState"
     :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
     :closable="false"
     class="w-[450px]"
@@ -13,7 +13,7 @@
     </template>
 
     <form @reset.prevent="resetAlbum" @submit.prevent="validateAndSubmit">
-      <div class="overflow-y-auto mb-4" style="max-height: 80vh">
+      <div class="mb-4">
         <div class="mb-4 pb-4 flex items-center">
           Private album
           <ToggleSwitch v-model="privateAlbum" :disable="isCreatingAlbum" class="ml-2" />
@@ -188,7 +188,7 @@ import { useRouter } from 'vue-router';
 const toast = useToast();
 const router = useRouter();
 
-const { getUpdateAlbumDialogState, setUpdateAlbumDialogState } = DialogContext();
+const { updateAlbumDialogState, setUpdateAlbumDialogState } = DialogContext();
 const { albumToBeUpdate, setAlbumToBeUpdated, fetchAlbumsByYear } = AlbumsContext();
 const { albumTags } = AlbumTagsContext();
 
@@ -335,7 +335,7 @@ const resetAlbum = () => {
 const yearOptions = getYearOptions();
 
 watch(
-  getUpdateAlbumDialogState,
+  updateAlbumDialogState,
   (newValue) => {
     if (newValue) {
       selectedYear.value = albumToBeUpdate.value.year || String(new Date().getFullYear());

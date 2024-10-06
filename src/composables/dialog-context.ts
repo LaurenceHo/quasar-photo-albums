@@ -3,11 +3,18 @@
 const renamePhotoDialogState = ref(false);
 const movePhotoDialogState = ref(false);
 const deletePhotoDialogState = ref(false);
-const uploadPhotoDialogState = ref(false);
 const updateAlbumDialogState = ref(false);
+const createAlbumTagDialogState = ref(false);
 const updateAlbumTagsDialogState = ref(false);
 
 export default function DialogContext() {
+  const getRenamePhotoDialogState = computed(() => renamePhotoDialogState.value);
+  const getMovePhotoDialogState = computed(() => movePhotoDialogState.value);
+  const getDeletePhotoDialogState = computed(() => deletePhotoDialogState.value);
+  const getUpdateAlbumDialogState = computed(() => updateAlbumDialogState.value);
+  const getCreateAlbumTagDialogState = computed(() => createAlbumTagDialogState.value);
+  const getUpdateAlbumTagsDialogState = computed(() => updateAlbumTagsDialogState.value);
+
   const setRenamePhotoDialogState = (state: boolean) => {
     renamePhotoDialogState.value = state;
   };
@@ -20,12 +27,12 @@ export default function DialogContext() {
     deletePhotoDialogState.value = state;
   };
 
-  const setUploadPhotoDialogState = (state: boolean) => {
-    uploadPhotoDialogState.value = state;
-  };
-
   const setUpdateAlbumDialogState = (state: boolean) => {
     updateAlbumDialogState.value = state;
+  };
+
+  const setCreateAlbumTagDialogState = (state: boolean) => {
+    createAlbumTagDialogState.value = state;
   };
 
   const setUpdateAlbumTagsDialogState = (state: boolean) => {
@@ -33,27 +40,18 @@ export default function DialogContext() {
   };
 
   return {
-    getRenamePhotoDialogState: computed(() => renamePhotoDialogState.value),
+    renamePhotoDialogState: getRenamePhotoDialogState,
+    movePhotoDialogState: getMovePhotoDialogState,
+    deletePhotoDialogState: getDeletePhotoDialogState,
+    updateAlbumDialogState: getUpdateAlbumDialogState,
+    createAlbumTagDialogState: getCreateAlbumTagDialogState,
+    updateAlbumTagsDialogState: getUpdateAlbumTagsDialogState,
+
     setRenamePhotoDialogState,
-    renamePhotoDialogState,
-
-    getMovePhotoDialogState: computed(() => movePhotoDialogState.value),
     setMovePhotoDialogState,
-    movePhotoDialogState,
-
-    getDeletePhotoDialogState: computed(() => deletePhotoDialogState.value),
     setDeletePhotoDialogState,
-    deletePhotoDialogState,
-
-    getUploadPhotoDialogState: computed(() => uploadPhotoDialogState.value),
-    setUploadPhotoDialogState,
-
-    getUpdateAlbumDialogState: computed(() => updateAlbumDialogState.value),
     setUpdateAlbumDialogState,
-    updateAlbumDialogState,
-
-    getUpdateAlbumTagsDialogState: computed(() => updateAlbumTagsDialogState.value),
-    setUpdateAlbumTagsDialogState,
-    updateAlbumTagsDialogState
+    setCreateAlbumTagDialogState,
+    setUpdateAlbumTagsDialogState
   };
 }

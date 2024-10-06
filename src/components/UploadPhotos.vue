@@ -1,7 +1,7 @@
 <template>
   <div class="w-full h-full">
     <div class="flex justify-end">
-      <Button class="mb-2" outlined rounded @click="closeDialog">
+      <Button class="mb-2" severity="secondary" rounded @click="closeUploader">
         <template #icon>
           <IconX :size="24" />
         </template>
@@ -70,7 +70,6 @@
 import DropZone from '@/components/file-uploader/DropZone.vue';
 import FilePreview from '@/components/file-uploader/FilePreview.vue';
 import DeviceContext from '@/composables/device-context';
-import DialogContext from '@/composables/dialog-context';
 import FileListContext from '@/composables/file-list-context';
 import FileUploaderContext from '@/composables/file-uploader-context';
 import { IconX } from '@tabler/icons-vue';
@@ -78,7 +77,7 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import { toRefs, watch } from 'vue';
 
-const emit = defineEmits(['refreshPhotoList']);
+const emits = defineEmits(['refreshPhotoList', 'closePhotoUploader']);
 
 const props = defineProps({
   albumId: {
@@ -88,7 +87,6 @@ const props = defineProps({
 });
 
 const { albumId } = toRefs(props);
-const { setUploadPhotoDialogState } = DialogContext();
 const { files, addFiles, removeFile } = FileListContext();
 const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, overwrite } = FileUploaderContext();
 const { isXSmallDevice } = DeviceContext();
@@ -104,16 +102,16 @@ const onInputChange = (e: Event) => {
 
 const clearFiles = () => (files.value = []);
 
-const finishUploadPhotos = () => {
-  emit('refreshPhotoList');
-  closeDialog();
-};
-
-const closeDialog = () => {
+const closeUploader = () => {
   overwrite.value = false;
   clearFiles();
   setIsCompleteUploading(false);
-  setUploadPhotoDialogState(false);
+  emits('closePhotoUploader');
+};
+
+const finishUploadPhotos = () => {
+  emits('refreshPhotoList');
+  closeUploader();
 };
 
 watch(albumId, (newValue) => {
