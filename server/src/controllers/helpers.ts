@@ -25,7 +25,7 @@ export const updatePhotoAlbum = async (album: Album, email = 'unknown') => {
     const result = await albumService.update({ id: album.id, year: album.year }, cloneAlbum);
 
     if (result) {
-      logger().info('##### Album updated:', album.id);
+      logger().info(`##### Album updated: ${album.id}`);
       await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
     }
     return result;
@@ -37,7 +37,7 @@ export const updatePhotoAlbum = async (album: Album, email = 'unknown') => {
 
 //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-photo-album-full.html
 export const uploadObject = async (filePath: string, object: any) => {
-  logger().info('##### S3 destination file path:', filePath);
+  logger().info(`##### S3 destination file path: ${filePath}`);
 
   try {
     const putObject: PutObjectCommandInput = {

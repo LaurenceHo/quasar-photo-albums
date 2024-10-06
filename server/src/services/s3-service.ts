@@ -22,7 +22,7 @@ import { configuration } from './config.js';
 
 export default class S3Service implements BaseService<Photo> {
   public readonly s3Client = new S3Client(configuration);
-  public readonly cdnURL = process.env['IMAGEKIT_CDN_URL'];
+  public readonly cdnURL = process.env['VITE_IMAGEKIT_CDN_URL'];
 
   async findAll(params: ListObjectsV2CommandInput): Promise<Photo[]> {
     const response = await this.s3Client.send(new ListObjectsV2Command(params));
@@ -54,10 +54,7 @@ export default class S3Service implements BaseService<Photo> {
   async delete(params: DeleteObjectsCommandInput): Promise<boolean> {
     const response = await this.s3Client.send(new DeleteObjectsCommand(params));
     if (response.$metadata.httpStatusCode === 200) {
-      logger().info(
-        '##### Delete objects:',
-        response.Deleted?.map((deleted) => deleted.Key)
-      );
+      logger().info(`##### Delete objects: ${response.Deleted?.map((deleted) => deleted.Key)}`);
     }
     return response.$metadata.httpStatusCode === 200;
   }

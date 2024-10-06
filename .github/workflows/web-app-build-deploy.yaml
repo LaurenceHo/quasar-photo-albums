@@ -18,42 +18,36 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     env:
-      ALBUM_APP_TITLE: ${{ secrets.ALBUM_APP_TITLE }}
-      STATIC_FILES_URL: ${{ secrets.STATIC_FILES_URL }}
-      IMAGEKIT_CDN_URL: ${{ secrets.IMAGEKIT_CDN_URL }}
-      MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
-      AWS_API_GATEWAY_URL: ${{ secrets.AWS_API_GATEWAY_URL }}
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
+      VITE_ALBUM_APP_TITLE: ${{ secrets.VITE_ALBUM_APP_TITLE }}
+      VITE_STATIC_FILES_URL: ${{ secrets.VITE_STATIC_FILES_URL }}
+      VITE_IMAGEKIT_CDN_URL: ${{ secrets.VITE_IMAGEKIT_CDN_URL }}
+      VITE_MAPBOX_API_KEY: ${{ secrets.VITE_MAPBOX_API_KEY }}
+      VITE_AWS_API_GATEWAY_URL: ${{ secrets.VITE_AWS_API_GATEWAY_URL }}
+      VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm install --force #TODO: remove --force
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
 
       - name: Write .env file
         run: |
           tee .env <<EOF
-          ALBUM_APP_TITLE=$ALBUM_APP_TITLE
-          STATIC_FILES_URL=$STATIC_FILES_URL
-          IMAGEKIT_CDN_URL=$IMAGEKIT_CDN_URL
-          MAPBOX_API_KEY=$MAPBOX_API_KEY
-          AWS_API_GATEWAY_URL=$AWS_API_GATEWAY_URL
-          GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+          VITE_ALBUM_APP_TITLE=$VITE_ALBUM_APP_TITLE
+          VITE_STATIC_FILES_URL=$VITE_STATIC_FILES_URL
+          VITE_IMAGEKIT_CDN_URL=$VITE_IMAGEKIT_CDN_URL
+          VITE_MAPBOX_API_KEY=$VITE_MAPBOX_API_KEY
+          VITE_AWS_API_GATEWAY_URL=$VITE_AWS_API_GATEWAY_URL
+          VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
           EOF
 
       - name: Test and build
         run: |
-          npm run types
-          npm run test
-          npm run build
+          bun run type-check
+          bun run test:unit
+          bun run build
 
       - name: Clean up old files
         uses: keithweaver/aws-s3-github-action@master
@@ -68,7 +62,7 @@ jobs:
       - name: Upload assets to S3
         uses: keithweaver/aws-s3-github-action@master
         with:
-          source: dist/spa/assets
+          source: dist/assets
           destination: s3://${{ secrets.AWS_S3_BUCKET_FOR_GITHUB_DEPLOY }}/assets
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}
@@ -78,7 +72,7 @@ jobs:
       - name: Upload index to S3
         uses: keithweaver/aws-s3-github-action@master
         with:
-          source: dist/spa/index.html
+          source: dist/index.html
           destination: s3://${{ secrets.AWS_S3_BUCKET_FOR_GITHUB_DEPLOY }}/index.html
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_GITHUB_DEPLOY }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_GITHUB_DEPLOY }}

@@ -1,14 +1,15 @@
-import HttpRequestService from 'src/services/http-request-service';
-import { ApiResponse, Place } from 'src/types';
+import type { ApiResponse, Place } from '@/schema';
+import { ApiBaseUrl } from '@/services/api-base-url';
+import { BaseApiRequestService } from '@/services/base-api-request-service';
 
-export default class LocationService extends HttpRequestService<Place[]> {
-  constructor() {
-    super();
-    this.baseUrl = this.baseUrl + '/location';
-  }
+export const LocationService = {
+  searchPlaces: async (text: string): Promise<ApiResponse<Place[]>> => {
+    const response = await BaseApiRequestService.perform('GET', `${ApiBaseUrl}/location/search?textQuery=${text}`);
 
-  public searchPlaces(text: string): Promise<ApiResponse<Place[]>> {
-    this.setDisplayingParameters(false);
-    return this.perform('GET', `/search?textQuery=${text}`);
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    return response.json();
   }
-}
+};

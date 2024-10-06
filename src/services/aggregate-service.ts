@@ -1,19 +1,15 @@
-import HttpRequestService from 'src/services/http-request-service';
-import { AggregateType, ApiResponse, DataAggregateValueMap } from 'src/types';
+import type { AggregateType, ApiResponse, DataAggregateValueMap } from '@/schema';
+import { ApiBaseUrl } from '@/services/api-base-url';
+import { BaseApiRequestService } from '@/services/base-api-request-service';
 
-export default class AggregateService extends HttpRequestService<DataAggregateValueMap[AggregateType]> {
-  constructor() {
-    super();
-    this.baseUrl = this.baseUrl + '/aggregate';
-  }
+export const AggregateService = {
+  getAggregateData: async (type: AggregateType): Promise<ApiResponse<DataAggregateValueMap[typeof type]>> => {
+    const response = await BaseApiRequestService.perform('GET', `${ApiBaseUrl}/aggregate/${type}`);
 
-  public getAggregateData(type: AggregateType): Promise<ApiResponse<DataAggregateValueMap[typeof type]>> {
-    this.setDisplayingParameters(
-      type === 'albumsWithLocation',
-      undefined,
-      true,
-      'Ooops, something went wrong, please try again later'
-    );
-    return this.perform('GET', `/${type}`);
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    return response.json();
   }
-}
+};

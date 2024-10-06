@@ -110,7 +110,7 @@ const _verifyIdToken = async (token: string) => {
   // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
   const ticket = await client.verifyIdToken({
     idToken: token,
-    audience: process.env['GOOGLE_CLIENT_ID'] ?? ''
+    audience: process.env['VITE_GOOGLE_CLIENT_ID'] ?? ''
   });
   return ticket.getPayload();
 };

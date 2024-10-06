@@ -1,4 +1,4 @@
-bun run types
+bun run type-check
 bun run lint-staged
 cd server
 bun run types:server

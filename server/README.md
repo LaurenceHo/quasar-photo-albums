@@ -40,7 +40,7 @@ photos. Replace these properties `AWS_S3_BUCKET_NAME` along with `PHOTO_ALBUMS_T
 `PHOTO_USER_PERMISSION_TABLE_NAME` and `DATA_AGGREGATIONS_TABLE_NAME` with the table name you want to use in `.env.example`
 and modify file name to `.env`. When you run `bun run serverless:deploy`, it will use those environment variables to
 create S3 bucket and tables, so you don't have to create S3 bucket and tables manually. Once the S3 bucket and tables
-are created, you can check them in AWS console. You will also need to replace `IMAGEKIT_CDN_URL` with the CloudFront Domain
+are created, you can check them in AWS console. You will also need to replace `VITE_IMAGEKIT_CDN_URL` with the CloudFront Domain
 name URL Serverless Framework created for you.
 
 #### ElectroDB
@@ -133,9 +133,9 @@ functions:
     environment:
       AWS_REGION_NAME: ${self:provider.region}
       GOOGLE_PLACES_API_KEY: ${env:GOOGLE_PLACES_API_KEY}
-      GOOGLE_CLIENT_ID: ${env:GOOGLE_CLIENT_ID}
+      VITE_GOOGLE_CLIENT_ID: ${env:VITE_GOOGLE_CLIENT_ID}
       ALBUM_URL: ${env:ALBUM_URL}
-      IMAGEKIT_CDN_URL: ${env:IMAGEKIT_CDN_URL}
+      VITE_IMAGEKIT_CDN_URL: ${env:VITE_IMAGEKIT_CDN_URL}
       AWS_S3_BUCKET_NAME: ${env:AWS_S3_BUCKET_NAME}
       PHOTO_ALBUMS_TABLE_NAME: ${env:PHOTO_ALBUMS_TABLE_NAME}
       PHOTO_ALBUM_TAGS_TABLE_NAME: ${env:PHOTO_ALBUM_TAGS_TABLE_NAME}
@@ -163,10 +163,10 @@ Please check [here](https://www.serverless.com/framework/docs/providers/aws/guid
 
 DOTENV: Loading environment variables from .env:
          - GOOGLE_PLACES_API_KEY
-         - GOOGLE_CLIENT_ID
+         - VITE_GOOGLE_CLIENT_ID
          - JWT_SECRET
          - ALBUM_URL
-         - IMAGEKIT_CDN_URL
+         - VITE_IMAGEKIT_CDN_URL
          - AWS_S3_BUCKET_NAME
          - PHOTO_ALBUMS_TABLE_NAME
          - PHOTO_ALBUM_TAGS_TABLE_NAME
