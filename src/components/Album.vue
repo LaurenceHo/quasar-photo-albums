@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center border border-gray-300 p-3 rounded-md cursor-pointer h-28 sm:h-32"
+    class="album-list-item cursor-pointer flex items-center border border-gray-300 p-3 rounded-md h-28 sm:h-36"
     data-test-id="list-album-item"
   >
     <div class="relative flex-shrink-0" @click="goToAlbum">
@@ -17,7 +17,7 @@
     <div class="flex-grow ml-3 min-w-0" @click="goToAlbum">
       <h3 class="text-lg font-semibold truncate">{{ albumItem.albumName }}</h3>
       <p v-if="albumItem.description" class="text-gray-600 truncate">{{ albumItem.description }}</p>
-      <div class="flex flex-wrap mt-1">
+      <div class="flex flex-nowrap mt-1 overflow-hidden">
         <Tag v-for="tag in tagsForDisplay" :key="tag" :value="tag" class="mr-2" severity="success" />
       </div>
     </div>
@@ -55,7 +55,7 @@ const { isXSmallDevice } = DeviceContext();
 const { albumItem } = toRefs(props);
 const router = useRouter();
 
-const thumbnailSize = computed(() => (isXSmallDevice.value ? 80 : 100));
+const thumbnailSize = computed(() => (isXSmallDevice.value ? 90 : 120));
 const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.albumCover ?? '')}`);
 const tagsForDisplay = computed(() => (albumItem.value?.tags ? albumItem.value.tags.slice(0, 3) : []));
 

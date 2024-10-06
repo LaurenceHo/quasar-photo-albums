@@ -59,7 +59,7 @@ export const getAlbumsByYear = http.get('/api/albums/**', async () => {
         albumName: 'demo-album 2',
         description: 'This is demo album 2',
         id: 'demo-album2',
-        tags: ['tag2', 'tag3']
+        tags: ['superlongtag2', 'superlongtag3', 'superlongtag4']
       },
       {
         isFeatured: true,

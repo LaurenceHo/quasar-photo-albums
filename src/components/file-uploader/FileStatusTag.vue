@@ -43,12 +43,6 @@ const tagConfig = computed(() => {
     animation: pulse 1.5s linear 0s infinite;
     @apply text-black;
   }
-
-  .p-tag {
-    padding: 0.1rem 0.3rem;
-    font-weight: 500;
-    font-size: 0.8rem;
-  }
 }
 
 @keyframes pulse {

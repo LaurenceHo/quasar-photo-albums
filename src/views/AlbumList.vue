@@ -38,8 +38,8 @@
   <div v-if="isFetchingFeaturedAlbums" class="py-4">
     <Skeleton class="mb-4" height="2rem" width="10rem" />
     <div class="flex">
-      <Skeleton :size="isXSmallDevice ? '10rem' : '12rem'" class="mr-4"></Skeleton>
-      <Skeleton :size="isXSmallDevice ? '10rem' : '12rem'"></Skeleton>
+      <Skeleton :size="isXSmallDevice ? '10rem' : '13rem'" class="mr-4"></Skeleton>
+      <Skeleton :size="isXSmallDevice ? '10rem' : '13rem'"></Skeleton>
     </div>
   </div>
   <div v-else-if="featuredAlbums && featuredAlbums.length > 0" class="py-4">
@@ -47,8 +47,8 @@
     <Carousel :featured-albums="featuredAlbums" />
   </div>
   <div v-if="isFetchingAlbums" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 pt-4">
-    <div v-for="n in 3" :key="n" class="flex items-center border border-gray-300 p-3 rounded-md h-32">
-      <Skeleton size="6rem" />
+    <div v-for="n in 3" :key="n" class="flex items-center border border-gray-300 p-3 rounded-md h-28 sm:h-36">
+      <Skeleton :size="isXSmallDevice ? '6rem' : '7rem'" />
       <div class="flex-grow ml-3">
         <Skeleton class="mb-2" width="10rem" />
         <Skeleton />
