@@ -1,5 +1,5 @@
 <template>
-  <main class="mt-2 max-w-screen-2xl mx-auto">
+  <main class="mt-2 mb-10 max-w-screen-2xl mx-auto">
     <div id="container" class="px-8 sm:px-4">
       <Breadcrumb
         :model="breadcrumbs"

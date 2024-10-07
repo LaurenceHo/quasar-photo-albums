@@ -1,7 +1,12 @@
 <template>
-  <div tabindex="0" @keydown.left="nextPhoto(-1)" @keydown.right="nextPhoto(1)" @keydown.esc="emit('closePhotoDetail')">
+  <div
+    tabindex="0"
+    @keydown.left="nextPhoto(-1)"
+    @keydown.right="nextPhoto(1)"
+    @keydown.esc="emits('closePhotoDetail')"
+  >
     <div class="flex justify-end">
-      <Button class="mb-2" outlined rounded @click="emit('closePhotoDetail')">
+      <Button class="mb-2" severity="secondary" rounded @click="emits('closePhotoDetail')">
         <template #icon>
           <IconX :size="24" />
         </template>
@@ -137,7 +142,7 @@ import { useRoute, useRouter } from 'vue-router';
 
 type ExifData = ExifTags & FileTags;
 
-const emit = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
+const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 
 const toast = useToast();
 const router = useRouter();

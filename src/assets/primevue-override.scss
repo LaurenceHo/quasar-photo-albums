@@ -16,3 +16,20 @@
     }
   }
 }
+
+.file-preview,.album-list-item {
+  .p-tag {
+    padding: 0.1rem 0.3rem;
+    font-weight: 500;
+    font-size: 0.8rem;
+  }
+}
+
+.dark-theme {
+  .file-preview {
+    .p-tag {
+      background: color-mix(in srgb,var(--p-green-500),transparent 30%);
+      color: var(--p-green-900);
+    }
+  }
+}

@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model:visible="renamePhotoDialogState" class="w-96" modal>
+  <Dialog v-model:visible="renamePhotoDialogState" :closable="false" class="w-96" modal>
     <template #header>
       <span class="text-xl font-semibold">Rename Photo</span>
     </template>
@@ -26,6 +26,7 @@
       <div class="flex justify-end">
         <Button
           :disabled="isPending"
+          class="mr-2"
           label="Cancel"
           text
           @click="

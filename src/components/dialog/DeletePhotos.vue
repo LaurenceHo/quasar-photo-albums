@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model:visible="deletePhotoDialogState" class="w-[450px]" header="Confirm" modal>
+  <Dialog v-model:visible="deletePhotoDialogState" :closable="false" class="w-[450px]" header="Confirm" modal>
     <template #header>
       <div class="flex">
         <IconAlertCircle :size="40" class="text-red-400 pr-2 flex-shrink-0" />
@@ -14,13 +14,12 @@
     <template #footer>
       <Button
         :disabled="isPending"
-        class="mr-2"
         label="Cancel"
         text
         @click="
           () => {
             reset();
-            setDeletePhotoDialogState(true);
+            setDeletePhotoDialogState(false);
           }
         "
       />
