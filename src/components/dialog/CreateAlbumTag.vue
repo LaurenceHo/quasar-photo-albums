@@ -75,7 +75,7 @@ const validateAndSubmit = async () => {
 };
 
 const { isPending: isCreatingTag, mutate: createAlbumTag } = useMutation({
-  mutationFn: async () => await AlbumTagService.createAlbumTags([{ tag: tagName.value }]),
+  mutationFn: () => AlbumTagService.createAlbumTags([{ tag: tagName.value }]),
   onSuccess: async () => {
     toast.add({
       severity: 'success',
