@@ -18,8 +18,8 @@
           class="w-full"
           data-test-id="input-album-tag"
           placeholder="Tag"
-          @blur="v$.tagName.$touch"
-          @input="v$.tagName.$touch"
+          @blur="v$.tagName.$touch()"
+          @input="v$.tagName.$touch()"
         />
         <div class="flex justify-between items-center mt-1">
           <small v-if="v$.tagName.$error" class="text-red-600">
