@@ -96,11 +96,20 @@
           </div>
         </div>
 
-        <div class="mb-4">
-          <FloatLabel>
+        <div class="mb-4 flex">
+          <FloatLabel class="w-full flex-grow">
             <SelectTags :selected-tags="selectedAlbumTags" extra-class="w-full" @select-tags="setSelectedTags" />
             <label for="select-tags">Album Tag</label>
           </FloatLabel>
+
+          <Button
+            data-test-id="create-tag-button"
+            severity="secondary"
+            text
+            @click="setCreateAlbumTagDialogState(true)"
+          >
+            <IconPlus :size="24" />
+          </Button>
         </div>
 
         <div class="mb-4 pb-4">
@@ -169,6 +178,7 @@ import { AlbumService } from '@/services/album-service';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { LocationService } from '@/services/location-service';
 import { getYearOptions } from '@/utils/helper';
+import { IconPlus } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
@@ -188,7 +198,7 @@ import { useRouter } from 'vue-router';
 const toast = useToast();
 const router = useRouter();
 
-const { updateAlbumDialogState, setUpdateAlbumDialogState } = DialogContext();
+const { updateAlbumDialogState, setUpdateAlbumDialogState, setCreateAlbumTagDialogState } = DialogContext();
 const { albumToBeUpdate, setAlbumToBeUpdated, fetchAlbumsByYear } = AlbumsContext();
 const { albumTags } = AlbumTagsContext();
 
