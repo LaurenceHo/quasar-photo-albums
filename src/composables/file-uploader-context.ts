@@ -15,6 +15,11 @@ export default function FileUploaderContext() {
   };
 
   const uploadFile = async (file: UploadFile, albumId: string) => {
+    if (file.isValidImage !== 'y') {
+      file.status = false;
+      return;
+    }
+
     file.exists = findPhotoIndex(file.file.name) !== -1;
     file.status = 'loading';
     let response;

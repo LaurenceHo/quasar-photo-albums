@@ -52,7 +52,7 @@
     <div class="flex justify-center pt-4">
       <Button
         v-if="!isCompleteUploading"
-        :disabled="isUploading || files.length === 0"
+        :disabled="isUploading || validFiles.length === 0"
         class="mr-4"
         data-test-id="clear-file-button"
         label="Clear all"
@@ -61,10 +61,10 @@
       />
       <Button
         v-if="!isCompleteUploading"
-        :disabled="isUploading || files.length === 0"
+        :disabled="isUploading || validFiles.length === 0"
         data-test-id="upload-file-button"
         label="Upload"
-        @click="uploadFiles(files)"
+        @click="uploadFiles(validFiles)"
       />
       <Button v-if="isCompleteUploading" data-test-id="finish-button" label="Done" @click="finishUploadPhotos" />
     </div>
@@ -80,7 +80,7 @@ import FileUploaderContext from '@/composables/file-uploader-context';
 import { IconX } from '@tabler/icons-vue';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
-import { toRefs, watch } from 'vue';
+import { computed, toRefs, watch } from 'vue';
 
 const emits = defineEmits(['refreshPhotoList', 'closePhotoUploader']);
 
@@ -96,6 +96,8 @@ const { files, addFiles, removeFile } = FileListContext();
 const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, overwrite } = FileUploaderContext();
 const { isXSmallDevice } = DeviceContext();
 const { uploadFiles } = createUploader(albumId.value);
+
+const validFiles = computed(() => files.value.filter((file) => file.isValidImage === 'y'));
 
 const onInputChange = (e: Event) => {
   const target = e.target as HTMLInputElement;

@@ -5,7 +5,8 @@ export const UploadFileSchema = z.object({
   file: z.instanceof(File),
   url: z.string(),
   status: z.union([z.literal('loading'), z.boolean(), z.null()]),
-  exists: z.boolean()
+  exists: z.boolean(),
+  isValidImage: z.union([z.literal('y'), z.literal('wrong_format'), z.literal('wrong_size')])
 });
 
 export type UploadFile = z.infer<typeof UploadFileSchema>;
