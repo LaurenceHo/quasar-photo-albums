@@ -207,7 +207,7 @@ const albumId = ref('');
 const albumName = ref('');
 const albumDesc = ref('');
 const privateAlbum = ref(false);
-const featuredAlbum = ref<boolean | null>(null);
+const featuredAlbum = ref<boolean | undefined>(undefined);
 const selectedAlbumTags = ref([] as string[]);
 const selectedPlace = ref(null as Place | null);
 const placeSuggestions = ref([] as Place[]);
@@ -353,7 +353,7 @@ watch(
       albumName.value = albumToBeUpdate.value.albumName;
       albumDesc.value = albumToBeUpdate.value.description || '';
       privateAlbum.value = albumToBeUpdate.value.isPrivate;
-      featuredAlbum.value = albumToBeUpdate.value.isFeatured || null;
+      featuredAlbum.value = albumToBeUpdate.value.isFeatured || undefined;
       selectedAlbumTags.value = albumToBeUpdate.value.tags || [];
       selectedPlace.value = albumToBeUpdate.value.place || null;
     }

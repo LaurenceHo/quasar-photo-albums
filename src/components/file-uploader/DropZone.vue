@@ -1,3 +1,4 @@
+<!-- In DropZone.vue -->
 <template>
   <Card
     :class="[
@@ -18,22 +19,24 @@
     }"
   >
     <template #content>
-      <div class="flex items-center">
-        <Checkbox v-model="overwrite" binary class="mr-2" />
-        <span>Overwrite existing photos</span>
-      </div>
+      <div class="flex flex-col h-full">
+        <div class="flex items-center">
+          <Checkbox v-model="overwrite" binary class="mr-2" />
+          <span>Overwrite existing photos</span>
+        </div>
 
-      <Divider class="!mb-0" />
-      <ProgressBar v-if="isUploading" class="mb-4" mode="indeterminate" style="height: 6px" />
+        <Divider class="!mb-0" />
+        <ProgressBar v-if="isUploading" class="mb-4" mode="indeterminate" style="height: 6px" />
 
-      <div
-        class="p-4 h-[90%]"
-        @dragenter.prevent="setActive"
-        @dragover.prevent="setActive"
-        @dragleave.prevent="setInactive"
-        @drop.prevent="onDrop"
-      >
-        <slot :drop-zone-active="active"></slot>
+        <div
+          class="p-4 flex-1 flex flex-col"
+          @dragenter.prevent="setActive"
+          @dragover.prevent="setActive"
+          @dragleave.prevent="setInactive"
+          @drop.prevent="onDrop"
+        >
+          <slot :drop-zone-active="active"></slot>
+        </div>
       </div>
     </template>
   </Card>

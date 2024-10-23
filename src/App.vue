@@ -132,19 +132,19 @@ const menu = ref();
 const items = ref([
   {
     label: 'New Album',
-    icon: IconFolderPlus,
+    icon: IconFolderPlus as any,
     visible: () => routeName.value === 'albumsByYear',
     command: () => setUpdateAlbumDialogState(true)
   },
   {
     label: 'Manage Album Tags',
-    icon: IconTags,
+    icon: IconTags as any,
     visible: () => routeName.value === 'albumsByYear',
     command: () => setUpdateAlbumTagsDialogState(true)
   },
   {
     label: 'Logout',
-    icon: IconLogout,
+    icon: IconLogout as any,
     command: () =>
       AuthService.logout().then(() => {
         localStorage.clear();

@@ -123,12 +123,12 @@ const confirmDeleteAlbum = (e: MouseEvent) => {
 const menuItems = [
   {
     label: 'Edit Album',
-    icon: IconEdit,
+    icon: IconEdit as any,
     command: setAlbum
   },
   {
     label: 'Delete Album',
-    icon: IconTrash,
+    icon: IconTrash as any,
     command: () => (deleteAlbumDialog.value = true)
   }
 ];

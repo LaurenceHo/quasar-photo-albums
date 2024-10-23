@@ -8,35 +8,40 @@
       </Button>
     </div>
 
-    <div class="flex justify-center items-center">
+    <div class="flex flex-col h-full">
       <DropZone v-slot="{ dropZoneActive }" @files-dropped="addFiles">
         <Message v-if="isCompleteUploading" class="mb-4" severity="success">Upload finished!</Message>
 
         <div
           v-if="!isCompleteUploading && !isUploading"
-          :class="{ 'text-xl': isXSmallDevice, 'text-4xl': !isXSmallDevice }"
-          class="font-bold flex flex-col justify-center items-center"
+          :class="[
+            { 'text-xl': isXSmallDevice, 'text-4xl': !isXSmallDevice },
+            files.length ? '' : 'flex-1 flex items-center justify-center'
+          ]"
+          class="font-bold"
         >
-          <span v-if="dropZoneActive" class="flex flex-col items-center mb-2">
-            <span>Drop Them Here</span>
-            <span class="text-base">to add them</span>
-          </span>
-          <span v-else class="flex flex-col items-center">
-            <span>Drag Your Photos Here</span>
-            <span class="text-base my-2">
-              or
-              <input
-                id="file-input"
-                accept="image/png, image/jpeg"
-                class="hidden"
-                multiple
-                type="file"
-                @change="onInputChange"
-              />
-              <label class="cursor-pointer underline italic" for="file-input">browse</label>
+          <div class="flex flex-col items-center">
+            <span v-if="dropZoneActive" class="flex flex-col items-center mb-2">
+              <span>Drop Them Here</span>
+              <span class="text-base">to add them</span>
             </span>
-          </span>
-          <span class="text-base font-normal">Max file size: 5MB. Only image files allowed</span>
+            <span v-else class="flex flex-col items-center">
+              <span>Drag Your Photos Here</span>
+              <span class="text-base my-2">
+                or
+                <input
+                  id="file-input"
+                  accept="image/png, image/jpeg"
+                  class="hidden"
+                  multiple
+                  type="file"
+                  @change="onInputChange"
+                />
+                <label class="cursor-pointer underline italic" for="file-input">browse</label>
+              </span>
+            </span>
+            <span class="text-base font-normal">Max file size: 5MB. Only image files allowed</span>
+          </div>
         </div>
         <ul v-show="files.length" class="gap-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 mt-4">
           <FilePreview v-for="file of files" :key="file.id" :file="file" tag="li" @remove="removeFile" />

@@ -56,7 +56,7 @@ const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = PhotosContext();
 const { currentAlbum, fetchAlbumsByYear, setCurrentAlbum, isAlbumCover } = AlbumsContext();
 const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } = DialogContext();
 
-const { mutate: makeCoverPhoto } = useMutation({
+const { mutate } = useMutation({
   mutationFn: async () => {
     // TODO: should show menu when clicking assign photo cover button
     const albumToBeUpdated = { ...(currentAlbum.value as Album), albumCover: photoKey.value as string };
@@ -84,6 +84,10 @@ const { mutate: makeCoverPhoto } = useMutation({
     });
   }
 });
+
+const makeCoverPhoto = () => {
+  mutate();
+};
 
 const deletePhoto = () => {
   setSelectedPhotos([photoKey.value]);
@@ -116,27 +120,27 @@ const toggle = (event: Event) => {
 const items = [
   {
     label: 'Copy Link',
-    icon: IconLink,
+    icon: IconLink as any,
     command: copyPhotoLink
   },
   {
     label: 'Delete Photo',
-    icon: IconTrash,
+    icon: IconTrash as any,
     command: deletePhoto
   },
   {
     label: 'Move Photo',
-    icon: IconFileExport,
+    icon: IconFileExport as any,
     command: movePhoto
   },
   {
     label: 'Rename Photo',
-    icon: IconEdit,
+    icon: IconEdit as any,
     command: renamePhoto
   },
   {
     label: 'Make Album Cover',
-    icon: IconPhotoStar,
+    icon: IconPhotoStar as any,
     command: makeCoverPhoto,
     visible: !isAlbumCover(photoKey.value)
   }
