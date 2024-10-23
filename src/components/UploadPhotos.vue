@@ -9,7 +9,7 @@
     </div>
 
     <div class="flex flex-col h-full">
-      <DropZone v-slot="{ dropZoneActive }" @files-dropped="addFiles">
+      <DropZone v-slot="{ dropZoneActive }" @files-dropped="addFiles" @valid-drag="isValidDragFn">
         <Message v-if="isCompleteUploading" class="mb-4" severity="success">Upload finished!</Message>
 
         <div
@@ -23,7 +23,8 @@
           <div class="flex flex-col items-center">
             <span v-if="dropZoneActive" class="flex flex-col items-center mb-2">
               <span>Drop Them Here</span>
-              <span class="text-base">to add them</span>
+              <span v-if="isValidDrag" class="text-base">to add them</span>
+              <span v-else class="text-red-600">Only image files allowed</span>
             </span>
             <span v-else class="flex flex-col items-center">
               <span>Drag Your Photos Here</span>
@@ -80,7 +81,7 @@ import FileUploaderContext from '@/composables/file-uploader-context';
 import { IconX } from '@tabler/icons-vue';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
-import { computed, toRefs, watch } from 'vue';
+import { computed, ref, toRefs, watch } from 'vue';
 
 const emits = defineEmits(['refreshPhotoList', 'closePhotoUploader']);
 
@@ -97,7 +98,13 @@ const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading
 const { isXSmallDevice } = DeviceContext();
 const { uploadFiles } = createUploader(albumId.value);
 
+const isValidDrag = ref(true);
+
 const validFiles = computed(() => files.value.filter((file) => file.isValidImage === 'y'));
+
+const isValidDragFn = (isValid: boolean) => {
+  isValidDrag.value = isValid;
+};
 
 const onInputChange = (e: Event) => {
   const target = e.target as HTMLInputElement;

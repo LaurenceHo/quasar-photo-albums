@@ -1,12 +1,12 @@
 import type { UploadFile as IUploadFile } from '@/schema';
 import { ref } from 'vue';
 
+export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+export const ALLOWED_FILE_TYPE = ['image/png', 'image/jpeg'];
+
 const files = ref<IUploadFile[]>([]);
 
 export default function FileListContext() {
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
-  const ALLOWED_FILE_TYPE = ['image/png', 'image/jpeg'];
-
   const addFiles = (newFiles: File[]) => {
     const newUploadFiles = [...newFiles]
       .map((file) => {

@@ -86,6 +86,9 @@ const { mutate } = useMutation({
 });
 
 const makeCoverPhoto = () => {
+  if (!currentAlbum.value || isAlbumCover(photoKey.value)) {
+    return;
+  }
   mutate();
 };
 
