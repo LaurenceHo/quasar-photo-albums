@@ -4,6 +4,18 @@
       'w-full max-w-7xl overflow-auto h-[calc(80vh-80px)]',
       { 'shadow-md border-2 border-dashed border-blue-500': active }
     ]"
+    :pt="{
+      body: {
+        style: {
+          height: '100%'
+        }
+      },
+      content: {
+        style: {
+          height: '100%'
+        }
+      }
+    }"
   >
     <template #content>
       <div class="flex items-center">
@@ -11,12 +23,11 @@
         <span>Overwrite existing photos</span>
       </div>
 
-      <Divider :pt="{ root: { style: { marginBottom: 0 } } }" />
-      <!-- TODO: Should show the percentage of upload progress here -->
+      <Divider class="!mb-0" />
       <ProgressBar v-if="isUploading" class="mb-4" mode="indeterminate" style="height: 6px" />
 
       <div
-        class="p-4"
+        class="p-4 h-[90%]"
         @dragenter.prevent="setActive"
         @dragover.prevent="setActive"
         @dragleave.prevent="setInactive"

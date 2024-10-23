@@ -10,18 +10,7 @@
       <Button
         v-if="file.status !== true && !file.exists"
         :disabled="file.status === 'loading'"
-        :pt="{
-          root: {
-            style: {
-              position: 'absolute',
-              top: '0.3rem',
-              right: '0.3rem',
-              padding: 0,
-              height: '1.2rem',
-              width: '1.2rem'
-            }
-          }
-        }"
+        class="!absolute !top-1 !right-1 !p-0 !h-5 !w-5"
         raised
         rounded
         severity="danger"

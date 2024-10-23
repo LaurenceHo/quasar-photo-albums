@@ -33,37 +33,16 @@
             />
           </div>
           <Button
-            :pt="{
-              root: {
-                style: {
-                  position: 'absolute',
-                  top: '50%',
-                  left: 0
-                }
-              }
-            }"
             data-test-id="previous-photo-button"
             rounded
+            class="!absolute !top-1/2 !left-0"
             @click="nextPhoto(-1)"
           >
             <template #icon>
               <IconChevronLeft :size="24" />
             </template>
           </Button>
-          <Button
-            :pt="{
-              root: {
-                style: {
-                  position: 'absolute',
-                  top: '50%',
-                  right: 0
-                }
-              }
-            }"
-            data-test-id="next-photo-button"
-            rounded
-            @click="nextPhoto(1)"
-          >
+          <Button data-test-id="next-photo-button" rounded class="!absolute !top-1/2 !right-0" @click="nextPhoto(1)">
             <template #icon>
               <IconChevronRight :size="24" />
             </template>

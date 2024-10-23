@@ -1,17 +1,7 @@
 <template>
   <main class="mt-2 mb-10 max-w-screen-2xl mx-auto">
     <div id="container" class="px-8 sm:px-4">
-      <Breadcrumb
-        :model="breadcrumbs"
-        :pt="{
-          root: {
-            style: {
-              paddingRight: '0',
-              paddingLeft: '0'
-            }
-          }
-        }"
-      >
+      <Breadcrumb :model="breadcrumbs" class="!px-0">
         <template #item="{ item }">
           <div class="flex items-center min-w-0">
             <component :is="item.icon" :size="20" />
