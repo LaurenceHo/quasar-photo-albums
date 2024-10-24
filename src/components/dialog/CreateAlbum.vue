@@ -153,7 +153,14 @@
       </div>
 
       <div class="flex justify-end">
-        <Button :disabled="isCreatingAlbum" class="mr-2" label="Cancel" text @click="resetAlbum" />
+        <Button
+          :disabled="isCreatingAlbum"
+          class="mr-2"
+          label="Cancel"
+          text
+          data-test-id="cancel-button"
+          @click="resetAlbum"
+        />
         <Button
           :disabled="v$.$invalid"
           :label="albumToBeUpdate.id ? 'Update' : 'Create'"

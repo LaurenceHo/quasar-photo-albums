@@ -12,18 +12,19 @@ export default function FileListContext() {
     const newUploadFiles = [...newFiles]
       .filter((file) => !fileExists(`${file.name}-${file.size}-${file.lastModified}-${file.type}`))
       .map((file) => {
-        let isValidFile: FileValidationStatus = 'valid';
+        let validationStatus: FileValidationStatus = 'valid';
 
         if (!ALLOWED_FILE_TYPE.includes(file.type)) {
-          isValidFile = 'invalid_format';
-          return new UploadFile(file, isValidFile);
+          validationStatus = 'invalid_format';
+          return new UploadFile(file, validationStatus);
         }
 
         if (file.size > MAX_FILE_SIZE) {
-          isValidFile = 'invalid_size';
+          validationStatus = 'invalid_size';
+          return new UploadFile(file, validationStatus);
         }
 
-        return new UploadFile(file, isValidFile);
+        return new UploadFile(file, validationStatus);
       });
     files.value = files.value.concat(newUploadFiles);
   };
