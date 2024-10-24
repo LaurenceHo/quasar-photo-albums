@@ -1,29 +1,30 @@
 import type { UploadFile as IUploadFile } from '@/schema';
+import type { FileValidationStatus } from '@/schema/upload-file';
 import { ref } from 'vue';
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
-export const ALLOWED_FILE_TYPE = ['image/png', 'image/jpeg'];
+export const ALLOWED_FILE_TYPE = ['image/png', 'image/jpeg', 'image/webp'];
 
 const files = ref<IUploadFile[]>([]);
 
 export default function FileListContext() {
   const addFiles = (newFiles: File[]) => {
     const newUploadFiles = [...newFiles]
+      .filter((file) => !fileExists(`${file.name}-${file.size}-${file.lastModified}-${file.type}`))
       .map((file) => {
-        let isValidImage: 'y' | 'wrong_format' | 'wrong_size' = 'y';
+        let isValidFile: FileValidationStatus = 'valid';
 
         if (!ALLOWED_FILE_TYPE.includes(file.type)) {
-          isValidImage = 'wrong_format';
-          return new UploadFile(file, isValidImage);
+          isValidFile = 'invalid_format';
+          return new UploadFile(file, isValidFile);
         }
 
         if (file.size > MAX_FILE_SIZE) {
-          isValidImage = 'wrong_size';
+          isValidFile = 'invalid_size';
         }
 
-        return new UploadFile(file, isValidImage);
-      })
-      .filter((file) => !fileExists(file.id));
+        return new UploadFile(file, isValidFile);
+      });
     files.value = files.value.concat(newUploadFiles);
   };
 
@@ -46,14 +47,14 @@ class UploadFile implements IUploadFile {
   url: string;
   status: 'loading' | boolean | null;
   exists: boolean;
-  isValidImage: 'y' | 'wrong_format' | 'wrong_size';
+  fileValidation: FileValidationStatus;
 
-  constructor(file: File, isValidImage: 'y' | 'wrong_format' | 'wrong_size') {
+  constructor(file: File, fileValidation: FileValidationStatus) {
     this.file = file;
     this.id = `${file.name}-${file.size}-${file.lastModified}-${file.type}`;
     this.url = URL.createObjectURL(file);
     this.status = null;
     this.exists = false;
-    this.isValidImage = isValidImage;
+    this.fileValidation = fileValidation;
   }
 }

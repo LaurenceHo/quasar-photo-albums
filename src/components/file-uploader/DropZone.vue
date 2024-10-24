@@ -1,7 +1,7 @@
 <!-- In DropZone.vue -->
 <template>
   <Card
-    :class="`w-full max-w-7xl overflow-auto h-screen max-h-[80vh]
+    :class="`w-full max-w-7xl overflow-auto h-[calc(80vh-80px)]
             ${active ? 'shadow-md border-2 border-dashed' : ''}
             ${isValidDrag ? 'border-blue-500' : 'border-red-500'}
             ${isUploading ? 'bg-gray-100' : ''}`"
@@ -49,6 +49,8 @@ import Card from 'primevue/card';
 import Divider from 'primevue/divider';
 import Checkbox from 'primevue/checkbox';
 import ProgressBar from 'primevue/progressbar';
+import { useToast } from 'primevue/usetoast';
+import { debounce } from 'radash';
 import { onMounted, onUnmounted, ref } from 'vue';
 
 const emits = defineEmits<{
@@ -57,8 +59,11 @@ const emits = defineEmits<{
 }>();
 
 const { overwrite, isUploading } = FileUploaderContext();
+const toast = useToast();
+
 const active = ref(false);
 const isValidDrag = ref(true);
+
 let inActiveTimeout: number | null = null;
 
 // setActive and setInactive use timeouts, so that when you drag an item over a child element,
@@ -77,12 +82,16 @@ const setInactive = () => {
   }, 50);
 };
 
+const emitValidDrag = debounce({ delay: 100 }, (isValid: boolean) => {
+  emits('valid-drag', isValid);
+});
+
 const onDragOver = (e: DragEvent) => {
   setActive();
   if (e.dataTransfer?.items) {
     isValidDrag.value = [...e.dataTransfer.items].every((item) => ALLOWED_FILE_TYPE.includes(item.type));
 
-    emits('valid-drag', isValidDrag.value);
+    emitValidDrag(isValidDrag.value);
   }
 };
 
@@ -90,6 +99,16 @@ const onDrop = (e: DragEvent) => {
   setInactive();
   if (e.dataTransfer?.files) {
     const filteredFiles = [...e.dataTransfer.files].filter((file) => ALLOWED_FILE_TYPE.includes(file.type));
+
+    const rejectedCount = e.dataTransfer.files.length - filteredFiles.length;
+    if (rejectedCount > 0) {
+      toast.add({
+        severity: 'error',
+        summary: 'Invalid files',
+        detail: `${rejectedCount} file(s) were rejected due to unsupported file type`,
+        life: 3000
+      });
+    }
 
     emits('files-dropped', filteredFiles);
   }

@@ -8,7 +8,7 @@
       </Button>
     </div>
 
-    <div class="flex flex-col h-full">
+    <div class="flex flex-col h-full items-center">
       <DropZone v-slot="{ dropZoneActive }" @files-dropped="addFiles" @valid-drag="isValidDragFn">
         <Message v-if="isCompleteUploading" class="mb-4" severity="success">Upload finished!</Message>
 
@@ -100,7 +100,7 @@ const { uploadFiles } = createUploader(albumId.value);
 
 const isValidDrag = ref(true);
 
-const validFiles = computed(() => files.value.filter((file) => file.isValidImage === 'y'));
+const validFiles = computed(() => files.value.filter((file) => file.fileValidation === 'valid'));
 
 const isValidDragFn = (isValid: boolean) => {
   isValidDrag.value = isValid;

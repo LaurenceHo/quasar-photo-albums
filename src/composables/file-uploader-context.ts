@@ -15,7 +15,7 @@ export default function FileUploaderContext() {
   };
 
   const uploadFile = async (file: UploadFile, albumId: string) => {
-    if (file.isValidImage !== 'y') {
+    if (file.fileValidation !== 'valid') {
       file.status = false;
       return;
     }

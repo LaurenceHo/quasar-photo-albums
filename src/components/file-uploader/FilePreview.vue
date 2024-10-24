@@ -2,15 +2,15 @@
   <component :is="tag" class="file-preview relative overflow-hidden col-12 sm:col-6 md:col-4 lg:col-3 xl:col-2">
     <div>{{ fileSize }}</div>
     <div class="relative">
-      <img v-if="file.isValidImage === 'y'" :alt="file.file.name" :src="file.url" />
+      <img v-if="file.fileValidation === 'valid'" :alt="file.file.name" :src="file.url" />
       <div v-else>
         File <strong>{{ file.file.name }}</strong>
-        {{ file.isValidImage === 'wrong_format' ? ' is not a supported file type' : ' exceeds 5MB size limit' }}
+        {{ file.fileValidation === 'invalid_format' ? ' is not a supported file type' : ' exceeds 5MB size limit' }}
       </div>
       <Button
         v-if="file.status !== true && !file.exists"
         :disabled="file.status === 'loading'"
-        class="!absolute !top-1 !right-1 !p-0 !h-5 !w-5"
+        class="!absolute !top-1 !right-1 !h-6 !w-6"
         raised
         rounded
         severity="danger"
@@ -18,7 +18,7 @@
         @click="$emit('remove', file)"
       >
         <template #icon>
-          <IconX :size="12" />
+          <IconX :size="14" />
         </template>
       </Button>
 
