@@ -8,35 +8,38 @@
       </Button>
     </div>
 
-    <div class="flex justify-center items-center">
-      <DropZone v-slot="{ dropZoneActive }" @files-dropped="addFiles">
+    <div class="flex flex-col h-full items-center">
+      <DropZone v-slot="{ dropZoneActive }" @files-dropped="addFiles" @valid-drag="isValidDragFn">
         <Message v-if="isCompleteUploading" class="mb-4" severity="success">Upload finished!</Message>
 
         <div
           v-if="!isCompleteUploading && !isUploading"
-          :class="{ 'text-xl': isXSmallDevice, 'text-4xl': !isXSmallDevice }"
-          class="font-bold flex flex-col justify-center items-center"
+          class="text-xl md:text-4xl font-bold"
+          :class="{ 'flex-1 flex items-center justify-center': !files.length }"
         >
-          <span v-if="dropZoneActive" class="flex flex-col items-center mb-2">
-            <span>Drop Them Here</span>
-            <span class="text-base">to add them</span>
-          </span>
-          <span v-else class="flex flex-col items-center">
-            <span>Drag Your Photos Here</span>
-            <span class="text-base my-2">
-              or
-              <input
-                id="file-input"
-                accept="image/png, image/jpeg"
-                class="hidden"
-                multiple
-                type="file"
-                @change="onInputChange"
-              />
-              <label class="cursor-pointer underline italic" for="file-input">browse</label>
+          <div class="flex flex-col items-center">
+            <span v-if="dropZoneActive" class="flex flex-col items-center mb-2">
+              <span>Drop Them Here</span>
+              <span v-if="isValidDrag" class="text-base">to add them</span>
+              <span v-else class="text-red-600">Only image files allowed</span>
             </span>
-          </span>
-          <span class="text-base font-normal">Max file size: 5MB. Only image files allowed</span>
+            <span v-else class="flex flex-col items-center">
+              <span>Drag Your Photos Here</span>
+              <span class="text-base my-2">
+                or
+                <input
+                  id="file-input"
+                  accept="image/png, image/jpeg"
+                  class="hidden"
+                  multiple
+                  type="file"
+                  @change="onInputChange"
+                />
+                <label class="cursor-pointer underline italic" for="file-input">browse</label>
+              </span>
+            </span>
+            <span class="text-base font-normal">Max file size: 5MB. Only image files allowed</span>
+          </div>
         </div>
         <ul v-show="files.length" class="gap-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 mt-4">
           <FilePreview v-for="file of files" :key="file.id" :file="file" tag="li" @remove="removeFile" />
@@ -47,7 +50,7 @@
     <div class="flex justify-center pt-4">
       <Button
         v-if="!isCompleteUploading"
-        :disabled="isUploading || files.length === 0"
+        :disabled="isUploading || validFiles.length === 0"
         class="mr-4"
         data-test-id="clear-file-button"
         label="Clear all"
@@ -56,10 +59,10 @@
       />
       <Button
         v-if="!isCompleteUploading"
-        :disabled="isUploading || files.length === 0"
+        :disabled="isUploading || validFiles.length === 0"
         data-test-id="upload-file-button"
         label="Upload"
-        @click="uploadFiles(files)"
+        @click="uploadFiles(validFiles)"
       />
       <Button v-if="isCompleteUploading" data-test-id="finish-button" label="Done" @click="finishUploadPhotos" />
     </div>
@@ -75,7 +78,7 @@ import FileUploaderContext from '@/composables/file-uploader-context';
 import { IconX } from '@tabler/icons-vue';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
-import { toRefs, watch } from 'vue';
+import { computed, ref, toRefs, watch } from 'vue';
 
 const emits = defineEmits(['refreshPhotoList', 'closePhotoUploader']);
 
@@ -91,6 +94,14 @@ const { files, addFiles, removeFile } = FileListContext();
 const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, overwrite } = FileUploaderContext();
 const { isXSmallDevice } = DeviceContext();
 const { uploadFiles } = createUploader(albumId.value);
+
+const isValidDrag = ref(true);
+
+const validFiles = computed(() => files.value.filter((file) => file.fileValidation === 'valid'));
+
+const isValidDragFn = (isValid: boolean) => {
+  isValidDrag.value = isValid;
+};
 
 const onInputChange = (e: Event) => {
   const target = e.target as HTMLInputElement;

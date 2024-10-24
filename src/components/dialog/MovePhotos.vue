@@ -81,7 +81,7 @@ import { IconFileAlert } from '@tabler/icons-vue';
 import { useMutation, useQuery } from '@tanstack/vue-query';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import Select from 'primevue/select';
+import Select, { type SelectFilterEvent } from 'primevue/select';
 import { useToast } from 'primevue/usetoast';
 import { computed, ref, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -133,9 +133,9 @@ const setSelectedYear = (year: string) => {
   selectedYear.value = year;
 };
 
-const filterAlbumsFunction = (event: { filter: string }) => {
+const filterAlbumsFunction = (event: SelectFilterEvent) => {
   filteredAlbumsList.value = mappedAlbumList.value.filter(
-    (album) => album.label.toLowerCase().indexOf(event.filter.toLowerCase()) > -1 && album.value !== albumId.value
+    (album) => album.label.toLowerCase().indexOf(event.value.toLowerCase()) > -1 && album.value !== albumId.value
   );
 };
 

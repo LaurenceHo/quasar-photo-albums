@@ -25,16 +25,8 @@
     </div>
     <Button
       v-if="!prevBtnDisabled && !nextBtnDisabled"
-      :pt="{
-        root: {
-          style: {
-            position: 'absolute',
-            top: '35%',
-            left: 0
-          }
-        }
-      }"
       rounded
+      class="!absolute !top-[35%] !left-0"
       @click="scrollPrev"
     >
       <template #icon>
@@ -44,16 +36,8 @@
 
     <Button
       v-if="!prevBtnDisabled && !nextBtnDisabled"
-      :pt="{
-        root: {
-          style: {
-            position: 'absolute',
-            top: '35%',
-            right: 0
-          }
-        }
-      }"
       rounded
+      class="!absolute !top-[35%] !right-0"
       @click="scrollNext"
     >
       <template #icon>

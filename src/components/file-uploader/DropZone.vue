@@ -1,45 +1,69 @@
+<!-- In DropZone.vue -->
 <template>
   <Card
-    :class="[
-      'w-full max-w-7xl overflow-auto h-[calc(80vh-80px)]',
-      { 'shadow-md border-2 border-dashed border-blue-500': active }
-    ]"
+    :class="`w-full max-w-7xl overflow-auto h-[calc(80vh-80px)]
+            ${active ? 'shadow-md border-2 border-dashed' : ''}
+            ${isValidDrag ? 'border-blue-500' : 'border-red-500'}
+            ${isUploading ? 'bg-gray-100' : ''}`"
+    :pt="{
+      body: {
+        style: {
+          height: '100%'
+        }
+      },
+      content: {
+        style: {
+          height: '100%'
+        }
+      }
+    }"
   >
     <template #content>
-      <div class="flex items-center">
-        <Checkbox v-model="overwrite" binary class="mr-2" />
-        <span>Overwrite existing photos</span>
-      </div>
+      <div class="flex flex-col h-full">
+        <div class="flex items-center">
+          <Checkbox id="overwrite-checkbox" v-model="overwrite" binary class="mr-2" />
+          <label for="overwrite-checkbox" class="cursor-pointer">Overwrite existing photos</label>
+        </div>
 
-      <Divider :pt="{ root: { style: { marginBottom: 0 } } }" />
-      <!-- TODO: Should show the percentage of upload progress here -->
-      <ProgressBar v-if="isUploading" class="mb-4" mode="indeterminate" style="height: 6px" />
+        <Divider class="!mb-0" />
+        <ProgressBar v-if="isUploading" class="mb-4 !h-1.5" mode="indeterminate" />
 
-      <div
-        class="p-4"
-        @dragenter.prevent="setActive"
-        @dragover.prevent="setActive"
-        @dragleave.prevent="setInactive"
-        @drop.prevent="onDrop"
-      >
-        <slot :drop-zone-active="active"></slot>
+        <div
+          class="p-4 flex-1 flex flex-col"
+          @dragenter.prevent="setActive"
+          @dragover.prevent="onDragOver"
+          @dragleave.prevent="setInactive"
+          @drop.prevent="onDrop"
+        >
+          <slot :drop-zone-active="active"></slot>
+        </div>
       </div>
     </template>
   </Card>
 </template>
 
 <script lang="ts" setup>
+import { ALLOWED_FILE_TYPE } from '@/composables/file-list-context';
 import FileUploaderContext from '@/composables/file-uploader-context';
 import Card from 'primevue/card';
 import Divider from 'primevue/divider';
 import Checkbox from 'primevue/checkbox';
 import ProgressBar from 'primevue/progressbar';
+import { useToast } from 'primevue/usetoast';
+import { debounce } from 'radash';
 import { onMounted, onUnmounted, ref } from 'vue';
 
-const emits = defineEmits<(e: 'files-dropped', files: File[]) => void>();
+const emits = defineEmits<{
+  (e: 'files-dropped', files: File[]): void;
+  (e: 'valid-drag', isValid: boolean): void;
+}>();
 
 const { overwrite, isUploading } = FileUploaderContext();
+const toast = useToast();
+
 const active = ref(false);
+const isValidDrag = ref(true);
+
 let inActiveTimeout: number | null = null;
 
 // setActive and setInactive use timeouts, so that when you drag an item over a child element,
@@ -58,10 +82,35 @@ const setInactive = () => {
   }, 50);
 };
 
+const emitValidDrag = debounce({ delay: 100 }, (isValid: boolean) => {
+  emits('valid-drag', isValid);
+});
+
+const onDragOver = (e: DragEvent) => {
+  setActive();
+  if (e.dataTransfer?.items) {
+    isValidDrag.value = [...e.dataTransfer.items].every((item) => ALLOWED_FILE_TYPE.includes(item.type));
+
+    emitValidDrag(isValidDrag.value);
+  }
+};
+
 const onDrop = (e: DragEvent) => {
   setInactive();
   if (e.dataTransfer?.files) {
-    emits('files-dropped', [...e.dataTransfer.files]);
+    const filteredFiles = [...e.dataTransfer.files].filter((file) => ALLOWED_FILE_TYPE.includes(file.type));
+
+    const rejectedCount = e.dataTransfer.files.length - filteredFiles.length;
+    if (rejectedCount > 0) {
+      toast.add({
+        severity: 'error',
+        summary: 'Invalid files',
+        detail: `${rejectedCount} file(s) were rejected due to unsupported file type`,
+        life: 3000
+      });
+    }
+
+    emits('files-dropped', filteredFiles);
   }
 };
 

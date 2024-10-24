@@ -73,18 +73,7 @@
       <div v-if="currentAlbum?.tags?.length && currentAlbum?.tags?.length > 0" class="flex flex-wrap gap-2 pb-4">
         <Tag v-for="(tag, i) in currentAlbum.tags" :key="i" :value="tag" data-test-id="album-tag" severity="success" />
       </div>
-      <Toolbar
-        v-if="isAdmin"
-        :pt="{
-          root: {
-            style: {
-              padding: '0.5rem'
-            }
-          }
-        }"
-        class="mb-4"
-        data-test-id="photo-manage-panel"
-      >
+      <Toolbar v-if="isAdmin" class="mb-4 !p-2" data-test-id="photo-manage-panel">
         <template #start>
           <Button
             v-tooltip="'Upload photos'"

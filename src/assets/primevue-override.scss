@@ -27,7 +27,11 @@
 
 .dark-theme {
   .file-preview {
-    .p-tag {
+    .p-button.p-button-icon-only {
+      padding: 0;
+    }
+
+    .p-tag-success {
       background: color-mix(in srgb,var(--p-green-500),transparent 30%);
       color: var(--p-green-900);
     }
