@@ -15,7 +15,7 @@
     "serverless:deploy:prod": "serverless deploy --stage prod",
     "start:server": "rimraf dist && bun build:server && bun dist/index.js",
     "test:server": "vitest run --coverage",
-    "types:server": "vue-tsc --build --force"
+    "types:server": "tsc --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.679.0",
