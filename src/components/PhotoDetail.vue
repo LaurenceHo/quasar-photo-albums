@@ -6,7 +6,7 @@
     @keydown.esc="emits('closePhotoDetail')"
   >
     <div class="flex justify-end">
-      <Button class="mb-2" severity="secondary" rounded @click="emits('closePhotoDetail')">
+      <Button class="mb-2" severity="secondary" rounded data-test-id="close-button" @click="emits('closePhotoDetail')">
         <template #icon>
           <IconX :size="24" />
         </template>
@@ -16,8 +16,8 @@
     <div class="grid grid-cols-4 gap-3">
       <div class="col-span-4 lg:col-span-3 flex flex-col items-center">
         <div class="w-full text-center mb-3">
-          <div class="">{{ photoFileName }}</div>
-          <div class="">({{ selectedImageIndex + 1 }}/{{ photosInAlbum.length }})</div>
+          <div data-test-id="photo-file-name">{{ photoFileName }}</div>
+          <div data-test-id="photo-index">({{ selectedImageIndex + 1 }}/{{ photosInAlbum.length }})</div>
         </div>
         <div class="relative w-full sm:min-h-96 lg:h-[calc(80vh-80px)] h-auto min-h-80">
           <div id="photo-image-detail" class="flex justify-center items-center h-full">
@@ -54,10 +54,10 @@
           <span class="text-2xl text-semibold">Details</span>
           <EditPhotoButton v-if="isAdmin && selectedImage" :photo-key="selectedImage?.key" />
         </div>
-        <Divider v-if="dateTime" />
-        <div v-if="dateTime" class="flex items-center mx-4">
+        <Divider v-if="localDateTime" />
+        <div v-if="localDateTime" class="flex items-center mx-4">
           <IconCalendarTime :size="24" class="mr-4" />
-          <span>{{ dateTime }}</span>
+          <span>{{ localDateTime }}</span>
         </div>
         <Divider v-if="exifTags['Image Height'] && exifTags['Image Width']" />
         <div v-if="exifTags['Image Height'] && exifTags['Image Width']" class="flex items-center mx-4">
@@ -116,7 +116,7 @@ import Button from 'primevue/button';
 import Divider from 'primevue/divider';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
-import { computed, ref, watch } from 'vue';
+import { computed, type ComputedRef, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 type ExifData = ExifTags & FileTags;
@@ -132,7 +132,7 @@ const { windowSize } = DeviceContext();
 
 const selectedImageIndex = ref(-1);
 const photoFileName = ref('');
-const exifTags = ref({} as ExifData);
+const exifTags = ref<Record<string, any>>({});
 const loadImage = ref(false);
 const imageContainerWidth = ref(0);
 const imageContainerHeight = ref(0);
@@ -143,17 +143,21 @@ const albumYear = computed(() => route.params['year'] as string);
 const photoId = computed(() => route.query['photo'] as string);
 
 /** Compute photo EXIF data begin */
-const dateTime = computed(() => {
+const localDateTime = computed(() => {
   if (exifTags.value.DateTime?.description) {
-    const dateTime = exifTags.value.DateTime?.description.split(' ');
-    const time = dateTime[1]?.split(':');
-    const composeTime = time ? time[0] + ':' + time[1] : '';
-    return `${dateTime[0]?.replace(':', '/')} ${composeTime} ${exifTags.value.OffsetTime?.value?.[0] ?? ''}`;
+    const dateTime = exifTags.value.DateTime?.description;
+    const [datePart, timePart] = dateTime.split(' ');
+    const [year, month, day] = datePart.split(':').map(Number);
+    const [hours, minutes, seconds] = timePart.split(':').map(Number);
+
+    const date = new Date(year, month - 1, day, hours, minutes, seconds);
+
+    return `${date.toLocaleString()} ${exifTags.value.OffsetTime?.value?.[0] ?? ''}`;
   }
-  return '';
+  return null;
 });
 
-const latitude = computed(() => {
+const latitude: ComputedRef<number> = computed(() => {
   if (exifTags.value.GPSLatitude?.description) {
     if (exifTags.value.GPSLatitudeRef?.value[0] === 'S') {
       return Number(exifTags.value.GPSLatitude?.description) * -1;
@@ -163,7 +167,7 @@ const latitude = computed(() => {
   return -1000;
 });
 
-const longitude = computed(() => {
+const longitude: ComputedRef<number> = computed(() => {
   if (exifTags.value.GPSLongitude?.description) {
     if (exifTags.value.GPSLongitudeRef?.value[0] === 'W') {
       return Number(exifTags.value.GPSLongitude?.description) * -1;
