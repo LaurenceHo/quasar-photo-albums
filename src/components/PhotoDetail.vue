@@ -144,14 +144,21 @@ const photoId = computed(() => route.query['photo'] as string);
 
 /** Compute photo EXIF data begin */
 const localDateTime = computed(() => {
-  if (exifTags.value.DateTime?.description) {
+ if (exifTags.value.DateTime?.description) {
     const dateTime = exifTags.value.DateTime?.description;
-    const [datePart, timePart] = dateTime.split(' ');
-    const [year, month, day] = datePart.split(':').map(Number);
-    const [hours, minutes, seconds] = timePart.split(':').map(Number);
-
-    const date = new Date(year, month - 1, day, hours, minutes, seconds);
-
+    // Validate format: "YYYY:MM:DD HH:MM:SS"
+    if (!/^\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}$/.test(dateTime)) {
+      return null;
+    }
+    
+    // Convert EXIF date format to ISO format
+    const isoDateTime = dateTime.replace(/^(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3');
+    const date = new Date(isoDateTime);
+    
+    // Validate parsed date
+    if (isNaN(date.getTime())) {
+      return null;
+    }
     return `${date.toLocaleString()} ${exifTags.value.OffsetTime?.value?.[0] ?? ''}`;
   }
   return null;
