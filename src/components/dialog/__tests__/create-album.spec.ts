@@ -179,18 +179,16 @@ describe('CreateAlbum', () => {
     const privateToggle = wrapper.findComponent(ToggleSwitch);
     const featuredToggle = wrapper.findAllComponents(ToggleSwitch)[1];
 
-    console.log('privateToggle', privateToggle.html());
-    console.log('featuredToggle', featuredToggle.html());
-
     // Default private album is true
     expect(privateToggle.props('modelValue')).toBe(true);
+    expect(featuredToggle.classes()).toContain('p-disabled');
 
     // Disable private album
     await privateToggle.setValue(false);
     expect(privateToggle.props('modelValue')).toBe(false);
+    expect(featuredToggle.classes()).not.toContain('p-disabled');
 
     // Set featured to true
-    expect(featuredToggle.props('modelValue')).toBe(false);
     await featuredToggle.setValue(true);
     expect(featuredToggle.props('modelValue')).toBe(true);
 
@@ -201,7 +199,7 @@ describe('CreateAlbum', () => {
     // Featured should automatically be set to false
     expect(featuredToggle.props('modelValue')).toBe(false);
     // Featured toggle should be disabled
-    expect(featuredToggle.props('disabled')).toBe(true);
+    expect(featuredToggle.classes()).toContain('p-disabled');
   });
 
   it('handles place search correctly', async () => {

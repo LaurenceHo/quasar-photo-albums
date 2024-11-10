@@ -8,7 +8,13 @@ const IntersectionObserverMock = vi.fn(() => ({
   disconnect: vi.fn(),
   observe: vi.fn(),
   takeRecords: vi.fn(),
-  unobserve: vi.fn(),
+  unobserve: vi.fn()
 }));
 
 vi.stubGlobal('IntersectionObserver', IntersectionObserverMock);
+
+const setup = () => {
+  process.env.TZ = 'Pacific/Auckland';
+};
+
+setup();
