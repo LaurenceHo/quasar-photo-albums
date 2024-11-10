@@ -132,7 +132,7 @@ const { windowSize } = DeviceContext();
 
 const selectedImageIndex = ref(-1);
 const photoFileName = ref('');
-const exifTags = ref<Record<string, any>>({});
+const exifTags = ref<Partial<ExifData>>({});
 const loadImage = ref(false);
 const imageContainerWidth = ref(0);
 const imageContainerHeight = ref(0);
