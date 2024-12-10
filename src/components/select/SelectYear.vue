@@ -43,7 +43,9 @@ const {
   isError
 } = useQuery({
   queryKey: ['countAlbumsByYear'],
-  queryFn: () => AggregateService.getAggregateData('countAlbumsByYear')
+  queryFn: () => AggregateService.getAggregateData('countAlbumsByYear'),
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false
 });
 
 watch(

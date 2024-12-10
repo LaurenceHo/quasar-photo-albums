@@ -105,7 +105,9 @@ const selectedYear = ref<string>((route.params['year'] as string) || 'na');
 const { data: albumsData, isLoading: isFetchingAlbums } = useQuery({
   enabled: computed(() => !!selectedYear.value),
   queryKey: ['getAlbumsByYear', selectedYear],
-  queryFn: () => AlbumService.getAlbumsByYear(selectedYear.value)
+  queryFn: () => AlbumService.getAlbumsByYear(selectedYear.value),
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false
 });
 
 const mappedAlbumList = computed(() => {

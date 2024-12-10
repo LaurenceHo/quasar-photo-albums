@@ -207,7 +207,9 @@ const { data: featuredAlbums, isFetching: isFetchingFeaturedAlbums } = useQuery(
       'albums',
       []
     ) as AlbumItem[];
-  }
+  },
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false
 });
 
 watch(albumList, (newValue) => {
