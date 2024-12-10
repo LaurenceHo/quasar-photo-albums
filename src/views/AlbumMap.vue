@@ -104,7 +104,9 @@ const { data: albumsWithLocation, isFetching } = useQuery({
       'albums',
       []
     ) as Album[];
-  }
+  },
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false
 });
 
 const inspectCluster = (

@@ -192,7 +192,9 @@ isDarkModeEnabled();
 const { isFetching, data: userData } = useQuery({
   queryKey: ['fetchApplications'],
   enabled: !userPermission.value.uid,
-  queryFn: AuthService.userInfo
+  queryFn: AuthService.userInfo,
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false
 });
 
 watch(userData, (data) => {
