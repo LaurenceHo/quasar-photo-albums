@@ -1,24 +1,34 @@
-import type { UserPermission } from '@/schema';
 import { DARK_MODE_ENABLED } from '@/utils/local-storage-key';
 import { computed, ref } from 'vue';
-
-const initialState: UserPermission = {
-  uid: '',
-  email: '',
-  role: '',
-  displayName: ''
-};
+import { useQuery } from '@tanstack/vue-query';
+import { AuthService } from '@/services/auth-service.ts';
+import type { UserPermission } from '@/schema';
 
 const darkMode = ref(false);
-const userPermission = ref(initialState);
+const userState = ref<UserPermission | null>(null);
 
 export default function UserConfigContext() {
-  const getUserPermission = computed(() => userPermission.value);
+  const { isFetching, data: userData } = useQuery({
+    queryKey: ['getUserInfo'],
+    enabled: !userState.value?.uid,
+    queryFn: AuthService.userInfo,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity
+  });
+
+  const getUserPermission = computed(() => {
+    if (userData.value?.data) {
+      userState.value = userData.value.data;
+    }
+    return userState.value;
+  });
+
   const getDarkMode = computed(() => darkMode.value);
-  const isAdmin = computed(() => userPermission.value?.role === 'admin');
+  const isAdmin = computed(() => userState.value?.role === 'admin');
 
   const setUserPermission = (user: UserPermission) => {
-    userPermission.value = user;
+    userState.value = user;
   };
 
   const setDarkMode = (mode: boolean) => {
@@ -27,6 +37,7 @@ export default function UserConfigContext() {
   };
 
   return {
+    isFetching,
     isAdmin,
     userPermission: getUserPermission,
     darkMode: getDarkMode,

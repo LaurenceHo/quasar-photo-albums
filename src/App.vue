@@ -1,5 +1,5 @@
 <template>
-  <Toolbar class="custom-toolbar sticky top-0 z-50">
+  <Toolbar class="sticky top-0 z-50 !rounded-none">
     <template #start>
       <router-link class="flex items-center" to="/">
         <img alt="Website logo" class="logo" height="48" width="48" src="/logo.png" />
@@ -105,7 +105,6 @@ import {
   IconTags,
   IconUser
 } from '@tabler/icons-vue';
-import { useQuery } from '@tanstack/vue-query';
 import Button from 'primevue/button';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
@@ -113,14 +112,14 @@ import InputText from 'primevue/inputtext';
 import Menu from 'primevue/menu';
 import ProgressSpinner from 'primevue/progressspinner';
 import Toolbar from 'primevue/toolbar';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
 
 const routeName = computed(() => route.name);
 const { albumSearchKey } = AlbumsContext();
-const { userPermission, setUserPermission, darkMode, setDarkMode } = UserConfigContext();
+const { isFetching, userPermission, darkMode, setDarkMode } = UserConfigContext();
 const { setUpdateAlbumDialogState, setUpdateAlbumTagsDialogState } = DialogContext();
 const appName = import.meta.env.VITE_ALBUM_APP_TITLE;
 const title = document.getElementsByTagName('title')?.[0];
@@ -188,18 +187,4 @@ const setDarkModeAndAddClass = (isDarkMode: boolean) => {
 };
 
 isDarkModeEnabled();
-
-const { isFetching, data: userData } = useQuery({
-  queryKey: ['fetchApplications'],
-  enabled: !userPermission.value.uid,
-  queryFn: AuthService.userInfo,
-  refetchOnWindowFocus: false,
-  refetchOnReconnect: false
-});
-
-watch(userData, (data) => {
-  if (data && data.data) {
-    setUserPermission(data.data);
-  }
-});
 </script>
