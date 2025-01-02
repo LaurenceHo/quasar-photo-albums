@@ -6,7 +6,7 @@ export default mergeConfig(
   viteConfig,
   defineConfig({
     test: {
-      setupFiles: './vitest-setup.ts',
+      setupFiles: './vitest.setup.ts',
       coverage: {
         provider: 'v8',
         reportsDirectory: 'coverage',

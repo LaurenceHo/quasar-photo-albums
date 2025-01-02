@@ -1,67 +1,25 @@
-// @ts-check
 import pluginVue from 'eslint-plugin-vue';
-import globals from 'globals';
-import eslint from '@eslint/js';
-import eslintConfigPrettier from 'eslint-config-prettier';
-import tsEslint from 'typescript-eslint';
+import vueTsEslintConfig from '@vue/eslint-config-typescript';
+import pluginVitest from '@vitest/eslint-plugin';
+import skipFormatting from '@vue/eslint-config-prettier/skip-formatting';
 
-export default tsEslint.config(
-  eslint.configs.recommended,
-  ...tsEslint.configs.recommended,
-  ...pluginVue.configs['flat/recommended'],
-  eslintConfigPrettier,
+export default [
   {
-    plugins: {
-      'typescript-eslint': tsEslint.plugin
-    },
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        process: 'readonly',
-        defineProps: 'readonly',
-        defineEmits: 'readonly',
-        defineExpose: 'readonly'
-      },
-      parserOptions: {
-        parser: tsEslint.parser,
-        extraFileExtensions: ['.vue'],
-        sourceType: 'module',
-        tsconfigRootDir: import.meta.dirname,
-        projectService: true
-      }
-    },
-    rules: {
-      quotes: [
-        'warn',
-        'single',
-        {
-          avoidEscape: true
-        }
-      ],
-      'no-undef': 'off',
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn',
-      'vue/multi-word-component-names': 'off'
-    }
+    name: 'app/files-to-lint',
+    files: ['**/*.{ts,mts,tsx,vue}']
   },
+
   {
-    files: ['**/*.js'],
-    ...tsEslint.configs.disableTypeChecked
+    name: 'app/files-to-ignore',
+    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**']
   },
+
+  ...pluginVue.configs['flat/essential'],
+  ...vueTsEslintConfig(),
+
   {
-    files: ['**/*.ts', '**/*.vue']
+    ...pluginVitest.configs.recommended,
+    files: ['src/**/__tests__/*']
   },
-  {
-    ignores: [
-      '*.config.*',
-      '*.d.ts',
-      'coverage',
-      'dist',
-      'node_modules',
-      'src/assets/**/*',
-      'vitest-setup.ts',
-      'server'
-    ]
-  }
-);
+  skipFormatting
+];
