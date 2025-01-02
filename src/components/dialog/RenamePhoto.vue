@@ -49,9 +49,9 @@
 </template>
 
 <script lang="ts" setup>
-import AlbumsContext from '@/composables/albums-context';
-import DialogContext from '@/composables/dialog-context';
-import PhotosContext from '@/composables/photos-context';
+import useAlbums from '@/composables/use-albums';
+import useDialog from '@/composables/use-dialog';
+import usePhotos from '@/composables/use-photos';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
 import { useMutation } from '@tanstack/vue-query';
@@ -89,9 +89,9 @@ const rules = computed(() => ({
 const toast = useToast();
 
 const { albumId } = toRefs(props);
-const { renamePhotoDialogState, setRenamePhotoDialogState } = DialogContext();
-const { currentPhotoToBeRenamed, findPhotoIndex } = PhotosContext();
-const { fetchAlbumsByYear, isAlbumCover: checkIsAlbumCover, currentAlbum } = AlbumsContext();
+const { renamePhotoDialogState, setRenamePhotoDialogState } = useDialog();
+const { currentPhotoToBeRenamed, findPhotoIndex } = usePhotos();
+const { fetchAlbumsByYear, isAlbumCover: checkIsAlbumCover, currentAlbum } = useAlbums();
 
 const findFileTypeIndex = computed(() => currentPhotoToBeRenamed.value.lastIndexOf('.'));
 const fileType = computed(() => currentPhotoToBeRenamed.value.slice(findFileTypeIndex.value));

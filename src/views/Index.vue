@@ -20,14 +20,14 @@
 </template>
 
 <script lang="ts" setup>
-import AlbumsContext from '@/composables/albums-context';
+import useAlbums from '@/composables/use-albums';
 import { IconFolders, IconLibraryPhoto } from '@tabler/icons-vue';
 import Breadcrumb from 'primevue/breadcrumb';
 import { computed, type FunctionalComponent } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const { currentAlbum } = AlbumsContext();
+const { currentAlbum } = useAlbums();
 
 const breadcrumbs = computed((): { label: string }[] => {
   const routes: { label: string; icon: FunctionalComponent }[] = [];

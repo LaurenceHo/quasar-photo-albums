@@ -106,9 +106,9 @@
 <script lang="ts" setup>
 import { EditPhotoButton } from '@/components/button';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
-import DeviceContext from '@/composables/device-context';
-import PhotosContext from '@/composables/photos-context';
-import UserConfigContext from '@/composables/user-config-context';
+import useDevice from '@/composables/use-device';
+import usePhotos from '@/composables/use-photos';
+import useUserConfig from '@/composables/use-user-config';
 import { IconCalendarTime, IconCamera, IconChevronLeft, IconChevronRight, IconPhoto, IconX } from '@tabler/icons-vue';
 import type { ExifTags, FileTags, NumberTag, RationalTag, StringArrayTag } from 'exifreader';
 import * as ExifReader from 'exifreader';
@@ -126,9 +126,9 @@ const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 const toast = useToast();
 const router = useRouter();
 const route = useRoute();
-const { isAdmin } = UserConfigContext();
-const { photosInAlbum, isFetchingPhotos, findPhotoByIndex, findPhotoIndex } = PhotosContext();
-const { windowSize } = DeviceContext();
+const { isAdmin } = useUserConfig();
+const { photosInAlbum, isFetchingPhotos, findPhotoByIndex, findPhotoIndex } = usePhotos();
+const { windowSize } = useDevice();
 
 const selectedImageIndex = ref(-1);
 const photoFileName = ref('');
@@ -144,17 +144,17 @@ const photoId = computed(() => route.query['photo'] as string);
 
 /** Compute photo EXIF data begin */
 const localDateTime = computed(() => {
- if (exifTags.value.DateTime?.description) {
+  if (exifTags.value.DateTime?.description) {
     const dateTime = exifTags.value.DateTime?.description;
     // Validate format: "YYYY:MM:DD HH:MM:SS"
     if (!/^\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}$/.test(dateTime)) {
       return null;
     }
-    
+
     // Convert EXIF date format to ISO format
     const isoDateTime = dateTime.replace(/^(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3');
     const date = new Date(isoDateTime);
-    
+
     // Validate parsed date
     if (isNaN(date.getTime())) {
       return null;

@@ -72,9 +72,9 @@
 </template>
 
 <script lang="ts" setup>
-import AlbumTagsContext from '@/composables/album-tags-context';
-import AlbumsContext, { type FilteredAlbumsByYear } from '@/composables/albums-context';
-import DialogContext from '@/composables/dialog-context';
+import useAlbumTags from '@/composables/use-album-tags';
+import useAlbums, { type FilteredAlbumsByYear } from '@/composables/use-albums';
+import useDialog from '@/composables/use-dialog';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-vue';
@@ -88,9 +88,9 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const toast = useToast();
 
-const { updateAlbumTagsDialogState, setUpdateAlbumTagsDialogState, setCreateAlbumTagDialogState } = DialogContext();
-const { albumTags, fetchAlbumTags } = AlbumTagsContext();
-const { fetchAlbumsByYear } = AlbumsContext();
+const { updateAlbumTagsDialogState, setUpdateAlbumTagsDialogState, setCreateAlbumTagDialogState } = useDialog();
+const { albumTags, fetchAlbumTags } = useAlbumTags();
+const { fetchAlbumsByYear } = useAlbums();
 
 const deleteTagDialog = ref(false);
 const tagName = ref('');

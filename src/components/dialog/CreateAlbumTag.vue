@@ -37,8 +37,8 @@
 </template>
 
 <script lang="ts" setup>
-import AlbumTagsContext from '@/composables/album-tags-context';
-import DialogContext from '@/composables/dialog-context';
+import useAlbumTags from '@/composables/use-album-tags';
+import useDialog from '@/composables/use-dialog';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
@@ -51,8 +51,8 @@ import { computed, ref } from 'vue';
 
 const toast = useToast();
 
-const { createAlbumTagDialogState, setCreateAlbumTagDialogState } = DialogContext();
-const { fetchAlbumTags } = AlbumTagsContext();
+const { createAlbumTagDialogState, setCreateAlbumTagDialogState } = useDialog();
+const { fetchAlbumTags } = useAlbumTags();
 
 const tagName = ref('');
 

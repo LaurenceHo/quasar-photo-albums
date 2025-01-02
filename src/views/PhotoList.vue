@@ -203,10 +203,10 @@ import PhotoDetail from '@/components/PhotoDetail.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SkeletonPhotoList from '@/components/SkeletonPhotoList.vue';
 import UploadPhotos from '@/components/UploadPhotos.vue';
-import AlbumsContext from '@/composables/albums-context';
-import DialogContext from '@/composables/dialog-context';
-import PhotosContext from '@/composables/photos-context';
-import UserConfigContext from '@/composables/user-config-context';
+import useAlbums from '@/composables/use-albums';
+import useDialog from '@/composables/use-dialog';
+import usePhotos from '@/composables/use-photos';
+import useUserConfig from '@/composables/use-user-config';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import {
@@ -243,10 +243,10 @@ const {
   movePhotoDialogState,
   setMovePhotoDialogState,
   renamePhotoDialogState
-} = DialogContext();
-const { isAdmin } = UserConfigContext();
-const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } = PhotosContext();
-const { currentAlbum, fetchAlbumsByYear } = AlbumsContext();
+} = useDialog();
+const { isAdmin } = useUserConfig();
+const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } = usePhotos();
+const { currentAlbum, fetchAlbumsByYear } = useAlbums();
 
 const albumId = computed(() => route.params['albumId'] as string);
 const albumYear = computed(() => route.params['year'] as string);

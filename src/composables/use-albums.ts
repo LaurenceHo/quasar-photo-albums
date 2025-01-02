@@ -54,7 +54,7 @@ const isFetchingAlbums = ref(false);
 const albumList = ref<Album[]>([]);
 const albumSearchKey = ref('');
 
-export default function AlbumsContext() {
+export default function useAlbums() {
   const getAlbumList = computed(() => albumList.value);
   const getIsFetchingAlbums = computed(() => isFetchingAlbums.value);
   const getAlbumToBeUpdate = computed(() => albumToBeUpdate.value);

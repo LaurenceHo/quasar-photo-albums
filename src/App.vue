@@ -89,9 +89,9 @@
   </template>
 </template>
 <script lang="ts" setup>
-import AlbumsContext from '@/composables/albums-context';
-import DialogContext from '@/composables/dialog-context';
-import UserConfigContext from '@/composables/user-config-context';
+import useAlbums from '@/composables/use-albums';
+import useDialog from '@/composables/use-dialog';
+import useUserConfig from '@/composables/use-user-config';
 import { AuthService } from '@/services/auth-service';
 import { DARK_MODE_ENABLED } from '@/utils/local-storage-key';
 import {
@@ -118,9 +118,9 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 
 const routeName = computed(() => route.name);
-const { albumSearchKey } = AlbumsContext();
-const { isFetching, userPermission, darkMode, setDarkMode } = UserConfigContext();
-const { setUpdateAlbumDialogState, setUpdateAlbumTagsDialogState } = DialogContext();
+const { albumSearchKey } = useAlbums();
+const { isFetching, userPermission, darkMode, setDarkMode } = useUserConfig();
+const { setUpdateAlbumDialogState, setUpdateAlbumTagsDialogState } = useDialog();
 const appName = import.meta.env.VITE_ALBUM_APP_TITLE;
 const title = document.getElementsByTagName('title')?.[0];
 if (title) {

@@ -21,9 +21,9 @@
 </template>
 
 <script lang="ts" setup>
-import AlbumsContext from '@/composables/albums-context';
-import DialogContext from '@/composables/dialog-context';
-import PhotosContext from '@/composables/photos-context';
+import useAlbums from '@/composables/use-albums';
+import useDialog from '@/composables/use-dialog';
+import usePhotos from '@/composables/use-photos';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { getStaticFileUrl } from '@/utils/helper';
@@ -52,9 +52,9 @@ const showPhotoCopiedTag = ref(false);
 
 const toast = useToast();
 
-const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = PhotosContext();
-const { currentAlbum, fetchAlbumsByYear, setCurrentAlbum, isAlbumCover } = AlbumsContext();
-const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } = DialogContext();
+const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = usePhotos();
+const { currentAlbum, fetchAlbumsByYear, setCurrentAlbum, isAlbumCover } = useAlbums();
+const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } = useDialog();
 
 const { mutate } = useMutation({
   mutationFn: async () => {

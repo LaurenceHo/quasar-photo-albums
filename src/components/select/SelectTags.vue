@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-import AlbumTagsContext from '@/composables/album-tags-context';
+import useAlbumTags from '@/composables/use-album-tags';
 import MultiSelect from 'primevue/multiselect';
 import { ref, toRefs, watch } from 'vue';
 
@@ -32,7 +32,7 @@ const props = defineProps({
 
 const { selectedTags } = toRefs(props);
 const internalSelectedTags = ref(selectedTags.value);
-const { fetchAlbumTags, isFetchingAlbumTags, albumTags } = AlbumTagsContext();
+const { fetchAlbumTags, isFetchingAlbumTags, albumTags } = useAlbumTags();
 
 fetchAlbumTags();
 

@@ -1,4 +1,4 @@
-import AlbumsContext, { initialAlbum } from '@/composables/albums-context';
+import useAlbums, { initialAlbum } from '@/composables/use-albums';
 import type { Photo } from '@/schema';
 import { PhotoService } from '@/services/photo-service';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
@@ -9,8 +9,8 @@ const isFetchingPhotos = ref(false);
 const selectedPhotos = ref([] as string[]);
 const currentPhotoToBeRenamed = ref('');
 
-export default function PhotosContext() {
-  const { currentAlbum, setCurrentAlbum } = AlbumsContext();
+export default function usePhotos() {
+  const { currentAlbum, setCurrentAlbum } = useAlbums();
 
   const getIsFetchingPhotos = computed(() => isFetchingPhotos.value);
   const getPhotosInAlbum = computed(() => photosInAlbum.value);

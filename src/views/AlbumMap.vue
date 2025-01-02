@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts" setup>
-import UserConfigContext from '@/composables/user-config-context';
+import useUserConfig from '@/composables/use-user-config';
 import type { Album, Album as AlbumItem, ApiResponse } from '@/schema';
 import { AggregateService } from '@/services/aggregate-service';
 import { compareDbUpdatedTime, fetchDbUpdatedTime } from '@/utils/helper';
@@ -32,7 +32,7 @@ interface AlbumsWithLocation {
 const cdnURL = import.meta.env.VITE_IMAGEKIT_CDN_URL as string;
 const mapCentreLng = Number(import.meta.env.VITE_MAP_CENTRE_LNG ?? 174.7633);
 const mapCentreLat = Number(import.meta.env.VITE_MAP_CENTRE_LAT ?? -36.8484);
-const { darkMode } = UserConfigContext();
+const { darkMode } = useUserConfig();
 
 const geoJson = computed(
   () =>

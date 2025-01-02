@@ -7,7 +7,7 @@ export const ALLOWED_FILE_TYPE = ['image/png', 'image/jpeg', 'image/webp'];
 
 const files = ref<IUploadFile[]>([]);
 
-export default function FileListContext() {
+export default function useFileList() {
   const addFiles = (newFiles: File[]) => {
     const newUploadFiles = [...newFiles]
       .filter((file) => !fileExists(`${file.name}-${file.size}-${file.lastModified}-${file.type}`))

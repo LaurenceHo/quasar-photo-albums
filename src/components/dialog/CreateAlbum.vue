@@ -177,9 +177,9 @@
 <script lang="ts" setup>
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SelectTags from '@/components/select/SelectTags.vue';
-import AlbumTagsContext from '@/composables/album-tags-context';
-import AlbumsContext from '@/composables/albums-context';
-import DialogContext from '@/composables/dialog-context';
+import useAlbumTags from '@/composables/use-album-tags';
+import useAlbums from '@/composables/use-albums';
+import useDialog from '@/composables/use-dialog';
 import type { Album, Place } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { AlbumTagService } from '@/services/album-tag-service';
@@ -205,9 +205,9 @@ import { useRouter } from 'vue-router';
 const toast = useToast();
 const router = useRouter();
 
-const { updateAlbumDialogState, setUpdateAlbumDialogState, setCreateAlbumTagDialogState } = DialogContext();
-const { albumToBeUpdate, setAlbumToBeUpdated, fetchAlbumsByYear } = AlbumsContext();
-const { albumTags } = AlbumTagsContext();
+const { updateAlbumDialogState, setUpdateAlbumDialogState, setCreateAlbumTagDialogState } = useDialog();
+const { albumToBeUpdate, setAlbumToBeUpdated, fetchAlbumsByYear } = useAlbums();
+const { albumTags } = useAlbumTags();
 
 const selectedYear = ref(String(new Date().getFullYear()));
 const albumId = ref('');

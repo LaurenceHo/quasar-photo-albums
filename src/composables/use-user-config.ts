@@ -7,7 +7,7 @@ import type { UserPermission } from '@/schema';
 const darkMode = ref(false);
 const userState = ref<UserPermission | null>(null);
 
-export default function UserConfigContext() {
+export default function useUserConfig() {
   const { isFetching, data: userData } = useQuery({
     queryKey: ['getUserInfo'],
     enabled: !userState.value?.uid,
