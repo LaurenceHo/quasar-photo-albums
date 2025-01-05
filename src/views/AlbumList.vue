@@ -85,13 +85,12 @@ import SelectYear from '@/components/select/SelectYear.vue';
 import useAlbums, { type FilteredAlbumsByYear } from '@/composables/use-albums';
 import useDevice from '@/composables/use-device';
 import useDialog from '@/composables/use-dialog';
+import useFeaturedAlbums from '@/composables/use-featured-albums';
 import useUserConfig from '@/composables/use-user-config';
-import type { Album as AlbumItem, ApiResponse } from '@/schema';
-import { AggregateService } from '@/services/aggregate-service';
-import { compareDbUpdatedTime, fetchDbUpdatedTime, sortByKey } from '@/utils/helper';
-import { FEATURED_ALBUMS, FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
+import type { Album as AlbumItem } from '@/schema';
+import { sortByKey } from '@/utils/helper';
+import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
 import { IconSortAscendingLetters, IconSortDescendingLetters } from '@tabler/icons-vue';
-import { useQuery } from '@tanstack/vue-query';
 import Button from 'primevue/button';
 import Paginator from 'primevue/paginator';
 import ScrollTop from 'primevue/scrolltop';
@@ -99,14 +98,9 @@ import Skeleton from 'primevue/skeleton';
 import Toast from 'primevue/toast';
 import ToggleSwitch from 'primevue/toggleswitch';
 import { useToast } from 'primevue/usetoast';
-import { get, isEmpty } from 'radash';
+import { isEmpty } from 'radash';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-
-interface FeaturedAlbums {
-  dbUpdatedTime: string;
-  albums: AlbumItem[];
-}
 
 const toast = useToast();
 const route = useRoute();
@@ -114,6 +108,7 @@ const router = useRouter();
 
 const { isAdmin } = useUserConfig();
 const { albumSearchKey, albumList, isFetchingAlbums, fetchAlbumsByYear } = useAlbums();
+const { isFetching: isFetchingFeaturedAlbums, data: featuredAlbums } = useFeaturedAlbums();
 const { isXSmallDevice } = useDevice();
 const { updateAlbumTagsDialogState, updateAlbumDialogState, createAlbumTagDialogState } = useDialog();
 
@@ -159,57 +154,6 @@ fetchAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year).catch(() => {
     detail: 'Error while fetching albums. Please try again later.',
     life: 3000
   });
-});
-
-/** Get featured albums and set to local storage **/
-const fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string) => {
-  let time = dbUpdatedTime;
-  if (!time) {
-    time = await fetchDbUpdatedTime();
-  }
-
-  const {
-    data: albums,
-    code,
-    message
-  } = (await AggregateService.getAggregateData('featuredAlbums')) as ApiResponse<AlbumItem[]>;
-  if (code !== 200) {
-    throw Error(message);
-  }
-
-  if (albums) {
-    localStorage.setItem(
-      FEATURED_ALBUMS,
-      JSON.stringify({
-        dbUpdatedTime: time,
-        albums
-      } as FeaturedAlbums)
-    );
-  }
-};
-
-const { data: featuredAlbums, isFetching: isFetchingFeaturedAlbums } = useQuery({
-  queryKey: ['featuredAlbums'],
-  queryFn: async () => {
-    if (!localStorage.getItem(FEATURED_ALBUMS)) {
-      await fetchFeaturedAlbumsAndSetToLocalStorage();
-    } else {
-      const compareResult = await compareDbUpdatedTime(
-        JSON.parse(<string>localStorage.getItem(FEATURED_ALBUMS)).dbUpdatedTime
-      );
-      if (!compareResult.isLatest) {
-        await fetchFeaturedAlbumsAndSetToLocalStorage(compareResult.dbUpdatedTime);
-      }
-    }
-
-    return get(
-      JSON.parse(localStorage.getItem(FEATURED_ALBUMS) || '{}') as FeaturedAlbums,
-      'albums',
-      []
-    ) as AlbumItem[];
-  },
-  refetchOnWindowFocus: false,
-  refetchOnReconnect: false
 });
 
 watch(albumList, (newValue) => {
