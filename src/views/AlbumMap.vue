@@ -59,7 +59,7 @@ const createPopup = (map: mapboxgl.Map, event: any, popup: mapboxgl.Popup) => {
   // Change the background if it's dark mode
   const popupContent = document.querySelector('.mapboxgl-popup-content');
   if (popupContent) {
-    popupContent.classList.toggle('bg-zinc-900', darkMode.value);
+    popupContent.classList.toggle('!bg-zinc-900', darkMode.value);
   }
 };
 
