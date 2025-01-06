@@ -52,7 +52,6 @@ const currentAlbum = ref(initialAlbum);
 const albumToBeUpdate = ref(initialAlbum);
 const isFetchingAlbums = ref(false);
 const albumList = ref<Album[]>([]);
-const albumSearchKey = ref('');
 
 export default function useAlbums() {
   const getAlbumList = computed(() => albumList.value);
@@ -102,7 +101,6 @@ export default function useAlbums() {
   const isAlbumCover = (photoKey: string) => photoKey === currentAlbum.value.albumCover;
 
   return {
-    albumSearchKey,
     isFetchingAlbums: getIsFetchingAlbums,
     albumList: getAlbumList,
     albumToBeUpdate: getAlbumToBeUpdate,

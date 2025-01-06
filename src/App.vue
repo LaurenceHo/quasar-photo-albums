@@ -18,7 +18,7 @@
         <InputIcon>
           <IconSearch :size="20" />
         </InputIcon>
-        <InputText v-model="albumSearchKey" placeholder="Search" />
+        <InputText v-model="searchKey" placeholder="Search" />
       </IconField>
     </template>
 
@@ -27,7 +27,7 @@
         <InputIcon>
           <IconSearch :size="20" />
         </InputIcon>
-        <InputText v-model="albumSearchKey" placeholder="Search" />
+        <InputText v-model="searchKey" placeholder="Search" />
       </IconField>
       <template v-if="routeName !== 'login'">
         <Button
@@ -95,10 +95,7 @@
   </template>
 </template>
 <script lang="ts" setup>
-import useAlbums from '@/composables/use-albums';
-import useDevice from '@/composables/use-device';
-import useDialog from '@/composables/use-dialog';
-import useUserConfig from '@/composables/use-user-config';
+import { useAlbumFilter, useDevice, useDialog, useUserConfig } from '@/composables';
 import { AuthService } from '@/services/auth-service';
 import { DARK_MODE_ENABLED } from '@/utils/local-storage-key';
 import {
@@ -112,23 +109,17 @@ import {
   IconTags,
   IconUser
 } from '@tabler/icons-vue';
-import Button from 'primevue/button';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
-import InputText from 'primevue/inputtext';
-import Menu from 'primevue/menu';
-import ProgressSpinner from 'primevue/progressspinner';
-import Toolbar from 'primevue/toolbar';
+import { Button, IconField, InputIcon, InputText, Menu, ProgressSpinner, Toolbar } from 'primevue';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-
 const routeName = computed(() => route.name);
-const { albumSearchKey } = useAlbums();
+
 const { isFetching, userPermission, darkMode, setDarkMode } = useUserConfig();
 const { setUpdateAlbumDialogState, setUpdateAlbumTagsDialogState } = useDialog();
 const { isMediumDevice } = useDevice();
+const { filterState } = useAlbumFilter();
 
 const appName = import.meta.env.VITE_ALBUM_APP_TITLE;
 const title = document.getElementsByTagName('title')?.[0];
@@ -160,6 +151,11 @@ const items = ref([
       })
   }
 ]);
+
+const searchKey = computed({
+  get: () => filterState.value.searchKey,
+  set: (value: string) => (filterState.value.searchKey = value)
+});
 
 const toggle = (event: any) => {
   menu.value.toggle(event);
