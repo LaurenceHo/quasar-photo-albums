@@ -25,11 +25,17 @@ export interface AlbumTags {
   tags: AlbumTag[];
 }
 
-const _fetchAlbumsAndSetToLocalStorage = async (year: string | undefined, dbUpdatedTime?: string) => {
-  let time = dbUpdatedTime;
-  if (!time) {
-    time = await fetchDbUpdatedTime();
-  }
+const _getStoredAlbums = (): FilteredAlbumsByYear | null => {
+  const stored = localStorage.getItem(FILTERED_ALBUMS_BY_YEAR);
+  return stored ? JSON.parse(stored) : null;
+};
+
+const _storeAlbums = (data: FilteredAlbumsByYear) => {
+  localStorage.setItem(FILTERED_ALBUMS_BY_YEAR, JSON.stringify(data));
+};
+
+const _fetchAlbumsAndSetToLocalStorage = async (year: string, dbUpdatedTime?: string) => {
+  const timestamp = dbUpdatedTime || (await fetchDbUpdatedTime());
 
   const { data: albums, code, message } = await AlbumService.getAlbumsByYear(year);
   if (code !== 200) {
@@ -37,15 +43,32 @@ const _fetchAlbumsAndSetToLocalStorage = async (year: string | undefined, dbUpda
   }
 
   if (albums) {
-    localStorage.setItem(
-      FILTERED_ALBUMS_BY_YEAR,
-      JSON.stringify({
-        dbUpdatedTime: time,
-        year,
-        albums
-      } as FilteredAlbumsByYear)
-    );
+    _storeAlbums({
+      dbUpdatedTime: timestamp,
+      year,
+      albums
+    });
   }
+
+  return albums;
+};
+
+const _shouldRefetchAlbums = async (year?: string, forceUpdate = false): Promise<boolean> => {
+  // If local storage is empty, we should fetch albums from database
+  const stored = _getStoredAlbums();
+  if (!stored) return true;
+
+  // If forceUpdate is true, we should fetch albums from database
+  if (forceUpdate) return true;
+
+  // If local storage is not the latest data or request year (query parameter) is different from local storage
+  // (user selects year from the dropdown),we should get albums from database
+  const { isLatest } = await compareDbUpdatedTime(stored.dbUpdatedTime);
+  if (!isLatest) return true;
+
+  if (year !== undefined && year !== stored.year) return true;
+
+  return false;
 };
 
 const currentAlbum = ref(initialAlbum);
@@ -54,34 +77,23 @@ const isFetchingAlbums = ref(false);
 const albumList = ref<Album[]>([]);
 
 export default function useAlbums() {
-  const getAlbumList = computed(() => albumList.value);
-  const getIsFetchingAlbums = computed(() => isFetchingAlbums.value);
-  const getAlbumToBeUpdate = computed(() => albumToBeUpdate.value);
-  const getCurrentAlbum = computed(() => currentAlbum.value);
-
   const fetchAlbumsByYear = async (year?: string, forceUpdate = false) => {
     isFetchingAlbums.value = true;
 
     try {
-      if (!localStorage.getItem(FILTERED_ALBUMS_BY_YEAR)) {
-        await _fetchAlbumsAndSetToLocalStorage(year);
+      const needsRefetch = await _shouldRefetchAlbums(year, forceUpdate);
+
+      if (needsRefetch) {
+        const albums = await _fetchAlbumsAndSetToLocalStorage(year ?? 'na');
+        if (!albums) return;
+        albumList.value = sortByKey(albums, 'albumName', 'asc');
       } else {
-        const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(
-          localStorage.getItem(FILTERED_ALBUMS_BY_YEAR) || '{}'
-        );
-        const compareResult = await compareDbUpdatedTime(filteredAlbumsByYear.dbUpdatedTime);
-        // If local storage is not the latest data or request year is different from local storage (user selects year
-        // from the dropdown),we should get albums from database
-        if (forceUpdate || !compareResult.isLatest || (year !== undefined && year !== filteredAlbumsByYear.year)) {
-          await _fetchAlbumsAndSetToLocalStorage(year, compareResult.dbUpdatedTime);
+        // If we don't need to refetch, we should get albums from local storage instead
+        const stored = _getStoredAlbums();
+        if (stored) {
+          albumList.value = sortByKey(stored.albums, 'albumName', 'asc');
         }
       }
-
-      // Get albums from local storage again
-      const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(
-        localStorage.getItem(FILTERED_ALBUMS_BY_YEAR) || '{}'
-      );
-      albumList.value = sortByKey(filteredAlbumsByYear.albums, 'albumName', 'asc');
     } catch (error) {
       isFetchingAlbums.value = false;
       throw error;
@@ -101,10 +113,12 @@ export default function useAlbums() {
   const isAlbumCover = (photoKey: string) => photoKey === currentAlbum.value.albumCover;
 
   return {
-    isFetchingAlbums: getIsFetchingAlbums,
-    albumList: getAlbumList,
-    albumToBeUpdate: getAlbumToBeUpdate,
-    currentAlbum: getCurrentAlbum,
+    // Getters
+    isFetchingAlbums: computed(() => isFetchingAlbums.value),
+    albumList: computed(() => albumList.value),
+    albumToBeUpdate: computed(() => albumToBeUpdate.value),
+    currentAlbum: computed(() => currentAlbum.value),
+    // Actions
     fetchAlbumsByYear,
     setAlbumToBeUpdated,
     setCurrentAlbum,
