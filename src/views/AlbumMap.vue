@@ -2,7 +2,7 @@
   <ProgressBar v-if="isFetching" mode="indeterminate" style="height: 4px"></ProgressBar>
   <div
     id="album-location-map"
-    :class="`${isFetching ? 'mt-[72px]' : 'mt-16'} absolute top-0 bottom-0 left-0 right-0 w-full`"
+    :class="`${isFetching ? 'mt-[72px]' : 'mt-14 md:mt-16'} absolute top-0 bottom-0 left-0 right-0 w-full h-full`"
   ></div>
 </template>
 

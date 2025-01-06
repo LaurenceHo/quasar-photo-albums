@@ -1,8 +1,14 @@
 <template>
-  <Toolbar class="sticky top-0 z-50 !rounded-none">
+  <Toolbar class="sticky top-0 z-50 rounded-none max-[768px]:p-1.5">
     <template #start>
       <router-link class="flex items-center" to="/">
-        <img alt="Website logo" class="logo" height="48" width="48" src="/logo.png" />
+        <img
+          alt="Website logo"
+          class="logo"
+          :height="isMediumDevice ? '48' : '36'"
+          :width="isMediumDevice ? '48' : '36'"
+          src="/logo.png"
+        />
         <h1 class="hidden sm:block text-2xl font-bold">{{ appName }}</h1>
       </router-link>
     </template>
@@ -90,6 +96,7 @@
 </template>
 <script lang="ts" setup>
 import useAlbums from '@/composables/use-albums';
+import useDevice from '@/composables/use-device';
 import useDialog from '@/composables/use-dialog';
 import useUserConfig from '@/composables/use-user-config';
 import { AuthService } from '@/services/auth-service';
@@ -121,6 +128,8 @@ const routeName = computed(() => route.name);
 const { albumSearchKey } = useAlbums();
 const { isFetching, userPermission, darkMode, setDarkMode } = useUserConfig();
 const { setUpdateAlbumDialogState, setUpdateAlbumTagsDialogState } = useDialog();
+const { isMediumDevice } = useDevice();
+
 const appName = import.meta.env.VITE_ALBUM_APP_TITLE;
 const title = document.getElementsByTagName('title')?.[0];
 if (title) {
