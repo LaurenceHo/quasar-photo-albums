@@ -1,7 +1,7 @@
 service: photo-album-api
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs22.x
   stage: dev
   region: ${env:AWS_REGION_NAME}
   iam:
