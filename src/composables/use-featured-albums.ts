@@ -41,22 +41,31 @@ export default function useFeaturedAlbums() {
   const { data, isFetching } = useQuery({
     queryKey: ['featuredAlbums'],
     queryFn: async () => {
-      if (!localStorage.getItem(FEATURED_ALBUMS)) {
+      const storedData = localStorage.getItem(FEATURED_ALBUMS);
+      if (!storedData) {
         await _fetchFeaturedAlbumsAndSetToLocalStorage();
       } else {
-        const compareResult = await compareDbUpdatedTime(
-          JSON.parse(<string>localStorage.getItem(FEATURED_ALBUMS)).dbUpdatedTime
-        );
-        if (!compareResult.isLatest) {
-          await _fetchFeaturedAlbumsAndSetToLocalStorage(compareResult.dbUpdatedTime);
+        try {
+          const parsedData = JSON.parse(storedData) as FeaturedAlbums;
+          const compareResult = await compareDbUpdatedTime(parsedData.dbUpdatedTime);
+          if (!compareResult.isLatest) {
+            await _fetchFeaturedAlbumsAndSetToLocalStorage(compareResult.dbUpdatedTime);
+          }
+        } catch (error) {
+          console.error('Failed to parse stored featured albums:', error);
+          await _fetchFeaturedAlbumsAndSetToLocalStorage();
         }
       }
 
-      return get(
-        JSON.parse(localStorage.getItem(FEATURED_ALBUMS) || '{}') as FeaturedAlbums,
-        'albums',
-        []
-      ) as AlbumItem[];
+      try {
+        const finalData = localStorage.getItem(FEATURED_ALBUMS);
+        if (!finalData) return [];
+        const parsedData = JSON.parse(finalData) as FeaturedAlbums;
+        return get(parsedData, 'albums', []) as AlbumItem[];
+      } catch (error) {
+        console.error('Failed to retrieve featured albums:', error);
+        return [];
+      }
     },
     refetchOnWindowFocus: false,
     refetchOnReconnect: false

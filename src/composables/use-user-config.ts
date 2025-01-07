@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/vue-query';
 import { AuthService } from '@/services/auth-service.ts';
 import type { UserPermission } from '@/schema';
 
-const darkMode = ref(false);
+const darkMode = ref(localStorage.getItem(DARK_MODE_ENABLED) === 'true');
 const userState = ref<UserPermission | null>(null);
 
 export default function useUserConfig() {
