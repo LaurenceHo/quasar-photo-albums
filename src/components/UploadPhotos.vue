@@ -72,9 +72,8 @@
 <script lang="ts" setup>
 import DropZone from '@/components/file-uploader/DropZone.vue';
 import FilePreview from '@/components/file-uploader/FilePreview.vue';
-import DeviceContext from '@/composables/device-context';
-import FileListContext from '@/composables/file-list-context';
-import FileUploaderContext from '@/composables/file-uploader-context';
+import useFileList from '@/composables/use-file-list';
+import useFileUploader from '@/composables/use-file-uploader';
 import { IconX } from '@tabler/icons-vue';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
@@ -90,9 +89,8 @@ const props = defineProps({
 });
 
 const { albumId } = toRefs(props);
-const { files, addFiles, removeFile } = FileListContext();
-const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, overwrite } = FileUploaderContext();
-const { isXSmallDevice } = DeviceContext();
+const { files, addFiles, removeFile } = useFileList();
+const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, overwrite } = useFileUploader();
 const { uploadFiles } = createUploader(albumId.value);
 
 const isValidDrag = ref(true);

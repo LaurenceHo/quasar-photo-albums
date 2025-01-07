@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import PhotoDetail from '@/components/PhotoDetail.vue';
 import { ref } from 'vue';
+import { QueryClient, VueQueryPlugin, type VueQueryPluginOptions } from '@tanstack/vue-query';
 
 vi.mock('primevue/usetoast', () => ({
   useToast: vi.fn(() => ({
@@ -11,7 +12,7 @@ vi.mock('primevue/usetoast', () => ({
   }))
 }));
 
-vi.mock('../../composables/photos-context', () => ({
+vi.mock('../../composables/use-photos', () => ({
   default: vi.fn().mockImplementation(() => ({
     photosInAlbum: ref([
       { key: 'photo1', url: 'https://example.com/photo1.jpg' },
@@ -23,12 +24,25 @@ vi.mock('../../composables/photos-context', () => ({
   }))
 }));
 
+// Create a test query client for tests
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false // disable retries for testing
+    }
+  }
+});
+
 describe('PhotoDetail.vue', () => {
   let wrapper: ReturnType<typeof mount>;
+  const options: VueQueryPluginOptions = {
+    queryClient
+  };
+
   beforeEach(() => {
     wrapper = mount(PhotoDetail, {
       global: {
-        plugins: [PrimeVue, router]
+        plugins: [router, PrimeVue, [VueQueryPlugin, options]]
       }
     });
   });

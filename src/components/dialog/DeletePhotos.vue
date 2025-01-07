@@ -29,8 +29,8 @@
 </template>
 
 <script lang="ts" setup>
-import DialogContext from '@/composables/dialog-context';
-import PhotosContext from '@/composables/photos-context';
+import useDialog from '@/composables/use-dialog';
+import usePhotos from '@/composables/use-photos';
 import { PhotoService } from '@/services/photo-service';
 import { IconAlertCircle } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
@@ -49,8 +49,8 @@ const props = defineProps({
 const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 
 const toast = useToast();
-const { deletePhotoDialogState, setDeletePhotoDialogState } = DialogContext();
-const { selectedPhotos } = PhotosContext();
+const { deletePhotoDialogState, setDeletePhotoDialogState } = useDialog();
+const { selectedPhotos } = usePhotos();
 const { albumId } = toRefs(props);
 
 const photoKeysArray = computed(() =>

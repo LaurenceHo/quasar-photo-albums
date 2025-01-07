@@ -46,7 +46,7 @@ const mockSetUpdateAlbumDialogState = vi.fn((state: boolean) => {
 });
 
 // Mock dialog context
-vi.mock('@/composables/dialog-context', () => ({
+vi.mock('@/composables/use-dialog', () => ({
   default: () => ({
     updateAlbumDialogState: computed(() => dialogState.value),
     setUpdateAlbumDialogState: mockSetUpdateAlbumDialogState,
@@ -56,7 +56,7 @@ vi.mock('@/composables/dialog-context', () => ({
 }));
 
 // Mock albums context
-vi.mock('@/composables/albums-context', () => ({
+vi.mock('@/composables/use-albums', () => ({
   default: () => ({
     albumToBeUpdate: ref({
       year: String(new Date().getFullYear()),
@@ -73,7 +73,7 @@ vi.mock('@/composables/albums-context', () => ({
 }));
 
 // Mock album tags context
-vi.mock('@/composables/album-tags-context', () => ({
+vi.mock('@/composables/use-album-tags', () => ({
   default: () => ({
     albumTags: ref([]),
     fetchAlbumTags: vi.fn()

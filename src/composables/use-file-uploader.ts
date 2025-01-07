@@ -1,4 +1,4 @@
-import PhotosContext from '@/composables/photos-context';
+import usePhotos from '@/composables/use-photos';
 import type { UploadFile } from '@/schema';
 import { PhotoService } from '@/services/photo-service';
 import { ref } from 'vue';
@@ -7,8 +7,8 @@ const isUploading = ref(false);
 const isCompleteUploading = ref(false);
 const overwrite = ref(false);
 
-export default function FileUploaderContext() {
-  const { findPhotoIndex } = PhotosContext();
+export default function useFileUploader() {
+  const { findPhotoIndex } = usePhotos();
 
   const setIsCompleteUploading = (state: boolean) => {
     isCompleteUploading.value = state;

@@ -7,7 +7,7 @@ const updateAlbumDialogState = ref(false);
 const createAlbumTagDialogState = ref(false);
 const updateAlbumTagsDialogState = ref(false);
 
-export default function DialogContext() {
+export default function useDialog() {
   const getRenamePhotoDialogState = computed(() => renamePhotoDialogState.value);
   const getMovePhotoDialogState = computed(() => movePhotoDialogState.value);
   const getDeletePhotoDialogState = computed(() => deletePhotoDialogState.value);

@@ -65,10 +65,10 @@
 <script lang="ts" setup>
 import { EditPhotoButton } from '@/components/button';
 import SquareImage from '@/components/SquareImage.vue';
-import AlbumsContext from '@/composables/albums-context';
-import DeviceContext from '@/composables/device-context';
-import PhotosContext from '@/composables/photos-context';
-import UserConfigContext from '@/composables/user-config-context';
+import useAlbums from '@/composables/use-albums';
+import useDevice from '@/composables/use-device';
+import usePhotos from '@/composables/use-photos';
+import useUserConfig from '@/composables/use-user-config';
 import { IconCircleCheckFilled, IconInfoCircle } from '@tabler/icons-vue';
 import Button from 'primevue/button';
 import { computed, onMounted, ref, toRefs } from 'vue';
@@ -91,10 +91,10 @@ const imageWidth = ref(250);
 
 const route = useRoute();
 const router = useRouter();
-const { isAdmin, darkMode } = UserConfigContext();
-const { selectedPhotos, setSelectedPhotos } = PhotosContext();
-const { isXSmallDevice } = DeviceContext();
-const { isAlbumCover } = AlbumsContext();
+const { isAdmin, darkMode } = useUserConfig();
+const { selectedPhotos, setSelectedPhotos } = usePhotos();
+const { isXSmallDevice } = useDevice();
+const { isAlbumCover } = useAlbums();
 
 const photoId = computed(() => photo.value['key'].split('/')[1]);
 const thumbnailSize = computed(() => (isXSmallDevice.value ? 80 : 100));

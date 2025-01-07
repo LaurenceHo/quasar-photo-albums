@@ -31,9 +31,9 @@
 import { EditAlbumButton } from '@/components/button';
 import NoImagePlaceholder from '@/components/NoImagePlaceholder.vue';
 import SquareImage from '@/components/SquareImage.vue';
-import { initialAlbum } from '@/composables/albums-context';
-import DeviceContext from '@/composables/device-context';
-import UserConfigContext from '@/composables/user-config-context';
+import { initialAlbum } from '@/composables/use-albums';
+import useDevice from '@/composables/use-device';
+import useUserConfig from '@/composables/use-user-config';
 import type { Album } from '@/schema';
 import { IconLock, IconStarFilled } from '@tabler/icons-vue';
 import Tag from 'primevue/tag';
@@ -50,8 +50,8 @@ const props = defineProps({
   }
 });
 
-const { isAdmin } = UserConfigContext();
-const { isXSmallDevice } = DeviceContext();
+const { isAdmin } = useUserConfig();
+const { isXSmallDevice } = useDevice();
 const { albumItem } = toRefs(props);
 const router = useRouter();
 

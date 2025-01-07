@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import UserConfigContext from '@/composables/user-config-context';
+import useUserConfig from '@/composables/use-user-config';
 import { AuthService } from '@/services/auth-service';
 import Panel from 'primevue/panel';
 import ProgressSpinner from 'primevue/progressspinner';
@@ -42,7 +42,7 @@ import { onMounted, ref } from 'vue';
 
 const toast = useToast();
 const loading = ref(false);
-const { userPermission, setUserPermission } = UserConfigContext();
+const { userPermission, setUserPermission } = useUserConfig();
 
 onMounted(() => {
   // https://developers.google.com/identity/gsi/web/reference/js-reference

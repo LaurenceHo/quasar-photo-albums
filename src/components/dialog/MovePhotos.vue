@@ -72,8 +72,8 @@
 
 <script lang="ts" setup>
 import SelectYear from '@/components/select/SelectYear.vue';
-import DialogContext from '@/composables/dialog-context';
-import PhotosContext from '@/composables/photos-context';
+import useDialog from '@/composables/use-dialog';
+import usePhotos from '@/composables/use-photos';
 import type { Photo } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
@@ -97,8 +97,8 @@ const { albumId } = toRefs(props);
 
 const route = useRoute();
 const toast = useToast();
-const { movePhotoDialogState, setMovePhotoDialogState } = DialogContext();
-const { selectedPhotos } = PhotosContext();
+const { movePhotoDialogState, setMovePhotoDialogState } = useDialog();
+const { selectedPhotos } = usePhotos();
 
 const selectedYear = ref<string>((route.params['year'] as string) || 'na');
 
@@ -161,7 +161,7 @@ const {
         .map((photo: Photo) => photo.key.split('/')[1] || '');
     }
 
-    let photoKeysNotDuplicate = photoKeysArray.value.filter((photoKey) => !duplicatedPhotoKeys.includes(photoKey));
+    const photoKeysNotDuplicate = photoKeysArray.value.filter((photoKey) => !duplicatedPhotoKeys.includes(photoKey));
     if (photoKeysNotDuplicate.length === 0) {
       throw new Error('All photos are duplicates');
     }

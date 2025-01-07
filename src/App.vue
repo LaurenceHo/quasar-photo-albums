@@ -1,8 +1,14 @@
 <template>
-  <Toolbar class="custom-toolbar sticky top-0 z-50">
+  <Toolbar class="sticky top-0 z-50 rounded-none max-[768px]:p-1.5">
     <template #start>
       <router-link class="flex items-center" to="/">
-        <img alt="Website logo" class="logo" height="48" width="48" src="/logo.png" />
+        <img
+          alt="Website logo"
+          class="logo"
+          :height="isMediumDevice ? '48' : '36'"
+          :width="isMediumDevice ? '48' : '36'"
+          src="/logo.png"
+        />
         <h1 class="hidden sm:block text-2xl font-bold">{{ appName }}</h1>
       </router-link>
     </template>
@@ -12,7 +18,7 @@
         <InputIcon>
           <IconSearch :size="20" />
         </InputIcon>
-        <InputText v-model="albumSearchKey" placeholder="Search" />
+        <InputText v-model="searchKey" placeholder="Search" />
       </IconField>
     </template>
 
@@ -21,7 +27,7 @@
         <InputIcon>
           <IconSearch :size="20" />
         </InputIcon>
-        <InputText v-model="albumSearchKey" placeholder="Search" />
+        <InputText v-model="searchKey" placeholder="Search" />
       </IconField>
       <template v-if="routeName !== 'login'">
         <Button
@@ -89,9 +95,7 @@
   </template>
 </template>
 <script lang="ts" setup>
-import AlbumsContext from '@/composables/albums-context';
-import DialogContext from '@/composables/dialog-context';
-import UserConfigContext from '@/composables/user-config-context';
+import { useAlbumFilter, useDevice, useDialog, useUserConfig } from '@/composables';
 import { AuthService } from '@/services/auth-service';
 import { DARK_MODE_ENABLED } from '@/utils/local-storage-key';
 import {
@@ -105,23 +109,18 @@ import {
   IconTags,
   IconUser
 } from '@tabler/icons-vue';
-import { useQuery } from '@tanstack/vue-query';
-import Button from 'primevue/button';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
-import InputText from 'primevue/inputtext';
-import Menu from 'primevue/menu';
-import ProgressSpinner from 'primevue/progressspinner';
-import Toolbar from 'primevue/toolbar';
-import { computed, ref, watch } from 'vue';
+import { Button, IconField, InputIcon, InputText, Menu, ProgressSpinner, Toolbar } from 'primevue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-
 const routeName = computed(() => route.name);
-const { albumSearchKey } = AlbumsContext();
-const { userPermission, setUserPermission, darkMode, setDarkMode } = UserConfigContext();
-const { setUpdateAlbumDialogState, setUpdateAlbumTagsDialogState } = DialogContext();
+
+const { isFetching, userPermission, darkMode, setDarkMode } = useUserConfig();
+const { setUpdateAlbumDialogState, setUpdateAlbumTagsDialogState } = useDialog();
+const { isMediumDevice } = useDevice();
+const { filterState } = useAlbumFilter();
+
 const appName = import.meta.env.VITE_ALBUM_APP_TITLE;
 const title = document.getElementsByTagName('title')?.[0];
 if (title) {
@@ -152,6 +151,11 @@ const items = ref([
       })
   }
 ]);
+
+const searchKey = computed({
+  get: () => filterState.value.searchKey,
+  set: (value: string) => (filterState.value.searchKey = value)
+});
 
 const toggle = (event: any) => {
   menu.value.toggle(event);
@@ -188,18 +192,4 @@ const setDarkModeAndAddClass = (isDarkMode: boolean) => {
 };
 
 isDarkModeEnabled();
-
-const { isFetching, data: userData } = useQuery({
-  queryKey: ['fetchApplications'],
-  enabled: !userPermission.value.uid,
-  queryFn: AuthService.userInfo,
-  refetchOnWindowFocus: false,
-  refetchOnReconnect: false
-});
-
-watch(userData, (data) => {
-  if (data && data.data) {
-    setUserPermission(data.data);
-  }
-});
 </script>

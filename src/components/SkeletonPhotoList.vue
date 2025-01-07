@@ -31,12 +31,12 @@
 </template>
 
 <script lang="ts" setup>
-import DeviceContext from '@/composables/device-context';
+import useDevice from '@/composables/use-device';
 import Skeleton from 'primevue/skeleton';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const { isXSmallDevice } = DeviceContext();
+const { isXSmallDevice } = useDevice();
 const photoId = computed(() => route.query['photo'] as string);
 </script>

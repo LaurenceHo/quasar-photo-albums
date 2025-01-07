@@ -1,36 +1,14 @@
-// @ts-check
 import pluginVue from 'eslint-plugin-vue';
-import globals from 'globals';
-import eslint from '@eslint/js';
-import eslintConfigPrettier from 'eslint-config-prettier';
-import tsEslint from 'typescript-eslint';
+import vueTsEslintConfig from '@vue/eslint-config-typescript';
+import pluginVitest from '@vitest/eslint-plugin';
+import skipFormatting from '@vue/eslint-config-prettier/skip-formatting';
 
-export default tsEslint.config(
-  eslint.configs.recommended,
-  ...tsEslint.configs.recommended,
-  ...pluginVue.configs['flat/recommended'],
-  eslintConfigPrettier,
+export default [
+  ...pluginVue.configs['flat/essential'],
+  ...vueTsEslintConfig(),
+
   {
-    plugins: {
-      'typescript-eslint': tsEslint.plugin
-    },
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        process: 'readonly',
-        defineProps: 'readonly',
-        defineEmits: 'readonly',
-        defineExpose: 'readonly'
-      },
-      parserOptions: {
-        parser: tsEslint.parser,
-        extraFileExtensions: ['.vue'],
-        sourceType: 'module',
-        tsconfigRootDir: import.meta.dirname,
-        projectService: true
-      }
-    },
+    files: ['**/*.{ts,mts,tsx,vue}'],
     rules: {
       quotes: [
         'warn',
@@ -45,23 +23,14 @@ export default tsEslint.config(
       'vue/multi-word-component-names': 'off'
     }
   },
+
   {
-    files: ['**/*.js'],
-    ...tsEslint.configs.disableTypeChecked
+    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**', 'server', '*.config.*', '*.d.ts']
   },
+
   {
-    files: ['**/*.ts', '**/*.vue']
+    ...pluginVitest.configs.recommended,
+    files: ['src/**/__tests__/*']
   },
-  {
-    ignores: [
-      '*.config.*',
-      '*.d.ts',
-      'coverage',
-      'dist',
-      'node_modules',
-      'src/assets/**/*',
-      'vitest-setup.ts',
-      'server'
-    ]
-  }
-);
+  skipFormatting
+];

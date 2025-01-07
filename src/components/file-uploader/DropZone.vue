@@ -43,8 +43,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ALLOWED_FILE_TYPE } from '@/composables/file-list-context';
-import FileUploaderContext from '@/composables/file-uploader-context';
+import { ALLOWED_FILE_TYPE } from '@/composables/use-file-list';
+import useFileUploader from '@/composables/use-file-uploader';
 import Card from 'primevue/card';
 import Divider from 'primevue/divider';
 import Checkbox from 'primevue/checkbox';
@@ -58,7 +58,7 @@ const emits = defineEmits<{
   (e: 'valid-drag', isValid: boolean): void;
 }>();
 
-const { overwrite, isUploading } = FileUploaderContext();
+const { overwrite, isUploading } = useFileUploader();
 const toast = useToast();
 
 const active = ref(false);

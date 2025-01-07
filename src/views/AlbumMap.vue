@@ -2,112 +2,22 @@
   <ProgressBar v-if="isFetching" mode="indeterminate" style="height: 4px"></ProgressBar>
   <div
     id="album-location-map"
-    :class="`${isFetching ? 'mt-[72px]' : 'mt-16'} absolute top-0 bottom-0 left-0 right-0 w-full`"
+    :class="['absolute top-0 bottom-0 left-0 right-0 w-full', `${isFetching ? 'mt-[72px]' : 'mt-14 md:mt-16'}`]"
   ></div>
 </template>
 
 <script lang="ts" setup>
-import UserConfigContext from '@/composables/user-config-context';
-import type { Album, Album as AlbumItem, ApiResponse } from '@/schema';
-import { AggregateService } from '@/services/aggregate-service';
-import { compareDbUpdatedTime, fetchDbUpdatedTime } from '@/utils/helper';
-import { ALBUMS_WITH_LOCATION } from '@/utils/local-storage-key';
-import { useQuery } from '@tanstack/vue-query';
+import useAlbumLocations from '@/composables/use-album-locations';
+import useUserConfig from '@/composables/use-user-config';
 import type { Feature, Point } from 'geojson';
-import mapboxgl from 'mapbox-gl';
+import mapboxgl, { type MapEventOf, type SourceSpecification } from 'mapbox-gl';
 import ProgressBar from 'primevue/progressbar';
-import { get } from 'radash';
-import { computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 
-interface GeoJson {
-  type: 'FeatureCollection';
-  features: Feature[];
-}
-
-interface AlbumsWithLocation {
-  dbUpdatedTime: string;
-  albums: AlbumItem[];
-}
-
-const cdnURL = import.meta.env.VITE_IMAGEKIT_CDN_URL as string;
 const mapCentreLng = Number(import.meta.env.VITE_MAP_CENTRE_LNG ?? 174.7633);
 const mapCentreLat = Number(import.meta.env.VITE_MAP_CENTRE_LAT ?? -36.8484);
-const { darkMode } = UserConfigContext();
-
-const geoJson = computed(
-  () =>
-    ({
-      type: 'FeatureCollection',
-      features: albumsWithLocation.value?.map((album: AlbumItem) => {
-        return {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [album.place?.location.longitude, album.place?.location.latitude]
-          } as Point,
-          properties: {
-            name: album.albumName,
-            description:
-              `<strong>${album.albumName}</strong><br/>` +
-              `${album.place?.displayName ? `<div>${album.place?.displayName}</div>` : ''}` +
-              `${
-                album.albumCover
-                  ? `<img src='${cdnURL}/${encodeURI(album.albumCover + '?tr=w-280' || '')}' alt='${album.albumName}' />`
-                  : ''
-              }` +
-              `${album.description ? `<p>${album.description}</p>` : ''}` +
-              `<a href='/album/${album.year}/${album.id}'>View Album</a>`
-          }
-        };
-      })
-    }) as GeoJson
-);
-
-/** Get albums with location and set to local storage */
-const fetchAlbumsWithLocation = async (dbUpdatedTime?: string) => {
-  let time = dbUpdatedTime;
-  if (!time) {
-    time = await fetchDbUpdatedTime();
-  }
-
-  const {
-    data: albums,
-    code,
-    message
-  } = (await AggregateService.getAggregateData('albumsWithLocation')) as ApiResponse<AlbumItem[]>;
-
-  if (code !== 200) {
-    throw Error(message);
-  }
-
-  if (albums) {
-    localStorage.setItem(ALBUMS_WITH_LOCATION, JSON.stringify({ dbUpdatedTime: time, albums } as AlbumsWithLocation));
-  }
-};
-
-const { data: albumsWithLocation, isFetching } = useQuery({
-  queryKey: ['albumsWithLocation'],
-  queryFn: async () => {
-    if (!localStorage.getItem(ALBUMS_WITH_LOCATION)) {
-      await fetchAlbumsWithLocation();
-    } else {
-      const compareResult = await compareDbUpdatedTime(
-        JSON.parse(<string>localStorage.getItem(ALBUMS_WITH_LOCATION)).dbUpdatedTime
-      );
-      if (!compareResult.isLatest) {
-        await fetchAlbumsWithLocation(compareResult.dbUpdatedTime);
-      }
-    }
-
-    return get(
-      JSON.parse(localStorage.getItem(ALBUMS_WITH_LOCATION) || '{}') as AlbumsWithLocation,
-      'albums',
-      []
-    ) as Album[];
-  },
-  refetchOnWindowFocus: false,
-  refetchOnReconnect: false
-});
+const { darkMode } = useUserConfig();
+const { isFetching, albumLocationGeoJson } = useAlbumLocations();
 
 const inspectCluster = (
   map: mapboxgl.Map,
@@ -119,7 +29,7 @@ const inspectCluster = (
     layers: ['clusters']
   });
   const clusterId = features[0]?.properties?.['cluster_id'];
-  (map.getSource('albums') as any).getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
+  (map.getSource('albums') as any).getClusterExpansionZoom(clusterId, (err: Error, zoom: number) => {
     if (err) return;
 
     map.easeTo({
@@ -149,7 +59,7 @@ const createPopup = (map: mapboxgl.Map, event: any, popup: mapboxgl.Popup) => {
   // Change the background if it's dark mode
   const popupContent = document.querySelector('.mapboxgl-popup-content');
   if (popupContent) {
-    popupContent.classList.toggle('bg-zinc-900', darkMode.value);
+    popupContent.classList.toggle('!bg-zinc-900', darkMode.value);
   }
 };
 
@@ -169,11 +79,11 @@ onMounted(async () => {
   map.on('load', () => {
     map.addSource('albums', {
       type: 'geojson',
-      data: geoJson.value,
+      data: albumLocationGeoJson.value,
       cluster: true,
       clusterMaxZoom: 14, // Max zoom to cluster points on
       clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
-    } as any);
+    } as SourceSpecification);
 
     map.addLayer({
       id: 'clusters',
@@ -242,7 +152,7 @@ onMounted(async () => {
 
     // When mouse moves over a point on the map, open a popup at the
     // location of the feature, with description HTML from its properties.
-    map.on('mouseenter', 'unclustered-point', (event: any) => {
+    map.on('mouseenter', 'unclustered-point', (event: MapEventOf<'mouseenter'>) => {
       createPopup(map, event, popup);
     });
 
@@ -251,7 +161,7 @@ onMounted(async () => {
     });
 
     // When touch moves over a point on the map, open a popup
-    map.on('touchstart', 'unclustered-point', (event: any) => {
+    map.on('touchstart', 'unclustered-point', (event: MapEventOf<'touchstart'>) => {
       createPopup(map, event, popup);
     });
   });

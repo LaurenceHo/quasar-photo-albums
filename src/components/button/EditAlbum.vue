@@ -49,8 +49,8 @@
 </template>
 
 <script lang="ts" setup>
-import AlbumsContext, { initialAlbum } from '@/composables/albums-context';
-import DialogContext from '@/composables/dialog-context';
+import useAlbums, { initialAlbum } from '@/composables/use-albums';
+import useDialog from '@/composables/use-dialog';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { IconAlertCircle, IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-vue';
@@ -73,8 +73,8 @@ const props = defineProps({
 const { albumItem } = toRefs(props);
 const route = useRoute();
 const toast = useToast();
-const { fetchAlbumsByYear, setAlbumToBeUpdated } = AlbumsContext();
-const { setUpdateAlbumDialogState } = DialogContext();
+const { fetchAlbumsByYear, setAlbumToBeUpdated } = useAlbums();
+const { setUpdateAlbumDialogState } = useDialog();
 
 const deleteAlbumDialog = ref(false);
 const albumName = ref(albumItem.value.albumName);

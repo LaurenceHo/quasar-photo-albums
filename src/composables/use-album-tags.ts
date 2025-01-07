@@ -1,4 +1,4 @@
-﻿import type { AlbumTags } from '@/composables/albums-context';
+﻿import type { AlbumTags } from '@/composables/use-albums';
 import type { AlbumTag } from '@/schema';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { compareDbUpdatedTime, fetchDbUpdatedTime, sortByKey } from '@/utils/helper';
@@ -32,7 +32,7 @@ const _fetchAlbumTagsAndSetToLocalStorage = async (dbUpdatedTime?: string) => {
 const isFetchingAlbumTags = ref(false);
 const albumTags = ref<AlbumTag[]>([]);
 
-export default function AlbumTagsContext() {
+export default function useAlbumTags() {
   const fetchAlbumTags = async (forceUpdate = false) => {
     isFetchingAlbumTags.value = true;
 

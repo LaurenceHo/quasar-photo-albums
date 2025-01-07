@@ -1,6 +1,6 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
-export default function DeviceContext() {
+export default function useDevice() {
   const windowWidth = ref(window.innerWidth);
 
   const updateWindowSize = () => {
