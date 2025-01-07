@@ -12,10 +12,7 @@ interface FeaturedAlbums {
 
 /** Get featured albums and set to local storage **/
 const _fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string) => {
-  let time = dbUpdatedTime;
-  if (!time) {
-    time = await fetchDbUpdatedTime();
-  }
+  const timestamp = dbUpdatedTime || (await fetchDbUpdatedTime());
 
   const {
     data: albums,
@@ -30,7 +27,7 @@ const _fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string) 
     localStorage.setItem(
       FEATURED_ALBUMS,
       JSON.stringify({
-        dbUpdatedTime: time,
+        dbUpdatedTime: timestamp,
         albums
       } as FeaturedAlbums)
     );

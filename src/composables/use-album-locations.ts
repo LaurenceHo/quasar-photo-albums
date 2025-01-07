@@ -20,10 +20,7 @@ interface AlbumsWithLocation {
 
 /** Get albums with location and set to local storage */
 const _fetchAlbumsWithLocationAndSetToLocationStorage = async (dbUpdatedTime?: string) => {
-  let time = dbUpdatedTime;
-  if (!time) {
-    time = await fetchDbUpdatedTime();
-  }
+  const timestamp = dbUpdatedTime || (await fetchDbUpdatedTime());
 
   const {
     data: albums,
@@ -36,7 +33,10 @@ const _fetchAlbumsWithLocationAndSetToLocationStorage = async (dbUpdatedTime?: s
   }
 
   if (albums) {
-    localStorage.setItem(ALBUMS_WITH_LOCATION, JSON.stringify({ dbUpdatedTime: time, albums } as AlbumsWithLocation));
+    localStorage.setItem(
+      ALBUMS_WITH_LOCATION,
+      JSON.stringify({ dbUpdatedTime: timestamp, albums } as AlbumsWithLocation)
+    );
   }
 };
 
