@@ -10,82 +10,83 @@
 import useAlbumLocations from '@/composables/use-album-locations';
 import useUserConfig from '@/composables/use-user-config';
 import type { Feature, Point } from 'geojson';
-import mapboxgl, { type MapEventOf, type SourceSpecification } from 'mapbox-gl';
+import mapboxgl, {
+  type GeoJSONSource,
+  type Map,
+  type MapEventOf,
+  type MapMouseEvent,
+  type MapTouchEvent,
+  type SourceSpecification
+} from 'mapbox-gl';
 import ProgressBar from 'primevue/progressbar';
-import { onMounted } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const mapCentreLng = Number(import.meta.env.VITE_MAP_CENTRE_LNG ?? 174.7633);
 const mapCentreLat = Number(import.meta.env.VITE_MAP_CENTRE_LAT ?? -36.8484);
 const { darkMode } = useUserConfig();
 const { isFetching, albumLocationGeoJson } = useAlbumLocations();
+const map = ref<Map | null>(null);
 
-const inspectCluster = (
-  map: mapboxgl.Map,
-  e: (mapboxgl.MapMouseEvent | mapboxgl.MapTouchEvent) & {
-    features?: mapboxgl.GeoJSONFeature[] | undefined;
-  }
-) => {
+type ClusterEvent = (MapMouseEvent | MapTouchEvent) & {
+  features?: mapboxgl.GeoJSONFeature[];
+};
+
+const inspectCluster = (map: Map, e: ClusterEvent) => {
   const features: Feature[] = map.queryRenderedFeatures(e.point, {
     layers: ['clusters']
   });
-  const clusterId = features[0]?.properties?.['cluster_id'];
-  (map.getSource('albums') as any).getClusterExpansionZoom(clusterId, (err: Error, zoom: number) => {
-    if (err) return;
+  const clusterId = features[0]?.properties?.cluster_id;
+  const source = map.getSource('albums') as GeoJSONSource;
+
+  if (!source || !clusterId) return;
+
+  source.getClusterExpansionZoom(clusterId, function (this: void, error?: Error | null, result?: number | null) {
+    if (error || !result) return;
 
     map.easeTo({
       center: (features[0]?.geometry as Point).coordinates as [number, number],
-      zoom: zoom
+      zoom: result
     });
   });
 };
 
-const createPopup = (map: mapboxgl.Map, event: any, popup: mapboxgl.Popup) => {
-  // Change the cursor style as a UI indicator.
+const createPopup = (map: Map, event: MapEventOf<'mouseenter'> | MapEventOf<'touchstart'>, popup: mapboxgl.Popup) => {
+  if (!event.features?.[0]) return;
+
   map.getCanvas().style.cursor = 'pointer';
 
-  const coordinates = event.features[0].geometry.coordinates.slice();
-  const description = event.features[0].properties.description;
-  // Ensure that if the map is zoomed out such that multiple
-  // copies of the feature are visible, the popup appears
-  // over the copy being pointed to.
+  const coordinates = (event.features[0].geometry as Point).coordinates.slice() as [number, number];
+  const description = event.features[0].properties?.description;
+
   while (Math.abs(event.lngLat.lng - coordinates[0]) > 180) {
     coordinates[0] += event.lngLat.lng > coordinates[0] ? 360 : -360;
   }
 
-  // Populate the popup and set its coordinates
-  // based on the feature found.
-  popup.setLngLat(coordinates).setHTML(description).addTo(map);
+  popup
+    .setLngLat(coordinates)
+    .setHTML(description || '')
+    .addTo(map);
 
-  // Change the background if it's dark mode
   const popupContent = document.querySelector('.mapboxgl-popup-content');
   if (popupContent) {
     popupContent.classList.toggle('!bg-zinc-900', darkMode.value);
   }
 };
 
-onMounted(async () => {
-  mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY as string;
-  const map = new mapboxgl.Map({
-    container: 'album-location-map',
-    style: 'mapbox://styles/mapbox/standard',
-    center: [mapCentreLng, mapCentreLat],
-    zoom: 4
-  });
-
-  map.on('idle', () => {
-    map.resize();
-  });
-
-  map.on('load', () => {
-    map.addSource('albums', {
+const initializeMapLayers = (mapInstance: Map) => {
+  if (!mapInstance.getSource('albums')) {
+    mapInstance.addSource('albums', {
       type: 'geojson',
       data: albumLocationGeoJson.value,
       cluster: true,
-      clusterMaxZoom: 14, // Max zoom to cluster points on
-      clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+      clusterMaxZoom: 14,
+      clusterRadius: 50
     } as SourceSpecification);
+  }
 
-    map.addLayer({
+  // Add clusters layer
+  if (!mapInstance.getLayer('clusters')) {
+    mapInstance.addLayer({
       id: 'clusters',
       type: 'circle',
       source: 'albums',
@@ -95,8 +96,11 @@ onMounted(async () => {
         'circle-radius': 20
       }
     });
+  }
 
-    map.addLayer({
+  // Add cluster count layer
+  if (!mapInstance.getLayer('cluster-count')) {
+    mapInstance.addLayer({
       id: 'cluster-count',
       type: 'symbol',
       source: 'albums',
@@ -110,61 +114,112 @@ onMounted(async () => {
         'text-color': 'white'
       }
     });
+  }
 
-    // Load custom marker image
-    map.loadImage('/marker-icon.png', (error, image) => {
-      if (error) throw error;
-      // Add the image to the map style.
-      map.addImage('custom-marker', image as ImageBitmap);
+  // Load and add custom marker image
+  mapInstance.loadImage('/marker-icon.png', (error, image) => {
+    if (error) {
+      console.error('Error loading marker image:', error);
+      return;
+    }
 
-      // Add a layer to use the image to represent the data.
-      map.addLayer({
+    if (!mapInstance.hasImage('custom-marker') && image) {
+      mapInstance.addImage('custom-marker', image);
+    }
+
+    // Add unclustered points layer
+    if (!mapInstance.getLayer('unclustered-point')) {
+      mapInstance.addLayer({
         id: 'unclustered-point',
         type: 'symbol',
         source: 'albums',
         filter: ['!', ['has', 'point_count']],
         layout: {
-          'icon-image': 'custom-marker', // reference the image
+          'icon-image': 'custom-marker',
           'icon-size': 0.25
         }
       });
-    });
-
-    // Inspect a cluster on mouse event
-    map.on('click', 'clusters', (e) => {
-      inspectCluster(map, e);
-    });
-
-    map.on('mouseenter', 'clusters', () => {
-      map.getCanvas().style.cursor = 'pointer';
-    });
-    map.on('mouseleave', 'clusters', () => {
-      map.getCanvas().style.cursor = '';
-    });
-
-    // Inspect a cluster on touch event
-    map.on('touchstart', 'clusters', (e) => {
-      inspectCluster(map, e);
-    });
-
-    // Create a popup, but don't add it to the map yet.
-    const popup = new mapboxgl.Popup();
-
-    // When mouse moves over a point on the map, open a popup at the
-    // location of the feature, with description HTML from its properties.
-    map.on('mouseenter', 'unclustered-point', (event: MapEventOf<'mouseenter'>) => {
-      createPopup(map, event, popup);
-    });
-
-    map.on('mouseleave', 'unclustered-point', () => {
-      map.getCanvas().style.cursor = '';
-    });
-
-    // When touch moves over a point on the map, open a popup
-    map.on('touchstart', 'unclustered-point', (event: MapEventOf<'touchstart'>) => {
-      createPopup(map, event, popup);
-    });
+    }
   });
+};
+
+onMounted(async () => {
+  try {
+    await nextTick();
+
+    if (!albumLocationGeoJson.value) {
+      console.warn('No GeoJSON data available');
+      return;
+    }
+
+    const accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
+    if (!accessToken) {
+      console.error('Mapbox API key is not set');
+      return;
+    }
+
+    mapboxgl.accessToken = accessToken;
+
+    const mapInstance = new mapboxgl.Map({
+      container: 'album-location-map',
+      style: 'mapbox://styles/mapbox/standard',
+      center: [mapCentreLng, mapCentreLat],
+      zoom: 4
+    });
+
+    map.value = mapInstance;
+
+    mapInstance.on('idle', () => {
+      mapInstance.resize();
+    });
+
+    mapInstance.on('load', () => {
+      initializeMapLayers(mapInstance);
+
+      const popup = new mapboxgl.Popup();
+
+      mapInstance.on('click', 'clusters', (e: ClusterEvent) => inspectCluster(mapInstance, e));
+      mapInstance.on('mouseenter', 'clusters', () => {
+        mapInstance.getCanvas().style.cursor = 'pointer';
+      });
+      mapInstance.on('mouseleave', 'clusters', () => {
+        mapInstance.getCanvas().style.cursor = '';
+      });
+      mapInstance.on('touchstart', 'clusters', (e: ClusterEvent) => inspectCluster(mapInstance, e));
+
+      mapInstance.on('mouseenter', 'unclustered-point', (event: MapEventOf<'mouseenter'>) => {
+        createPopup(mapInstance, event, popup);
+      });
+      mapInstance.on('mouseleave', 'unclustered-point', () => {
+        mapInstance.getCanvas().style.cursor = '';
+      });
+      mapInstance.on('touchstart', 'unclustered-point', (event: MapEventOf<'touchstart'>) => {
+        createPopup(mapInstance, event, popup);
+      });
+    });
+  } catch (error) {
+    console.error('Error initializing map:', error);
+  }
+});
+
+watch(
+  albumLocationGeoJson,
+  (newData) => {
+    if (!map.value) return;
+
+    const source = map.value.getSource('albums') as GeoJSONSource;
+    if (source && newData) {
+      source.setData(newData);
+    }
+  },
+  { deep: true }
+);
+
+onUnmounted(() => {
+  if (map.value) {
+    map.value.remove();
+    map.value = null;
+  }
 });
 </script>
 

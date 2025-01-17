@@ -13,7 +13,23 @@ import router from './router';
 
 const prepareApp = async () => {
   const { worker } = await import('./mocks/browser');
-  return worker.start();
+  return worker.start({
+    onUnhandledRequest: (request, print) => {
+      const ignoredUrls = [
+        'chrome-extension://',
+        'https://fonts.gstatic.com',
+        'https://api.mapbox.com',
+        'https://events.mapbox.com'
+      ];
+
+      // Check if the request URL starts with any of the ignored URLs
+      if (ignoredUrls.some((url) => request.url.startsWith(url))) {
+        return;
+      }
+
+      print.warning();
+    }
+  });
 };
 
 const app = createApp(App);
