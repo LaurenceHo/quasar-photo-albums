@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "msw": "vite --mode MSW",
+    "msw": "vite --mode MSW --open",
     "dev": "vite --port=9000 --open",
     "build": "vite build",
     "format": "prettier --ignore-path .gitignore --write src/** --ignore-unknown",

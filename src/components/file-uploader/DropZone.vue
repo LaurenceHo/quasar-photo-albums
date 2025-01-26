@@ -1,7 +1,7 @@
 <!-- In DropZone.vue -->
 <template>
   <Card
-    :class="`w-full max-w-7xl overflow-auto h-[calc(80vh-80px)]
+    :class="`file-drop-zone w-full max-w-7xl overflow-auto h-[calc(80vh-80px)]
             ${active ? 'shadow-md border-2 border-dashed' : ''}
             ${isValidDrag ? 'border-blue-500' : 'border-red-500'}
             ${isUploading ? 'bg-gray-100' : ''}`"
@@ -22,11 +22,11 @@
       <div class="flex flex-col h-full">
         <div class="flex items-center">
           <Checkbox id="overwrite-checkbox" v-model="overwrite" binary class="mr-2" />
-          <label for="overwrite-checkbox" class="cursor-pointer">Overwrite existing photos</label>
+          <label class="cursor-pointer" for="overwrite-checkbox">Overwrite existing photos</label>
         </div>
 
         <Divider class="!mb-0" />
-        <ProgressBar v-if="isUploading" class="mb-4 !h-1.5" mode="indeterminate" />
+        <ProgressBar v-if="isUploading" class="mb-4 h-1.5" mode="indeterminate" />
 
         <div
           class="p-4 flex-1 flex flex-col"
@@ -46,8 +46,8 @@
 import { ALLOWED_FILE_TYPE } from '@/composables/use-file-list';
 import useFileUploader from '@/composables/use-file-uploader';
 import Card from 'primevue/card';
-import Divider from 'primevue/divider';
 import Checkbox from 'primevue/checkbox';
+import Divider from 'primevue/divider';
 import ProgressBar from 'primevue/progressbar';
 import { useToast } from 'primevue/usetoast';
 import { debounce } from 'radash';
