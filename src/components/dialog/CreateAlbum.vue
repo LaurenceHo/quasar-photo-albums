@@ -96,7 +96,7 @@
           </div>
         </div>
 
-        <div class="mb-4 flex">
+        <div class="mb-4 flex gap-2">
           <FloatLabel class="w-full flex-grow">
             <SelectTags :selected-tags="selectedAlbumTags" extra-class="w-full" @select-tags="setSelectedTags" />
             <label for="select-tags">Album Tag</label>

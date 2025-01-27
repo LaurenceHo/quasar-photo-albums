@@ -1,6 +1,13 @@
 <template>
   <div class="absolute bottom-1 right-1">
-    <Tag v-if="tagConfig" :class="tagConfig.class" :severity="tagConfig.severity" :value="tagConfig.value" rounded>
+    <Tag
+      v-if="tagConfig"
+      :class="tagConfig.class"
+      :pt="tagConfig.pt"
+      :severity="tagConfig.severity"
+      :value="tagConfig.value"
+      rounded
+    >
       <template #icon>
         <component :is="tagConfig.icon" :size="16" />
       </template>
@@ -23,10 +30,34 @@ const props = defineProps({
 
 const tagConfig = computed(() => {
   const config = {
-    loading: { severity: 'secondary', value: 'Uploading', icon: IconLoader, class: 'loading-indicator' },
-    uploaded: { severity: 'success', value: 'Uploaded', icon: IconCheck, class: '' },
-    error: { severity: 'danger', value: 'Error', icon: IconAlertCircle, class: '' },
-    exists: { severity: 'warn', value: 'File exists', icon: IconFileAlert, class: '' }
+    loading: {
+      severity: 'secondary',
+      value: 'Uploading',
+      icon: IconLoader,
+      class: 'loading-indicator',
+      pt: undefined
+    },
+    uploaded: {
+      severity: 'success',
+      value: 'Uploaded',
+      icon: IconCheck,
+      class: '',
+      pt: { root: { class: 'dark:bg-green-500 dark:text-green-900' } }
+    },
+    error: {
+      severity: 'danger',
+      value: 'Error',
+      icon: IconAlertCircle,
+      class: '',
+      pt: { root: { class: 'dark:bg-red-500 dark:text-red-900' } }
+    },
+    exists: {
+      severity: 'warn',
+      value: 'File exists',
+      icon: IconFileAlert,
+      class: '',
+      pt: { root: { class: 'dark:bg-orange-500 dark:text-orange-900' } }
+    }
   };
 
   if (props.file.status === 'loading') return config.loading;

@@ -15,7 +15,7 @@ export const initialAlbum: Album = {
 };
 
 export interface FilteredAlbumsByYear {
-  dbUpdatedTime: string;
+  dbUpdatedTime: string | null;
   year: string;
   albums: Album[];
 }

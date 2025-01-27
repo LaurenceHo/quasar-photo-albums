@@ -7,7 +7,6 @@
     filter
     option-label="tag"
     option-value="tag"
-    placeholder="Album Tag"
     display="chip"
     input-id="select-tags"
   />

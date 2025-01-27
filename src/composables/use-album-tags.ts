@@ -6,7 +6,7 @@ import { ALBUM_TAGS } from '@/utils/local-storage-key';
 import { get } from 'radash';
 import { computed, ref } from 'vue';
 
-const _fetchAlbumTagsAndSetToLocalStorage = async (dbUpdatedTime?: string) => {
+const _fetchAlbumTagsAndSetToLocalStorage = async (dbUpdatedTime?: string | null) => {
   let time = dbUpdatedTime;
   if (!time) {
     time = await fetchDbUpdatedTime();

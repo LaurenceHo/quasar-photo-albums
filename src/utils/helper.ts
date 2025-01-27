@@ -11,7 +11,7 @@ export const getYearOptions = () => {
   return yearOptions;
 };
 
-export const fetchDbUpdatedTime = async () => {
+export const fetchDbUpdatedTime: () => Promise<string | null> = async () => {
   let dbUpdatedTimeJSON: { time: string } = { time: '' };
   try {
     const response = await fetch(getStaticFileUrl('updateDatabaseAt.json'));
@@ -19,6 +19,7 @@ export const fetchDbUpdatedTime = async () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // Might encounter CORS issue. Do nothing
+    return null;
   }
   return dbUpdatedTimeJSON.time;
 };
@@ -27,7 +28,7 @@ export const compareDbUpdatedTime = async (localDbUpdatedTime: string | null) =>
   // Get updated time from s3
   const time = await fetchDbUpdatedTime();
   return {
-    isLatest: localDbUpdatedTime === time,
+    isLatest: time === null ? false : localDbUpdatedTime === time,
     dbUpdatedTime: time
   };
 };

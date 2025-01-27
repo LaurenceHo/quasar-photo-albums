@@ -4,7 +4,7 @@
     :class="`file-drop-zone w-full max-w-7xl overflow-auto h-[calc(80vh-80px)]
             ${active ? 'shadow-md border-2 border-dashed' : ''}
             ${isValidDrag ? 'border-blue-500' : 'border-red-500'}
-            ${isUploading ? 'bg-gray-100' : ''}`"
+            ${isUploading ? 'bg-gray-100 dark:bg-zinc-800' : ''}`"
     :pt="{
       body: {
         style: {

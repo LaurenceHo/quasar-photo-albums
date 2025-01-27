@@ -164,7 +164,7 @@ const toggle = (event: any) => {
 const toggleDarkMode = () => {
   const element = document.querySelector('html');
   if (element) {
-    element.classList.toggle('dark-theme');
+    element.classList.toggle('dark');
   }
   setDarkMode(!darkMode.value);
 };
@@ -185,7 +185,7 @@ const isDarkModeEnabled = () => {
 
 const setDarkModeAndAddClass = (isDarkMode: boolean) => {
   if (isDarkMode) {
-    document.querySelector('html')?.classList.add('dark-theme');
+    document.querySelector('html')?.classList.add('dark');
   }
   setDarkMode(isDarkMode);
   return isDarkMode;

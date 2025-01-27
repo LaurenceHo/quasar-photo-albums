@@ -11,7 +11,7 @@ interface FeaturedAlbums {
 }
 
 /** Get featured albums and set to local storage **/
-const _fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string) => {
+const _fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string | null) => {
   const timestamp = dbUpdatedTime || (await fetchDbUpdatedTime());
 
   const {

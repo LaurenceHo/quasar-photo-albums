@@ -19,7 +19,7 @@ interface AlbumsWithLocation {
 }
 
 /** Get albums with location and set to local storage */
-const _fetchAlbumsWithLocationAndSetToLocationStorage = async (dbUpdatedTime?: string) => {
+const _fetchAlbumsWithLocationAndSetToLocationStorage = async (dbUpdatedTime?: string | null) => {
   const timestamp = dbUpdatedTime || (await fetchDbUpdatedTime());
 
   const {

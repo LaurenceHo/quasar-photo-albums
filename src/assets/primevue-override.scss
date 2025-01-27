@@ -26,21 +26,3 @@
     padding: 0;
   }
 }
-
-.dark-theme {
-  .file-drop-zone {
-    background: oklch(.21 .006 285.885);
-    .file-preview {
-      .p-tag-success {
-        background: color-mix(in srgb,var(--p-green-500),transparent 30%);
-        color: var(--p-green-900);
-      }
-      .p-tag-danger {
-        background: color-mix(in srgb,var(--p-red-500),transparent 50%)
-      }
-      .p-tag-warn {
-        background: color-mix(in srgb,var(--p-orange-500),transparent 40%);
-      }
-    }
-  }
-}

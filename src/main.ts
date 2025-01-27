@@ -56,7 +56,7 @@ app.use(PrimeVue, {
   theme: {
     preset: myThemePreset,
     options: {
-      darkModeSelector: '.dark-theme',
+      darkModeSelector: '.dark',
       cssLayer: {
         name: 'primevue',
         order: 'tailwind-base, primevue, tailwind-utilities'
