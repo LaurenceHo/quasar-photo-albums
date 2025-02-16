@@ -54,7 +54,8 @@ export default class S3Service implements BaseService<Photo> {
   async delete(params: DeleteObjectsCommandInput): Promise<boolean> {
     const response = await this.s3Client.send(new DeleteObjectsCommand(params));
     if (response.$metadata.httpStatusCode === 200) {
-      logger().info(`##### Delete objects: ${response.Deleted?.map((deleted) => deleted.Key)}`);
+      const deletedKeys = response.Deleted?.map((deleted) => deleted.Key).join(',');
+      logger().info(`##### Delete objects: ${deletedKeys}`);
     }
     return response.$metadata.httpStatusCode === 200;
   }

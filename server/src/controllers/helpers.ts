@@ -41,7 +41,7 @@ export const uploadObject = async (filePath: string, object: any) => {
 
   try {
     const putObject: PutObjectCommandInput = {
-      Body: object,
+      Body: object ?? '',
       Bucket: s3BucketName,
       Key: filePath
     };
