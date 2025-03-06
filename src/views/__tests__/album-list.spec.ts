@@ -7,45 +7,45 @@ import { ref } from 'vue';
 vi.mock('@/composables/use-album-filter', () => ({
   default: vi.fn(() => ({
     filterState: ref({ sortOrder: 'asc', privateOnly: false, selectedTags: [] }),
-    filteredAlbums: ref([])
-  }))
+    filteredAlbums: ref([]),
+  })),
 }));
 
 vi.mock('@/composables/use-albums', () => ({
   default: vi.fn(() => ({
     isFetchingAlbums: ref(false),
-    fetchAlbumsByYear: vi.fn().mockResolvedValue([])
-  }))
+    fetchAlbumsByYear: vi.fn().mockResolvedValue([]),
+  })),
 }));
 
 vi.mock('@/composables/use-featured-albums', () => ({
   default: vi.fn(() => ({
     isFetching: ref(false),
-    data: ref([])
-  }))
+    data: ref([]),
+  })),
 }));
 
 vi.mock('@/composables/use-user-config', () => ({
   default: vi.fn(() => ({
-    isAdmin: ref(false)
-  }))
+    isAdmin: ref(false),
+  })),
 }));
 
 const mockPush = vi.fn();
 
 vi.mock('vue-router', () => ({
   useRoute: vi.fn(() => ({
-    params: {}
+    params: {},
   })),
   useRouter: vi.fn(() => ({
-    push: mockPush
-  }))
+    push: mockPush,
+  })),
 }));
 
 vi.mock('primevue/usetoast', () => ({
   useToast: vi.fn(() => ({
-    add: vi.fn()
-  }))
+    add: vi.fn(),
+  })),
 }));
 
 describe('AlbumList.vue', () => {
@@ -67,9 +67,9 @@ describe('AlbumList.vue', () => {
           CreateAlbum: true,
           CreateAlbumTag: true,
           UpdateAlbumTags: true,
-          Toast: true
-        }
-      }
+          Toast: true,
+        },
+      },
     });
   });
 
@@ -90,7 +90,7 @@ describe('AlbumList.vue', () => {
     // Check the shared mockPush function
     expect(mockPush).toHaveBeenCalledWith({
       name: 'albumsByYear',
-      params: { year: '2023' }
+      params: { year: '2023' },
     });
   });
 

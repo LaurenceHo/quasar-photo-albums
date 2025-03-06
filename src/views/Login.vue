@@ -1,12 +1,12 @@
 <template>
-  <div class="flex items-center justify-center min-h-[90vh]">
+  <div class="flex min-h-[90vh] items-center justify-center">
     <Panel
       :pt="{
         header: {
           style: {
-            justifyContent: 'center'
-          }
-        }
+            justifyContent: 'center',
+          },
+        },
       }"
       class="w-[300px]"
       header="Header"
@@ -17,8 +17,12 @@
 
       <template v-if="!userPermission?.uid">
         <div class="relative">
-          <div id="google-login-button" :style="`opacity: ${loading ? 0.5 : 1}`" class="flex justify-center"></div>
-          <div v-if="loading" class="absolute top-0 right-0 w-full h-full cursor-not-allowed" />
+          <div
+            id="google-login-button"
+            :style="`opacity: ${loading ? 0.5 : 1}`"
+            class="flex justify-center"
+          ></div>
+          <div v-if="loading" class="absolute top-0 right-0 h-full w-full cursor-not-allowed" />
           <ProgressSpinner v-if="loading" class="login-loading-spinner" fill="transparent" />
         </div>
       </template>
@@ -58,7 +62,7 @@ onMounted(() => {
           severity: 'success',
           summary: 'Welcome',
           detail: `Hello, ${userPermission.displayName}`,
-          life: 3000
+          life: 3000,
         });
         setTimeout(() => window.location.assign('/'), 1000);
       } else {
@@ -66,7 +70,7 @@ onMounted(() => {
           severity: 'error',
           summary: 'Permission denied',
           detail: "You don't have permission to login.",
-          life: 3000
+          life: 3000,
         });
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -75,7 +79,7 @@ onMounted(() => {
         severity: 'error',
         summary: 'Permission denied',
         detail: "You don't have permission to login.",
-        life: 3000
+        life: 3000,
       });
     } finally {
       loading.value = false;
@@ -85,12 +89,12 @@ onMounted(() => {
   if (google) {
     google.accounts.id.initialize({
       client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '',
-      callback: handleCredentialResponse
+      callback: handleCredentialResponse,
     });
     google.accounts.id.renderButton(document.getElementById('google-login-button'), {
       theme: 'outline',
       size: 'large',
-      width: '240'
+      width: '240',
     });
   }
 });

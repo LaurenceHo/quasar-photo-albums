@@ -2,7 +2,10 @@
   <ProgressBar v-if="isFetching" mode="indeterminate" style="height: 4px"></ProgressBar>
   <div
     id="album-location-map"
-    :class="['absolute top-0 bottom-0 left-0 right-0 w-full', `${isFetching ? 'mt-[72px]' : 'mt-14 md:mt-16'}`]"
+    :class="[
+      'absolute top-0 right-0 bottom-0 left-0 w-full',
+      `${isFetching ? 'mt-[72px]' : 'mt-14 md:mt-16'}`,
+    ]"
   ></div>
 </template>
 
@@ -16,7 +19,7 @@ import mapboxgl, {
   type MapEventOf,
   type MapMouseEvent,
   type MapTouchEvent,
-  type SourceSpecification
+  type SourceSpecification,
 } from 'mapbox-gl';
 import ProgressBar from 'primevue/progressbar';
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -33,24 +36,31 @@ type ClusterEvent = (MapMouseEvent | MapTouchEvent) & {
 
 const inspectCluster = (map: Map, e: ClusterEvent) => {
   const features: Feature[] = map.queryRenderedFeatures(e.point, {
-    layers: ['clusters']
+    layers: ['clusters'],
   });
   const clusterId = features[0]?.properties?.cluster_id;
   const source = map.getSource('albums') as GeoJSONSource;
 
   if (!source || !clusterId) return;
 
-  source.getClusterExpansionZoom(clusterId, function (this: void, error?: Error | null, result?: number | null) {
-    if (error || !result) return;
+  source.getClusterExpansionZoom(
+    clusterId,
+    function (this: void, error?: Error | null, result?: number | null) {
+      if (error || !result) return;
 
-    map.easeTo({
-      center: (features[0]?.geometry as Point).coordinates as [number, number],
-      zoom: result
-    });
-  });
+      map.easeTo({
+        center: (features[0]?.geometry as Point).coordinates as [number, number],
+        zoom: result,
+      });
+    },
+  );
 };
 
-const createPopup = (map: Map, event: MapEventOf<'mouseenter'> | MapEventOf<'touchstart'>, popup: mapboxgl.Popup) => {
+const createPopup = (
+  map: Map,
+  event: MapEventOf<'mouseenter'> | MapEventOf<'touchstart'>,
+  popup: mapboxgl.Popup,
+) => {
   if (!event.features?.[0]) return;
 
   map.getCanvas().style.cursor = 'pointer';
@@ -80,7 +90,7 @@ const initializeMapLayers = (mapInstance: Map) => {
       data: albumLocationGeoJson.value,
       cluster: true,
       clusterMaxZoom: 14,
-      clusterRadius: 50
+      clusterRadius: 50,
     } as SourceSpecification);
   }
 
@@ -93,8 +103,8 @@ const initializeMapLayers = (mapInstance: Map) => {
       filter: ['has', 'point_count'],
       paint: {
         'circle-color': '#637A90',
-        'circle-radius': 20
-      }
+        'circle-radius': 20,
+      },
     });
   }
 
@@ -108,11 +118,11 @@ const initializeMapLayers = (mapInstance: Map) => {
       layout: {
         'text-field': ['get', 'point_count_abbreviated'],
         'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-        'text-size': 12
+        'text-size': 12,
       },
       paint: {
-        'text-color': 'white'
-      }
+        'text-color': 'white',
+      },
     });
   }
 
@@ -136,8 +146,8 @@ const initializeMapLayers = (mapInstance: Map) => {
         filter: ['!', ['has', 'point_count']],
         layout: {
           'icon-image': 'custom-marker',
-          'icon-size': 0.25
-        }
+          'icon-size': 0.25,
+        },
       });
     }
   });
@@ -164,7 +174,7 @@ onMounted(async () => {
       container: 'album-location-map',
       style: 'mapbox://styles/mapbox/standard',
       center: [mapCentreLng, mapCentreLat],
-      zoom: 4
+      zoom: 4,
     });
 
     map.value = mapInstance;
@@ -212,7 +222,7 @@ watch(
       source.setData(newData);
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
 onUnmounted(() => {

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="album-list-item cursor-pointer flex items-center border border-gray-300 p-3 rounded-md h-28 sm:h-36"
+    class="album-list-item flex h-28 cursor-pointer items-center rounded-md border border-gray-300 p-3 sm:h-36"
     data-test-id="list-album-item"
   >
     <div class="relative flex-shrink-0" @click="goToAlbum">
@@ -11,14 +11,28 @@
         :src="`${thumbnail}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
       />
       <NoImagePlaceholder v-else :icon-size="30" :size="thumbnailSize" />
-      <IconLock v-if="albumItem?.isPrivate" :size="20" class="absolute top-1 left-1 text-gray-300" />
-      <IconStarFilled v-if="albumItem?.isFeatured" :size="20" class="absolute top-1 left-1 text-pink-400" />
+      <IconLock
+        v-if="albumItem?.isPrivate"
+        :size="20"
+        class="absolute top-1 left-1 text-gray-300"
+      />
+      <IconStarFilled
+        v-if="albumItem?.isFeatured"
+        :size="20"
+        class="absolute top-1 left-1 text-pink-400"
+      />
     </div>
-    <div class="flex-grow ml-3 min-w-0" @click="goToAlbum">
-      <h3 class="text-lg font-semibold truncate">{{ albumItem.albumName }}</h3>
-      <p v-if="albumItem.description" class="text-gray-600 truncate">{{ albumItem.description }}</p>
-      <div class="flex flex-nowrap mt-1 overflow-hidden">
-        <Tag v-for="tag in tagsForDisplay" :key="tag" :value="tag" class="mr-2" severity="success" />
+    <div class="ml-3 min-w-0 flex-grow" @click="goToAlbum">
+      <h3 class="truncate text-lg font-semibold">{{ albumItem.albumName }}</h3>
+      <p v-if="albumItem.description" class="truncate text-gray-600">{{ albumItem.description }}</p>
+      <div class="mt-1 flex flex-nowrap overflow-hidden">
+        <Tag
+          v-for="tag in tagsForDisplay"
+          :key="tag"
+          :value="tag"
+          class="mr-2"
+          severity="success"
+        />
       </div>
     </div>
     <div v-if="isAdmin" class="flex-shrink-0">
@@ -46,8 +60,8 @@ const props = defineProps({
   albumItem: {
     type: Object as () => Album,
     required: true,
-    default: () => initialAlbum
-  }
+    default: () => initialAlbum,
+  },
 });
 
 const { isAdmin } = useUserConfig();
@@ -57,7 +71,9 @@ const router = useRouter();
 
 const thumbnailSize = computed(() => (isXSmallDevice.value ? 90 : 120));
 const thumbnail = computed(() => `${cdnURL}/${encodeURI(albumItem.value?.albumCover ?? '')}`);
-const tagsForDisplay = computed(() => (albumItem.value?.tags ? albumItem.value.tags.slice(0, 3) : []));
+const tagsForDisplay = computed(() =>
+  albumItem.value?.tags ? albumItem.value.tags.slice(0, 3) : [],
+);
 
 const goToAlbum = () => router.push(`/album/${albumItem.value?.year}/${albumItem.value?.id}`);
 </script>

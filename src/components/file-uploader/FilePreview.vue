@@ -1,11 +1,18 @@
 <template>
-  <component :is="tag" class="file-preview relative overflow-hidden col-12 sm:col-6 md:col-4 lg:col-3 xl:col-2">
+  <component
+    :is="tag"
+    class="file-preview relative col-12 overflow-hidden sm:col-6 md:col-4 lg:col-3 xl:col-2"
+  >
     <div>{{ fileSize }}</div>
     <div class="relative">
       <img v-if="file.fileValidation === 'valid'" :alt="file.file.name" :src="file.url" />
       <div v-else>
         File <strong>{{ file.file.name }}</strong>
-        {{ file.fileValidation === 'invalid_format' ? ' is not a supported file type' : ' exceeds 5MB size limit' }}
+        {{
+          file.fileValidation === 'invalid_format'
+            ? ' is not a supported file type'
+            : ' exceeds 5MB size limit'
+        }}
       </div>
       <Button
         v-if="file.status !== true && !file.exists"
@@ -38,7 +45,7 @@ defineEmits<(e: 'remove', file: IUploadFile) => void>();
 
 const props = defineProps({
   file: { type: Object as () => IUploadFile, required: true },
-  tag: { type: String, default: 'li' }
+  tag: { type: String, default: 'li' },
 });
 
 const { file } = toRefs(props);

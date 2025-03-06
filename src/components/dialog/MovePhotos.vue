@@ -11,15 +11,18 @@
         Move photo{{ selectedPhotos.length > 1 ? 's' : '' }} to another album
       </span>
       <div v-else class="flex">
-        <IconFileAlert :size="40" class="text-yellow-600 mr-2" />
+        <IconFileAlert :size="40" class="mr-2 text-yellow-600" />
         <span class="text-xl font-semibold">
-          Photo{{ duplicatedPhotoKeys.length > 1 ? 's' : '' }} exist{{ duplicatedPhotoKeys.length < 2 ? 's' : '' }} in
+          Photo{{ duplicatedPhotoKeys.length > 1 ? 's' : '' }} exist{{
+            duplicatedPhotoKeys.length < 2 ? 's' : ''
+          }}
+          in
           {{ selectedAlbum }}
         </span>
       </div>
     </template>
 
-    <div v-if="duplicatedPhotoKeys.length === 0" class="flex flex-col mb-4">
+    <div v-if="duplicatedPhotoKeys.length === 0" class="mb-4 flex flex-col">
       Select another album for {{ selectedPhotos.length > 1 ? 'these' : 'this' }} photo{{
         selectedPhotos.length > 1 ? 's' : ''
       }}.
@@ -47,7 +50,9 @@
       </template>
 
       <template v-else>
-        <div v-for="photoKey in duplicatedPhotoKeys" :key="photoKey" class="mb-2">{{ photoKey }}</div>
+        <div v-for="photoKey in duplicatedPhotoKeys" :key="photoKey" class="mb-2">
+          {{ photoKey }}
+        </div>
       </template>
     </div>
 
@@ -90,8 +95,8 @@ const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 const props = defineProps({
   albumId: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 const { albumId } = toRefs(props);
 
@@ -107,7 +112,7 @@ const { data: albumsData, isLoading: isFetchingAlbums } = useQuery({
   queryKey: ['getAlbumsByYear', selectedYear],
   queryFn: () => AlbumService.getAlbumsByYear(selectedYear.value),
   refetchOnWindowFocus: false,
-  refetchOnReconnect: false
+  refetchOnReconnect: false,
 });
 
 const mappedAlbumList = computed(() => {
@@ -123,7 +128,7 @@ const photoKeysArray = computed(
     selectedPhotos.value.map((photoKey: string) => {
       const photoKeyArray = photoKey?.split('/');
       return photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
-    }) as string[]
+    }) as string[],
 );
 
 const duplicatedPhotoKeys = ref<string[]>([]);
@@ -137,17 +142,22 @@ const setSelectedYear = (year: string) => {
 
 const filterAlbumsFunction = (event: SelectFilterEvent) => {
   filteredAlbumsList.value = mappedAlbumList.value.filter(
-    (album) => album.label.toLowerCase().indexOf(event.value.toLowerCase()) > -1 && album.value !== albumId.value
+    (album) =>
+      album.label.toLowerCase().indexOf(event.value.toLowerCase()) > -1 &&
+      album.value !== albumId.value,
   );
 };
 
 const {
   isPending,
   mutate: movePhoto,
-  reset
+  reset,
 } = useMutation({
   mutationFn: async () => {
-    const photosInSelectedAlbum = await PhotoService.getPhotosByAlbumId(selectedAlbum.value, selectedYear.value);
+    const photosInSelectedAlbum = await PhotoService.getPhotosByAlbumId(
+      selectedAlbum.value,
+      selectedYear.value,
+    );
     let duplicatedPhotoKeys: string[] = [];
     if (photosInSelectedAlbum.data?.photos) {
       duplicatedPhotoKeys = photosInSelectedAlbum.data.photos
@@ -161,12 +171,18 @@ const {
         .map((photo: Photo) => photo.key.split('/')[1] || '');
     }
 
-    const photoKeysNotDuplicate = photoKeysArray.value.filter((photoKey) => !duplicatedPhotoKeys.includes(photoKey));
+    const photoKeysNotDuplicate = photoKeysArray.value.filter(
+      (photoKey) => !duplicatedPhotoKeys.includes(photoKey),
+    );
     if (photoKeysNotDuplicate.length === 0) {
       throw new Error('All photos are duplicates');
     }
 
-    const result = await PhotoService.movePhotos(albumId?.value, selectedAlbum.value, photoKeysNotDuplicate);
+    const result = await PhotoService.movePhotos(
+      albumId?.value,
+      selectedAlbum.value,
+      photoKeysNotDuplicate,
+    );
     return { result, tempDuplicatedPhotoKeys: duplicatedPhotoKeys };
   },
   onSuccess: ({ result, tempDuplicatedPhotoKeys }) => {
@@ -177,7 +193,7 @@ const {
           severity: 'success',
           summary: 'Success',
           detail: 'Photos moved',
-          life: 3000
+          life: 3000,
         });
         setTimeout(() => {
           setMovePhotoDialogState(false);
@@ -197,10 +213,10 @@ const {
         severity: 'error',
         summary: 'Error',
         detail: 'Error while moving photos. Please try again later.',
-        life: 3000
+        life: 3000,
       });
     }
-  }
+  },
 });
 
 const confirmMovePhotos = (e: MouseEvent) => {

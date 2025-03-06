@@ -1,9 +1,5 @@
 <template>
-  <div
-    v-if="photoStyle === 'grid'"
-    class="photo-item col-12 sm:col-6 md:col-4 lg:col-3 xl:col-2"
-    data-test-id="photo-item"
-  >
+  <div v-if="photoStyle === 'grid'" class="photo-item w-full" data-test-id="photo-item">
     <div :class="['relative cursor-pointer', { 'photo-selected rounded-md': isPhotoSelected }]">
       <SquareImage
         :id="`photo-image-${photo['key']}`"
@@ -11,7 +7,10 @@
         :src="`${photo['url']}?tr=w-${imageWidth},h-${imageWidth}`"
         @click="goToPhotoDetail"
       />
-      <div v-if="isAdmin" class="absolute top-0 left-0 right-0 flex justify-between photo-top-button-container">
+      <div
+        v-if="isAdmin"
+        class="photo-top-button-container absolute top-0 right-0 left-0 flex justify-between"
+      >
         <Button
           v-tooltip="'Select Photo'"
           :severity="`${isPhotoSelected ? 'primary' : 'secondary'}`"
@@ -30,16 +29,16 @@
         v-if="isAlbumCover(photo['key'])"
         v-tooltip="'Album cover'"
         :size="24"
-        class="absolute bottom-1 left-1 text-primary-600"
+        class="text-primary-600 absolute bottom-1 left-1"
       />
     </div>
   </div>
   <div
     v-else
     :class="[
-      'flex items-center border border-gray-300 p-2 sm:p-3 rounded-md cursor-pointer h-26 sm:h-32',
+      'flex h-26 cursor-pointer items-center rounded-md border border-gray-300 p-2 sm:h-32 sm:p-3',
       { 'photo-selected': isPhotoSelected },
-      { 'border-primary-400': darkMode && isPhotoSelected }
+      { 'border-primary-400': darkMode && isPhotoSelected },
     ]"
     data-test-id="detail-photo-item"
   >
@@ -51,12 +50,12 @@
         :src="`${photo['url']}?tr=w-${thumbnailSize},h-${thumbnailSize}`"
       />
     </div>
-    <div class="flex-grow ml-3 min-w-0" @click="selectPhoto(photo['key'])">
-      <div class="text-lg truncate">{{ photoId }}</div>
+    <div class="ml-3 min-w-0 flex-grow" @click="selectPhoto(photo['key'])">
+      <div class="truncate text-lg">{{ photoId }}</div>
       <div class="text-sm text-gray-400">{{ lastModified }}</div>
       <div class="text-sm text-gray-400">{{ fileSize }}</div>
     </div>
-    <div v-if="isAdmin" class="flex-shrink-0 ml-2">
+    <div v-if="isAdmin" class="ml-2 flex-shrink-0">
       <EditPhotoButton :photo-key="photo['key']" />
     </div>
   </div>
@@ -77,13 +76,13 @@ import { useRoute, useRouter } from 'vue-router';
 const props = defineProps({
   photoStyle: {
     type: String,
-    required: true
+    required: true,
   },
   photo: {
     type: Object,
     required: true,
-    default: () => ({ key: '', url: '' })
-  }
+    default: () => ({ key: '', url: '' }),
+  },
 });
 
 const { photo } = toRefs(props);

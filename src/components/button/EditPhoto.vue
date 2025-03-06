@@ -1,5 +1,12 @@
 <template>
-  <Button :class="extraClass" data-test-id="edit-photo-button" rounded severity="secondary" text @click="toggle">
+  <Button
+    :class="extraClass"
+    data-test-id="edit-photo-button"
+    rounded
+    severity="secondary"
+    text
+    @click="toggle"
+  >
     <template #icon>
       <IconDotsVertical :size="24" />
     </template>
@@ -27,7 +34,14 @@ import usePhotos from '@/composables/use-photos';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { getStaticFileUrl } from '@/utils/helper';
-import { IconDotsVertical, IconEdit, IconFileExport, IconLink, IconPhotoStar, IconTrash } from '@tabler/icons-vue';
+import {
+  IconDotsVertical,
+  IconEdit,
+  IconFileExport,
+  IconLink,
+  IconPhotoStar,
+  IconTrash,
+} from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
 import Button from 'primevue/button';
 import Menu from 'primevue/menu';
@@ -38,12 +52,12 @@ import { ref, toRefs } from 'vue';
 const props = defineProps({
   extraClass: {
     type: String,
-    default: ''
+    default: '',
   },
   photoKey: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const menu = ref();
@@ -54,12 +68,16 @@ const toast = useToast();
 
 const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = usePhotos();
 const { currentAlbum, fetchAlbumsByYear, setCurrentAlbum, isAlbumCover } = useAlbums();
-const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } = useDialog();
+const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } =
+  useDialog();
 
 const { mutate } = useMutation({
   mutationFn: async () => {
     // TODO: should show menu when clicking assign photo cover button
-    const albumToBeUpdated = { ...(currentAlbum.value as Album), albumCover: photoKey.value as string };
+    const albumToBeUpdated = {
+      ...(currentAlbum.value as Album),
+      albumCover: photoKey.value as string,
+    };
     const result = await AlbumService.updateAlbum(albumToBeUpdated);
     return { result, album: albumToBeUpdated };
   },
@@ -72,7 +90,7 @@ const { mutate } = useMutation({
       severity: 'success',
       summary: 'Success',
       detail: `Album "${album.albumName}" cover photo updated.`,
-      life: 3000
+      life: 3000,
     });
   },
   onError: () => {
@@ -80,9 +98,9 @@ const { mutate } = useMutation({
       severity: 'error',
       summary: 'Error',
       detail: 'Error while updating album. Please try again later.',
-      life: 3000
+      life: 3000,
     });
-  }
+  },
 });
 
 const makeCoverPhoto = () => {
@@ -124,28 +142,28 @@ const items = [
   {
     label: 'Copy Link',
     icon: IconLink as any,
-    command: copyPhotoLink
+    command: copyPhotoLink,
   },
   {
     label: 'Delete Photo',
     icon: IconTrash as any,
-    command: deletePhoto
+    command: deletePhoto,
   },
   {
     label: 'Move Photo',
     icon: IconFileExport as any,
-    command: movePhoto
+    command: movePhoto,
   },
   {
     label: 'Rename Photo',
     icon: IconEdit as any,
-    command: renamePhoto
+    command: renamePhoto,
   },
   {
     label: 'Make Album Cover',
     icon: IconPhotoStar as any,
     command: makeCoverPhoto,
-    visible: !isAlbumCover(photoKey.value)
-  }
+    visible: !isAlbumCover(photoKey.value),
+  },
 ];
 </script>

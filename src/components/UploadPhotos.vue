@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full h-full">
+  <div class="h-full w-full">
     <div class="flex justify-end">
       <Button class="mb-2" severity="secondary" rounded @click="closeUploader">
         <template #icon>
@@ -8,24 +8,26 @@
       </Button>
     </div>
 
-    <div class="flex flex-col h-full items-center">
+    <div class="flex h-full flex-col items-center">
       <DropZone v-slot="{ dropZoneActive }" @files-dropped="addFiles" @valid-drag="isValidDragFn">
-        <Message v-if="isCompleteUploading" class="mb-4" severity="success">Upload finished!</Message>
+        <Message v-if="isCompleteUploading" class="mb-4" severity="success"
+          >Upload finished!</Message
+        >
 
         <div
           v-if="!isCompleteUploading && !isUploading"
-          class="text-xl md:text-4xl font-bold"
-          :class="{ 'flex-1 flex items-center justify-center': !files.length }"
+          class="text-xl font-bold md:text-4xl"
+          :class="{ 'flex flex-1 items-center justify-center': !files.length }"
         >
           <div class="flex flex-col items-center">
-            <span v-if="dropZoneActive" class="flex flex-col items-center mb-2">
+            <span v-if="dropZoneActive" class="mb-2 flex flex-col items-center">
               <span>Drop Them Here</span>
               <span v-if="isValidDrag" class="text-base">to add them</span>
               <span v-else class="text-red-600">Only image files allowed</span>
             </span>
             <span v-else class="flex flex-col items-center">
               <span>Drag Your Photos Here</span>
-              <span class="text-base my-2">
+              <span class="my-2 text-base">
                 or
                 <input
                   id="file-input"
@@ -35,14 +37,23 @@
                   type="file"
                   @change="onInputChange"
                 />
-                <label class="cursor-pointer underline italic" for="file-input">browse</label>
+                <label class="cursor-pointer italic underline" for="file-input">browse</label>
               </span>
             </span>
             <span class="text-base font-normal">Max file size: 5MB. Only image files allowed</span>
           </div>
         </div>
-        <ul v-show="files.length" class="gap-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 mt-4">
-          <FilePreview v-for="file of files" :key="file.id" :file="file" tag="li" @remove="removeFile" />
+        <ul
+          v-show="files.length"
+          class="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6"
+        >
+          <FilePreview
+            v-for="file of files"
+            :key="file.id"
+            :file="file"
+            tag="li"
+            @remove="removeFile"
+          />
         </ul>
       </DropZone>
     </div>
@@ -64,7 +75,12 @@
         label="Upload"
         @click="uploadFiles(validFiles)"
       />
-      <Button v-if="isCompleteUploading" data-test-id="finish-button" label="Done" @click="finishUploadPhotos" />
+      <Button
+        v-if="isCompleteUploading"
+        data-test-id="finish-button"
+        label="Done"
+        @click="finishUploadPhotos"
+      />
     </div>
   </div>
 </template>
@@ -84,13 +100,14 @@ const emits = defineEmits(['refreshPhotoList', 'closePhotoUploader']);
 const props = defineProps({
   albumId: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const { albumId } = toRefs(props);
 const { files, addFiles, removeFile } = useFileList();
-const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, overwrite } = useFileUploader();
+const { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, overwrite } =
+  useFileUploader();
 const { uploadFiles } = createUploader(albumId.value);
 
 const isValidDrag = ref(true);

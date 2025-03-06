@@ -4,8 +4,8 @@
   </template>
   <template v-else>
     <div v-if="!photoId && !showPhotoUploader" class="py-4">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center pb-4">
-        <div class="flex items-center w-full sm:w-auto">
+      <div class="flex flex-col items-start pb-4 sm:flex-row sm:items-center">
+        <div class="flex w-full items-center sm:w-auto">
           <Button class="flex-shrink-0" rounded @click="goBack">
             <template #icon>
               <IconArrowNarrowLeft :size="24" />
@@ -16,7 +16,9 @@
             :options="['grid', 'detail']"
             aria-labelledby="basic"
             class="ml-2 flex-shrink-0"
-            @update:model-value="(value) => router.replace({ query: { ...route.query, photoStyle: value } })"
+            @update:model-value="
+              (value) => router.replace({ query: { ...route.query, photoStyle: value } })
+            "
           >
             <template #option="{ option }">
               <template v-if="option === 'grid'">
@@ -53,27 +55,36 @@
             v-if="currentAlbum?.isPrivate"
             v-tooltip="'This is a private album'"
             :size="24"
-            class="text-gray-600 ml-2"
+            class="ml-2 text-gray-600"
           />
           <IconStar
             v-else-if="currentAlbum?.isFeatured"
             v-tooltip="'This is a featured album'"
             :size="24"
-            class="text-gray-600 ml-2"
+            class="ml-2 text-gray-600"
           />
         </div>
         <p
           v-if="currentAlbum?.description"
-          class="text-xl text-gray-600 py-2 mt-2 sm:mt-0 sm:ml-2 w-full sm:w-auto sm:flex-grow sm:min-w-0"
+          class="mt-2 w-full py-2 text-xl text-gray-600 sm:mt-0 sm:ml-2 sm:w-auto sm:min-w-0 sm:flex-grow"
           data-test-id="album-desc"
         >
           {{ currentAlbum?.description }}
         </p>
       </div>
-      <div v-if="currentAlbum?.tags?.length && currentAlbum?.tags?.length > 0" class="flex flex-wrap gap-2 pb-4">
-        <Tag v-for="(tag, i) in currentAlbum.tags" :key="i" :value="tag" data-test-id="album-tag" severity="success" />
+      <div
+        v-if="currentAlbum?.tags?.length && currentAlbum?.tags?.length > 0"
+        class="flex flex-wrap gap-2 pb-4"
+      >
+        <Tag
+          v-for="(tag, i) in currentAlbum.tags"
+          :key="i"
+          :value="tag"
+          data-test-id="album-tag"
+          severity="success"
+        />
       </div>
-      <Toolbar v-if="isAdmin" class="mb-4 !p-2" data-test-id="photo-manage-panel">
+      <Toolbar v-if="isAdmin" class="mb-4 p-2" data-test-id="photo-manage-panel">
         <template #start>
           <Button
             v-tooltip="'Upload photos'"
@@ -112,7 +123,9 @@
               <IconX :size="24" />
             </template>
           </Button>
-          <span v-if="selectedPhotos.length > 0" class="ml-2"> {{ selectedPhotos.length }} selected </span>
+          <span v-if="selectedPhotos.length > 0" class="ml-2">
+            {{ selectedPhotos.length }} selected
+          </span>
         </template>
         <template #end>
           <Button
@@ -144,11 +157,16 @@
         :class="[
           'grid',
           photoStyle === 'grid'
-            ? 'gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6'
-            : 'gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+            ? 'grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6'
+            : 'grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
         ]"
       >
-        <Photo v-for="photo in photosInAlbum" :key="photo.key" :photo="photo" :photo-style="photoStyle" />
+        <Photo
+          v-for="photo in photosInAlbum"
+          :key="photo.key"
+          :photo="photo"
+          :photo-style="photoStyle"
+        />
       </div>
       <h2 v-if="photosInAlbum.length === 0">No results.</h2>
       <ScrollTop />
@@ -163,7 +181,11 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <PhotoDetail v-if="photoId" @refresh-photo-list="refreshPhotoList" @close-photo-detail="closePhotoDetail" />
+        <PhotoDetail
+          v-if="photoId"
+          @refresh-photo-list="refreshPhotoList"
+          @close-photo-detail="closePhotoDetail"
+        />
         <UploadPhotos
           v-else-if="showPhotoUploader && isAdmin"
           :album-id="currentAlbum?.id"
@@ -220,7 +242,7 @@ import {
   IconPhotoUp,
   IconStar,
   IconTrash,
-  IconX
+  IconX,
 } from '@tabler/icons-vue';
 import Button from 'primevue/button';
 import Popover from 'primevue/popover';
@@ -242,10 +264,11 @@ const {
   setDeletePhotoDialogState,
   movePhotoDialogState,
   setMovePhotoDialogState,
-  renamePhotoDialogState
+  renamePhotoDialogState,
 } = useDialog();
 const { isAdmin } = useUserConfig();
-const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } = usePhotos();
+const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } =
+  usePhotos();
 const { currentAlbum, fetchAlbumsByYear } = useAlbums();
 
 const albumId = computed(() => route.params['albumId'] as string);
@@ -270,7 +293,8 @@ const goBack = () => {
   }
 };
 
-const closePhotoDetail = async () => await router.replace({ query: { ...route.query, photo: undefined } });
+const closePhotoDetail = async () =>
+  await router.replace({ query: { ...route.query, photo: undefined } });
 
 const refreshPhotoList = async () => {
   const isPrevAlbumEmpty = photosInAlbum.value.length === 0;
@@ -280,7 +304,10 @@ const refreshPhotoList = async () => {
   let albumToBeUpdated = null;
   if (isPrevAlbumEmpty) {
     // If album is empty before uploading photos, set the first photo as album cover.
-    albumToBeUpdated = { ...(currentAlbum.value as Album), albumCover: photosInAlbum.value[0]?.key as string };
+    albumToBeUpdated = {
+      ...(currentAlbum.value as Album),
+      albumCover: photosInAlbum.value[0]?.key as string,
+    };
   } else if (!isPrevAlbumEmpty && isCurrentAlbumEmpty) {
     albumToBeUpdated = { ...(currentAlbum.value as Album), albumCover: '' };
   }
@@ -300,7 +327,7 @@ fetchPhotos(albumId.value, albumYear.value).catch(() => {
     severity: 'error',
     summary: 'Error',
     detail: 'Error while fetching photos. Please try again later.',
-    life: 3000
+    life: 3000,
   });
 });
 

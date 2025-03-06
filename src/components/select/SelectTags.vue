@@ -21,12 +21,12 @@ const emits = defineEmits(['selectTags']);
 const props = defineProps({
   selectedTags: {
     type: Array as () => string[],
-    default: () => []
+    default: () => [],
   },
   extraClass: {
     type: String,
-    default: ''
-  }
+    default: '',
+  },
 });
 
 const { selectedTags } = toRefs(props);
@@ -40,6 +40,6 @@ watch(
   (value) => {
     emits('selectTags', value);
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>

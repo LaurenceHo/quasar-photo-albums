@@ -1,11 +1,11 @@
 <template>
-  <main class="mt-2 mb-10 max-w-screen-2xl mx-auto">
+  <main class="mx-auto mt-2 mb-10 max-w-screen-2xl">
     <div id="container" class="px-8 sm:px-4">
       <Breadcrumb :model="breadcrumbs" class="!px-0">
         <template #item="{ item }">
-          <div class="flex items-center min-w-0">
+          <div class="flex min-w-0 items-center">
             <component :is="item.icon" :size="20" />
-            <span class="ml-2 truncate max-w-[160px] sm:max-w-full">{{ item.label }}</span>
+            <span class="ml-2 max-w-[160px] truncate sm:max-w-full">{{ item.label }}</span>
           </div>
         </template>
       </Breadcrumb>
@@ -35,7 +35,7 @@ const breadcrumbs = computed((): { label: string }[] => {
   if (route.name === 'photosByAlbum') {
     routes.push({
       label: currentAlbum.value.albumName,
-      icon: IconLibraryPhoto
+      icon: IconLibraryPhoto,
     });
   }
   return routes;

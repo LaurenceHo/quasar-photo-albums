@@ -1,29 +1,29 @@
 <template>
   <div
     :style="size ? `width: ${size}px; height: ${size}px;` : ''"
-    class="relative after:content-[''] after:block after:pb-[100%]"
+    class="relative after:block after:pb-[100%] after:content-['']"
   >
-    <img :id="id" :alt="alt" :src="src" class="rounded-md absolute w-full h-full object-cover" />
+    <img :id="id" :alt="alt" :src="src" class="absolute h-full w-full rounded-md object-cover" />
   </div>
 </template>
 <script lang="ts" setup>
 defineProps({
   id: {
     type: String,
-    default: null
+    default: null,
   },
   alt: {
     type: String,
-    default: ''
+    default: '',
   },
   src: {
     type: String,
     default: '',
-    required: true
+    required: true,
   },
   size: {
     type: Number,
-    default: null
-  }
+    default: null,
+  },
 });
 </script>

@@ -6,7 +6,13 @@
     @keydown.esc="emits('closePhotoDetail')"
   >
     <div class="flex justify-end">
-      <Button class="mb-2" severity="secondary" rounded data-test-id="close-button" @click="emits('closePhotoDetail')">
+      <Button
+        class="mb-2"
+        severity="secondary"
+        rounded
+        data-test-id="close-button"
+        @click="emits('closePhotoDetail')"
+      >
         <template #icon>
           <IconX :size="24" />
         </template>
@@ -14,21 +20,27 @@
     </div>
 
     <div class="grid grid-cols-4 gap-3">
-      <div class="col-span-4 lg:col-span-3 flex flex-col items-center">
-        <div class="w-full text-center mb-3">
+      <div class="col-span-4 flex flex-col items-center lg:col-span-3">
+        <div class="mb-3 w-full text-center">
           <div data-test-id="photo-file-name">{{ photoFileName }}</div>
-          <div data-test-id="photo-index">({{ selectedImageIndex + 1 }}/{{ photosInAlbum.length }})</div>
+          <div data-test-id="photo-index">
+            ({{ selectedImageIndex + 1 }}/{{ photosInAlbum.length }})
+          </div>
         </div>
-        <div class="relative w-full sm:min-h-96 lg:h-[calc(80vh-80px)] h-auto min-h-80">
-          <div id="photo-image-detail" class="flex justify-center items-center h-full">
+        <div class="relative h-auto min-h-80 w-full sm:min-h-96 lg:h-[calc(80vh-80px)]">
+          <div id="photo-image-detail" class="flex h-full items-center justify-center">
             <ProgressSpinner v-if="loadImage" />
             <img
               v-else
               :alt="photoFileName"
-              :height="!isPhotoLandscape && windowSize < 1024 && windowSize > 640 ? `${imageDisplayHeight}px` : ''"
+              :height="
+                !isPhotoLandscape && windowSize < 1024 && windowSize > 640
+                  ? `${imageDisplayHeight}px`
+                  : ''
+              "
               :src="selectedImage?.url || ''"
               :width="isPhotoLandscape ? `${imageDisplayWidth}px` : ''"
-              class="rounded-md max-h-full"
+              class="max-h-full rounded-md"
               @load="loadImage = false"
             />
           </div>
@@ -42,25 +54,33 @@
               <IconChevronLeft :size="24" />
             </template>
           </Button>
-          <Button data-test-id="next-photo-button" rounded class="!absolute !top-1/2 !right-0" @click="nextPhoto(1)">
+          <Button
+            data-test-id="next-photo-button"
+            rounded
+            class="!absolute !top-1/2 !right-0"
+            @click="nextPhoto(1)"
+          >
             <template #icon>
               <IconChevronRight :size="24" />
             </template>
           </Button>
         </div>
       </div>
-      <div class="col-span-4 lg:col-span-1 mt-3 lg:mt-0">
-        <div class="flex justify-between mx-4">
-          <span class="text-2xl text-semibold">Details</span>
+      <div class="col-span-4 mt-3 lg:col-span-1 lg:mt-0">
+        <div class="mx-4 flex justify-between">
+          <span class="text-semibold text-2xl">Details</span>
           <EditPhotoButton v-if="isAdmin && selectedImage" :photo-key="selectedImage?.key" />
         </div>
         <Divider v-if="localDateTime" />
-        <div v-if="localDateTime" class="flex items-center mx-4">
+        <div v-if="localDateTime" class="mx-4 flex items-center">
           <IconCalendarTime :size="24" class="mr-4" />
           <span>{{ localDateTime }}</span>
         </div>
         <Divider v-if="exifTags['Image Height'] && exifTags['Image Width']" />
-        <div v-if="exifTags['Image Height'] && exifTags['Image Width']" class="flex items-center mx-4">
+        <div
+          v-if="exifTags['Image Height'] && exifTags['Image Width']"
+          class="mx-4 flex items-center"
+        >
           <IconPhoto :size="24" class="mr-4" />
           <div>
             <div>
@@ -72,8 +92,12 @@
             </div>
             <small class="text-gray-500">
               <span>f/{{ aperture }}</span>
-              <span v-if="exifTags.ExposureTime"> | {{ (exifTags.ExposureTime as RationalTag).description }}</span>
-              <span v-if="exifTags.FocalLength"> | {{ (exifTags.FocalLength as RationalTag).description }}</span>
+              <span v-if="exifTags.ExposureTime">
+                | {{ (exifTags.ExposureTime as RationalTag).description }}</span
+              >
+              <span v-if="exifTags.FocalLength">
+                | {{ (exifTags.FocalLength as RationalTag).description }}</span
+              >
               <span v-if="exifTags.ISOSpeedRatings">
                 | ISO{{ (exifTags.ISOSpeedRatings as NumberTag).description }}
               </span>
@@ -82,10 +106,12 @@
           </div>
         </div>
         <Divider v-if="exifTags.Model" />
-        <div v-if="exifTags.Model" class="flex items-center mx-4">
+        <div v-if="exifTags.Model" class="mx-4 flex items-center">
           <IconCamera :size="24" class="mr-4" />
           <div>
-            <div>{{ exifTags.Make?.description }} {{ (exifTags.Model as StringArrayTag).value[0] }}</div>
+            <div>
+              {{ exifTags.Make?.description }} {{ (exifTags.Model as StringArrayTag).value[0] }}
+            </div>
             <small v-if="exifTags.LensModel" class="text-gray-500">
               {{ (exifTags.LensModel as StringArrayTag).value[0] }}
             </small>
@@ -93,7 +119,12 @@
         </div>
         <Divider v-if="exifTags.GPSLatitudeRef && exifTags.GPSLongitudeRef" />
         <div
-          v-if="exifTags.GPSLatitudeRef && exifTags.GPSLongitudeRef && longitude > -1000 && latitude > -1000"
+          v-if="
+            exifTags.GPSLatitudeRef &&
+            exifTags.GPSLongitudeRef &&
+            longitude > -1000 &&
+            latitude > -1000
+          "
           class="mx-4"
         >
           <PhotoLocationMap :latitude="latitude" :longitude="longitude" />
@@ -109,7 +140,14 @@ import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import useDevice from '@/composables/use-device';
 import usePhotos from '@/composables/use-photos';
 import useUserConfig from '@/composables/use-user-config';
-import { IconCalendarTime, IconCamera, IconChevronLeft, IconChevronRight, IconPhoto, IconX } from '@tabler/icons-vue';
+import {
+  IconCalendarTime,
+  IconCamera,
+  IconChevronLeft,
+  IconChevronRight,
+  IconPhoto,
+  IconX,
+} from '@tabler/icons-vue';
 import type { ExifTags, FileTags, NumberTag, RationalTag, StringArrayTag } from 'exifreader';
 import * as ExifReader from 'exifreader';
 import Button from 'primevue/button';
@@ -184,12 +222,16 @@ const longitude: ComputedRef<number> = computed(() => {
   return -1000;
 });
 
-const exposureBias = computed(() => parseFloat(exifTags.value.ExposureBiasValue?.description ?? '0').toFixed(2));
+const exposureBias = computed(() =>
+  parseFloat(exifTags.value.ExposureBiasValue?.description ?? '0').toFixed(2),
+);
 
 const aperture = computed(() =>
-  parseFloat(exifTags.value.ApertureValue?.description ?? exifTags.value.MaxApertureValue?.description ?? '0').toFixed(
-    1
-  )
+  parseFloat(
+    exifTags.value.ApertureValue?.description ??
+      exifTags.value.MaxApertureValue?.description ??
+      '0',
+  ).toFixed(1),
 );
 
 const imageOriginalWidth = computed(() => Number(exifTags.value['Image Width']?.value ?? 0));
@@ -200,14 +242,17 @@ const isPhotoLandscape = computed(
       exifTags.value.Orientation?.value === 0 ||
       exifTags.value.Orientation?.value === 1 ||
       exifTags.value.Orientation?.value === 3) &&
-    imageOriginalWidth.value > imageOriginalHeight.value
+    imageOriginalWidth.value > imageOriginalHeight.value,
 );
 /** Compute photo EXIF data end */
 
 const imageDisplayWidth = computed(() => {
   if (imageOriginalWidth.value > 1080 && imageContainerWidth.value > 1080) {
     return 1080;
-  } else if (imageOriginalWidth.value > imageContainerWidth.value && imageContainerWidth.value < 1080) {
+  } else if (
+    imageOriginalWidth.value > imageContainerWidth.value &&
+    imageContainerWidth.value < 1080
+  ) {
     return imageContainerWidth.value;
   }
   return imageOriginalWidth.value;
@@ -224,7 +269,8 @@ const nextPhoto = (dir: number) => {
   exifTags.value = {};
 
   const photoListLength = photosInAlbum.value.length;
-  selectedImageIndex.value = (selectedImageIndex.value + (dir % photoListLength) + photoListLength) % photoListLength;
+  selectedImageIndex.value =
+    (selectedImageIndex.value + (dir % photoListLength) + photoListLength) % photoListLength;
 
   if (selectedImage.value) {
     const photoId = selectedImage.value.key.split('/')[1];
@@ -251,13 +297,13 @@ watch(
           severity: 'error',
           summary: 'Error',
           detail: 'Photo does not exist',
-          life: 3000
+          life: 3000,
         });
         setTimeout(() => router.push(`/album/${albumYear.value}/${albumId.value}`), 3000);
       }
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 );
 
 // If photo exists based on URL, get EXIF data from photo
@@ -278,6 +324,6 @@ watch(
       }
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 );
 </script>
