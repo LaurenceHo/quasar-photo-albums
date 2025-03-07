@@ -8,12 +8,12 @@ import { computed, onMounted, ref, toRefs, watch } from 'vue';
 const props = defineProps({
   carouselApi: {
     type: Object as () => EmblaCarouselType | undefined,
-    required: true
+    required: true,
   },
   dotIndex: {
     type: Number,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const { dotIndex, carouselApi } = toRefs(props);
@@ -22,7 +22,7 @@ const selectedIndex = ref(0);
 
 const dotButtonClasses = computed(() => ({
   embla__dot: true,
-  'embla__dot--selected': dotIndex.value === selectedIndex.value
+  'embla__dot--selected': dotIndex.value === selectedIndex.value,
 }));
 
 const onSelect = (carouselApi: EmblaCarouselType) => {

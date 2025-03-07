@@ -1,14 +1,20 @@
 <template>
-  <Dialog v-model:visible="deletePhotoDialogState" :closable="false" class="w-[450px]" header="Confirm" modal>
+  <Dialog
+    v-model:visible="deletePhotoDialogState"
+    :closable="false"
+    class="w-[450px]"
+    header="Confirm"
+    modal
+  >
     <template #header>
       <div class="flex">
-        <IconAlertCircle :size="40" class="text-red-400 pr-2 flex-shrink-0" />
+        <IconAlertCircle :size="40" class="flex-shrink-0 pr-2 text-red-400" />
         <span class="text-xl font-semibold" data-test-id="confirm-delete-photos-dialog-title">
           Do you want to delete photo{{ selectedPhotos.length > 1 ? 's' : '' }} as below?
         </span>
       </div>
     </template>
-    <div class="max-h-[50vh] overflow-y-auto mb-4">
+    <div class="mb-4 max-h-[50vh] overflow-y-auto">
       <div v-for="photoKey in photoKeysArray" :key="photoKey" class="mb-2">{{ photoKey }}</div>
     </div>
     <template #footer>
@@ -42,8 +48,8 @@ import { computed, toRefs } from 'vue';
 const props = defineProps({
   albumId: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
@@ -57,13 +63,13 @@ const photoKeysArray = computed(() =>
   selectedPhotos.value.map((photoKey: string) => {
     const photoKeyArray = photoKey.split('/');
     return photoKeyArray.length > 1 ? photoKeyArray[1] : photoKeyArray[0];
-  })
+  }),
 );
 
 const {
   isPending,
   mutate: deletePhoto,
-  reset
+  reset,
 } = useMutation({
   mutationFn: async () => await PhotoService.deletePhotos(albumId.value, photoKeysArray.value),
   onSuccess: async () => {
@@ -71,7 +77,7 @@ const {
       severity: 'success',
       summary: 'Success',
       detail: 'Photos deleted',
-      life: 3000
+      life: 3000,
     });
     setTimeout(() => {
       setDeletePhotoDialogState(false);
@@ -84,9 +90,9 @@ const {
       severity: 'error',
       summary: 'Error',
       detail: 'Error while deleting photos. Please try again later.',
-      life: 3000
+      life: 3000,
     });
-  }
+  },
 });
 
 const confirmDeletePhotos = (e: MouseEvent) => {

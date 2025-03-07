@@ -19,25 +19,25 @@ import CreateAlbum from '../CreateAlbum.vue';
 vi.mock('@/services/album-service', () => ({
   AlbumService: {
     createAlbum: vi.fn().mockResolvedValue({ code: 200 }),
-    updateAlbum: vi.fn().mockResolvedValue({ code: 200 })
-  }
+    updateAlbum: vi.fn().mockResolvedValue({ code: 200 }),
+  },
 }));
 
 vi.mock('@/services/album-tag-service', () => ({
   AlbumTagService: {
-    createAlbumTags: vi.fn().mockResolvedValue({ code: 200 })
-  }
+    createAlbumTags: vi.fn().mockResolvedValue({ code: 200 }),
+  },
 }));
 
 vi.mock('@/services/location-service', () => ({
   LocationService: {
-    searchPlaces: vi.fn()
-  }
+    searchPlaces: vi.fn(),
+  },
 }));
 
 // Mock composables
 vi.mock('primevue/usetoast', () => ({
-  useToast: vi.fn()
+  useToast: vi.fn(),
 }));
 
 const dialogState = ref(true);
@@ -51,8 +51,8 @@ vi.mock('@/composables/use-dialog', () => ({
     updateAlbumDialogState: computed(() => dialogState.value),
     setUpdateAlbumDialogState: mockSetUpdateAlbumDialogState,
     createAlbumTagDialogState: ref(false),
-    setCreateAlbumTagDialogState: vi.fn()
-  })
+    setCreateAlbumTagDialogState: vi.fn(),
+  }),
 }));
 
 // Mock albums context
@@ -65,28 +65,28 @@ vi.mock('@/composables/use-albums', () => ({
       albumCover: '',
       description: '',
       tags: [],
-      isPrivate: true
+      isPrivate: true,
     }),
     setAlbumToBeUpdated: vi.fn(),
-    fetchAlbumsByYear: vi.fn()
-  })
+    fetchAlbumsByYear: vi.fn(),
+  }),
 }));
 
 // Mock album tags context
 vi.mock('@/composables/use-album-tags', () => ({
   default: () => ({
     albumTags: ref([]),
-    fetchAlbumTags: vi.fn()
-  })
+    fetchAlbumTags: vi.fn(),
+  }),
 }));
 
 // Create a test query client for tests
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: false // disable retries for testing
-    }
-  }
+      retry: false, // disable retries for testing
+    },
+  },
 });
 
 describe('CreateAlbum', () => {
@@ -94,7 +94,7 @@ describe('CreateAlbum', () => {
     // Reset dialog state before each mount
     dialogState.value = true;
     const options: VueQueryPluginOptions = {
-      queryClient
+      queryClient,
     };
 
     return mount(CreateAlbum, {
@@ -102,20 +102,21 @@ describe('CreateAlbum', () => {
         plugins: [router, PrimeVue, [VueQueryPlugin, options]],
         stubs: {
           Dialog: {
-            template: '<div class="p-dialog" v-if="visible"><slot name="header"></slot><slot></slot></div>',
-            props: ['visible']
+            template:
+              '<div class="p-dialog" v-if="visible"><slot name="header"></slot><slot></slot></div>',
+            props: ['visible'],
           },
           FloatLabel: {
-            template: '<div class="p-float-label"><slot></slot></div>'
+            template: '<div class="p-float-label"><slot></slot></div>',
           },
           Button,
           InputText,
           Select,
           ToggleSwitch,
           AutoComplete,
-          Textarea
-        }
-      }
+          Textarea,
+        },
+      },
     });
   };
 
@@ -123,7 +124,7 @@ describe('CreateAlbum', () => {
     vi.clearAllMocks();
     queryClient.clear(); // Clear query cache between tests
     (useToast as any).mockReturnValue({
-      add: vi.fn()
+      add: vi.fn(),
     });
   });
 
@@ -167,7 +168,9 @@ describe('CreateAlbum', () => {
 
     // Test invalid characters
     await albumIdInput.setValue('Invalid@Album#ID');
-    expect(wrapper.text()).toContain('Only lowercase alphanumeric, space, underscore and dash are allowed');
+    expect(wrapper.text()).toContain(
+      'Only lowercase alphanumeric, space, underscore and dash are allowed',
+    );
 
     // Test valid input
     await albumIdInput.setValue('valid-album-id');
@@ -207,10 +210,18 @@ describe('CreateAlbum', () => {
     const autoComplete = wrapper.findComponent(AutoComplete);
 
     const mockPlaces = [
-      { displayName: 'New York', formattedAddress: 'NY, USA', location: { latitude: 40.7128, longitude: -74.006 } }
+      {
+        displayName: 'New York',
+        formattedAddress: 'NY, USA',
+        location: { latitude: 40.7128, longitude: -74.006 },
+      },
     ];
 
-    vi.mocked(LocationService.searchPlaces).mockResolvedValueOnce({ code: 200, status: 'success', data: mockPlaces });
+    vi.mocked(LocationService.searchPlaces).mockResolvedValueOnce({
+      code: 200,
+      status: 'success',
+      data: mockPlaces,
+    });
 
     // Trigger place search
     autoComplete.vm.$emit('complete', { query: 'New York' });
@@ -226,7 +237,7 @@ describe('CreateAlbum', () => {
       albumName: 'Test Album',
       description: 'Test Description',
       isPrivate: true,
-      tags: ['test']
+      tags: ['test'],
     };
 
     // Fill in form
@@ -245,8 +256,8 @@ describe('CreateAlbum', () => {
     expect(toast.add).toHaveBeenCalledWith(
       expect.objectContaining({
         severity: 'success',
-        summary: 'Success'
-      })
+        summary: 'Success',
+      }),
     );
   });
 
@@ -270,8 +281,8 @@ describe('CreateAlbum', () => {
     expect(toast.add).toHaveBeenCalledWith(
       expect.objectContaining({
         severity: 'error',
-        summary: 'Error'
-      })
+        summary: 'Error',
+      }),
     );
   });
 

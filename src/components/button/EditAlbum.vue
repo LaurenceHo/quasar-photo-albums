@@ -13,18 +13,23 @@
         </button>
       </template>
     </Menu>
-    <Dialog v-model:visible="deleteAlbumDialog" class="w-[450px]" data-test-id="confirm-delete-album-dialog" modal>
+    <Dialog
+      v-model:visible="deleteAlbumDialog"
+      class="w-[450px]"
+      data-test-id="confirm-delete-album-dialog"
+      modal
+    >
       <template #header>
         <div class="flex">
-          <IconAlertCircle :size="40" class="text-red-400 pr-2 flex-shrink-0" />
+          <IconAlertCircle :size="40" class="flex-shrink-0 pr-2 text-red-400" />
           <span class="text-xl font-semibold" data-test-id="confirm-delete-album-dialog-title">
             Do you want to delete album "{{ albumName }}"?
           </span>
         </div>
       </template>
       <div class="mb-4">
-        All photos in this album will be deleted, and any new photos added while the delete action is in progress might
-        also be deleted.
+        All photos in this album will be deleted, and any new photos added while the delete action
+        is in progress might also be deleted.
       </div>
       <template #footer>
         <Button
@@ -66,8 +71,8 @@ const props = defineProps({
   albumItem: {
     type: Object as () => Album,
     required: true,
-    default: () => initialAlbum as Album
-  }
+    default: () => initialAlbum as Album,
+  },
 });
 
 const { albumItem } = toRefs(props);
@@ -92,7 +97,7 @@ const setAlbum = () => {
 const {
   isPending,
   mutate: deleteAlbum,
-  reset
+  reset,
 } = useMutation({
   mutationFn: async () => await AlbumService.deleteAlbum(albumItem.value.id, albumItem.value.year),
   onSuccess: async () => {
@@ -100,7 +105,7 @@ const {
       severity: 'success',
       summary: 'Success',
       detail: 'Album deleted.',
-      life: 3000
+      life: 3000,
     });
     await fetchAlbumsByYear(route.params.year as string, true);
     deleteAlbumDialog.value = false;
@@ -110,9 +115,9 @@ const {
       severity: 'error',
       summary: 'Error',
       detail: 'Error while deleting album. Please try again later.',
-      life: 3000
+      life: 3000,
     });
-  }
+  },
 });
 
 const confirmDeleteAlbum = (e: MouseEvent) => {
@@ -124,12 +129,12 @@ const menuItems = [
   {
     label: 'Edit Album',
     icon: IconEdit as any,
-    command: setAlbum
+    command: setAlbum,
   },
   {
     label: 'Delete Album',
     icon: IconTrash as any,
-    command: () => (deleteAlbumDialog.value = true)
-  }
+    command: () => (deleteAlbumDialog.value = true),
+  },
 ];
 </script>

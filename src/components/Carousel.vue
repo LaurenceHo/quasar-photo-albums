@@ -1,5 +1,5 @@
 <template>
-  <div class="embla relative q-mb-xl-xl q-mb-lg-lg q-mb-md">
+  <div class="embla q-mb-xl-xl q-mb-lg-lg q-mb-md relative">
     <div ref="emblaRef" class="embla__viewport">
       <div class="embla__container">
         <template v-for="albumItem in featuredAlbums" :key="albumItem.id">
@@ -13,7 +13,7 @@
                 />
                 <NoImagePlaceholder v-else />
                 <div
-                  class="bg-black bg-opacity-50 opacity-100 transition-all duration-500 rounded-t-md h-8 flex items-center overflow-hidden absolute top-0 left-0 right-0 px-2 flex-wrap"
+                  class="bg-opacity-50 absolute top-0 right-0 left-0 flex h-8 flex-wrap items-center overflow-hidden rounded-t-md bg-black px-2 opacity-100 transition-all duration-500"
                 >
                   <div class="truncate text-white">{{ albumItem.albumName }}</div>
                 </div>
@@ -47,7 +47,7 @@
 
     <div
       v-if="emblaApi && !prevBtnDisabled && !nextBtnDisabled"
-      class="hidden sm:flex flex-wrap justify-center items-center -mr-2"
+      class="-mr-2 hidden flex-wrap items-center justify-center sm:flex"
     >
       <carousel-dot-button
         v-for="(_, index) in scrollSnaps"
@@ -73,8 +73,8 @@ const props = defineProps({
   featuredAlbums: {
     type: Array as () => Album[],
     required: true,
-    default: () => []
-  }
+    default: () => [],
+  },
 });
 
 const cdnURL = import.meta.env.VITE_IMAGEKIT_CDN_URL as string;

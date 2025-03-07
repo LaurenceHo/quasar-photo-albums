@@ -1,6 +1,5 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
-import './assets/tailwind.css';
-import './assets/primevue-override.scss';
+import './assets/primevue-override.css';
 import { definePreset } from '@primevue/themes';
 import Aura from '@primevue/themes/aura';
 import { VueQueryPlugin } from '@tanstack/vue-query';
@@ -19,7 +18,7 @@ const prepareApp = async () => {
         'chrome-extension://',
         'https://fonts.gstatic.com',
         'https://api.mapbox.com',
-        'https://events.mapbox.com'
+        'https://events.mapbox.com',
       ];
 
       // Check if the request URL starts with any of the ignored URLs
@@ -28,7 +27,7 @@ const prepareApp = async () => {
       }
 
       print.warning();
-    }
+    },
   });
 };
 
@@ -47,9 +46,9 @@ const myThemePreset = definePreset(Aura, {
       700: '{sky.700}',
       800: '{sky.800}',
       900: '{sky.900}',
-      950: '{sky.950}'
-    }
-  }
+      950: '{sky.950}',
+    },
+  },
 });
 
 app.use(PrimeVue, {
@@ -59,10 +58,10 @@ app.use(PrimeVue, {
       darkModeSelector: '.dark',
       cssLayer: {
         name: 'primevue',
-        order: 'tailwind-base, primevue, tailwind-utilities'
-      }
-    }
-  }
+        order: 'theme, base, primevue',
+      },
+    },
+  },
 });
 app.use(router);
 app.use(VueQueryPlugin);

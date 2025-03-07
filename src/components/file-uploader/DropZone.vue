@@ -1,25 +1,22 @@
 <!-- In DropZone.vue -->
 <template>
   <Card
-    :class="`file-drop-zone w-full max-w-7xl overflow-auto h-[calc(80vh-80px)]
-            ${active ? 'shadow-md border-2 border-dashed' : ''}
-            ${isValidDrag ? 'border-blue-500' : 'border-red-500'}
-            ${isUploading ? 'bg-gray-100 dark:bg-zinc-800' : ''}`"
+    :class="`file-drop-zone h-[calc(80vh-80px)] w-full max-w-7xl overflow-auto ${active ? 'border-2 border-dashed shadow-md' : ''} ${isValidDrag ? 'border-blue-500' : 'border-red-500'} ${isUploading ? 'bg-gray-100 dark:bg-zinc-800' : ''}`"
     :pt="{
       body: {
         style: {
-          height: '100%'
-        }
+          height: '100%',
+        },
       },
       content: {
         style: {
-          height: '100%'
-        }
-      }
+          height: '100%',
+        },
+      },
     }"
   >
     <template #content>
-      <div class="flex flex-col h-full">
+      <div class="flex h-full flex-col">
         <div class="flex items-center">
           <Checkbox id="overwrite-checkbox" v-model="overwrite" binary class="mr-2" />
           <label class="cursor-pointer" for="overwrite-checkbox">Overwrite existing photos</label>
@@ -29,7 +26,7 @@
         <ProgressBar v-if="isUploading" class="mb-4 h-1.5" mode="indeterminate" />
 
         <div
-          class="p-4 flex-1 flex flex-col"
+          class="flex flex-1 flex-col p-4"
           @dragenter.prevent="setActive"
           @dragover.prevent="onDragOver"
           @dragleave.prevent="setInactive"
@@ -89,7 +86,9 @@ const emitValidDrag = debounce({ delay: 100 }, (isValid: boolean) => {
 const onDragOver = (e: DragEvent) => {
   setActive();
   if (e.dataTransfer?.items) {
-    isValidDrag.value = [...e.dataTransfer.items].every((item) => ALLOWED_FILE_TYPE.includes(item.type));
+    isValidDrag.value = [...e.dataTransfer.items].every((item) =>
+      ALLOWED_FILE_TYPE.includes(item.type),
+    );
 
     emitValidDrag(isValidDrag.value);
   }
@@ -98,7 +97,9 @@ const onDragOver = (e: DragEvent) => {
 const onDrop = (e: DragEvent) => {
   setInactive();
   if (e.dataTransfer?.files) {
-    const filteredFiles = [...e.dataTransfer.files].filter((file) => ALLOWED_FILE_TYPE.includes(file.type));
+    const filteredFiles = [...e.dataTransfer.files].filter((file) =>
+      ALLOWED_FILE_TYPE.includes(file.type),
+    );
 
     const rejectedCount = e.dataTransfer.files.length - filteredFiles.length;
     if (rejectedCount > 0) {
@@ -106,7 +107,7 @@ const onDrop = (e: DragEvent) => {
         severity: 'error',
         summary: 'Invalid files',
         detail: `${rejectedCount} file(s) were rejected due to unsupported file type`,
-        life: 3000
+        life: 3000,
       });
     }
 

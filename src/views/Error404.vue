@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-[90vh]">
-    <h1 class="font-bold text-[30vh]">404</h1>
+  <div class="flex min-h-[90vh] flex-col items-center justify-center">
+    <h1 class="text-[30vh] font-bold">404</h1>
 
     <h2 class="text-xl text-slate-400">Oops. Nothing here...</h2>
 

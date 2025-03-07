@@ -21,11 +21,11 @@
           @blur="v$.tagName.$touch()"
           @input="v$.tagName.$touch()"
         />
-        <div class="flex justify-between items-center mt-1">
+        <div class="mt-1 flex items-center justify-between">
           <small v-if="v$.tagName.$error" class="text-red-600">
             {{ v$.tagName.$errors[0].$message }}
           </small>
-          <small class="text-gray-500 ml-auto">{{ tagName.length }}/20</small>
+          <small class="ml-auto text-gray-500">{{ tagName.length }}/20</small>
         </div>
       </div>
       <div class="flex justify-end">
@@ -61,8 +61,11 @@ const rules = computed(() => ({
     required: helpers.withMessage('This field is required.', required),
     minLength: helpers.withMessage('Tag must be at least 2 characters long.', minLength(2)),
     maxLength: helpers.withMessage('Tag cannot exceed 20 characters.', maxLength(20)),
-    alphaNum: helpers.withMessage('Tag must contain only lowercase letters and numbers.', helpers.regex(/^[a-z0-9]+$/))
-  }
+    alphaNum: helpers.withMessage(
+      'Tag must contain only lowercase letters and numbers.',
+      helpers.regex(/^[a-z0-9]+$/),
+    ),
+  },
 }));
 
 const v$ = useVuelidate(rules, { tagName });
@@ -81,7 +84,7 @@ const { isPending: isCreatingTag, mutate: createAlbumTag } = useMutation({
       severity: 'success',
       summary: 'Success',
       detail: `Tag "${tagName.value}" created.`,
-      life: 3000
+      life: 3000,
     });
     await fetchAlbumTags(true);
     onReset();
@@ -91,9 +94,9 @@ const { isPending: isCreatingTag, mutate: createAlbumTag } = useMutation({
       severity: 'error',
       summary: 'Error',
       detail: 'Error while creating tag. Please try again later.',
-      life: 3000
+      life: 3000,
     });
-  }
+  },
 });
 
 const onReset = () => {

@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute bottom-1 right-1">
+  <div class="absolute right-1 bottom-1">
     <Tag
       v-if="tagConfig"
       :class="tagConfig.class"
@@ -24,8 +24,8 @@ import { computed } from 'vue';
 const props = defineProps({
   file: {
     type: Object as () => IUploadFile,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const tagConfig = computed(() => {
@@ -35,29 +35,29 @@ const tagConfig = computed(() => {
       value: 'Uploading',
       icon: IconLoader,
       class: 'loading-indicator',
-      pt: undefined
+      pt: undefined,
     },
     uploaded: {
       severity: 'success',
       value: 'Uploaded',
       icon: IconCheck,
       class: '',
-      pt: { root: { class: 'dark:bg-green-500 dark:text-green-900' } }
+      pt: { root: { class: 'dark:bg-green-500 dark:text-green-900' } },
     },
     error: {
       severity: 'danger',
       value: 'Error',
       icon: IconAlertCircle,
       class: '',
-      pt: { root: { class: 'dark:bg-red-500 dark:text-red-900' } }
+      pt: { root: { class: 'dark:bg-red-500 dark:text-red-900' } },
     },
     exists: {
       severity: 'warn',
       value: 'File exists',
       icon: IconFileAlert,
       class: '',
-      pt: { root: { class: 'dark:bg-orange-500 dark:text-orange-900' } }
-    }
+      pt: { root: { class: 'dark:bg-orange-500 dark:text-orange-900' } },
+    },
   };
 
   if (props.file.status === 'loading') return config.loading;

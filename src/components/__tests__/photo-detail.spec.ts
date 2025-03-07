@@ -8,42 +8,42 @@ import { QueryClient, VueQueryPlugin, type VueQueryPluginOptions } from '@tansta
 
 vi.mock('primevue/usetoast', () => ({
   useToast: vi.fn(() => ({
-    add: vi.fn()
-  }))
+    add: vi.fn(),
+  })),
 }));
 
 vi.mock('../../composables/use-photos', () => ({
   default: vi.fn().mockImplementation(() => ({
     photosInAlbum: ref([
       { key: 'photo1', url: 'https://example.com/photo1.jpg' },
-      { key: 'photo2', url: 'https://example.com/photo2.jpg' }
+      { key: 'photo2', url: 'https://example.com/photo2.jpg' },
     ]),
     isFetchingPhotos: ref(false),
     findPhotoByIndex: vi.fn(),
-    findPhotoIndex: vi.fn()
-  }))
+    findPhotoIndex: vi.fn(),
+  })),
 }));
 
 // Create a test query client for tests
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: false // disable retries for testing
-    }
-  }
+      retry: false, // disable retries for testing
+    },
+  },
 });
 
 describe('PhotoDetail.vue', () => {
   let wrapper: ReturnType<typeof mount>;
   const options: VueQueryPluginOptions = {
-    queryClient
+    queryClient,
   };
 
   beforeEach(() => {
     wrapper = mount(PhotoDetail, {
       global: {
-        plugins: [router, PrimeVue, [VueQueryPlugin, options]]
-      }
+        plugins: [router, PrimeVue, [VueQueryPlugin, options]],
+      },
     });
   });
 
@@ -65,7 +65,7 @@ describe('PhotoDetail.vue', () => {
 
     vm.exifTags = {
       DateTime: { description: '2023:11:10 12:00:00' },
-      OffsetTime: { value: ['+10:00'] }
+      OffsetTime: { value: ['+10:00'] },
     };
     await wrapper.vm.$nextTick();
     expect(vm.localDateTime).toBe('10/11/2023, 12:00:00 pm +10:00');
@@ -99,7 +99,7 @@ describe('PhotoDetail.vue', () => {
       GPSLatitude: { description: '27.98785' },
       GPSLatitudeRef: { value: ['N'] },
       GPSLongitude: { description: '86.925026' },
-      GPSLongitudeRef: { value: ['E'] }
+      GPSLongitudeRef: { value: ['E'] },
     };
     await wrapper.vm.$nextTick();
     expect(vm.latitude).toBe(27.98785);

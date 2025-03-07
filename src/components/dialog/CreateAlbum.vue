@@ -14,7 +14,7 @@
 
     <form @reset.prevent="resetAlbum" @submit.prevent="validateAndSubmit">
       <div class="mb-4">
-        <div class="mb-4 pb-4 flex items-center">
+        <div class="mb-4 flex items-center pb-4">
           Private album
           <ToggleSwitch v-model="privateAlbum" :disable="isCreatingAlbum" class="ml-2" />
         </div>
@@ -50,8 +50,10 @@
           <small v-if="v$.albumId.$invalid" class="text-red-600">
             {{ v$.albumId.$silentErrors[0]?.$message }}
           </small>
-          <div class="flex justify-between items-center mt-1 text-gray-500">
-            <small v-if="!albumToBeUpdate.id"> Once album is created, album id cannot be changed. </small>
+          <div class="mt-1 flex items-center justify-between text-gray-500">
+            <small v-if="!albumToBeUpdate.id">
+              Once album is created, album id cannot be changed.
+            </small>
             <small class="ml-auto">{{ albumId.length }}/30</small>
           </div>
         </div>
@@ -68,7 +70,7 @@
             />
             <label for="album-name">Album Name</label>
           </FloatLabel>
-          <div class="flex justify-between items-center mt-1 text-gray-500">
+          <div class="mt-1 flex items-center justify-between text-gray-500">
             <small v-if="v$.albumName.$invalid" class="text-red-600">
               {{ v$.albumName.$silentErrors[0]?.$message }}
             </small>
@@ -88,7 +90,7 @@
             />
             <label for="album-desc">Album Description</label>
           </FloatLabel>
-          <div class="flex justify-between items-center mt-1 text-gray-500">
+          <div class="mt-1 flex items-center justify-between text-gray-500">
             <small v-if="v$.albumDesc.$invalid" class="text-red-600">
               {{ v$.albumDesc.$silentErrors[0]?.$message }}
             </small>
@@ -98,7 +100,11 @@
 
         <div class="mb-4 flex gap-2">
           <FloatLabel class="w-full flex-grow">
-            <SelectTags :selected-tags="selectedAlbumTags" extra-class="w-full" @select-tags="setSelectedTags" />
+            <SelectTags
+              :selected-tags="selectedAlbumTags"
+              extra-class="w-full"
+              @select-tags="setSelectedTags"
+            />
             <label for="select-tags">Album Tag</label>
           </FloatLabel>
 
@@ -115,9 +121,15 @@
         <div class="mb-4 pb-4">
           <div class="flex items-center">
             Featured album
-            <ToggleSwitch v-model="featuredAlbum" :disabled="isCreatingAlbum || privateAlbum" class="ml-2" />
+            <ToggleSwitch
+              v-model="featuredAlbum"
+              :disabled="isCreatingAlbum || privateAlbum"
+              class="ml-2"
+            />
           </div>
-          <small v-if="privateAlbum" class="text-gray-500">Cannot be featured album if album is private.</small>
+          <small v-if="privateAlbum" class="text-gray-500"
+            >Cannot be featured album if album is private.</small
+          >
         </div>
 
         <div class="mb-4">
@@ -205,7 +217,8 @@ import { useRouter } from 'vue-router';
 const toast = useToast();
 const router = useRouter();
 
-const { updateAlbumDialogState, setUpdateAlbumDialogState, setCreateAlbumTagDialogState } = useDialog();
+const { updateAlbumDialogState, setUpdateAlbumDialogState, setCreateAlbumTagDialogState } =
+  useDialog();
 const { albumToBeUpdate, setAlbumToBeUpdated, fetchAlbumsByYear } = useAlbums();
 const { albumTags } = useAlbumTags();
 
@@ -233,17 +246,17 @@ const rules = computed(() => ({
     maxLength: helpers.withMessage('It cannot exceed 30 characters', maxLength(30)),
     validName: helpers.withMessage(
       'Only lowercase alphanumeric, space, underscore and dash are allowed',
-      (value: string) => /^[a-z0-9\s-_]*$/.test(value)
-    )
+      (value: string) => /^[a-z0-9\s-_]*$/.test(value),
+    ),
   },
   albumName: {
     required: helpers.withMessage('This field is required.', required),
     minLength: helpers.withMessage('It must be at least 2 characters long', minLength(2)),
-    maxLength: helpers.withMessage('It cannot exceed 50 characters', maxLength(50))
+    maxLength: helpers.withMessage('It cannot exceed 50 characters', maxLength(50)),
   },
   albumDesc: {
-    maxLength: helpers.withMessage('It cannot exceed 200 characters', maxLength(200))
-  }
+    maxLength: helpers.withMessage('It cannot exceed 200 characters', maxLength(200)),
+  },
 }));
 
 const v$ = useVuelidate(rules, { selectedYear, albumId, albumName, albumDesc });
@@ -282,7 +295,9 @@ const { isPending: isCreatingAlbum, mutate: createAlbum } = useMutation({
 
     // Create tag
     if (!isEmpty(selectedAlbumTags.value)) {
-      const findNewTags = selectedAlbumTags.value.filter((tag) => !storedTagsStringArray.value.includes(tag));
+      const findNewTags = selectedAlbumTags.value.filter(
+        (tag) => !storedTagsStringArray.value.includes(tag),
+      );
       if (findNewTags.length > 0) {
         await AlbumTagService.createAlbumTags(findNewTags.map((tag) => ({ tag })));
       }
@@ -297,7 +312,7 @@ const { isPending: isCreatingAlbum, mutate: createAlbum } = useMutation({
       isPrivate: privateAlbum.value,
       isFeatured: featuredAlbum.value ?? undefined,
       place: selectedPlace.value,
-      tags: selectedAlbumTags.value
+      tags: selectedAlbumTags.value,
     };
 
     let result;
@@ -315,7 +330,7 @@ const { isPending: isCreatingAlbum, mutate: createAlbum } = useMutation({
         severity: 'success',
         summary: 'Success',
         detail: `Album "${album.albumName}" ${albumToBeUpdate.value.id ? 'updated' : 'created'}.`,
-        life: 3000
+        life: 3000,
       });
 
       setTimeout(async () => {
@@ -330,9 +345,9 @@ const { isPending: isCreatingAlbum, mutate: createAlbum } = useMutation({
       severity: 'error',
       summary: 'Error',
       detail: 'Error while creating/updating album. Please try again later.',
-      life: 3000
+      life: 3000,
     });
-  }
+  },
 });
 
 const resetAlbum = () => {
@@ -344,7 +359,7 @@ const resetAlbum = () => {
     albumCover: '',
     description: '',
     tags: [],
-    isPrivate: true
+    isPrivate: true,
   });
   setUpdateAlbumDialogState(false);
 };
@@ -365,7 +380,7 @@ watch(
       selectedPlace.value = albumToBeUpdate.value.place || null;
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 );
 
 // If it's private album, it cannot be featured album

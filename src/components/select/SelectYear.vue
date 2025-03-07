@@ -9,7 +9,7 @@
     option-value="year"
   >
     <template #option="{ option: { year, count } }">
-      <div class="flex align-items-center">
+      <div class="align-items-center flex">
         <div>{{ year }} ({{ count }})</div>
       </div>
     </template>
@@ -26,12 +26,12 @@ const emits = defineEmits(['selectYear']);
 const props = defineProps({
   selectedYear: {
     type: String,
-    required: true
+    required: true,
   },
   extraClass: {
     type: String,
-    default: ''
-  }
+    default: '',
+  },
 });
 
 const { selectedYear } = toRefs(props);
@@ -40,12 +40,12 @@ const internalSelectedYear = ref(selectedYear.value);
 const {
   data: countAlbumsByYear,
   isFetching,
-  isError
+  isError,
 } = useQuery({
   queryKey: ['countAlbumsByYear'],
   queryFn: () => AggregateService.getAggregateData('countAlbumsByYear'),
   refetchOnWindowFocus: false,
-  refetchOnReconnect: false
+  refetchOnReconnect: false,
 });
 
 watch(
@@ -53,6 +53,6 @@ watch(
   (value) => {
     emits('selectYear', value);
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>

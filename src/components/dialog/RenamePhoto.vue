@@ -16,11 +16,11 @@
           />
           <span class="ml-2">{{ fileType }}</span>
         </div>
-        <div class="flex justify-between items-center mt-1">
+        <div class="mt-1 flex items-center justify-between">
           <small v-if="v$.$invalid" class="text-red-600">
             {{ v$.$silentErrors[0]?.$message }}
           </small>
-          <small class="text-gray-500 ml-auto">{{ newPhotoNameWithoutExtension.length }}/30</small>
+          <small class="ml-auto text-gray-500">{{ newPhotoNameWithoutExtension.length }}/30</small>
         </div>
       </div>
       <div class="flex justify-end">
@@ -37,7 +37,11 @@
           "
         />
         <Button
-          :disabled="v$.$invalid || isPending || newPhotoNameWithoutExtension === currentFileNameWithoutExtension"
+          :disabled="
+            v$.$invalid ||
+            isPending ||
+            newPhotoNameWithoutExtension === currentFileNameWithoutExtension
+          "
           :loading="isPending"
           data-test-id="rename-photos-button"
           label="Save"
@@ -67,8 +71,8 @@ import { computed, ref, toRefs, watch } from 'vue';
 const props = defineProps({
   albumId: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
@@ -80,10 +84,10 @@ const rules = computed(() => ({
     maxLength: helpers.withMessage('It cannot exceed 30 characters', maxLength(30)),
     validName: helpers.withMessage(
       'Only alphanumeric, space, full stop, underscore and dash are allowed',
-      (value: string) => /^[A-Za-z0-9\s.\-_]*$/.test(value)
+      (value: string) => /^[A-Za-z0-9\s.\-_]*$/.test(value),
     ),
-    notExists: helpers.withMessage('Photo name already exists', () => !isExistedPhotoKey.value)
-  }
+    notExists: helpers.withMessage('Photo name already exists', () => !isExistedPhotoKey.value),
+  },
 }));
 
 const toast = useToast();
@@ -96,7 +100,7 @@ const { fetchAlbumsByYear, isAlbumCover: checkIsAlbumCover, currentAlbum } = use
 const findFileTypeIndex = computed(() => currentPhotoToBeRenamed.value.lastIndexOf('.'));
 const fileType = computed(() => currentPhotoToBeRenamed.value.slice(findFileTypeIndex.value));
 const currentFileNameWithoutExtension = computed(
-  () => currentPhotoToBeRenamed.value.slice(0, findFileTypeIndex.value).split('/')[1]
+  () => currentPhotoToBeRenamed.value.slice(0, findFileTypeIndex.value).split('/')[1],
 ); // Without album id
 
 const isExistedPhotoKey = ref(false);
@@ -109,7 +113,7 @@ const v$ = useVuelidate(rules, { newPhotoNameWithoutExtension });
 const {
   isPending,
   mutate: renamePhoto,
-  reset
+  reset,
 } = useMutation({
   mutationFn: async () => {
     newPhotoNameWithoutExtension.value = newPhotoNameWithoutExtension.value.trim();
@@ -120,7 +124,7 @@ const {
     return await PhotoService.renamePhoto(
       albumId.value,
       newPhotoId.value,
-      `${currentFileNameWithoutExtension.value}${fileType.value}`
+      `${currentFileNameWithoutExtension.value}${fileType.value}`,
     );
   },
   onSuccess: async (result) => {
@@ -128,7 +132,7 @@ const {
       if (isAlbumCover.value) {
         const albumToBeUpdated = {
           ...currentAlbum.value,
-          albumCover: `${albumId.value}/${newPhotoId.value}`
+          albumCover: `${albumId.value}/${newPhotoId.value}`,
         };
         const response = await AlbumService.updateAlbum(albumToBeUpdated);
         if (response.code === 200) {
@@ -139,7 +143,7 @@ const {
         severity: 'success',
         summary: 'Success',
         detail: 'Photos renamed',
-        life: 3000
+        life: 3000,
       });
       setTimeout(() => {
         setRenamePhotoDialogState(false);
@@ -153,9 +157,9 @@ const {
       severity: 'error',
       summary: 'Error',
       detail: 'Error while renaming photos. Please try again later.',
-      life: 3000
+      life: 3000,
     });
-  }
+  },
 });
 
 const validateAndSubmit = async () => {

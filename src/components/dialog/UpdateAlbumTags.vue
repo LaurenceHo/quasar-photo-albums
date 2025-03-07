@@ -8,15 +8,24 @@
   >
     <template #header>
       <div class="flex items-center">
-        <Button data-test-id="create-tag-button" severity="secondary" text @click="setCreateAlbumTagDialogState(true)">
+        <Button
+          data-test-id="create-tag-button"
+          severity="secondary"
+          text
+          @click="setCreateAlbumTagDialogState(true)"
+        >
           <IconPlus :size="24" />
         </Button>
-        <span class="text-xl font-semibold ml-2">Album tags</span>
+        <span class="ml-2 text-xl font-semibold">Album tags</span>
       </div>
     </template>
     <div class="max-h-[50vh] overflow-y-auto">
-      <ul class="list-none p-0 m-0 divide-y">
-        <li v-for="(albumTag, i) in albumTags" :key="albumTag.tag" class="flex justify-between items-center py-2">
+      <ul class="m-0 list-none divide-y p-0">
+        <li
+          v-for="(albumTag, i) in albumTags"
+          :key="albumTag.tag"
+          class="flex items-center justify-between py-2"
+        >
           <span>{{ albumTag.tag }}</span>
           <Button
             :data-test-id="`delete-tag-button-${i}`"
@@ -39,10 +48,16 @@
     </template>
   </Dialog>
 
-  <Dialog v-model:visible="deleteTagDialog" :closable="false" class="w-96" data-test-id="delete-tag-dialog" modal>
+  <Dialog
+    v-model:visible="deleteTagDialog"
+    :closable="false"
+    class="w-96"
+    data-test-id="delete-tag-dialog"
+    modal
+  >
     <template #header>
       <div class="flex">
-        <IconAlertCircle :size="40" class="text-red-400 pr-2 flex-shrink-0" />
+        <IconAlertCircle :size="40" class="flex-shrink-0 pr-2 text-red-400" />
         <span class="text-xl font-semibold" data-test-id="confirm-delete-album-dialog-title">
           Do you want to delete tag "{{ tagName }}"?
         </span>
@@ -88,7 +103,8 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const toast = useToast();
 
-const { updateAlbumTagsDialogState, setUpdateAlbumTagsDialogState, setCreateAlbumTagDialogState } = useDialog();
+const { updateAlbumTagsDialogState, setUpdateAlbumTagsDialogState, setCreateAlbumTagDialogState } =
+  useDialog();
 const { albumTags, fetchAlbumTags } = useAlbumTags();
 const { fetchAlbumsByYear } = useAlbums();
 
@@ -96,12 +112,14 @@ const deleteTagDialog = ref(false);
 const tagName = ref('');
 
 const paramsYear = computed(() => route.params['year'] as string);
-const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(<string>localStorage.getItem(FILTERED_ALBUMS_BY_YEAR));
+const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(
+  <string>localStorage.getItem(FILTERED_ALBUMS_BY_YEAR),
+);
 
 const {
   isPending: isDeletingTag,
   mutate: deleteAlbumTag,
-  reset
+  reset,
 } = useMutation({
   mutationFn: async () => await AlbumTagService.deleteAlbumTag(tagName.value),
   onSuccess: async () => {
@@ -109,7 +127,7 @@ const {
       severity: 'success',
       summary: 'Success',
       detail: `Tag "${tagName.value}" deleted.`,
-      life: 3000
+      life: 3000,
     });
     await fetchAlbumTags(true);
     await fetchAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year, true);
@@ -121,9 +139,9 @@ const {
       severity: 'error',
       summary: 'Error',
       detail: 'Error while deleting tag. Please try again later.',
-      life: 3000
+      life: 3000,
     });
-  }
+  },
 });
 
 const confirmDeleteTag = (e: MouseEvent) => {

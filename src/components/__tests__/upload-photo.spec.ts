@@ -13,8 +13,8 @@ vi.mock('@/composables/use-file-list', () => ({
   default: vi.fn(() => ({
     files: ref([]),
     addFiles: vi.fn(),
-    removeFile: vi.fn()
-  }))
+    removeFile: vi.fn(),
+  })),
 }));
 
 vi.mock('@/composables/use-file-uploader', () => ({
@@ -22,25 +22,29 @@ vi.mock('@/composables/use-file-uploader', () => ({
     setIsCompleteUploading: vi.fn(),
     createUploader: vi.fn(() => ({
       uploadFile: vi.fn(() => Promise.resolve({ code: 200, status: 'success' })),
-      uploadFiles: vi.fn(() => Promise.resolve())
+      uploadFiles: vi.fn(() => Promise.resolve()),
     })),
     isUploading: ref(false),
     isCompleteUploading: ref(false),
-    overwrite: ref(false)
-  }))
+    overwrite: ref(false),
+  })),
 }));
 
 vi.mock('primevue/usetoast', () => ({
   useToast: vi.fn(() => ({
-    add: vi.fn()
-  }))
+    add: vi.fn(),
+  })),
 }));
 
 describe('UploadPhotos.vue', () => {
   const mockAlbumId = 'album-123';
   const mockFiles = [
     { id: '1', file: new File([''], 'test.png', { type: 'image/png' }), fileValidation: 'valid' },
-    { id: '2', file: new File([''], 'invalid.txt', { type: 'text/plain' }), fileValidation: 'invalid' }
+    {
+      id: '2',
+      file: new File([''], 'invalid.txt', { type: 'text/plain' }),
+      fileValidation: 'invalid',
+    },
   ];
 
   let wrapper: any;
@@ -50,23 +54,23 @@ describe('UploadPhotos.vue', () => {
     vi.mocked(useFileList).mockReturnValue({
       files: ref([]),
       addFiles: vi.fn(),
-      removeFile: vi.fn()
+      removeFile: vi.fn(),
     });
 
     vi.mocked(useFileUploader).mockReturnValue({
       setIsCompleteUploading: vi.fn(),
       createUploader: () => ({
         uploadFile: vi.fn(() => Promise.resolve({ code: 200, status: 'success' })),
-        uploadFiles: vi.fn(() => Promise.resolve())
+        uploadFiles: vi.fn(() => Promise.resolve()),
       }),
       isUploading: ref(false),
       isCompleteUploading: ref(false),
-      overwrite: ref(false)
+      overwrite: ref(false),
     });
 
     wrapper = mount(UploadPhotos, {
       props: {
-        albumId: mockAlbumId
+        albumId: mockAlbumId,
       },
       global: {
         plugins: [PrimeVue],
@@ -74,16 +78,16 @@ describe('UploadPhotos.vue', () => {
           Button,
           Message,
           DropZone: {
-            template: '<div><slot /></div>'
+            template: '<div><slot /></div>',
           },
           FilePreview: {
-            template: '<div />'
+            template: '<div />',
           },
           IconX: {
-            template: '<svg />'
-          }
-        }
-      }
+            template: '<svg />',
+          },
+        },
+      },
     });
   });
 
@@ -104,7 +108,7 @@ describe('UploadPhotos.vue', () => {
     const mockFileList = [new File([''], 'test.png', { type: 'image/png' })];
 
     Object.defineProperty(input.element, 'files', {
-      value: mockFileList
+      value: mockFileList,
     });
 
     await input.trigger('change');
@@ -112,7 +116,9 @@ describe('UploadPhotos.vue', () => {
   });
 
   it('disables upload button when no valid files', () => {
-    (useFileList as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({ files: ref(mockFiles) });
+    (useFileList as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+      files: ref(mockFiles),
+    });
     const uploadButton = wrapper.find('[data-test-id="upload-file-button"]');
     expect(uploadButton.attributes('disabled')).toBeDefined();
   });
@@ -121,25 +127,25 @@ describe('UploadPhotos.vue', () => {
     (useFileList as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({
       files: ref([]),
       addFiles: vi.fn(),
-      removeFile: vi.fn()
+      removeFile: vi.fn(),
     });
 
     (useFileUploader as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({
       setIsCompleteUploading: vi.fn(),
       createUploader: () => ({
         uploadFile: vi.fn(),
-        uploadFiles: vi.fn()
+        uploadFiles: vi.fn(),
       }),
       isUploading: ref(false),
       isCompleteUploading: ref(true),
-      overwrite: ref(false)
+      overwrite: ref(false),
     });
 
     const newWrapper = mount(UploadPhotos, {
       props: { albumId: mockAlbumId },
       global: {
-        plugins: [PrimeVue]
-      }
+        plugins: [PrimeVue],
+      },
     });
 
     // Wait for Vue updates
@@ -153,14 +159,14 @@ describe('UploadPhotos.vue', () => {
 
   it('clears all files when clear button is clicked', async () => {
     (useFileList as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({
-      files: ref(mockFiles)
+      files: ref(mockFiles),
     });
 
     const newWrapper = mount(UploadPhotos, {
       props: { albumId: mockAlbumId },
       global: {
-        plugins: [PrimeVue]
-      }
+        plugins: [PrimeVue],
+      },
     });
 
     expect((newWrapper.vm as any).files.length).toBe(2);
@@ -171,14 +177,14 @@ describe('UploadPhotos.vue', () => {
   it('emits refresh event when finish button is clicked', async () => {
     (useFileUploader as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({
       ...useFileUploader(),
-      isCompleteUploading: ref(true)
+      isCompleteUploading: ref(true),
     });
 
     const newWrapper = mount(UploadPhotos, {
       props: { albumId: mockAlbumId },
       global: {
-        plugins: [PrimeVue]
-      }
+        plugins: [PrimeVue],
+      },
     });
 
     await newWrapper.find('[data-test-id="finish-button"]').trigger('click');
@@ -197,14 +203,14 @@ describe('UploadPhotos.vue', () => {
 
   it('clears files when albumId changes', async () => {
     (useFileList as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({
-      files: ref(mockFiles)
+      files: ref(mockFiles),
     });
 
     const newWrapper = mount(UploadPhotos, {
       props: { albumId: mockAlbumId },
       global: {
-        plugins: [PrimeVue]
-      }
+        plugins: [PrimeVue],
+      },
     });
 
     expect((newWrapper.vm as any).files.length).toBe(2);
