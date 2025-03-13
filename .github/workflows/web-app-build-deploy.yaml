@@ -26,6 +26,7 @@ jobs:
       VITE_MAPBOX_API_KEY: ${{ secrets.VITE_MAPBOX_API_KEY }}
       VITE_AWS_API_GATEWAY_URL: ${{ secrets.VITE_AWS_API_GATEWAY_URL }}
       VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+      VITE_GTAG_ID: ${{ secrets.VITE_GTAG_ID }}"
 
     steps:
       - uses: actions/checkout@v4
@@ -41,6 +42,7 @@ jobs:
           VITE_MAPBOX_API_KEY=$VITE_MAPBOX_API_KEY
           VITE_AWS_API_GATEWAY_URL=$VITE_AWS_API_GATEWAY_URL
           VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+          VITE_GTAG_ID=$VITE_GTAG_ID
           EOF
 
       - name: Test and build

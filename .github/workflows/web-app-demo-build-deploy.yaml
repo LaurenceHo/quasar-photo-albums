@@ -27,6 +27,7 @@ jobs:
       VITE_AWS_API_GATEWAY_URL: ${{ vars.VITE_AWS_API_GATEWAY_URL }}
       VITE_MAP_CENTRE_LNG: ${{ vars.VITE_MAP_CENTRE_LNG }}
       VITE_MAP_CENTRE_LAT: ${{ vars.VITE_MAP_CENTRE_LAT }}
+      VITE_GTAG_ID: ${{ secrets.VITE_GTAG_ID }}"
 
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +45,7 @@ jobs:
           VITE_GOOGLE_CLIENT_ID=DEMO_GOOGLE_CLIENT_ID
           VITE_MAP_CENTRE_LNG=$VITE_MAP_CENTRE_LNG
           VITE_MAP_CENTRE_LAT=$VITE_MAP_CENTRE_LAT
+          VITE_GTAG_ID=DEMO_GTAG_ID
           EOF
 
       - name: Test and build

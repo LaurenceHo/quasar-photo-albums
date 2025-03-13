@@ -41,24 +41,25 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.21.0",
+    "@eslint/js": "^9.22.0",
     "@tsconfig/node20": "^20.1.4",
     "@tsconfig/strictest": "^2.0.5",
     "@types/aws-lambda": "^8.10.147",
     "@types/jsonwebtoken": "^9.0.9",
     "@vitest/coverage-v8": "^3.0.8",
+    "aws-sdk-client-mock": "^4.1.0",
     "esbuild": "0.25.0",
-    "eslint": "^9.21.0",
-    "eslint-config-prettier": "^10.0.2",
+    "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
     "form-auto-content": "^3.2.1",
     "globals": "^16.0.0",
-    "lint-staged": "^15.4.3",
+    "lint-staged": "^15.5.0",
     "rimraf": "^6.0.1",
     "serverless": "3.39.0",
     "serverless-dotenv-plugin": "^6.0.0",
     "serverless-plugin-typescript": "^2.1.5",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.26.0",
+    "typescript-eslint": "^8.26.1",
     "vitest": "^3.0.8"
   },
   "engines": {
@@ -67,6 +68,9 @@
     "yarn": ">= 4"
   },
   "lint-staged": {
-    "*.ts": ["eslint --fix", "prettier --write src/ test/ --ignore-unknown --ignore-path .gitignore"]
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write src/ test/ --ignore-unknown --ignore-path .gitignore"
+    ]
   }
 }
