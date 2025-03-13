@@ -21,3 +21,4 @@ coverage
 
 *.tsbuildinfo
 .env
+*~

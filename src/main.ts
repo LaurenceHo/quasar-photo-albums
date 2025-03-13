@@ -10,6 +10,13 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 
+declare global {
+  interface Window {
+    dataLayer: any[]; // You can make this more specific if needed (e.g., Array<any>)
+    gtag?: (...args: any[]) => void; // Optional gtag function
+  }
+}
+
 const prepareApp = async () => {
   const { worker } = await import('./mocks/browser');
   return worker.start({
@@ -74,4 +81,34 @@ if (import.meta.env.MODE === 'MSW') {
   });
 } else {
   app.mount('#app');
+}
+
+const gtagId = import.meta.env.VITE_GTAG_ID;
+if (gtagId) {
+  console.log('Loading Google Analytics with GTAG_ID:', gtagId);
+
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${gtagId}`;
+  
+  // Wait for the script to load before initializing
+  script.onload = () => {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(...args: any[]) {
+      window.dataLayer.push(args);
+    }
+    window.gtag = gtag;
+
+    gtag('js', new Date());
+    gtag('config', gtagId);
+    console.log('Google Analytics initialised');
+  };
+
+  script.onerror = () => {
+    console.error('Failed to load Google Analytics script');
+  };
+
+  document.head.appendChild(script);
+} else {
+  console.warn('VITE_GTAG_ID is not defined');
 }

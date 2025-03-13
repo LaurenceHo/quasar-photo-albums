@@ -8,12 +8,12 @@ export default defineConfig({
   plugins: [vue(), vueDevTools(), tailwindcss()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
   },
   server: {
     watch: {
-      ignored: ['coverage/**/**', '**/**/__tests__/**']
-    }
-  }
+      ignored: ['coverage/**/**', '**/**/__tests__/**'],
+    },
+  },
 });

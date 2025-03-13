@@ -1,114 +1,113 @@
-import { ListObjectsV2CommandOutput } from '@aws-sdk/client-s3';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { mockClient } from 'aws-sdk-client-mock';
+import {
+  CopyObjectCommand,
+  DeleteObjectsCommand,
+  HeadBucketCommand,
+  HeadObjectCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import S3Service from '../../src/services/s3-service';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock the AWS S3 client and its methods
-vi.mock('@aws-sdk/client-s3', () => {
-  return {
-    S3Client: vi.fn(() => ({
-      send: vi.fn()
-    })),
-    ListObjectsV2Command: vi.fn(),
-    PutObjectCommand: vi.fn(),
-    DeleteObjectsCommand: vi.fn(),
-    CopyObjectCommand: vi.fn(),
-    HeadObjectCommand: vi.fn(),
-    HeadBucketCommand: vi.fn()
-  };
-});
+const s3Mock = mockClient(S3Client);
 
 describe('S3Service', () => {
   let s3Service: S3Service;
-  let mockSend: any;
 
   beforeEach(() => {
+    s3Mock.reset();
     s3Service = new S3Service();
-    mockSend = vi.mocked(s3Service.s3Client.send);
   });
 
   describe('findAll', () => {
-    it('should return an array of photos', async () => {
-      const mockResponse: ListObjectsV2CommandOutput = {
+    it('should return array of photos from S3 objects', async () => {
+      const mockResponse = {
         Contents: [
           {
-            Key: 'photo1.jpg',
+            Key: 'test-photo.jpg',
             Size: 1024,
-            LastModified: new Date()
+            LastModified: new Date('2025-01-01'),
           },
-          {
-            Key: 'photo2.jpg',
-            Size: 2048,
-            LastModified: new Date()
-          }
         ],
-        $metadata: { httpStatusCode: 200 }
       };
 
-      mockSend.mockResolvedValue(mockResponse);
+      s3Mock.on(ListObjectsV2Command).resolves(mockResponse);
 
-      const photos = await s3Service.findAll({ Bucket: 'test-bucket' });
+      const result = await s3Service.findAll({ Bucket: 'test-bucket' });
 
-      expect(photos).toHaveLength(2);
-      expect(photos[0].url).toContain('photo1.jpg');
-      expect(photos[1].url).toContain('photo2.jpg');
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual({
+        key: 'test-photo.jpg',
+        size: 1024,
+        lastModified: new Date('2025-01-01'),
+        url: `${s3Service.cdnURL}/test-photo.jpg`,
+      });
     });
 
-    it('should return an empty array if no contents are found', async () => {
-      const mockResponse: ListObjectsV2CommandOutput = {
-        Contents: undefined,
-        $metadata: { httpStatusCode: 200 }
-      };
+    it('should handle empty response', async () => {
+      s3Mock.on(ListObjectsV2Command).resolves({});
 
-      mockSend.mockResolvedValue(mockResponse);
+      const result = await s3Service.findAll({ Bucket: 'test-bucket' });
 
-      const photos = await s3Service.findAll({ Bucket: 'test-bucket' });
-
-      expect(photos).toHaveLength(0);
+      expect(result).toEqual([]);
     });
   });
 
   describe('create', () => {
-    it('should return true if the object is created successfully', async () => {
-      mockSend.mockResolvedValue({ $metadata: { httpStatusCode: 200 } });
+    it('should return true when file is uploaded successfully', async () => {
+      s3Mock.on(PutObjectCommand).resolves({
+        $metadata: { httpStatusCode: 200 },
+      });
 
-      const result = await s3Service.create({ Bucket: 'test-bucket', Key: 'photo1.jpg' });
+      const result = await s3Service.create({
+        Bucket: 'test-bucket',
+        Key: 'test-photo.jpg',
+        Body: 'test-content',
+      });
 
       expect(result).toBe(true);
     });
 
-    it('should return false if the object creation fails', async () => {
-      mockSend.mockResolvedValue({ $metadata: { httpStatusCode: 500 } });
+    it('should return false when upload fails', async () => {
+      s3Mock.on(PutObjectCommand).resolves({
+        $metadata: { httpStatusCode: 500 },
+      });
 
-      const result = await s3Service.create({ Bucket: 'test-bucket', Key: 'photo1.jpg' });
+      const result = await s3Service.create({
+        Bucket: 'test-bucket',
+        Key: 'test-photo.jpg',
+        Body: 'test-content',
+      });
 
       expect(result).toBe(false);
     });
   });
 
   describe('delete', () => {
-    it('should return true if the objects are deleted successfully', async () => {
-      // Mock the response from the S3 client
-      mockSend.mockResolvedValue({
+    it('should return true when objects are deleted successfully', async () => {
+      s3Mock.on(DeleteObjectsCommand).resolves({
         $metadata: { httpStatusCode: 200 },
-        Deleted: [{ Key: 'photo1.jpg' }, { Key: 'photo2.jpg' }]
+        Deleted: [{ Key: 'test-photo.jpg' }],
       });
 
-      // Call the delete method
       const result = await s3Service.delete({
         Bucket: 'test-bucket',
-        Delete: { Objects: [{ Key: 'photo1.jpg' }, { Key: 'photo2.jpg' }] }
+        Delete: { Objects: [{ Key: 'test-photo.jpg' }] },
       });
 
-      // Assert the result
       expect(result).toBe(true);
     });
 
-    it('should return false if the objects deletion fails', async () => {
-      mockSend.mockResolvedValue({ $metadata: { httpStatusCode: 500 } });
+    it('should return false when deletion fails', async () => {
+      s3Mock.on(DeleteObjectsCommand).resolves({
+        $metadata: { httpStatusCode: 500 },
+      });
 
       const result = await s3Service.delete({
         Bucket: 'test-bucket',
-        Delete: { Objects: [{ Key: 'photo1.jpg' }, { Key: 'photo2.jpg' }] }
+        Delete: { Objects: [{ Key: 'test-photo.jpg' }] },
       });
 
       expect(result).toBe(false);
@@ -116,25 +115,29 @@ describe('S3Service', () => {
   });
 
   describe('copy', () => {
-    it('should return true if the object is copied successfully', async () => {
-      mockSend.mockResolvedValue({ $metadata: { httpStatusCode: 200 } });
+    it('should return true when object is copied successfully', async () => {
+      s3Mock.on(CopyObjectCommand).resolves({
+        $metadata: { httpStatusCode: 200 },
+      });
 
       const result = await s3Service.copy({
         Bucket: 'test-bucket',
-        CopySource: 'source-bucket/photo1.jpg',
-        Key: 'photo1.jpg'
+        CopySource: 'source-bucket/test-photo.jpg',
+        Key: 'test-photo-copy.jpg',
       });
 
       expect(result).toBe(true);
     });
 
-    it('should return false if the object copy fails', async () => {
-      mockSend.mockResolvedValue({ $metadata: { httpStatusCode: 500 } });
+    it('should return false when copy fails', async () => {
+      s3Mock.on(CopyObjectCommand).resolves({
+        $metadata: { httpStatusCode: 500 },
+      });
 
       const result = await s3Service.copy({
         Bucket: 'test-bucket',
-        CopySource: 'source-bucket/photo1.jpg',
-        Key: 'photo1.jpg'
+        CopySource: 'source-bucket/test-photo.jpg',
+        Key: 'test-photo-copy.jpg',
       });
 
       expect(result).toBe(false);
@@ -142,38 +145,74 @@ describe('S3Service', () => {
   });
 
   describe('checkIfFileExists', () => {
-    it('should return true if the file exists', async () => {
-      mockSend.mockResolvedValue({ $metadata: { httpStatusCode: 200 } });
+    it('should return true when file exists', async () => {
+      s3Mock.on(HeadObjectCommand).resolves({
+        $metadata: { httpStatusCode: 200 },
+      });
 
-      const result = await s3Service.checkIfFileExists({ Bucket: 'test-bucket', Key: 'photo1.jpg' });
+      const result = await s3Service.checkIfFileExists({
+        Bucket: 'test-bucket',
+        Key: 'test-photo.jpg',
+      });
 
       expect(result).toBe(true);
     });
 
-    it('should return false if the file does not exist', async () => {
-      mockSend.mockRejectedValue(new Error('File not found'));
+    it('should return false when file does not exist', async () => {
+      s3Mock.on(HeadObjectCommand).rejects(new Error('Not Found'));
 
-      const result = await s3Service.checkIfFileExists({ Bucket: 'test-bucket', Key: 'photo1.jpg' });
+      const result = await s3Service.checkIfFileExists({
+        Bucket: 'test-bucket',
+        Key: 'test-photo.jpg',
+      });
 
       expect(result).toBe(false);
     });
   });
 
   describe('checkIfBucketExists', () => {
-    it('should return true if the bucket exists', async () => {
-      mockSend.mockResolvedValue({ $metadata: { httpStatusCode: 200 } });
+    it('should return true when bucket exists', async () => {
+      s3Mock.on(HeadBucketCommand).resolves({
+        $metadata: { httpStatusCode: 200 },
+      });
 
-      const result = await s3Service.checkIfBucketExists({ Bucket: 'test-bucket' });
+      const result = await s3Service.checkIfBucketExists({
+        Bucket: 'test-bucket',
+      });
 
       expect(result).toBe(true);
     });
 
-    it('should return false if the bucket does not exist', async () => {
-      mockSend.mockRejectedValue(new Error('Bucket not found'));
+    it('should return false when bucket does not exist', async () => {
+      s3Mock.on(HeadBucketCommand).rejects(new Error('Not Found'));
 
-      const result = await s3Service.checkIfBucketExists({ Bucket: 'test-bucket' });
+      const result = await s3Service.checkIfBucketExists({
+        Bucket: 'test-bucket',
+      });
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe('listObjects', () => {
+    it('should return ListObjectsV2CommandOutput when successful', async () => {
+      const mockResponse = {
+        Contents: [
+          {
+            Key: 'test-photo.jpg',
+            Size: 1024,
+            LastModified: new Date('2025-01-01'),
+          },
+        ],
+      };
+
+      s3Mock.on(ListObjectsV2Command).resolves(mockResponse);
+
+      const result = await s3Service.listObjects({
+        Bucket: 'test-bucket',
+      });
+
+      expect(result).toEqual(mockResponse);
     });
   });
 });

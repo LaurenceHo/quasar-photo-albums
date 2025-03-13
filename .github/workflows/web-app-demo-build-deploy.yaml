@@ -44,6 +44,7 @@ jobs:
           VITE_GOOGLE_CLIENT_ID=DEMO_GOOGLE_CLIENT_ID
           VITE_MAP_CENTRE_LNG=$VITE_MAP_CENTRE_LNG
           VITE_MAP_CENTRE_LAT=$VITE_MAP_CENTRE_LAT
+          VITE_GTAG_ID=DEMO_GTAG_ID
           EOF
 
       - name: Test and build
