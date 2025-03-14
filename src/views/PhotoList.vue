@@ -321,7 +321,7 @@ const refreshPhotoList = async () => {
   setSelectedPhotos([]);
 };
 
-fetchAlbumsByYear(albumYear.value);
+// fetchAlbumsByYear(albumYear.value);
 fetchPhotos(albumId.value, albumYear.value).catch(() => {
   toast.add({
     severity: 'error',
