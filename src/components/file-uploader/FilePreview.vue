@@ -1,8 +1,5 @@
 <template>
-  <component
-    :is="tag"
-    class="file-preview relative col-12 overflow-hidden sm:col-6 md:col-4 lg:col-3 xl:col-2"
-  >
+  <component :is="tag" class="file-preview relative w-full overflow-hidden">
     <div>{{ fileSize }}</div>
     <div class="relative">
       <img v-if="file.fileValidation === 'valid'" :alt="file.file.name" :src="file.url" />
@@ -11,7 +8,7 @@
         {{
           file.fileValidation === 'invalid_format'
             ? ' is not a supported file type'
-            : ' exceeds 5MB size limit'
+            : ' exceeds 10MB size limit'
         }}
       </div>
       <Button

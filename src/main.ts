@@ -85,30 +85,30 @@ if (import.meta.env.MODE === 'MSW') {
 
 const gtagId = import.meta.env.VITE_GTAG_ID;
 if (gtagId) {
-  console.log('Loading Google Analytics with GTAG_ID:', gtagId);
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag(...args: any[]) {
+    window.dataLayer.push({ event: args[0], ...(args.length > 1 ? args[1] : {}) });
+  }
+  window.gtag = gtag;
+
+  gtag('js', new Date());
+  gtag('config', gtagId);
 
   const script = document.createElement('script');
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${gtagId}`;
-  
-  // Wait for the script to load before initializing
-  script.onload = () => {
-    window.dataLayer = window.dataLayer || [];
-    function gtag(...args: any[]) {
-      window.dataLayer.push(args);
-    }
-    window.gtag = gtag;
-
-    gtag('js', new Date());
-    gtag('config', gtagId);
-    console.log('Google Analytics initialised');
-  };
-
-  script.onerror = () => {
-    console.error('Failed to load Google Analytics script');
-  };
-
   document.head.appendChild(script);
 } else {
   console.warn('VITE_GTAG_ID is not defined');
 }
+
+router.afterEach((to) => {
+  if (window.gtag) {
+    window.gtag('event', 'page_view', {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: to.fullPath,
+    });
+  }
+});

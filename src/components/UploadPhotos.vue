@@ -1,7 +1,7 @@
 <template>
   <div class="h-full w-full">
     <div class="flex justify-end">
-      <Button class="mb-2" severity="secondary" rounded @click="closeUploader">
+      <Button class="mb-2" rounded severity="secondary" @click="closeUploader">
         <template #icon>
           <IconX :size="24" />
         </template>
@@ -10,14 +10,14 @@
 
     <div class="flex h-full flex-col items-center">
       <DropZone v-slot="{ dropZoneActive }" @files-dropped="addFiles" @valid-drag="isValidDragFn">
-        <Message v-if="isCompleteUploading" class="mb-4" severity="success"
-          >Upload finished!</Message
-        >
+        <Message v-if="isCompleteUploading" class="mb-4" severity="success">
+          Upload finished!
+        </Message>
 
         <div
           v-if="!isCompleteUploading && !isUploading"
-          class="text-xl font-bold md:text-4xl"
           :class="{ 'flex flex-1 items-center justify-center': !files.length }"
+          class="text-xl font-bold md:text-4xl"
         >
           <div class="flex flex-col items-center">
             <span v-if="dropZoneActive" class="mb-2 flex flex-col items-center">
@@ -40,7 +40,7 @@
                 <label class="cursor-pointer italic underline" for="file-input">browse</label>
               </span>
             </span>
-            <span class="text-base font-normal">Max file size: 5MB. Only image files allowed</span>
+            <span class="text-base font-normal">Max file size: 10MB. Only image files allowed</span>
           </div>
         </div>
         <ul

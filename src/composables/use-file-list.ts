@@ -2,7 +2,7 @@ import type { UploadFile as IUploadFile } from '@/schema';
 import type { FileValidationStatus } from '@/schema/upload-file';
 import { ref } from 'vue';
 
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 export const ALLOWED_FILE_TYPE = ['image/png', 'image/jpeg', 'image/webp'];
 
 const files = ref<IUploadFile[]>([]);

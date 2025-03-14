@@ -1,4 +1,3 @@
-<!-- In DropZone.vue -->
 <template>
   <Card
     :class="`file-drop-zone h-[calc(80vh-80px)] w-full max-w-7xl overflow-auto ${active ? 'border-2 border-dashed shadow-md' : ''} ${isValidDrag ? 'border-blue-500' : 'border-red-500'} ${isUploading ? 'bg-gray-100 dark:bg-zinc-800' : ''}`"

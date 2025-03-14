@@ -252,7 +252,7 @@ import Tag from 'primevue/tag';
 import Toast from 'primevue/toast';
 import Toolbar from 'primevue/toolbar';
 import { useToast } from 'primevue/usetoast';
-import { computed, ref, watch } from 'vue';
+import { computed, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const toast = useToast();
@@ -280,6 +280,12 @@ const photoId = computed(() => route.query['photo'] as string);
 const showPhotoUploader = ref(false);
 const showMap = ref();
 const photoStyle = ref((route.query['photoStyle'] as string) || 'grid'); // Grid is default photo list style
+
+onUnmounted(() => {
+  showPhotoUploader.value = false;
+  showMap.value.hide();
+  setSelectedPhotos([]);
+});
 
 const toggle = (event: any) => {
   showMap.value.toggle(event);
@@ -321,7 +327,6 @@ const refreshPhotoList = async () => {
   setSelectedPhotos([]);
 };
 
-fetchAlbumsByYear(albumYear.value);
 fetchPhotos(albumId.value, albumYear.value).catch(() => {
   toast.add({
     severity: 'error',

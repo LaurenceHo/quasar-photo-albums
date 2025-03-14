@@ -17,7 +17,7 @@ import locationRoute from './routes/location-route.js';
 import photoRoute from './routes/photo-route.js';
 import JsonResponse from './utils/json-response.js';
 
-const ACCEPTED_MAX_FILE_SIZE = 5 * 1024 * 1024;
+const ACCEPTED_MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 dotenv.config();
 
@@ -43,7 +43,7 @@ await app.register(cors, {
 
     cb(new Error('This origin is not allowed'), false);
   },
-  preflightContinue: true
+  preflightContinue: true,
 });
 await app.register(helmet);
 await app.register(rateLimit, { max: 100 });
@@ -56,11 +56,11 @@ await app.register(multipart, {
     fileSize: ACCEPTED_MAX_FILE_SIZE, // For multipart forms, the max file size in bytes
     files: 1, // Max number of file fields
     headerPairs: 1000, // Max number of header key=>value pairs
-    parts: 500 // For multipart forms, the max number of parts (fields + files)
-  }
+    parts: 500, // For multipart forms, the max number of parts (fields + files)
+  },
 });
 await app.register(throttle, {
-  bytesPerSecond: 1024 * 128 // 128KB/s
+  bytesPerSecond: 1024 * 128, // 128KB/s
 });
 
 // Route
@@ -83,7 +83,9 @@ app.setErrorHandler((err: FastifyError, _req: FastifyRequest, reply: FastifyRepl
   return new JsonResponse(500).error(reply, err.message);
 });
 
-app.decorate('verifyJwtClaim', verifyJwtClaim).decorate('verifyUserPermission', verifyUserPermission);
+app
+  .decorate('verifyJwtClaim', verifyJwtClaim)
+  .decorate('verifyUserPermission', verifyUserPermission);
 
 app.register(authRoute);
 app.register(albumRoute);

@@ -24,8 +24,13 @@ export default function useFileUploader() {
     file.status = 'loading';
     let response;
     if (file.id.includes('image') && (overwrite.value || (!overwrite.value && !file.exists))) {
-      response = await PhotoService.uploadPhotos(file.file, albumId);
-      file.status = response.status === 'Success';
+      try {
+        response = await PhotoService.uploadPhotos(file.file, albumId);
+        file.status = response.status === 'Success';
+      } catch (error) {
+        console.error(error);
+        file.status = false;
+      }
     } else {
       file.status = false;
     }
@@ -44,7 +49,7 @@ export default function useFileUploader() {
 
   const createUploader = (albumId: string) => ({
     uploadFile: (file: UploadFile) => uploadFile(file, albumId),
-    uploadFiles: (files: UploadFile[]) => uploadFiles(files, albumId)
+    uploadFiles: (files: UploadFile[]) => uploadFiles(files, albumId),
   });
 
   return { setIsCompleteUploading, createUploader, isUploading, isCompleteUploading, overwrite };
