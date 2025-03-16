@@ -10,7 +10,7 @@ const albumTagRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, d
 
   instance.post('/api/albumTags', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and'
+      relation: 'and',
     }),
     handler: controller.create,
     schema: {
@@ -20,16 +20,16 @@ const albumTagRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, d
           type: 'object',
           required: ['tag'],
           properties: {
-            tag: { type: 'string' }
-          }
-        }
-      }
-    }
+            tag: { type: 'string' },
+          },
+        },
+      },
+    },
   });
 
   instance.delete('/api/albumTags/:tagId', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and'
+      relation: 'and',
     }),
     handler: controller.delete,
     schema: {
@@ -37,11 +37,11 @@ const albumTagRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, d
         type: 'object',
         properties: {
           tagId: {
-            type: 'string'
-          }
-        }
-      }
-    }
+            type: 'string',
+          },
+        },
+      },
+    },
   });
 
   done();

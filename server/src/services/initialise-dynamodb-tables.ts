@@ -8,8 +8,8 @@ import { ddbDocClient } from './dynamodb-client.js';
 const getTableStatus = async (tableName: string) => {
   return await ddbDocClient.send(
     new DescribeTableCommand({
-      TableName: tableName
-    })
+      TableName: tableName,
+    }),
   );
 };
 
@@ -29,7 +29,9 @@ const initialiseAlbumTable = async () => {
     await getTableStatus(albumTableName);
   } catch (error) {
     logger().error(error);
-    throw Error(`Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`);
+    throw Error(
+      `Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`,
+    );
   }
 
   try {
@@ -52,12 +54,12 @@ const initialiseAlbumTable = async () => {
               formattedAddress: 'Sydney NSW, Australia',
               location: {
                 latitude: -33.8688,
-                longitude: 151.2093
-              }
+                longitude: 151.2093,
+              },
             } as any,
             tags: ['test-tag-1'],
             createdBy: 'System',
-            updatedBy: 'System'
+            updatedBy: 'System',
           } as Album).go({ response: 'none' });
           logger().info(`Mock data inserted into ${albumTableName} table.`);
         }
@@ -74,7 +76,9 @@ const initialiseAlbumTagsTable = async () => {
     await getTableStatus(albumTagsTableName);
   } catch (error) {
     logger().error(error);
-    throw Error(`Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`);
+    throw Error(
+      `Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`,
+    );
   }
 
   try {
@@ -85,7 +89,7 @@ const initialiseAlbumTagsTable = async () => {
         if (items.data.length === 0) {
           logger().info(`Insert mock data into ${albumTagsTableName} table......`);
           await AlbumTagEntity.create({
-            tag: 'test-tag-1'
+            tag: 'test-tag-1',
           } as AlbumTag).go({ response: 'none' });
           logger().info(`Mock data inserted into ${albumTagsTableName} table.`);
         }
@@ -102,7 +106,9 @@ const initialiseUserTable = async () => {
     await getTableStatus(userTableName);
   } catch (error) {
     logger().error(error);
-    throw Error(`Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`);
+    throw Error(
+      `Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`,
+    );
   }
 
   try {
@@ -116,7 +122,7 @@ const initialiseUserTable = async () => {
             uid: 'test-uid-1',
             email: 'test@example.com',
             displayName: 'Test User',
-            role: 'admin'
+            role: 'admin',
           } as UserPermission).go({ response: 'none' });
           logger().info(`Mock data inserted into ${userTableName} table.`);
         }

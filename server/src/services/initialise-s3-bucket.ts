@@ -21,12 +21,14 @@ export const initialiseS3Bucket = async () => {
     }
   } catch (err) {
     logger().error(err);
-    throw Error(`Bucket ${s3BucketName} does not exist. Please run 'bun run serverless:deploy' first.`);
+    throw Error(
+      `Bucket ${s3BucketName} does not exist. Please run 'bun run serverless:deploy' first.`,
+    );
   }
 
   const exists = await s3Service.checkIfFileExists({
     Bucket: s3BucketName,
-    Key: 'updateDatabaseAt.json'
+    Key: 'updateDatabaseAt.json',
   });
   if (!exists) {
     fs.readFile('./assets/example_photo1.webp', async (err, data) => {

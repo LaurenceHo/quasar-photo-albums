@@ -10,38 +10,38 @@ export const UserPermissionEntity = new Entity(
     model: {
       entity: 'userPermissionEntity',
       version: '1',
-      service: 'userPermissionService'
+      service: 'userPermissionService',
     },
     attributes: {
       uid: {
         type: 'string',
-        required: true
+        required: true,
       },
       email: {
         type: 'string',
-        required: true
+        required: true,
       },
       displayName: {
         type: 'string',
-        required: true
+        required: true,
       },
       role: {
         type: 'string',
-        required: true
-      }
+        required: true,
+      },
     },
     indexes: {
       byUid: {
         pk: {
           field: 'uid',
-          composite: ['uid']
+          composite: ['uid'],
         },
         sk: {
           field: 'email',
-          composite: ['email']
-        }
-      }
-    }
+          composite: ['email'],
+        },
+      },
+    },
   },
-  { client: ddbDocClient, table: userTableName }
+  { client: ddbDocClient, table: userTableName },
 );

@@ -16,7 +16,8 @@ export interface DataAggregation<K extends keyof ValueMap> {
   value: ValueMap[K];
 }
 
-export const dataAggregationsTableName = process.env['DATA_AGGREGATIONS_TABLE_NAME'] || 'data-aggregations';
+export const dataAggregationsTableName =
+  process.env['DATA_AGGREGATIONS_TABLE_NAME'] || 'data-aggregations';
 
 type ValueAttributes = Album[] | AlbumsByYear;
 
@@ -30,7 +31,7 @@ export const DataAggregationEntity = new Entity(
     model: {
       entity: 'dataAggregations',
       version: '1',
-      service: 'aggregationService'
+      service: 'aggregationService',
     },
     attributes: {
       key: {
@@ -38,30 +39,30 @@ export const DataAggregationEntity = new Entity(
           ALBUMS_WITH_LOCATION,
           COUNT_ALBUMS_BY_YEAR,
           COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
-          FEATURED_ALBUMS
+          FEATURED_ALBUMS,
         ] as const,
         required: true,
-        readOnly: true
+        readOnly: true,
       },
       value: {
         type: CustomAttributeType<ValueAttributes>('any'),
-        required: true
+        required: true,
       },
       updatedAt: {
         type: 'string',
         required: true,
         default: () => new Date().toISOString(),
-        set: () => new Date().toISOString()
-      }
+        set: () => new Date().toISOString(),
+      },
     },
     indexes: {
       byKey: {
         pk: {
           field: 'pk',
-          composite: ['key']
-        }
-      }
-    }
+          composite: ['key'],
+        },
+      },
+    },
   },
-  { client: ddbDocClient, table: dataAggregationsTableName }
+  { client: ddbDocClient, table: dataAggregationsTableName },
 );

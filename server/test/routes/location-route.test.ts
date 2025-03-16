@@ -8,10 +8,10 @@ vi.mock('../../src/controllers/helpers', async () => ({
         {
           formattedAddress: 'Auckland, New Zealand',
           location: { latitude: -36.85088270000001, longitude: 174.7644881 },
-          displayName: { text: 'Auckland', languageCode: 'en' }
-        }
-      ]
-    })
+          displayName: { text: 'Auckland', languageCode: 'en' },
+        },
+      ],
+    }),
 }));
 
 describe('location route', () => {
@@ -21,7 +21,10 @@ describe('location route', () => {
   });
 
   it('should return correct location', async () => {
-    const response = await app.inject({ method: 'get', url: '/api/location/search?textQuery=somewhere' });
+    const response = await app.inject({
+      method: 'get',
+      url: '/api/location/search?textQuery=somewhere',
+    });
 
     expect(response.statusCode).toBe(200);
     expect(response.payload).toBe(
@@ -33,10 +36,10 @@ describe('location route', () => {
           {
             displayName: 'Auckland',
             formattedAddress: 'Auckland, New Zealand',
-            location: { latitude: -36.85088270000001, longitude: 174.7644881 }
-          }
-        ]
-      })
+            location: { latitude: -36.85088270000001, longitude: 174.7644881 },
+          },
+        ],
+      }),
     );
   });
 });

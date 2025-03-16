@@ -5,29 +5,29 @@ import { mockAlbumList, mockPhotoList, mockSignedCookies } from '../mock-data';
 
 vi.mock('../../src/services/album-service', () => ({
   default: vi.fn().mockImplementation(() => ({
-    findOne: () => Promise.resolve(mockAlbumList[2]) // private album
-  }))
+    findOne: () => Promise.resolve(mockAlbumList[2]), // private album
+  })),
 }));
 
 vi.mock('../../src/services/s3-service', () => ({
   default: vi.fn().mockImplementation(() => ({
-    findAll: () => Promise.resolve(mockPhotoList)
-  }))
+    findAll: () => Promise.resolve(mockPhotoList),
+  })),
 }));
 
 vi.mock('../../src/controllers/helpers', async () => ({
-  updatePhotoAlbum: () => Promise.resolve(true)
+  updatePhotoAlbum: () => Promise.resolve(true),
 }));
 
 const mocks = vi.hoisted(() => {
   return {
-    updatePhotoAlbum: vi.fn().mockResolvedValue(true)
+    updatePhotoAlbum: vi.fn().mockResolvedValue(true),
   };
 });
 
 vi.mock('../../src/controllers/helpers', () => {
   return {
-    updatePhotoAlbum: mocks.updatePhotoAlbum
+    updatePhotoAlbum: mocks.updatePhotoAlbum,
   };
 });
 
@@ -41,8 +41,8 @@ describe('private album route', () => {
       method: 'get',
       url: '/api/photos/2024/test',
       headers: {
-        Cookie: `jwt=${mockSignedCookies()}`
-      }
+        Cookie: `jwt=${mockSignedCookies()}`,
+      },
     });
     expect(updatePhotoAlbum).toBe(mocks.updatePhotoAlbum);
     expect(mocks.updatePhotoAlbum).toHaveBeenCalledOnce();
@@ -54,16 +54,16 @@ describe('private album route', () => {
         message: 'ok',
         data: {
           album: mockAlbumList[2],
-          photos: mockPhotoList
-        }
-      })
+          photos: mockPhotoList,
+        },
+      }),
     );
   });
 
   it('should return 401', async () => {
     const response = await app.inject({
       method: 'get',
-      url: '/api/photos/2024/test'
+      url: '/api/photos/2024/test',
     });
     expect(response.statusCode).toBe(401);
   });

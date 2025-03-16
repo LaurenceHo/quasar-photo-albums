@@ -6,7 +6,7 @@ import {
   COUNT_ALBUMS_BY_YEAR,
   COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
   DataAggregationEntity,
-  FEATURED_ALBUMS
+  FEATURED_ALBUMS,
 } from '../schemas/aggregation.js';
 import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
@@ -36,7 +36,7 @@ export const handler: Handler = async (event: DynamoDBStreamEvent, _context, cal
     'albumCover',
     'place',
     'isFeatured',
-    'isPrivate'
+    'isPrivate',
   ]);
 
   const publicAlbums = albumList.filter((album) => album.isPrivate === false);
@@ -52,27 +52,27 @@ export const handler: Handler = async (event: DynamoDBStreamEvent, _context, cal
     await Promise.all([
       // Insert albums with location
       DataAggregationEntity.update({
-        key: ALBUMS_WITH_LOCATION
+        key: ALBUMS_WITH_LOCATION,
       })
         .set({ value: albumsHavePlace, updatedAt: new Date().toISOString() })
         .go({ response: 'none' }),
       // Insert featured albums
       DataAggregationEntity.update({
-        key: FEATURED_ALBUMS
+        key: FEATURED_ALBUMS,
       })
         .set({ value: featuredAlbums, updatedAt: new Date().toISOString() })
         .go({ response: 'none' }),
       // Insert count albums by year
       DataAggregationEntity.update({
-        key: COUNT_ALBUMS_BY_YEAR
+        key: COUNT_ALBUMS_BY_YEAR,
       })
         .set({ value: albumsByYear, updatedAt: new Date().toISOString() })
         .go({ response: 'none' }),
       DataAggregationEntity.update({
-        key: COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE
+        key: COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
       })
         .set({ value: albumsByYearExcludePrivate, updatedAt: new Date().toISOString() })
-        .go({ response: 'none' })
+        .go({ response: 'none' }),
     ]);
 
     callback(null, 'success');

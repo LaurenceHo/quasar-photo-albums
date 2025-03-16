@@ -14,7 +14,7 @@ export const setJwtCookies = async (reply: FastifyReply, token: string) => {
     httpOnly: true,
     secure: true,
     signed: true,
-    path: '/'
+    path: '/',
   };
   reply.setCookie('jwt', token, options);
   reply.header('Cache-Control', 'private');
@@ -37,14 +37,18 @@ export const cleanJwtCookie = (reply: FastifyReply, message: string, code = 401)
  * @param reply
  * @param done
  */
-export const verifyJwtClaim: FastifyAuthFunction = async (request: FastifyRequest, reply: FastifyReply, done: any) => {
+export const verifyJwtClaim: FastifyAuthFunction = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+  done: any,
+) => {
   const token = get(request, 'cookies.jwt', '');
   const result = reply.unsignCookie(token);
   if (result.valid && result.value != null) {
     try {
       (request as RequestWithUser).user = jwt.verify(
         result.value,
-        process.env['JWT_SECRET'] as string
+        process.env['JWT_SECRET'] as string,
       ) as UserPermission;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
@@ -60,7 +64,7 @@ export const verifyJwtClaim: FastifyAuthFunction = async (request: FastifyReques
 export const verifyUserPermission: FastifyAuthFunction = async (
   request: FastifyRequest,
   _reply: FastifyReply,
-  done: any
+  done: any,
 ) => {
   if ((request as RequestWithUser).user?.role !== 'admin') {
     done(new Error('Unauthorized action'));

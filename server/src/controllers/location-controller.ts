@@ -11,7 +11,7 @@ export default class LocationController extends BaseController {
       'POST',
       ':searchText',
       { textQuery, languageCode: 'en' },
-      'places.formattedAddress,places.displayName,places.location'
+      'places.formattedAddress,places.displayName,places.location',
     );
     let places: Place[] = [];
     if (response.places) {
@@ -20,7 +20,7 @@ export default class LocationController extends BaseController {
         return {
           displayName: displayName.text,
           formattedAddress,
-          location
+          location,
         };
       });
     }

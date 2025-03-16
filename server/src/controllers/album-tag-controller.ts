@@ -27,7 +27,10 @@ export default class AlbumTagController extends BaseController {
       const result = await albumTagService.create(tags);
 
       if (result) {
-        await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+        await uploadObject(
+          'updateDatabaseAt.json',
+          JSON.stringify({ time: new Date().toISOString() }),
+        );
         return this.ok(reply, 'Album tag created');
       }
 
@@ -48,7 +51,7 @@ export default class AlbumTagController extends BaseController {
           'scan',
           null,
           ['year', 'id', 'tags'],
-          ({ tags }: any, { contains }: any) => `${contains(tags, tag)}`
+          ({ tags }: any, { contains }: any) => `${contains(tags, tag)}`,
         );
 
         const promises: Promise<any>[] = [];
@@ -66,7 +69,10 @@ export default class AlbumTagController extends BaseController {
         }
 
         await Promise.all(promises);
-        await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+        await uploadObject(
+          'updateDatabaseAt.json',
+          JSON.stringify({ time: new Date().toISOString() }),
+        );
         return this.ok(reply, 'Album tag deleted');
       }
 

@@ -14,20 +14,20 @@ vi.mock('../../src/services/album-service', () => ({
     },
     create: () => Promise.resolve(true),
     update: () => Promise.resolve(true),
-    delete: () => Promise.resolve(true)
-  }))
+    delete: () => Promise.resolve(true),
+  })),
 }));
 
 vi.mock('../../src/routes/auth-middleware', async () => ({
   verifyJwtClaim: () => Promise.resolve(),
-  verifyUserPermission: () => Promise.resolve()
+  verifyUserPermission: () => Promise.resolve(),
 }));
 
 vi.mock('../../src/controllers/helpers', async () => ({
   updatePhotoAlbum: () => Promise.resolve(true),
   emptyS3Folder: () => Promise.resolve(true),
   uploadObject: () => Promise.resolve(true),
-  verifyIfIsAdmin: () => true
+  verifyIfIsAdmin: () => true,
 }));
 
 describe('album route', () => {
@@ -43,8 +43,8 @@ describe('album route', () => {
         code: 200,
         status: 'Success',
         message: 'ok',
-        data: mockAlbumList
-      })
+        data: mockAlbumList,
+      }),
     );
   });
 
@@ -59,16 +59,16 @@ describe('album route', () => {
           albumCover: '',
           albumName: 'Test album',
           description: '',
-          isPrivate: true
-        } as Album
+          isPrivate: true,
+        } as Album,
       });
       expect(response.statusCode).toBe(200);
       expect(response.payload).toBe(
         JSON.stringify({
           code: 200,
           status: 'Success',
-          message: 'Album created'
-        })
+          message: 'Album created',
+        }),
       );
     });
 
@@ -85,8 +85,8 @@ describe('album route', () => {
           year: '',
           id: 'test-album',
           albumName: 'Test album',
-          isPrivate: true
-        } as Album
+          isPrivate: true,
+        } as Album,
       });
       expect(response.statusCode).toBe(422);
     });
@@ -99,8 +99,8 @@ describe('album route', () => {
           year: '2024',
           id: '',
           albumName: 'Test album',
-          isPrivate: true
-        } as Album
+          isPrivate: true,
+        } as Album,
       });
       expect(response.statusCode).toBe(422);
     });
@@ -112,8 +112,8 @@ describe('album route', () => {
         payload: {
           year: '2024',
           id: 'test-id',
-          isPrivate: true
-        } as Album
+          isPrivate: true,
+        } as Album,
       });
       expect(response.statusCode).toBe(422);
     });
@@ -130,16 +130,16 @@ describe('album route', () => {
           albumCover: '',
           albumName: 'Test album',
           description: '',
-          isPrivate: true
-        } as Album
+          isPrivate: true,
+        } as Album,
       });
       expect(response.statusCode).toBe(200);
       expect(response.payload).toBe(
         JSON.stringify({
           code: 200,
           status: 'Success',
-          message: 'Album updated'
-        })
+          message: 'Album updated',
+        }),
       );
     });
   });
@@ -151,8 +151,8 @@ describe('album route', () => {
         url: '/api/albums',
         payload: {
           year: '2024',
-          id: 'test-album'
-        }
+          id: 'test-album',
+        },
       });
       expect(response.statusCode).toBe(200);
     });

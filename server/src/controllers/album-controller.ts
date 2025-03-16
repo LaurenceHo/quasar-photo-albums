@@ -21,8 +21,18 @@ export default class AlbumController extends BaseController {
       const albumList = await albumService.findAll(
         'query',
         { indexName: 'byYear', key: { year } },
-        ['year', 'id', 'albumName', 'albumCover', 'description', 'tags', 'isPrivate', 'place', 'isFeatured'],
-        query
+        [
+          'year',
+          'id',
+          'albumName',
+          'albumCover',
+          'description',
+          'tags',
+          'isPrivate',
+          'place',
+          'isFeatured',
+        ],
+        query,
       );
 
       return this.ok<Album[]>(reply, 'ok', albumList);
@@ -42,7 +52,7 @@ export default class AlbumController extends BaseController {
         'scan',
         null,
         ['id'],
-        ({ id }: any, { eq }: any) => `${eq(id, album.id)}`
+        ({ id }: any, { eq }: any) => `${eq(id, album.id)}`,
       );
       if (exists.length > 0) {
         return this.clientError(reply, 'Album already exists');
@@ -51,7 +61,10 @@ export default class AlbumController extends BaseController {
       const result = await albumService.create(album);
 
       if (result) {
-        await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+        await uploadObject(
+          'updateDatabaseAt.json',
+          JSON.stringify({ time: new Date().toISOString() }),
+        );
         // Create folder in S3
         await uploadObject(album.id + '/', null);
         return this.ok(reply, 'Album created');
@@ -91,7 +104,10 @@ export default class AlbumController extends BaseController {
         const result = await albumService.delete(requestBody);
 
         if (result) {
-          await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+          await uploadObject(
+            'updateDatabaseAt.json',
+            JSON.stringify({ time: new Date().toISOString() }),
+          );
           return this.ok(reply, 'Album deleted');
         }
         return this.fail(reply, 'Failed to delete photo album');

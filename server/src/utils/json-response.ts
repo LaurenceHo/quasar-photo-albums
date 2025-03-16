@@ -1,5 +1,10 @@
 import { FastifyReply } from 'fastify';
-import { STATUS_BAD_REQUEST, STATUS_ERROR, STATUS_SUCCESS, STATUS_UNAUTHORIZED } from '../constants.js';
+import {
+  STATUS_BAD_REQUEST,
+  STATUS_ERROR,
+  STATUS_SUCCESS,
+  STATUS_UNAUTHORIZED,
+} from '../constants.js';
 import { ApiResponse, ResponseStatus } from '../types';
 
 export default class JsonResponse<T> {
@@ -18,13 +23,13 @@ export default class JsonResponse<T> {
         code: 200,
         status: this._status,
         message,
-        data
+        data,
       } satisfies ApiResponse<T>);
     } else {
       return reply.code(this.code).send({
         code: this.code,
         status: this._status,
-        message
+        message,
       } satisfies ResponseStatus);
     }
   }
@@ -34,7 +39,7 @@ export default class JsonResponse<T> {
     return reply.code(this.code).send({
       code: this.code,
       status: this._status,
-      message
+      message,
     } satisfies ResponseStatus);
   }
 
@@ -43,7 +48,7 @@ export default class JsonResponse<T> {
     return reply.code(this.code).send({
       code: this.code,
       status: this._status,
-      message
+      message,
     } satisfies ResponseStatus);
   }
 
@@ -52,7 +57,7 @@ export default class JsonResponse<T> {
     return reply.code(this.code).send({
       code: this.code,
       status: this._status,
-      message
+      message,
     } satisfies ResponseStatus);
   }
 

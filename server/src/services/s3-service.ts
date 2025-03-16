@@ -13,7 +13,7 @@ import {
   ListObjectsV2CommandOutput,
   PutObjectCommand,
   PutObjectCommandInput,
-  S3Client
+  S3Client,
 } from '@aws-sdk/client-s3';
 import logger from 'pino';
 import { get } from 'radash';

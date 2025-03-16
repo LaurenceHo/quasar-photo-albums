@@ -13,11 +13,11 @@ const locationRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, d
         required: ['textQuery'],
         properties: {
           textQuery: {
-            type: 'string'
-          }
-        }
-      }
-    }
+            type: 'string',
+          },
+        },
+      },
+    },
   });
 
   done();

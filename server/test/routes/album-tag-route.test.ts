@@ -4,18 +4,18 @@ import { mockAlbumList } from '../mock-data';
 
 const authMock = vi.hoisted(() => ({
   verifyJwtClaim: vi.fn(() => Promise.resolve()),
-  verifyUserPermission: vi.fn(() => Promise.resolve())
+  verifyUserPermission: vi.fn(() => Promise.resolve()),
 }));
 
 vi.mock('../../src/controllers/helpers', async () => ({
   updatePhotoAlbum: () => Promise.resolve(true),
   emptyS3Folder: () => Promise.resolve(true),
-  uploadObject: () => Promise.resolve(true)
+  uploadObject: () => Promise.resolve(true),
 }));
 
 vi.mock('../../src/routes/auth-middleware', async () => ({
   verifyJwtClaim: () => authMock.verifyJwtClaim(),
-  verifyUserPermission: () => authMock.verifyUserPermission()
+  verifyUserPermission: () => authMock.verifyUserPermission(),
 }));
 
 vi.mock('../../src/services/album-service', () => ({
@@ -23,16 +23,16 @@ vi.mock('../../src/services/album-service', () => ({
     findAll: () => Promise.resolve(mockAlbumList),
     create: () => Promise.resolve(true),
     update: () => Promise.resolve(true),
-    delete: () => Promise.resolve(true)
-  }))
+    delete: () => Promise.resolve(true),
+  })),
 }));
 
 vi.mock('../../src/services/album-tag-service', () => ({
   default: vi.fn().mockImplementation(() => ({
     findAll: () => Promise.resolve([{ tag: 'sport' }, { tag: 'food' }, { tag: 'hiking' }]),
     create: () => Promise.resolve(true),
-    delete: () => Promise.resolve(true)
-  }))
+    delete: () => Promise.resolve(true),
+  })),
 }));
 
 describe('album tag route with auth', () => {
@@ -50,10 +50,12 @@ describe('album tag route with auth', () => {
       method: 'post',
       url: '/api/albumTags',
       payload: {
-        tag: 'tag1'
-      }
+        tag: 'tag1',
+      },
     });
-    expect(response.payload).toBe(JSON.stringify({ code: 422, status: 'Bad Request', message: 'body must be array' }));
+    expect(response.payload).toBe(
+      JSON.stringify({ code: 422, status: 'Bad Request', message: 'body must be array' }),
+    );
   });
 
   it('should return 200 when adding tag', async () => {
@@ -62,16 +64,16 @@ describe('album tag route with auth', () => {
       url: '/api/albumTags',
       payload: [
         {
-          tag: 'tag1'
-        }
-      ]
+          tag: 'tag1',
+        },
+      ],
     });
     expect(response.payload).toBe(
       JSON.stringify({
         code: 200,
         status: 'Success',
-        message: 'Album tag created'
-      })
+        message: 'Album tag created',
+      }),
     );
   });
 
@@ -86,8 +88,8 @@ describe('album tag route with auth', () => {
       JSON.stringify({
         code: 200,
         status: 'Success',
-        message: 'Album tag deleted'
-      })
+        message: 'Album tag deleted',
+      }),
     );
   });
 });
@@ -109,8 +111,8 @@ describe('album tag route without auth', () => {
         code: 200,
         status: 'Success',
         message: 'ok',
-        data: [{ tag: 'sport' }, { tag: 'food' }, { tag: 'hiking' }]
-      })
+        data: [{ tag: 'sport' }, { tag: 'food' }, { tag: 'hiking' }],
+      }),
     );
   });
 
