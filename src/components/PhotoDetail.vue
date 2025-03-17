@@ -8,9 +8,9 @@
     <div class="flex justify-end">
       <Button
         class="mb-2"
-        severity="secondary"
-        rounded
         data-test-id="close-button"
+        rounded
+        severity="secondary"
         @click="emits('closePhotoDetail')"
       >
         <template #icon>
@@ -27,27 +27,31 @@
             ({{ selectedImageIndex + 1 }}/{{ photosInAlbum.length }})
           </div>
         </div>
+        <IconView360Number v-if="isPanoramaPhoto" />
         <div class="relative h-auto min-h-80 w-full sm:min-h-96 lg:h-[calc(80vh-80px)]">
           <div id="photo-image-detail" class="flex h-full items-center justify-center">
             <ProgressSpinner v-if="loadImage" />
-            <img
-              v-else
-              :alt="photoFileName"
-              :height="
-                !isPhotoLandscape && windowSize < 1024 && windowSize > 640
-                  ? `${imageDisplayHeight}px`
-                  : ''
-              "
-              :src="selectedImage?.url || ''"
-              :width="isPhotoLandscape ? `${imageDisplayWidth}px` : ''"
-              class="max-h-full rounded-md"
-              @load="loadImage = false"
-            />
+            <template v-else>
+              <img
+                v-if="!isPanoramaPhoto"
+                :alt="photoFileName"
+                :height="
+                  !isPhotoLandscape && windowSize < 1024 && windowSize > 640
+                    ? `${imageDisplayHeight}px`
+                    : ''
+                "
+                :src="selectedImage?.url || ''"
+                :width="isPhotoLandscape ? `${imageDisplayWidth}px` : ''"
+                class="max-h-full rounded-md"
+                @load="loadImage = false"
+              />
+              <PanoramaViewer v-else :imageUrl="selectedImage?.url ?? ''" />
+            </template>
           </div>
           <Button
+            class="!absolute !top-1/2 !left-0"
             data-test-id="previous-photo-button"
             rounded
-            class="!absolute !top-1/2 !left-0"
             @click="nextPhoto(-1)"
           >
             <template #icon>
@@ -55,9 +59,9 @@
             </template>
           </Button>
           <Button
+            class="!absolute !top-1/2 !right-0"
             data-test-id="next-photo-button"
             rounded
-            class="!absolute !top-1/2 !right-0"
             @click="nextPhoto(1)"
           >
             <template #icon>
@@ -93,11 +97,11 @@
             <small class="text-gray-500">
               <span>f/{{ aperture }}</span>
               <span v-if="exifTags.ExposureTime">
-                | {{ (exifTags.ExposureTime as RationalTag).description }}</span
-              >
+                | {{ (exifTags.ExposureTime as RationalTag).description }}
+              </span>
               <span v-if="exifTags.FocalLength">
-                | {{ (exifTags.FocalLength as RationalTag).description }}</span
-              >
+                | {{ (exifTags.FocalLength as RationalTag).description }}
+              </span>
               <span v-if="exifTags.ISOSpeedRatings">
                 | ISO{{ (exifTags.ISOSpeedRatings as NumberTag).description }}
               </span>
@@ -136,6 +140,7 @@
 
 <script lang="ts" setup>
 import { EditPhotoButton } from '@/components/button';
+import PanoramaViewer from '@/components/PanoramaViewer.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import useDevice from '@/composables/use-device';
 import usePhotos from '@/composables/use-photos';
@@ -146,10 +151,18 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconPhoto,
+  IconView360Number,
   IconX,
 } from '@tabler/icons-vue';
-import type { ExifTags, FileTags, NumberTag, RationalTag, StringArrayTag } from 'exifreader';
-import * as ExifReader from 'exifreader';
+import type {
+  ExifTags,
+  FileTags,
+  NumberTag,
+  RationalTag,
+  StringArrayTag,
+  ValueTag,
+} from 'exifreader';
+import ExifReader from 'exifreader';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
 import ProgressSpinner from 'primevue/progressspinner';
@@ -157,7 +170,10 @@ import { useToast } from 'primevue/usetoast';
 import { computed, type ComputedRef, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-type ExifData = ExifTags & FileTags;
+type ExifData = ExifTags &
+  FileTags & {
+    UsePanoramaViewer?: ValueTag;
+  };
 
 const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 
@@ -238,14 +254,49 @@ const imageOriginalWidth = computed(() => Number(exifTags.value['Image Width']?.
 const imageOriginalHeight = computed(() => Number(exifTags.value['Image Height']?.value ?? 0));
 const isPhotoLandscape = computed(
   () =>
-    (!exifTags.value.Orientation ||
+    (isPanoramaPhoto.value ||
+      !exifTags.value.Orientation ||
       exifTags.value.Orientation?.value === 0 ||
       exifTags.value.Orientation?.value === 1 ||
       exifTags.value.Orientation?.value === 3) &&
     imageOriginalWidth.value > imageOriginalHeight.value,
 );
+const isPanoramaPhoto = computed(() => {
+  if (exifTags.value.UsePanoramaViewer?.value) return true;
+
+  // Check for common 360 camera indicators
+  if (
+    exifTags.value.Make?.description?.includes('RICOH') &&
+    exifTags.value.Model?.description?.includes('THETA')
+  )
+    return true;
+
+  if (
+    exifTags.value.Make?.description?.includes('SAMSUNG') &&
+    exifTags.value.Model?.description?.includes('GEAR 360')
+  )
+    return true;
+
+  // Check aspect ratio (2:1 is common for equirectangular panoramas)
+  const width = imageOriginalWidth.value;
+  const height = imageOriginalHeight.value;
+  if (width && height) {
+    const ratio = width / height;
+    if (Math.abs(ratio - 2) < 0.1) return true;
+  }
+
+  // Check if filename contains panorama indicators
+  if (
+    photoFileName.value.toLowerCase().includes('360') ||
+    photoFileName.value.toLowerCase().includes('pano')
+  )
+    return true;
+
+  return false;
+});
 /** Compute photo EXIF data end */
 
+/** Compute image display size begin */
 const imageDisplayWidth = computed(() => {
   if (imageOriginalWidth.value > 1080 && imageContainerWidth.value > 1080) {
     return 1080;
@@ -264,6 +315,7 @@ const imageDisplayHeight = computed(() => {
   }
   return imageOriginalHeight.value;
 });
+/** Compute image display size end */
 
 const nextPhoto = (dir: number) => {
   exifTags.value = {};

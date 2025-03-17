@@ -12,8 +12,8 @@ import router from './router';
 
 declare global {
   interface Window {
-    dataLayer: any[]; // You can make this more specific if needed (e.g., Array<any>)
-    gtag?: (...args: any[]) => void; // Optional gtag function
+    dataLayer: any[];
+    gtag?: (...args: any[]) => void;
   }
 }
 
@@ -90,6 +90,7 @@ if (gtagId) {
   function gtag(...args: any[]) {
     window.dataLayer.push({ event: args[0], ...(args.length > 1 ? args[1] : {}) });
   }
+
   window.gtag = gtag;
 
   gtag('js', new Date());

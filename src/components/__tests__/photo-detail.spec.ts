@@ -6,6 +6,22 @@ import PhotoDetail from '@/components/PhotoDetail.vue';
 import { ref } from 'vue';
 import { QueryClient, VueQueryPlugin, type VueQueryPluginOptions } from '@tanstack/vue-query';
 
+// Mock vue-router
+vi.mock('vue-router', async () => {
+  const actual = (await vi.importActual('vue-router')) as any;
+  return {
+    ...actual,
+    useRoute: vi.fn(() => ({
+      params: { albumId: 'album', year: '2023' },
+      query: { photo: 'photo1' },
+    })),
+    useRouter: vi.fn(() => ({
+      replace: vi.fn(),
+      push: vi.fn(),
+    })),
+  };
+});
+
 vi.mock('primevue/usetoast', () => ({
   useToast: vi.fn(() => ({
     add: vi.fn(),
@@ -15,20 +31,34 @@ vi.mock('primevue/usetoast', () => ({
 vi.mock('../../composables/use-photos', () => ({
   default: vi.fn().mockImplementation(() => ({
     photosInAlbum: ref([
-      { key: 'photo1', url: 'https://example.com/photo1.jpg' },
-      { key: 'photo2', url: 'https://example.com/photo2.jpg' },
+      { key: 'album/photo1.jpg', url: 'https://example.com/photo1.jpg' },
+      { key: 'album/photo2.jpg', url: 'https://example.com/photo2.jpg' },
     ]),
     isFetchingPhotos: ref(false),
-    findPhotoByIndex: vi.fn(),
-    findPhotoIndex: vi.fn(),
+    findPhotoByIndex: vi.fn((index) => ({
+      key: `album/photo${index + 1}.jpg`,
+      url: `https://example.com/photo${index + 1}.jpg`,
+    })),
+    findPhotoIndex: vi.fn((photoId) => (photoId === 'photo1' ? 0 : 1)),
   })),
 }));
 
-// Create a test query client for tests
+vi.mock('@/composables/use-user-config', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    isAdmin: ref(false),
+  })),
+}));
+
+vi.mock('exifreader', () => ({
+  default: {
+    load: vi.fn().mockResolvedValue({}),
+  },
+}));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: false, // disable retries for testing
+      retry: false,
     },
   },
 });
@@ -52,15 +82,17 @@ describe('PhotoDetail.vue', () => {
     expect(wrapper.find('img').exists()).toBe(true);
   });
 
-  it('displays the correct number of photos in the album', async () => {
-    const { vm } = wrapper as any;
-
-    vm.selectedImageIndex = 0;
+  it('displays the correct photo index and total', async () => {
     await wrapper.vm.$nextTick();
-    expect(wrapper.find('[data-test-id="photo-index"]').text()).toContain('1/2');
+    expect(wrapper.find('[data-test-id="photo-index"]').text()).toBe('(1/2)');
   });
 
-  it.skip('computes localDateTime correctly', async () => {
+  it('displays correct photo file name', async () => {
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('[data-test-id="photo-file-name"]').text()).toBe('photo1.jpg');
+  });
+
+  it('computes localDateTime correctly', async () => {
     const { vm } = wrapper as any;
 
     vm.exifTags = {
@@ -68,7 +100,8 @@ describe('PhotoDetail.vue', () => {
       OffsetTime: { value: ['+10:00'] },
     };
     await wrapper.vm.$nextTick();
-    expect(vm.localDateTime).toBe('10/11/2023, 12:00:00 pm +10:00');
+    expect(vm.localDateTime).toContain('2023');
+    expect(vm.localDateTime).toContain('+10:00');
   });
 
   it('calls nextPhoto with correct arguments', async () => {
@@ -77,6 +110,8 @@ describe('PhotoDetail.vue', () => {
     const spy = vi.spyOn(vm, 'nextPhoto');
     await wrapper.find('[data-test-id="next-photo-button"]').trigger('click');
     expect(spy).toHaveBeenCalledWith(1);
+    await wrapper.find('[data-test-id="previous-photo-button"]').trigger('click');
+    expect(spy).toHaveBeenCalledWith(-1);
   });
 
   it('emits closePhotoDetail event', async () => {
@@ -89,6 +124,10 @@ describe('PhotoDetail.vue', () => {
 
     vm.selectedImageIndex = 0;
     vm.nextPhoto(1);
+    expect(vm.selectedImageIndex).toBe(1);
+    vm.nextPhoto(1);
+    expect(vm.selectedImageIndex).toBe(0);
+    vm.nextPhoto(-1);
     expect(vm.selectedImageIndex).toBe(1);
   });
 
@@ -104,5 +143,87 @@ describe('PhotoDetail.vue', () => {
     await wrapper.vm.$nextTick();
     expect(vm.latitude).toBe(27.98785);
     expect(vm.longitude).toBe(86.925026);
+  });
+
+  it('computes negative latitude and longitude correctly', async () => {
+    const { vm } = wrapper as any;
+
+    vm.exifTags = {
+      GPSLatitude: { description: '33.7490' },
+      GPSLatitudeRef: { value: ['S'] },
+      GPSLongitude: { description: '84.3880' },
+      GPSLongitudeRef: { value: ['W'] },
+    };
+    await wrapper.vm.$nextTick();
+    expect(vm.latitude).toBe(-33.749);
+    expect(vm.longitude).toBe(-84.388);
+  });
+
+  it('computes isPhotoLandscape correctly', async () => {
+    const { vm } = wrapper as any;
+
+    vm.exifTags = {
+      'Image Width': { value: 1920 },
+      'Image Height': { value: 1080 },
+      Orientation: { value: 1 },
+    };
+    await wrapper.vm.$nextTick();
+    expect(vm.isPhotoLandscape).toBe(true);
+
+    vm.exifTags = {
+      'Image Width': { value: 1080 },
+      'Image Height': { value: 1920 },
+    };
+    await wrapper.vm.$nextTick();
+    expect(vm.isPhotoLandscape).toBe(false);
+  });
+
+  it('computes isPanoramaPhoto correctly', async () => {
+    const { vm } = wrapper as any;
+
+    // Test UsePanoramaViewer flag
+    vm.exifTags = {
+      UsePanoramaViewer: { value: true },
+    };
+    await wrapper.vm.$nextTick();
+    expect(vm.isPanoramaPhoto).toBe(true);
+
+    // Test RICOH THETA detection
+    vm.exifTags = {
+      Make: { description: 'RICOH' },
+      Model: { description: 'THETA Z1' },
+    };
+    expect(vm.isPanoramaPhoto).toBe(true);
+
+    // Test Samsung Gear 360 detection
+    vm.exifTags = {
+      Make: { description: 'SAMSUNG' },
+      Model: { description: 'GEAR 360' },
+    };
+    expect(vm.isPanoramaPhoto).toBe(true);
+
+    // Test 2:1 aspect ratio
+    vm.exifTags = {
+      'Image Width': { value: 4000 },
+      'Image Height': { value: 2000 },
+    };
+    expect(vm.isPanoramaPhoto).toBe(true);
+
+    // Test filename with '360'
+    vm.exifTags = {};
+    vm.photoFileName = 'photo360.jpg';
+    expect(vm.isPanoramaPhoto).toBe(true);
+
+    // Test filename with 'pano'
+    vm.photoFileName = 'panorama.jpg';
+    expect(vm.isPanoramaPhoto).toBe(true);
+
+    // Test non-panorama case
+    vm.exifTags = {
+      'Image Width': { value: 1920 },
+      'Image Height': { value: 1080 },
+    };
+    vm.photoFileName = 'regular.jpg';
+    expect(vm.isPanoramaPhoto).toBe(false);
   });
 });

@@ -44,11 +44,74 @@ import { useToast } from 'primevue/usetoast';
 import { isEmpty } from 'radash';
 import { onMounted, ref } from 'vue';
 
+interface GoogleCredentialResponse {
+  credential: string;
+  select_by: string;
+  client_id: string;
+}
+
+interface GoogleButtonOptions {
+  theme?: 'outline' | 'filled_blue' | 'filled_black';
+  size?: 'large' | 'medium' | 'small';
+  text?: 'signin_with' | 'signup_with' | 'continue_with' | 'signin';
+  shape?: 'rectangular' | 'pill' | 'circle' | 'square';
+  logo_alignment?: 'left' | 'center';
+  width?: string;
+  locale?: string;
+}
+
+interface GoogleIdentityServices {
+  initialize(config: {
+    client_id: string;
+    callback?: (response: GoogleCredentialResponse) => void;
+    auto_select?: boolean;
+    cancel_on_tap_outside?: boolean;
+    context?: string;
+    use_fedcm_for_prompt?: boolean;
+  }): void;
+  renderButton(element: HTMLElement | null, options: GoogleButtonOptions): void;
+  prompt(
+    momentListener?: (notification: {
+      isNotDisplayed: () => boolean;
+      isSkippedMoment: () => boolean;
+      isDismissedMoment: () => boolean;
+      getNotDisplayedReason: () => string;
+      getSkippedReason: () => string;
+      getDismissedReason: () => string;
+    }) => void,
+  ): void;
+}
+
+interface GoogleIdentity {
+  id: GoogleIdentityServices;
+}
+
+declare global {
+  interface Window {
+    google: {
+      accounts: GoogleIdentity;
+    };
+  }
+  const google: {
+    accounts: GoogleIdentity;
+  };
+}
+
 const toast = useToast();
 const loading = ref(false);
 const { userPermission, setUserPermission } = useUserConfig();
 
-onMounted(() => {
+onMounted(async () => {
+  if (!window.google) {
+    await new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.onload = resolve;
+      document.head.appendChild(script);
+    });
+  }
+
   // https://developers.google.com/identity/gsi/web/reference/js-reference
   const handleCredentialResponse = async (response: any) => {
     localStorage.clear();
@@ -86,12 +149,12 @@ onMounted(() => {
     }
   };
 
-  if (google) {
-    google.accounts.id.initialize({
+  if (window.google) {
+    window.google.accounts.id.initialize({
       client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '',
       callback: handleCredentialResponse,
     });
-    google.accounts.id.renderButton(document.getElementById('google-login-button'), {
+    window.google.accounts.id.renderButton(document.getElementById('google-login-button'), {
       theme: 'outline',
       size: 'large',
       width: '240',
