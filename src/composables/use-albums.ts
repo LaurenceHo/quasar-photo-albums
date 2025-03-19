@@ -11,7 +11,7 @@ export const initialAlbum: Album = {
   albumCover: '',
   description: '',
   tags: [],
-  isPrivate: true
+  isPrivate: true,
 };
 
 export interface FilteredAlbumsByYear {
@@ -46,7 +46,7 @@ const _fetchAlbumsAndSetToLocalStorage = async (year: string, dbUpdatedTime?: st
     _storeAlbums({
       dbUpdatedTime: timestamp,
       year,
-      albums
+      albums,
     });
   }
 
@@ -122,6 +122,6 @@ export default function useAlbums() {
     fetchAlbumsByYear,
     setAlbumToBeUpdated,
     setCurrentAlbum,
-    isAlbumCover
+    isAlbumCover,
   };
 }

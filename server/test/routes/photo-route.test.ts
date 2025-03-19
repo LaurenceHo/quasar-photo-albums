@@ -51,24 +51,12 @@ describe('photo route', () => {
 
   describe('upload photo', () => {
     it('should return 200', async () => {
-      const form = formAutoContent({
-        myField: 'hello',
-        myFile: fs.createReadStream('../doc-images/AWS-Architecture.png'),
-      });
-
       const response = await app.inject({
-        method: 'post',
-        url: '/api/photos/upload/test',
-        ...form,
+        method: 'get',
+        url: '/api/photos/upload/test?filename=test.jpg&mimeType=image/jpeg',
       });
       expect(response.statusCode).toBe(200);
-      expect(response.payload).toBe(
-        JSON.stringify({
-          code: 200,
-          status: 'Success',
-          message: 'Photo uploaded',
-        }),
-      );
+      expect(JSON.stringify(response.payload)).toContain('uploadUrl');
     });
   });
 

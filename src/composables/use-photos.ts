@@ -71,6 +71,6 @@ export default function usePhotos() {
     setCurrentPhotoToBeRenamed,
     setSelectedPhotos,
     findPhotoByIndex,
-    findPhotoIndex
+    findPhotoIndex,
   };
 }

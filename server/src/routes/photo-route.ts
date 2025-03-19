@@ -23,7 +23,7 @@ const photoRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done
     },
   });
 
-  instance.post('/api/photos/upload/:albumId', {
+  instance.get('/api/photos/upload/:albumId', {
     onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
       relation: 'and',
     }),

@@ -21,6 +21,7 @@
     "@aws-sdk/client-dynamodb": "^3.758.0",
     "@aws-sdk/client-s3": "^3.758.0",
     "@aws-sdk/lib-dynamodb": "^3.758.0",
+    "@aws-sdk/s3-request-presigner": "^3.758.0",
     "@fastify/auth": "5.0.2",
     "@fastify/cookie": "11.0.2",
     "@fastify/cors": "^11.0.0",
@@ -69,8 +70,7 @@
   },
   "lint-staged": {
     "*.ts": [
-      "eslint --fix",
-      "prettier --write src/ test/ --ignore-unknown --ignore-path .gitignore"
+      "eslint --fix"
     ]
   }
 }

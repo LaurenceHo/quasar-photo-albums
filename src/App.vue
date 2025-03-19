@@ -9,12 +9,12 @@
           :width="isMediumDevice ? '48' : '36'"
           src="/logo.png"
         />
-        <h1 class="hidden sm:block text-2xl font-bold">{{ appName }}</h1>
+        <h1 class="hidden text-2xl font-bold sm:block">{{ appName }}</h1>
       </router-link>
     </template>
 
     <template #center>
-      <IconField v-if="routeName === 'albumsByYear'" class="md:hidden right-0">
+      <IconField v-if="routeName === 'albumsByYear'" class="right-0 md:hidden">
         <InputIcon>
           <IconSearch :size="20" />
         </InputIcon>
@@ -31,7 +31,9 @@
       </IconField>
       <template v-if="routeName !== 'login'">
         <Button
-          :severity="routeName === 'albumsByYear' || routeName === 'photosByAlbum' ? 'primary' : 'secondary'"
+          :severity="
+            routeName === 'albumsByYear' || routeName === 'photosByAlbum' ? 'primary' : 'secondary'
+          "
           as="router-link"
           label="Photos"
           text
@@ -87,7 +89,7 @@
       </Menu>
     </template>
   </Toolbar>
-  <div v-if="isFetching" class="flex items-center justify-center min-h-[90vh]">
+  <div v-if="isFetching" class="flex min-h-[90vh] items-center justify-center">
     <ProgressSpinner />
   </div>
   <template v-else>
@@ -107,16 +109,16 @@ import {
   IconSearch,
   IconSun,
   IconTags,
-  IconUser
+  IconUser,
 } from '@tabler/icons-vue';
 import { Button, IconField, InputIcon, InputText, Menu, ProgressSpinner, Toolbar } from 'primevue';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const routeName = computed(() => route.name);
 
-const { isFetching, userPermission, darkMode, setDarkMode } = useUserConfig();
+const { isFetching, userPermission, darkMode, setDarkMode, setEnabled } = useUserConfig();
 const { setUpdateAlbumDialogState, setUpdateAlbumTagsDialogState } = useDialog();
 const { isMediumDevice } = useDevice();
 const { filterState } = useAlbumFilter();
@@ -127,19 +129,18 @@ if (title) {
   title.innerHTML = appName;
 }
 
-const menu = ref();
-const items = ref([
+const items = [
   {
     label: 'New Album',
     icon: IconFolderPlus as any,
     visible: () => routeName.value === 'albumsByYear',
-    command: () => setUpdateAlbumDialogState(true)
+    command: () => setUpdateAlbumDialogState(true),
   },
   {
     label: 'Manage Album Tags',
     icon: IconTags as any,
     visible: () => routeName.value === 'albumsByYear',
-    command: () => setUpdateAlbumTagsDialogState(true)
+    command: () => setUpdateAlbumTagsDialogState(true),
   },
   {
     label: 'Logout',
@@ -148,13 +149,19 @@ const items = ref([
       AuthService.logout().then(() => {
         localStorage.clear();
         location.reload();
-      })
-  }
-]);
+      }),
+  },
+];
+
+const menu = ref();
+
+onMounted(() => {
+  setEnabled(true);
+});
 
 const searchKey = computed({
   get: () => filterState.value.searchKey,
-  set: (value: string) => (filterState.value.searchKey = value)
+  set: (value: string) => (filterState.value.searchKey = value),
 });
 
 const toggle = (event: any) => {

@@ -1,3 +1,5 @@
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { get, isEmpty } from 'radash';
@@ -6,11 +8,13 @@ import AlbumService from '../services/album-service.js';
 import S3Service from '../services/s3-service.js';
 import { PhotoResponse, PhotosRequest, RenamePhotoRequest } from '../types';
 import { BaseController } from './base-controller.js';
-import { deleteObjects, updatePhotoAlbum, uploadObject } from './helpers.js';
+import { deleteObjects, updatePhotoAlbum } from './helpers.js';
 
 const s3Service = new S3Service();
 const albumService = new AlbumService();
+
 const bucketName = process.env['AWS_S3_BUCKET_NAME'];
+const s3Client = new S3Client({ region: 'us-east-1' });
 
 export default class PhotoController extends BaseController {
   /**
@@ -89,25 +93,29 @@ export default class PhotoController extends BaseController {
 
   create: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const albumId = (request.params as any)['albumId'] as string;
+    const { filename, mimeType } = request.query as { filename: string; mimeType: string };
+
+    if (!filename || !mimeType) {
+      return this.fail(reply, 'Filename and mimeType are required in query parameters');
+    }
+
+    const filePath = `${albumId}/${filename}`;
 
     try {
-      const data = await request.file();
-      const filename = data?.filename;
-      const mimeType = data?.mimetype;
-      const buffer = await data?.toBuffer();
+      const command = new PutObjectCommand({
+        Bucket: bucketName,
+        Key: filePath,
+        ContentType: mimeType,
+      });
 
-      request.log.info(
-        `##### Uploading file: ${filename}, mimeType: ${mimeType}, file size: ${buffer?.length} bytes`,
-      );
-      const result = await uploadObject(`${albumId}/${filename}`, buffer);
-      if (result) {
-        request.log.info(`##### Photo uploaded: ${filename}`);
-        return this.ok(reply, 'Photo uploaded');
-      }
-      return this.fail(reply, 'Failed to upload photos');
+      // Generate presigned URL (valid for 60 seconds)
+      const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 60 });
+
+      request.log.info(`##### Generated presigned URL for file: ${filePath}`);
+      return this.ok(reply, 'ok', { uploadUrl });
     } catch (err: any) {
-      request.log.error('Failed to upload photos:', err);
-      return this.fail(reply, 'Failed to upload photos');
+      request.log.error('Failed to generate presigned URL:', err);
+      return this.fail(reply, 'Failed to generate upload URL');
     }
   };
 

@@ -6,9 +6,12 @@ import { PhotoService } from '../photo-service';
 // Mock the BaseApiRequestService
 vi.mock('@/services/base-api-request-service', () => ({
   BaseApiRequestService: {
-    perform: vi.fn()
-  }
+    perform: vi.fn(),
+  },
 }));
+
+// Mock the global fetch for the S3 upload
+global.fetch = vi.fn();
 
 describe('PhotoService', () => {
   beforeEach(() => {
@@ -24,7 +27,10 @@ describe('PhotoService', () => {
 
       await PhotoService.getPhotosByAlbumId(albumId, year);
 
-      expect(BaseApiRequestService.perform).toHaveBeenCalledWith('GET', `${ApiBaseUrl}/photos/${year}/${albumId}`);
+      expect(BaseApiRequestService.perform).toHaveBeenCalledWith(
+        'GET',
+        `${ApiBaseUrl}/photos/${year}/${albumId}`,
+      );
     });
 
     it('should return the JSON response from the API when successful', async () => {
@@ -46,40 +52,98 @@ describe('PhotoService', () => {
   });
 
   describe('uploadPhotos', () => {
-    it('should call BaseApiRequestService.perform with correct parameters', async () => {
+    it('should call BaseApiRequestService.perform with correct parameters to get presigned URL', async () => {
       const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
       const albumId = '123';
-      const mockResponse = { ok: true, json: vi.fn().mockResolvedValue({ status: 'success' }) };
-      (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
+      const mockApiResponse = {
+        ok: true,
+        json: vi.fn().mockResolvedValue({ data: { uploadUrl: 'https://s3-presigned-url' } }),
+      };
+      const mockS3Response = { ok: true };
+      (BaseApiRequestService.perform as any).mockResolvedValue(mockApiResponse);
+      (global.fetch as any).mockResolvedValue(mockS3Response);
 
       await PhotoService.uploadPhotos(file, albumId);
 
       expect(BaseApiRequestService.perform).toHaveBeenCalledWith(
-        'POST',
-        `${ApiBaseUrl}/photos/upload/${albumId}`,
-        null,
-        null,
-        { file }
+        'GET',
+        `${ApiBaseUrl}/photos/upload/${albumId}?filename=${file.name}&mimeType=${file.type}`,
       );
     });
 
-    it('should return the ResponseStatus from the API when successful', async () => {
-      const mockStatus = { status: 'success' };
-      const mockResponse = { ok: true, json: vi.fn().mockResolvedValue(mockStatus) };
-      (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
+    it('should call fetch with the presigned URL and correct parameters', async () => {
+      const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
+      const albumId = '123';
+      const mockUploadUrl = 'https://s3-presigned-url';
+      const mockApiResponse = {
+        ok: true,
+        json: vi.fn().mockResolvedValue({ data: { uploadUrl: mockUploadUrl } }),
+      };
+      const mockS3Response = { ok: true };
+      (BaseApiRequestService.perform as any).mockResolvedValue(mockApiResponse);
+      (global.fetch as any).mockResolvedValue(mockS3Response);
 
-      const result = await PhotoService.uploadPhotos(new File([''], 'test.jpg', { type: 'image/jpeg' }), '123');
+      await PhotoService.uploadPhotos(file, albumId);
 
-      expect(result).toEqual(mockStatus);
+      expect(global.fetch).toHaveBeenCalledWith(mockUploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type },
+      });
     });
 
-    it('should throw an error if the API request fails', async () => {
+    it('should return ResponseStatus when upload is successful', async () => {
+      const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
+      const albumId = '123';
+      const mockApiResponse = {
+        ok: true,
+        json: vi.fn().mockResolvedValue({ data: { uploadUrl: 'https://s3-presigned-url' } }),
+      };
+      const mockS3Response = { ok: true };
+      (BaseApiRequestService.perform as any).mockResolvedValue(mockApiResponse);
+      (global.fetch as any).mockResolvedValue(mockS3Response);
+
+      const result = await PhotoService.uploadPhotos(file, albumId);
+
+      expect(result).toEqual({
+        code: 200,
+        status: 'Success',
+        message: 'ok',
+      });
+    });
+
+    it('should throw an error if fetching presigned URL fails', async () => {
+      const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
+      const albumId = '123';
       const mockResponse = { ok: false, statusText: 'Bad Request' };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      await expect(
-        PhotoService.uploadPhotos(new File([''], 'test.jpg', { type: 'image/jpeg' }), '123')
-      ).rejects.toThrow('Bad Request');
+      await expect(PhotoService.uploadPhotos(file, albumId)).rejects.toThrow('Bad Request');
+    });
+
+    it('should throw an error if upload URL is not returned', async () => {
+      const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
+      const albumId = '123';
+      const mockApiResponse = { ok: true, json: vi.fn().mockResolvedValue({ data: {} }) };
+      (BaseApiRequestService.perform as any).mockResolvedValue(mockApiResponse);
+
+      await expect(PhotoService.uploadPhotos(file, albumId)).rejects.toThrow(
+        'Upload URL not found',
+      );
+    });
+
+    it('should throw an error if S3 upload fails', async () => {
+      const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
+      const albumId = '123';
+      const mockApiResponse = {
+        ok: true,
+        json: vi.fn().mockResolvedValue({ data: { uploadUrl: 'https://s3-presigned-url' } }),
+      };
+      const mockS3Response = { ok: false, statusText: 'Forbidden' };
+      (BaseApiRequestService.perform as any).mockResolvedValue(mockApiResponse);
+      (global.fetch as any).mockResolvedValue(mockS3Response);
+
+      await expect(PhotoService.uploadPhotos(file, albumId)).rejects.toThrow('Upload failed');
     });
   });
 
@@ -96,7 +160,7 @@ describe('PhotoService', () => {
       expect(BaseApiRequestService.perform).toHaveBeenCalledWith('PUT', `${ApiBaseUrl}/photos`, {
         albumId,
         destinationAlbumId,
-        photoKeys
+        photoKeys,
       });
     });
 
@@ -114,7 +178,9 @@ describe('PhotoService', () => {
       const mockResponse = { ok: false, statusText: 'Not Found' };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      await expect(PhotoService.movePhotos('123', '456', ['photo1.jpg', 'photo2.jpg'])).rejects.toThrow('Not Found');
+      await expect(
+        PhotoService.movePhotos('123', '456', ['photo1.jpg', 'photo2.jpg']),
+      ).rejects.toThrow('Not Found');
     });
   });
 
@@ -129,7 +195,7 @@ describe('PhotoService', () => {
 
       expect(BaseApiRequestService.perform).toHaveBeenCalledWith('DELETE', `${ApiBaseUrl}/photos`, {
         albumId,
-        photoKeys
+        photoKeys,
       });
     });
 
@@ -147,7 +213,9 @@ describe('PhotoService', () => {
       const mockResponse = { ok: false, statusText: 'Bad Request' };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      await expect(PhotoService.deletePhotos('123', ['photo1.jpg', 'photo2.jpg'])).rejects.toThrow('Bad Request');
+      await expect(PhotoService.deletePhotos('123', ['photo1.jpg', 'photo2.jpg'])).rejects.toThrow(
+        'Bad Request',
+      );
     });
   });
 
@@ -161,11 +229,15 @@ describe('PhotoService', () => {
 
       await PhotoService.renamePhoto(albumId, newPhotoKey, currentPhotoKey);
 
-      expect(BaseApiRequestService.perform).toHaveBeenCalledWith('PUT', `${ApiBaseUrl}/photos/rename`, {
-        albumId,
-        newPhotoKey,
-        currentPhotoKey
-      });
+      expect(BaseApiRequestService.perform).toHaveBeenCalledWith(
+        'PUT',
+        `${ApiBaseUrl}/photos/rename`,
+        {
+          albumId,
+          newPhotoKey,
+          currentPhotoKey,
+        },
+      );
     });
 
     it('should return the ResponseStatus from the API when successful', async () => {
@@ -182,7 +254,9 @@ describe('PhotoService', () => {
       const mockResponse = { ok: false, statusText: 'Not Found' };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      await expect(PhotoService.renamePhoto('123', 'newname.jpg', 'oldname.jpg')).rejects.toThrow('Not Found');
+      await expect(PhotoService.renamePhoto('123', 'newname.jpg', 'oldname.jpg')).rejects.toThrow(
+        'Not Found',
+      );
     });
   });
 });

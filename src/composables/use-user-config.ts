@@ -8,13 +8,16 @@ const darkMode = ref(localStorage.getItem(DARK_MODE_ENABLED) === 'true');
 const userState = ref<UserPermission | null>(null);
 
 export default function useUserConfig() {
+  const isEnabled = ref(false);
+  const getDarkMode = computed(() => darkMode.value);
+  const isAdmin = computed(() => userState.value?.role === 'admin');
+
   const { isFetching, data: userData } = useQuery({
     queryKey: ['getUserInfo'],
-    enabled: !userState.value?.uid,
     queryFn: AuthService.userInfo,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    staleTime: Infinity
+    enabled: isEnabled,
   });
 
   const getUserPermission = computed(() => {
@@ -23,9 +26,6 @@ export default function useUserConfig() {
     }
     return userState.value;
   });
-
-  const getDarkMode = computed(() => darkMode.value);
-  const isAdmin = computed(() => userState.value?.role === 'admin');
 
   const setUserPermission = (user: UserPermission) => {
     userState.value = user;
@@ -36,12 +36,17 @@ export default function useUserConfig() {
     localStorage.setItem(DARK_MODE_ENABLED, mode ? 'true' : 'false');
   };
 
+  const setEnabled = (value: boolean) => {
+    isEnabled.value = value;
+  };
+
   return {
     isFetching,
     isAdmin,
     userPermission: getUserPermission,
     darkMode: getDarkMode,
     setUserPermission,
-    setDarkMode
+    setDarkMode,
+    setEnabled,
   };
 }

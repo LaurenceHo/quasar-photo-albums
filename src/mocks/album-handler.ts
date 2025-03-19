@@ -95,6 +95,11 @@ export const mockAlbums = [
 export const getAlbumsByYear = http.get('/api/albums/**', async () => {
   await delay();
 
+  // return new HttpResponse(null, {
+  //   status: 500,
+  //   statusText: 'Error',
+  // });
+
   return HttpResponse.json({
     code: 200,
     status: 'Success',
