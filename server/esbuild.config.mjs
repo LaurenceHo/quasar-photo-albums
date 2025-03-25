@@ -5,7 +5,8 @@ await esbuild.build({
   bundle: false,
   platform: 'node',
   target: 'esnext',
-  outdir: 'dist',
+  outdir: 'dist/app',
   format: 'esm',
+  sourcemap: true,
   minify: true
 });

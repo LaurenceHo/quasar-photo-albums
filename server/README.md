@@ -79,12 +79,6 @@ Firstly, install serverless-http
 $ bun add serverless-http
 ```
 
-Secondly, install serverless and serverless-plugin-typescript
-
-```bash
-$ bun add serverless serverless-plugin-typescript
-```
-
 Then, wrap your Fastify app with serverless-http
 
 ```typescript
@@ -100,104 +94,18 @@ app.get('/', (request: FastifyRequest, reply: FastifyReply) => {
 export const handler = serverless(app as any);
 ```
 
-To get this application deployed, let's create a `serverless.yml` in our working directory. When we deploy to AWS
-locally, we also need to install [serverless-dotenv-plugin](https://www.serverless.com/plugins/serverless-dotenv-plugin). It will load environment variables from `.env` file to
-`serverless.yml`.
+To deploy it, you can use the following command
 
 ```bash
-$ bun add serverless-dotenv-plugin
+$ bun run prepare:server:deploy
+$ bun run cdk:deploy
 ```
 
-Your `serverless.yaml` should look like as below:
-
-```yaml
-service: my-fastify-application
-provider:
-  name: aws
-  runtime: nodejs20.x
-  stage: dev
-  region: ${env:AWS_REGION_NAME}
-
-plugins:
-  - serverless-plugin-typescript #A Serverless Framework plugin to transpile TypeScript before deploying
-  - serverless-dotenv-plugin #You will need this plugin to import all variables from .env into functions
-
-useDotenv: true #Enable the plugin
-
-functions:
-  app:
-    handler: src/app.handler
-    events:
-      - http: ANY /
-      - http: ANY /{proxy+}
-    environment:
-      AWS_REGION_NAME: ${self:provider.region}
-      GOOGLE_PLACES_API_KEY: ${env:GOOGLE_PLACES_API_KEY}
-      VITE_GOOGLE_CLIENT_ID: ${env:VITE_GOOGLE_CLIENT_ID}
-      ALBUM_URL: ${env:ALBUM_URL}
-      VITE_IMAGEKIT_CDN_URL: ${env:VITE_IMAGEKIT_CDN_URL}
-      AWS_S3_BUCKET_NAME: ${env:AWS_S3_BUCKET_NAME}
-      PHOTO_ALBUMS_TABLE_NAME: ${env:PHOTO_ALBUMS_TABLE_NAME}
-      PHOTO_ALBUM_TAGS_TABLE_NAME: ${env:PHOTO_ALBUM_TAGS_TABLE_NAME}
-      PHOTO_USER_PERMISSION_TABLE_NAME: ${env:PHOTO_USER_PERMISSION_TABLE_NAME}
-      JWT_SECRET: ${env:JWT_SECRET}
-
-custom:
-  dotenv:
-    exclude:
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
-```
-
-Now, let's deploy it to AWS Lambda:
-
-```bash
-$ bun run serverless:deploy
-```
-
-If this is your first time using Serverless Framework, you will be asked to set up your AWS credentials.
-Please check [here](https://www.serverless.com/framework/docs/providers/aws/guide/credentials/) for further information.
-
-```bash
-> serverless deploy
-
-DOTENV: Loading environment variables from .env:
-         - GOOGLE_PLACES_API_KEY
-         - VITE_GOOGLE_CLIENT_ID
-         - JWT_SECRET
-         - ALBUM_URL
-         - VITE_IMAGEKIT_CDN_URL
-         - AWS_S3_BUCKET_NAME
-         - PHOTO_ALBUMS_TABLE_NAME
-         - PHOTO_ALBUM_TAGS_TABLE_NAME
-         - PHOTO_USER_PERMISSION_TABLE_NAME
-
-Deploying my-serverless-app to stage dev (us-east-1, "default" provider)
-Compiling with Typescript...
-Using local tsconfig.json - tsconfig.json
-Typescript compiled.
-
-... snip ...
-
-Service Information
-service: my-fastify-application
-stage: dev
-region: us-east-1
-stack: my-fastify-application-dev
-api keys:
-  None
-endpoints:
-  ANY - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/dev
-  ANY - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/dev/{proxy+}
-functions:
-  app: my-fastify-application-dev-app
-```
-
-You can check your AWS Lambda function in AWS console. You should see a new Lambda function and API Gateway created.
+If this is your first time to deploy, you will need to run `bun run cdk:bootstrap` first.
 
 ### AWS Permissions
 
-If you deploy your Lambda function and API Gateway by running the above command `bun run serverless:deploy`, Serverless
+If you deploy your Lambda function and API Gateway by running the above command `bun run cdk:deploy`, Serverless
 Framework will deal with AWS permissions for you as long as you set up the correct DynamoDB table names and S3 bucket name.
 
 ### Enabling binary support using the API Gateway console

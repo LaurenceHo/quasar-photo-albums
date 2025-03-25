@@ -6,12 +6,11 @@ on:
       - master
     paths:
       - "server/src/**"
+      - "server/lib/**"
+      - "server/bin/**"
+      - "server/cdk.json"
+      - "server/package.json"
   workflow_dispatch:
-    inputs:
-      buildManually:
-        description: 'Deploy API manually'
-        required: true
-        default: build
 
 jobs:
   build-and-deploy:
@@ -30,6 +29,7 @@ jobs:
       PHOTO_ALBUM_TAGS_TABLE_NAME: ${{ secrets.PHOTO_ALBUM_TAGS_TABLE_NAME }}
       PHOTO_USER_PERMISSION_TABLE_NAME: ${{ secrets.PHOTO_USER_PERMISSION_TABLE_NAME }}
       DATA_AGGREGATIONS_TABLE_NAME: ${{ secrets.DATA_AGGREGATIONS_TABLE_NAME }}
+      PHOTO_ALBUMS_STREAM_ARN: ${{ secrets.PHOTO_ALBUMS_STREAM_ARN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -37,31 +37,18 @@ jobs:
 
       - name: Install dependencies and test
         run: |
-          bun install
           cd ./server
           bun install
           bun run types:server
           bun run test:server
 
-      - name: Write .env file
+      - name: Build Server
         run: |
           cd ./server
-          tee .env <<EOF
-          AWS_REGION_NAME=$AWS_REGION_NAME
-          GOOGLE_PLACES_API_KEY=$GOOGLE_PLACES_API_KEY
-          VITE_GOOGLE_CLIENT_ID=DEMO_GOOGLE_CLIENT_ID
-          JWT_SECRET=$JWT_SECRET
-          ALBUM_URL=$ALBUM_URL
-          VITE_IMAGEKIT_CDN_URL=$VITE_IMAGEKIT_CDN_URL
-          AWS_S3_BUCKET_NAME=$AWS_S3_BUCKET_NAME
-          PHOTO_ALBUMS_TABLE_NAME=$PHOTO_ALBUMS_TABLE_NAME
-          PHOTO_ALBUM_TAGS_TABLE_NAME=$PHOTO_ALBUM_TAGS_TABLE_NAME
-          PHOTO_USER_PERMISSION_TABLE_NAME=$PHOTO_USER_PERMISSION_TABLE_NAME
-          DATA_AGGREGATIONS_TABLE_NAME=$DATA_AGGREGATIONS_TABLE_NAME
-          EOF
+          bun run prepare:server:deploy
 
-      - name: Serverless deploy
-        uses: serverless/github-action@master
-        with:
-          args: -c "cd ./server && serverless deploy --force --conceal"
-          entrypoint: /bin/sh
+      - name: CDK Deploy
+        run: |
+          cd ./server
+          bun cdk acknowledge 32775
+          bun cdk deploy PhotoAlbumDevStack --quiet --require-approval never | grep -E "✅|time"

@@ -6,12 +6,8 @@ on:
       - master
     paths:
       - "src/**"
+      - "package.json"
   workflow_dispatch:
-    inputs:
-      buildManually:
-        description: 'Run build manually'
-        required: true
-        default: 'build'
 
 jobs:
   build-and-deploy:
@@ -32,18 +28,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install
-
-      - name: Write .env file
-        run: |
-          tee .env <<EOF
-          VITE_ALBUM_APP_TITLE=$VITE_ALBUM_APP_TITLE
-          VITE_STATIC_FILES_URL=$VITE_STATIC_FILES_URL
-          VITE_IMAGEKIT_CDN_URL=$VITE_IMAGEKIT_CDN_URL
-          VITE_MAPBOX_API_KEY=$VITE_MAPBOX_API_KEY
-          VITE_AWS_API_GATEWAY_URL=$VITE_AWS_API_GATEWAY_URL
-          VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
-          VITE_GTAG_ID=$VITE_GTAG_ID
-          EOF
 
       - name: Test and build
         run: |
