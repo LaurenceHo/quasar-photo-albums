@@ -8,11 +8,6 @@ on:
       - "src/**"
       - "package.json"
   workflow_dispatch:
-    inputs:
-      buildManually:
-        description: 'Run build manually'
-        required: true
-        default: 'build'
 
 jobs:
   build-and-deploy:
