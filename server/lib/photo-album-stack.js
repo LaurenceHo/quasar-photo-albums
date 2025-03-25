@@ -28,7 +28,9 @@ const createCloudFrontDistribution = (scope, id, photoBucket) => {
     },
     additionalBehaviors: {
       '/*.json': {
-        origin: new origins.HttpOrigin(`${photoBucket.bucketWebsiteDomainName}`),
+        origin: new origins.HttpOrigin(`${photoBucket.bucketWebsiteDomainName}`, {
+          protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+        }),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.HTTPS_ONLY,
         cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
       },
