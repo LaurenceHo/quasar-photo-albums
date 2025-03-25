@@ -52,4 +52,4 @@ jobs:
         run: |
           cd ./server
           bun cdk acknowledge 32775
-          bun cdk deploy PhotoAlbumDevStack --quiet --require-approval never | grep -E "✅"
+          bun cdk deploy PhotoAlbumDevStack --quiet --require-approval never | grep -E "✅|time"
