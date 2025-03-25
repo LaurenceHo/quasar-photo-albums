@@ -50,4 +50,5 @@ jobs:
       - name: CDK Deploy
         run: |
           cd ./server
-          bun run cdk:deploy PhotoAlbumDevStack
+          bun cdk acknowledge 32775
+          bun cdk deploy PhotoAlbumDevStack --quiet --require-approval never | grep -E "✅"
