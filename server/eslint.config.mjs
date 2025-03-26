@@ -43,6 +43,6 @@ export default tsEslint.config(
     files: ['**/*.ts'],
   },
   {
-    ignores: ['*.config.*', '*.d.ts', '.serverless', 'coverage', 'dist', 'node_modules'],
+    ignores: ['*.config.*', '*.d.ts', 'coverage', 'dist', 'node_modules'],
   }
 );

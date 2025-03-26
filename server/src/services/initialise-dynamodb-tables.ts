@@ -30,7 +30,7 @@ const initialiseAlbumTable = async () => {
   } catch (error) {
     logger().error(error);
     throw Error(
-      `Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`,
+      `Table ${albumTableName} does not exist. Please run 'bun run cdk:deploy' first.`,
     );
   }
 
@@ -107,7 +107,7 @@ const initialiseUserTable = async () => {
   } catch (error) {
     logger().error(error);
     throw Error(
-      `Table ${albumTableName} does not exist. Please run 'bun run serverless:deploy' first.`,
+      `Table ${albumTableName} does not exist. Please run 'bun run cdk:deploy' first.`,
     );
   }
 

@@ -13,7 +13,7 @@
                 />
                 <NoImagePlaceholder v-else />
                 <div
-                  class="bg-opacity-50 absolute top-0 right-0 left-0 flex h-8 flex-wrap items-center overflow-hidden rounded-t-md bg-black px-2 opacity-100 transition-all duration-500"
+                  class="absolute top-0 right-0 left-0 flex h-8 flex-wrap items-center overflow-hidden rounded-t-md bg-black/60 px-2 transition-all duration-500"
                 >
                   <div class="truncate text-white">{{ albumItem.albumName }}</div>
                 </div>

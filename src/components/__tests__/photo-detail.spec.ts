@@ -1,10 +1,10 @@
-import router from '@/router';
-import PrimeVue from 'primevue/config';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
 import PhotoDetail from '@/components/PhotoDetail.vue';
-import { ref } from 'vue';
+import router from '@/router';
 import { QueryClient, VueQueryPlugin, type VueQueryPluginOptions } from '@tanstack/vue-query';
+import { mount } from '@vue/test-utils';
+import PrimeVue from 'primevue/config';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ref } from 'vue';
 
 // Mock vue-router
 vi.mock('vue-router', async () => {
@@ -183,7 +183,7 @@ describe('PhotoDetail.vue', () => {
 
     // Test UsePanoramaViewer flag
     vm.exifTags = {
-      UsePanoramaViewer: { value: true },
+      ProjectionType: { description: 'equirectangular' },
     };
     await wrapper.vm.$nextTick();
     expect(vm.isPanoramaPhoto).toBe(true);

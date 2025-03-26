@@ -146,21 +146,21 @@ import useDevice from '@/composables/use-device';
 import usePhotos from '@/composables/use-photos';
 import useUserConfig from '@/composables/use-user-config';
 import {
-  IconCalendarTime,
-  IconCamera,
-  IconChevronLeft,
-  IconChevronRight,
-  IconPhoto,
-  IconView360Number,
-  IconX,
+IconCalendarTime,
+IconCamera,
+IconChevronLeft,
+IconChevronRight,
+IconPhoto,
+IconView360Number,
+IconX,
 } from '@tabler/icons-vue';
 import type {
-  ExifTags,
-  FileTags,
-  NumberTag,
-  RationalTag,
-  StringArrayTag,
-  ValueTag,
+ExifTags,
+FileTags,
+NumberTag,
+RationalTag,
+StringArrayTag,
+ValueTag,
 } from 'exifreader';
 import ExifReader from 'exifreader';
 import Button from 'primevue/button';
@@ -172,7 +172,7 @@ import { useRoute, useRouter } from 'vue-router';
 
 type ExifData = ExifTags &
   FileTags & {
-    UsePanoramaViewer?: ValueTag;
+    ProjectionType?: ValueTag;
   };
 
 const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
@@ -262,29 +262,30 @@ const isPhotoLandscape = computed(
     imageOriginalWidth.value > imageOriginalHeight.value,
 );
 const isPanoramaPhoto = computed(() => {
-  if (exifTags.value.UsePanoramaViewer?.value) return true;
+  if (exifTags.value.ProjectionType?.description === 'equirectangular') return true;
 
   // Check for common 360 camera indicators
-  if (
-    exifTags.value.Make?.description?.includes('RICOH') &&
-    exifTags.value.Model?.description?.includes('THETA')
-  )
-    return true;
+  const make = exifTags.value.Make?.description?.toLowerCase() || '';
+  const model = exifTags.value.Model?.description?.toLowerCase() || '';
 
-  if (
-    exifTags.value.Make?.description?.includes('SAMSUNG') &&
-    exifTags.value.Model?.description?.includes('GEAR 360')
-  )
-    return true;
+  // Check for common 360 cameras
+  const panoramaCameras = [
+    { make: 'ricoh', model: 'theta' },
+    { make: 'samsung', model: 'gear 360' },
+    { make: 'insta360', model: '' },
+    { make: 'gopro', model: 'fusion' },
+    { make: 'gopro', model: 'max' },
+    { make: 'xiaomi', model: 'mijia' }
+  ];
 
-  // Check if filename contains panorama indicators
-  if (
-    photoFileName.value.toLowerCase().includes('360') ||
-    photoFileName.value.toLowerCase().includes('pano')
-  )
+  if (panoramaCameras.some(camera => make.includes(camera.make) &&
+      (camera.model === '' || model.includes(camera.model)))) {
     return true;
+  }
 
-  return false;
+  const fileName = photoFileName.value.toLowerCase();
+  return fileName.includes('360') || fileName.includes('pano');
+
 });
 /** Compute photo EXIF data end */
 

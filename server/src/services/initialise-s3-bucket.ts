@@ -22,7 +22,7 @@ export const initialiseS3Bucket = async () => {
   } catch (err) {
     logger().error(err);
     throw Error(
-      `Bucket ${s3BucketName} does not exist. Please run 'bun run serverless:deploy' first.`,
+      `Bucket ${s3BucketName} does not exist. Please run 'bun run cdk:deploy' first.`,
     );
   }
 
