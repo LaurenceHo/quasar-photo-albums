@@ -1,10 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
-import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as dotenv from 'dotenv';
 import path from 'path';
@@ -50,6 +50,7 @@ const createAppLambdaFunction = (scope, id, envType) => {
     runtime: lambda.Runtime.NODEJS_22_X,
     handler: 'app.handler',
     code: lambda.Code.fromAsset(path.join(rootDir, 'dist/lambda')),
+    timeout: cdk.Duration.seconds(15),
     environment: {
       AWS_REGION_NAME: process.env.AWS_REGION_NAME,
       GOOGLE_PLACES_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
@@ -73,8 +74,12 @@ const createAggregationsLambdaFunction = (scope, id, envType) => {
     runtime: lambda.Runtime.NODEJS_22_X,
     handler: 'aggregations/albums.handler',
     code: lambda.Code.fromAsset(path.join(rootDir, 'dist/lambda')),
+    timeout: cdk.Duration.seconds(15),
     environment: {
       NODE_OPTIONS: '--experimental-vm-modules',
+      AWS_REGION_NAME: process.env.AWS_REGION_NAME,
+      PHOTO_ALBUMS_TABLE_NAME: process.env.PHOTO_ALBUMS_TABLE_NAME,
+      DATA_AGGREGATIONS_TABLE_NAME: process.env.DATA_AGGREGATIONS_TABLE_NAME
     },
   });
 };
