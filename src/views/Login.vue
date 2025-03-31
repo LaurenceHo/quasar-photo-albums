@@ -48,16 +48,7 @@ interface GoogleCredentialResponse {
   credential: string;
   select_by: string;
   client_id: string;
-}
-
-interface GoogleButtonOptions {
-  theme?: 'outline' | 'filled_blue' | 'filled_black';
-  size?: 'large' | 'medium' | 'small';
-  text?: 'signin_with' | 'signup_with' | 'continue_with' | 'signin';
-  shape?: 'rectangular' | 'pill' | 'circle' | 'square';
-  logo_alignment?: 'left' | 'center';
-  width?: string;
-  locale?: string;
+  state?: string; // Add state to the response type
 }
 
 interface GoogleIdentityServices {
@@ -68,18 +59,19 @@ interface GoogleIdentityServices {
     cancel_on_tap_outside?: boolean;
     context?: string;
     use_fedcm_for_prompt?: boolean;
+    state?: string; // Add state to initialization
   }): void;
-  renderButton(element: HTMLElement | null, options: GoogleButtonOptions): void;
-  prompt(
-    momentListener?: (notification: {
-      isNotDisplayed: () => boolean;
-      isSkippedMoment: () => boolean;
-      isDismissedMoment: () => boolean;
-      getNotDisplayedReason: () => string;
-      getSkippedReason: () => string;
-      getDismissedReason: () => string;
-    }) => void,
-  ): void;
+  renderButton(element: HTMLElement | null, options: {
+    theme?: 'outline' | 'filled_blue' | 'filled_black';
+    size?: 'large' | 'medium' | 'small';
+    text?: 'signin_with' | 'signup_with' | 'continue_with' | 'signin';
+    shape?: 'rectangular' | 'pill' | 'circle' | 'square';
+    logo_alignment?: 'left' | 'center';
+    width?: string;
+    locale?: string;
+    state?: string;
+  }): void;
+  prompt(): void;
 }
 
 interface GoogleIdentity {
@@ -100,6 +92,8 @@ declare global {
 const toast = useToast();
 const loading = ref(false);
 const { userPermission, setUserPermission } = useUserConfig();
+const csrfState = ref<string>('');
+
 
 onMounted(async () => {
   if (!window.google) {
@@ -112,12 +106,12 @@ onMounted(async () => {
     });
   }
 
-  // https://developers.google.com/identity/gsi/web/reference/js-reference
-  const handleCredentialResponse = async (response: any) => {
+  const handleCredentialResponse = async (response: GoogleCredentialResponse) => {
     localStorage.clear();
+
     try {
       loading.value = true;
-      const { data: userPermission } = await AuthService.login(response.credential);
+      const { data: userPermission } = await AuthService.login(response.credential, csrfState.value);
 
       if (!isEmpty(userPermission) && userPermission !== undefined) {
         setUserPermission(userPermission);
@@ -150,14 +144,21 @@ onMounted(async () => {
   };
 
   if (window.google) {
+    // Generate and store CSRF state
+    const { state } = await AuthService.generateCsrfState();
+    csrfState.value = state;
+
     window.google.accounts.id.initialize({
       client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '',
       callback: handleCredentialResponse,
+      state: csrfState.value,
     });
+
     window.google.accounts.id.renderButton(document.getElementById('google-login-button'), {
       theme: 'outline',
       size: 'large',
       width: '240',
+      state: csrfState.value,
     });
   }
 });

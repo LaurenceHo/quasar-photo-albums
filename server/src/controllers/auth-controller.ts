@@ -49,7 +49,7 @@ export default class AuthController extends BaseController {
   };
 
   verifyIdToken: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const token = (request.body as any).token;
+    const { token, state } = request.body as { token: string; state?: string };
 
     try {
       const payload = await _verifyIdToken(token);
@@ -57,21 +57,25 @@ export default class AuthController extends BaseController {
       const email = payload?.email ?? '';
       const auth_time = payload?.iat ?? 0;
 
-      // Only process if the authorised user just login in the last 5 minutes.
+      const storedState = (request.cookies as any).csrf_state;
+      if (state !== storedState) {
+        request.log.info(`CSRF state mismatch: ${state} vs ${storedState}`);
+        return this.unauthorized(reply, 'Unauthorized');
+      }
+
+      // Only process if the authorised user just logged in within the last 5 minutes
       if (new Date().getTime() / 1000 - auth_time < 5 * 60) {
         const userPermission = await userService.findOne({ uid, email });
 
         if (userPermission) {
-          // Sign JWT token
           const token = jwt.sign(userPermission, process.env['JWT_SECRET'] as string, {
             expiresIn: '7d',
           });
-          // Set token as cookies
           await setJwtCookies(reply, token);
           return this.ok<UserPermission>(reply, 'ok', userPermission);
         } else {
           request.log.info(`User ${email} doesn't have permission`);
-          return this.unauthorized(reply, `User ${email} doesn't have login permission`);
+          return this.unauthorized(reply, 'Unauthorized');
         }
       } else {
         return this.fail(reply, 'Error while user login');

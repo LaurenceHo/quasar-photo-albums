@@ -15,17 +15,41 @@ describe('AuthService', () => {
     vi.resetAllMocks();
   });
 
+  describe('generateCsrfState', () => {
+    it('should call BaseApiRequestService.perform with correct parameters', async () => {
+      const mockResponse = { json: vi.fn().mockResolvedValue({ state: 'csrf-state' }) };
+      (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
+
+      await AuthService.generateCsrfState();
+
+      expect(BaseApiRequestService.perform).toHaveBeenCalledWith('GET', `${ApiBaseUrl}/auth/csrf`);
+    });
+
+    it('should return the state from the API response', async () => {
+      const mockState = { state: 'csrf-state' };
+      const mockResponse = { json: vi.fn().mockResolvedValue(mockState) };
+      (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
+
+      const result = await AuthService.generateCsrfState();
+
+      expect(result).toEqual(mockState);
+    });
+  });
+
   describe('login', () => {
     it('should call BaseApiRequestService.perform with correct parameters', async () => {
       const mockToken = 'mock-token';
+      const mockState = 'mock-state';
       const mockResponse = { ok: true, json: vi.fn().mockResolvedValue({}) };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      await AuthService.login(mockToken);
+      await AuthService.login(mockToken, mockState);
 
-      expect(BaseApiRequestService.perform).toHaveBeenCalledWith('POST', `${ApiBaseUrl}/auth/verifyIdToken`, {
-        token: mockToken
-      });
+      expect(BaseApiRequestService.perform).toHaveBeenCalledWith(
+        'POST',
+        `${ApiBaseUrl}/auth/verifyIdToken`,
+        { token: mockToken, state: mockState }
+      );
     });
 
     it('should return the JSON response from the API', async () => {
@@ -33,7 +57,7 @@ describe('AuthService', () => {
       const mockResponse = { ok: true, json: vi.fn().mockResolvedValue(mockUserPermission) };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      const result = await AuthService.login('mock-token');
+      const result = await AuthService.login('mock-token', 'mock-state');
 
       expect(result).toEqual(mockUserPermission);
     });
@@ -42,7 +66,7 @@ describe('AuthService', () => {
       const mockResponse = { ok: false, statusText: 'Unauthorized' };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      await expect(AuthService.login('invalid-token')).rejects.toThrow('Unauthorized');
+      await expect(AuthService.login('invalid-token', 'invalid-state')).rejects.toThrow('Unauthorized');
     });
   });
 
