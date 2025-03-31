@@ -21,10 +21,10 @@
     "types:server": "tsc --noEmit"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.775.0",
-    "@aws-sdk/client-s3": "^3.775.0",
-    "@aws-sdk/lib-dynamodb": "^3.775.0",
-    "@aws-sdk/s3-request-presigner": "^3.775.0",
+    "@aws-sdk/client-dynamodb": "^3.777.0",
+    "@aws-sdk/client-s3": "^3.779.0",
+    "@aws-sdk/lib-dynamodb": "^3.778.0",
+    "@aws-sdk/s3-request-presigner": "^3.779.0",
     "@fastify/auth": "5.0.2",
     "@fastify/cookie": "11.0.2",
     "@fastify/cors": "^11.0.1",
@@ -32,7 +32,7 @@
     "@fastify/multipart": "9.0.3",
     "@fastify/rate-limit": "10.2.2",
     "@fastify/throttle": "3.0.2",
-    "aws-cdk-lib": "^2.185.0",
+    "aws-cdk-lib": "^2.186.0",
     "aws-lambda": "^1.0.7",
     "dotenv": "^16.4.7",
     "electrodb": "^3.4.1",
@@ -50,8 +50,8 @@
     "@tsconfig/strictest": "^2.0.5",
     "@types/aws-lambda": "^8.10.148",
     "@types/jsonwebtoken": "^9.0.9",
-    "@types/node": "^22.13.13",
-    "@vitest/coverage-v8": "^3.0.9",
+    "@types/node": "^22.13.14",
+    "@vitest/coverage-v8": "^3.1.1",
     "aws-cdk": "^2.1006.0",
     "aws-sdk-client-mock": "^4.1.0",
     "esbuild": "0.25.1",
@@ -62,8 +62,8 @@
     "lint-staged": "^15.5.0",
     "rimraf": "^6.0.1",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.28.0",
-    "vitest": "^3.0.9"
+    "typescript-eslint": "^8.29.0",
+    "vitest": "^3.1.1"
   },
   "engines": {
     "node": "^22",
