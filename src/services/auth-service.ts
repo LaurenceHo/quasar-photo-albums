@@ -3,8 +3,17 @@ import { ApiBaseUrl } from '@/services/api-base-url';
 import { BaseApiRequestService } from '@/services/base-api-request-service';
 
 export const AuthService = {
-  login: async (token: string): Promise<ApiResponse<UserPermission>> => {
-    const response = await BaseApiRequestService.perform('POST', `${ApiBaseUrl}/auth/verifyIdToken`, { token });
+  generateCsrfState: async (): Promise<{ state: string }> => {
+    const response = await BaseApiRequestService.perform('GET', `${ApiBaseUrl}/auth/csrf`);
+    return response.json();
+  },
+
+  login: async (token: string, state: string): Promise<ApiResponse<UserPermission>> => {
+    const response = await BaseApiRequestService.perform(
+      'POST',
+      `${ApiBaseUrl}/auth/verifyIdToken`,
+      { token, state },
+    );
     if (!response.ok) {
       throw new Error(response.statusText);
     }
@@ -21,5 +30,5 @@ export const AuthService = {
     if (!response.ok) {
       throw new Error(response.statusText);
     }
-  }
+  },
 };
