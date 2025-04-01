@@ -1,12 +1,9 @@
 <template>
   <ProgressBar v-if="isFetching" mode="indeterminate" style="height: 4px"></ProgressBar>
-  <div
-    id="album-location-map"
-    :class="[
-      'absolute top-0 right-0 bottom-0 left-0 w-full',
-      `${isFetching ? 'mt-[72px]' : 'mt-14 md:mt-16'}`,
-    ]"
-  ></div>
+  <div id="album-location-map" :class="[
+    'absolute top-0 right-0 bottom-0 left-0 w-full',
+    `${isFetching ? 'mt-[72px]' : 'mt-14 md:mt-16'}`,
+  ]"></div>
 </template>
 
 <script lang="ts" setup>
@@ -14,15 +11,16 @@ import useAlbumLocations from '@/composables/use-album-locations';
 import useUserConfig from '@/composables/use-user-config';
 import type { Feature, Point } from 'geojson';
 import mapboxgl, {
-  type GeoJSONSource,
-  type Map,
-  type MapEventOf,
-  type MapMouseEvent,
-  type MapTouchEvent,
-  type SourceSpecification,
+type GeoJSONSource,
+type Map,
+type MapEventOf,
+type MapMouseEvent,
+type MapTouchEvent,
+type SourceSpecification,
 } from 'mapbox-gl';
 import ProgressBar from 'primevue/progressbar';
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { interpolateGreatCircle } from '../utils/helper';
 
 const mapCentreLng = Number(import.meta.env.VITE_MAP_CENTRE_LNG ?? 174.7633);
 const mapCentreLat = Number(import.meta.env.VITE_MAP_CENTRE_LAT ?? -36.8484);
@@ -206,6 +204,54 @@ onMounted(async () => {
       mapInstance.on('touchstart', 'unclustered-point', (event: MapEventOf<'touchstart'>) => {
         createPopup(mapInstance, event, popup);
       });
+
+      // TEST
+      const travelHistory: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: {
+          type: 'MultiLineString',
+          coordinates: [
+            // TODO: Read from user's travel history
+            // Route 1: Taipei to Tokyo
+            ...interpolateGreatCircle([121.5654, 25.0330], [139.6917, 35.6895], 20),
+            // Route 2: Tokyo to LA
+            ...interpolateGreatCircle([139.6917, 35.6895], [-118.2437, 34.0522], 20),
+            // Route 3: Auckland to Hawaii
+            ...interpolateGreatCircle([174.7633, -36.8484], [-157.8583, 21.3069], 20),
+          ],
+        },
+        properties: {},
+      };
+
+      mapInstance.addSource('travel-route', {
+        type: 'geojson',
+        data: travelHistory,
+      });
+
+      mapInstance.addLayer({
+        id: 'travel-route-layer',
+        type: 'line',
+        source: 'travel-route',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': '#FF0000',
+          'line-width': 4,
+          'line-opacity': 0.75,
+        },
+      }, 'clusters');
+
+      // Fit map to all routes
+      // const allCoordinates = travelHistory.geometry.coordinates.flat();
+      // const bounds = allCoordinates.reduce((bounds, coord) => {
+      //   return bounds.extend(coord);
+      // }, new mapboxgl.LngLatBounds(allCoordinates[0], allCoordinates[0]));
+      // mapInstance.fitBounds(bounds, { padding: 50, maxZoom: 5 }); // Adjust maxZoom if needed
+
+      console.log('Travel route source:', mapInstance.getSource('travel-route'));
+      console.log('Travel route layer:', mapInstance.getLayer('travel-route-layer'));
     });
   } catch (error) {
     console.error('Error initializing map:', error);
