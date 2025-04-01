@@ -6,7 +6,7 @@ export type Album = EntityRecord<typeof AlbumEntity> & Place;
 
 export const albumTableName = process.env['PHOTO_ALBUMS_TABLE_NAME'] || 'photo-albums';
 
-type PlaceAttributes =
+export type PlaceAttributes =
   | {
       displayName: {
         type: 'string';

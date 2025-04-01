@@ -17,6 +17,18 @@ export const AlbumTagEntity = new Entity(
         type: 'string',
         required: true,
       },
+      createdAt: {
+        type: 'string',
+        required: true,
+        readOnly: true,
+        default: () => new Date().toISOString(),
+        set: () => new Date().toISOString(),
+      },
+      createdBy: {
+        type: 'string',
+        required: true,
+        readOnly: true,
+      },
     },
     indexes: {
       byTag: {
