@@ -1,6 +1,5 @@
 {
     "app": "node bin/photo-album-api.js",
-    "output": "cdkout",
     "watch": {
       "include": [
         "**"
@@ -9,7 +8,7 @@
         "README.md",
         "cdk*.json",
         "**/*.d.ts",
-        "cdkout",
+        "cdk.out",
         "tsconfig.json",
         "package*.json",
         "yarn.lock",

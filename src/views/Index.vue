@@ -1,4 +1,5 @@
 <template>
+  <ProgressBar v-if="isFetching" mode="indeterminate" style="height: 4px"></ProgressBar>
   <main class="mx-auto mt-2 mb-10 max-w-screen-2xl">
     <div id="container" class="px-8 sm:px-4">
       <Breadcrumb :model="breadcrumbs" class="!px-0">
@@ -20,14 +21,23 @@
 </template>
 
 <script lang="ts" setup>
-import useAlbums from '@/composables/use-albums';
+import { useAlbums, useLoading } from '@/composables';
 import { IconFolders, IconLibraryPhoto } from '@tabler/icons-vue';
-import Breadcrumb from 'primevue/breadcrumb';
+import { useIsFetching, useIsMutating } from '@tanstack/vue-query';
+import { Breadcrumb, ProgressBar } from 'primevue';
 import { computed, type FunctionalComponent } from 'vue';
 import { useRoute } from 'vue-router';
 
+const globalIsFetching = useIsFetching();
+const globalIsMutating = useIsMutating();
+
 const route = useRoute();
 const { currentAlbum } = useAlbums();
+const { isLoading } = useLoading();
+
+const isFetching = computed(() => {
+  return globalIsFetching.value || globalIsMutating.value || isLoading.value;
+});
 
 const breadcrumbs = computed((): { label: string }[] => {
   const routes: { label: string; icon: FunctionalComponent }[] = [];

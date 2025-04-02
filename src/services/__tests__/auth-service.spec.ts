@@ -75,7 +75,7 @@ describe('AuthService', () => {
       const mockResponse = { ok: true, json: vi.fn().mockResolvedValue({}) };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      await AuthService.userInfo();
+      await AuthService.getUserInfo();
 
       expect(BaseApiRequestService.perform).toHaveBeenCalledWith('GET', `${ApiBaseUrl}/auth/userInfo`);
     });
@@ -85,7 +85,7 @@ describe('AuthService', () => {
       const mockResponse = { ok: true, json: vi.fn().mockResolvedValue(mockUserInfo) };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      const result = await AuthService.userInfo();
+      const result = await AuthService.getUserInfo();
 
       expect(result).toEqual(mockUserInfo);
     });
@@ -94,7 +94,7 @@ describe('AuthService', () => {
       const mockResponse = { ok: false, json: vi.fn().mockResolvedValue({ error: 'Unauthorized' }) };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      const result = await AuthService.userInfo();
+      const result = await AuthService.getUserInfo();
 
       expect(result).toEqual({ error: 'Unauthorized' });
     });

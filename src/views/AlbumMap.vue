@@ -1,5 +1,9 @@
 <template>
-  <ProgressBar v-if="isFetching" mode="indeterminate" style="height: 4px"></ProgressBar>
+  <ProgressBar
+    v-if="isFetching || isTravelRecordsFetching"
+    mode="indeterminate"
+    style="height: 4px"
+  ></ProgressBar>
   <div
     id="album-location-map"
     :class="[
@@ -10,8 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-import useAlbumLocations from '@/composables/use-album-locations';
-import useUserConfig from '@/composables/use-user-config';
+import { useAlbumLocations, useTravelRecords, useUserConfig } from '@/composables';
 import type { Feature, Point } from 'geojson';
 import mapboxgl, {
   type GeoJSONSource,
@@ -21,13 +24,14 @@ import mapboxgl, {
   type MapTouchEvent,
   type SourceSpecification,
 } from 'mapbox-gl';
-import ProgressBar from 'primevue/progressbar';
+import { ProgressBar } from 'primevue';
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const mapCentreLng = Number(import.meta.env.VITE_MAP_CENTRE_LNG ?? 174.7633);
 const mapCentreLat = Number(import.meta.env.VITE_MAP_CENTRE_LAT ?? -36.8484);
 const { darkMode } = useUserConfig();
 const { isFetching, albumLocationGeoJson } = useAlbumLocations();
+const { isFetching: isTravelRecordsFetching, travelRecordGeoJson } = useTravelRecords();
 const map = ref<Map | null>(null);
 
 type ClusterEvent = (MapMouseEvent | MapTouchEvent) & {
@@ -151,6 +155,33 @@ const initializeMapLayers = (mapInstance: Map) => {
       });
     }
   });
+
+  if (!mapInstance.getSource('travel-route')) {
+    mapInstance.addSource('travel-route', {
+      type: 'geojson',
+      data: travelRecordGeoJson.value,
+    });
+  }
+
+  if (!mapInstance.getLayer('travel-route-layer')) {
+    mapInstance.addLayer(
+      {
+        id: 'travel-route-layer',
+        type: 'line',
+        source: 'travel-route',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': '#FF0000',
+          'line-width': 2,
+          'line-opacity': 0.75,
+        },
+      },
+      'clusters',
+    );
+  }
 };
 
 onMounted(async () => {
@@ -218,6 +249,19 @@ watch(
     if (!map.value) return;
 
     const source = map.value.getSource('albums') as GeoJSONSource;
+    if (source && newData) {
+      source.setData(newData);
+    }
+  },
+  { deep: true },
+);
+
+watch(
+  travelRecordGeoJson,
+  (newData) => {
+    if (!map.value) return;
+
+    const source = map.value.getSource('travel-route') as GeoJSONSource;
     if (source && newData) {
       source.setData(newData);
     }

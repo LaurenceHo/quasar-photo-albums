@@ -10,9 +10,9 @@
   "scripts": {
     "build:server": "rimraf dist && bun esbuild.config.mjs",
     "cdk:bootstrap": "cdk bootstrap",
-    "cdk:synth": "cdk synth",
-    "cdk:deploy": "cdk deploy",
-    "cdk:diff": "cdk diff",
+    "cdk:synth": "cdk synth PhotoAlbumDevStack",
+    "cdk:deploy": "cdk deploy PhotoAlbumDevStack",
+    "cdk:diff": "cdk diff PhotoAlbumDevStack",
     "format": "prettier --write src/ test/ --ignore-unknown --ignore-path .gitignore",
     "lint": "eslint --fix",
     "prepare:server:deploy": "rimraf dist && bun esbuild.lambda.mjs",

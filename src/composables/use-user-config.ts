@@ -1,8 +1,8 @@
-import { DARK_MODE_ENABLED } from '@/utils/local-storage-key';
-import { computed, ref } from 'vue';
-import { useQuery } from '@tanstack/vue-query';
-import { AuthService } from '@/services/auth-service.ts';
 import type { UserPermission } from '@/schema';
+import { AuthService } from '@/services/auth-service.js';
+import { DARK_MODE_ENABLED } from '@/utils/local-storage-key';
+import { useQuery } from '@tanstack/vue-query';
+import { computed, ref } from 'vue';
 
 const darkMode = ref(localStorage.getItem(DARK_MODE_ENABLED) === 'true');
 const userState = ref<UserPermission | null>(null);
@@ -14,7 +14,7 @@ export default function useUserConfig() {
 
   const { isFetching, data: userData } = useQuery({
     queryKey: ['getUserInfo'],
-    queryFn: AuthService.userInfo,
+    queryFn: AuthService.getUserInfo,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     enabled: isEnabled,

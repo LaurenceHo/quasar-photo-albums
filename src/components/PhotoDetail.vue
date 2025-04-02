@@ -35,13 +35,8 @@
               <img
                 v-if="!isPanoramaPhoto"
                 :alt="photoFileName"
-                :height="
-                  !isPhotoLandscape && windowSize < 1024 && windowSize > 640
-                    ? `${imageDisplayHeight}px`
-                    : ''
-                "
                 :src="selectedImage?.url || ''"
-                :width="isPhotoLandscape ? `${imageDisplayWidth}px` : ''"
+                :style="imageStyles"
                 class="max-h-full rounded-md"
                 @load="loadImage = false"
               />
@@ -275,38 +270,63 @@ const isPanoramaPhoto = computed(() => {
     { make: 'insta360', model: '' },
     { make: 'gopro', model: 'fusion' },
     { make: 'gopro', model: 'max' },
-    { make: 'xiaomi', model: 'mijia' }
+    { make: 'xiaomi', model: 'mijia' },
   ];
 
-  if (panoramaCameras.some(camera => make.includes(camera.make) &&
-      (camera.model === '' || model.includes(camera.model)))) {
+  if (
+    panoramaCameras.some(
+      (camera) =>
+        make.includes(camera.make) && (camera.model === '' || model.includes(camera.model)),
+    )
+  ) {
     return true;
   }
 
   const fileName = photoFileName.value.toLowerCase();
   return fileName.includes('360') || fileName.includes('pano');
-
 });
 /** Compute photo EXIF data end */
 
 /** Compute image display size begin */
-const imageDisplayWidth = computed(() => {
-  if (imageOriginalWidth.value > 1080 && imageContainerWidth.value > 1080) {
-    return 1080;
-  } else if (
-    imageOriginalWidth.value > imageContainerWidth.value &&
-    imageContainerWidth.value < 1080
-  ) {
-    return imageContainerWidth.value;
-  }
-  return imageOriginalWidth.value;
-});
+const imageStyles = computed(() => {
+  const styles = {height: '', width: ''};
+  const aspectRatio = imageOriginalWidth.value / imageOriginalHeight.value;
 
-const imageDisplayHeight = computed(() => {
-  if (imageOriginalHeight.value > imageContainerHeight.value) {
-    return imageContainerHeight.value;
+  // Calculate maximum dimensions based on container
+  const maxWidth = Math.min(
+    imageOriginalWidth.value,
+    imageContainerWidth.value > 1080 ? 1080 : imageContainerWidth.value
+  );
+  const maxHeight = Math.min(imageOriginalHeight.value, imageContainerHeight.value);
+
+  // For square or landscape images
+  if (aspectRatio >= 1) {
+    let width = Math.round(maxWidth);
+    let height = Math.round(width / aspectRatio);
+
+    // If calculated height exceeds container height, scale based on height instead
+    if (height > maxHeight) {
+      height = Math.round(maxHeight);
+      width = Math.round(height * aspectRatio);
+    }
+    styles.width = `${width}px`;
+    styles.height = `${height}px`;
   }
-  return imageOriginalHeight.value;
+  // For portrait images
+  else {
+    let height = Math.round(maxHeight);
+    let width = Math.round(height * aspectRatio);
+
+    // If calculated width exceeds max width, scale based on width instead
+    if (width > maxWidth) {
+      width = Math.round(maxWidth);
+      height = Math.round(width / aspectRatio);
+    }
+    styles.width = `${width}px`;
+    styles.height = `${height}px`;
+  }
+
+  return styles;
 });
 /** Compute image display size end */
 

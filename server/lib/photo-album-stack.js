@@ -3,6 +3,7 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as s3 from 'aws-cdk-lib/aws-s3';
@@ -62,6 +63,7 @@ const createAppLambdaFunction = (scope, id, envType) => {
       PHOTO_ALBUM_TAGS_TABLE_NAME: process.env.PHOTO_ALBUM_TAGS_TABLE_NAME,
       PHOTO_USER_PERMISSION_TABLE_NAME: process.env.PHOTO_USER_PERMISSION_TABLE_NAME,
       DATA_AGGREGATIONS_TABLE_NAME: process.env.DATA_AGGREGATIONS_TABLE_NAME,
+      TRAVEL_RECORDS_TABLE_NAME: process.env.TRAVEL_RECORDS_TABLE_NAME,
       JWT_SECRET: process.env.JWT_SECRET,
       NODE_OPTIONS: '--experimental-vm-modules',
     },
@@ -79,7 +81,7 @@ const createAggregationsLambdaFunction = (scope, id, envType) => {
       NODE_OPTIONS: '--experimental-vm-modules',
       AWS_REGION_NAME: process.env.AWS_REGION_NAME,
       PHOTO_ALBUMS_TABLE_NAME: process.env.PHOTO_ALBUMS_TABLE_NAME,
-      DATA_AGGREGATIONS_TABLE_NAME: process.env.DATA_AGGREGATIONS_TABLE_NAME
+      DATA_AGGREGATIONS_TABLE_NAME: process.env.DATA_AGGREGATIONS_TABLE_NAME,
     },
   });
 };
@@ -113,7 +115,7 @@ class PhotoAlbumStack extends cdk.Stack {
     // DynamoDB Tables - Reuse if exists, otherwise create
     const albumTable = this.getOrCreateDynamoTable(
       'AlbumTable',
-      process.env.PHOTO_ALBUMS_TABLE_NAME,
+      process.env.PHOTO_ALBUMS_TABLE_NAME || 'photo-albums',
       {
         partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
         sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
@@ -121,24 +123,28 @@ class PhotoAlbumStack extends cdk.Stack {
         removalPolicy: cdk.RemovalPolicy.RETAIN,
         deletionProtection: true,
         pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: true },
+        billingMode: dynamodb.BillingMode.PROVISIONED,
+        ProvisionedThroughput: { ReadCapacityUnits: 4, WriteCapacityUnits: 4 },
       },
       process.env.PHOTO_ALBUMS_STREAM_ARN,
     );
 
     const albumTagTable = this.getOrCreateDynamoTable(
       'AlbumTagTable',
-      process.env.PHOTO_ALBUM_TAGS_TABLE_NAME,
+      process.env.PHOTO_ALBUM_TAGS_TABLE_NAME || 'photo-album-tags',
       {
         partitionKey: { name: 'tag', type: dynamodb.AttributeType.STRING },
         removalPolicy: cdk.RemovalPolicy.RETAIN,
         deletionProtection: true,
         pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: true },
+        billingMode: dynamodb.BillingMode.PROVISIONED,
+        ProvisionedThroughput: { ReadCapacityUnits: 4, WriteCapacityUnits: 1 },
       },
     );
 
     const userPermissionTable = this.getOrCreateDynamoTable(
       'UserPermissionTable',
-      process.env.PHOTO_USER_PERMISSION_TABLE_NAME,
+      process.env.PHOTO_USER_PERMISSION_TABLE_NAME || 'user-permission',
       {
         partitionKey: { name: 'uid', type: dynamodb.AttributeType.STRING },
         sortKey: { name: 'email', type: dynamodb.AttributeType.STRING },
@@ -149,11 +155,35 @@ class PhotoAlbumStack extends cdk.Stack {
 
     const aggregationTable = this.getOrCreateDynamoTable(
       'AggregationTable',
-      process.env.DATA_AGGREGATIONS_TABLE_NAME,
+      process.env.DATA_AGGREGATIONS_TABLE_NAME || 'data-aggregations',
       {
         partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
         removalPolicy: cdk.RemovalPolicy.RETAIN,
         deletionProtection: true,
+        pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: true },
+        billingMode: dynamodb.BillingMode.PROVISIONED,
+        ProvisionedThroughput: { ReadCapacityUnits: 4, WriteCapacityUnits: 1 },
+      },
+    );
+
+    const travelRecordTable = this.getOrCreateDynamoTable(
+      'TravelRecordsTable',
+      process.env.TRAVEL_RECORDS_TABLE_NAME || 'travel-records',
+      {
+        partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
+        removalPolicy: cdk.RemovalPolicy.RETAIN,
+        deletionProtection: true,
+        pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: true },
+        billingMode: dynamodb.BillingMode.PROVISIONED,
+        ProvisionedThroughput: { ReadCapacityUnits: 4, WriteCapacityUnits: 1 },
+        globalSecondaryIndexes: [
+          {
+            indexName: 'gsi1',
+            partitionKey: { name: 'gsi1pk', type: dynamodb.AttributeType.STRING },
+            sortKey: { name: 'gsi1sk', type: dynamodb.AttributeType.STRING },
+            projectionType: dynamodb.ProjectionType.ALL,
+          },
+        ],
       },
     );
 
@@ -170,7 +200,16 @@ class PhotoAlbumStack extends cdk.Stack {
     albumTagTable.grantReadWriteData(appFunction);
     userPermissionTable.grantReadWriteData(appFunction);
     aggregationTable.grantReadWriteData(appFunction);
+    travelRecordTable.grantReadWriteData(appFunction);
     photoBucket.grantReadWrite(appFunction);
+
+    appFunction.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['dynamodb:Query'],
+        resources: [travelRecordTable.tableArn, `${travelRecordTable.tableArn}/index/*`],
+      }),
+    );
 
     albumTable.grantStreamRead(aggregationsFunction);
     aggregationTable.grantReadWriteData(aggregationsFunction);
@@ -245,6 +284,7 @@ class PhotoAlbumStack extends cdk.Stack {
   getOrCreateDynamoTable(id, tableName, tableProps, streamArn = null) {
     if (tableName) {
       try {
+        console.log(`Attempting to retrieve DynamoDB table: ${tableName}`);
         if (streamArn) {
           return dynamodb.Table.fromTableAttributes(this, id, {
             tableName,

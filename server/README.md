@@ -51,11 +51,13 @@ You can see these resources in your AWS Console after running bootstrap:
 Before running cdk bootstrap , you need to ensure:
 
 1. AWS credentials are properly configured with sufficient permissions. Make sure your .env file has:
+
 ```properties
 AWS_ACCESS_KEY_ID=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_key
 AWS_REGION_NAME=your_region
- ```
+CDK_DEFAULT_ACCOUNT=your_account_id
+```
 
 2. Install the required dependencies:
 
@@ -71,7 +73,7 @@ $ bun run cdk:bootstrap
 
 ### Deploy AWS DynamoDB and S3 bucket by AWS CDK
 
-Before you start, you need to create DynamoDB tablas and S3 bucket. This bucket will be for your SPA website hosting, and storing your photos. Replace these properties `AWS_S3_BUCKET_NAME` along with `PHOTO_ALBUMS_TABLE_NAME`, `PHOTO_ALBUM_TAGS_TABLE_NAME`, `PHOTO_USER_PERMISSION_TABLE_NAME` and `DATA_AGGREGATIONS_TABLE_NAME` with the table name you want to use in `.env.example` and modify file name to `.env`. When you run `bun run cdk:deploy`, it will use those environment variables to create S3 bucket and tables, so you don't have to create S3 bucket and tables manually. Once the S3 bucket and tables are created, you can check them in AWS console. You will also need to replace `VITE_IMAGEKIT_CDN_URL` with the CloudFront Domain name URL Serverless Framework created for you.
+Before you start, you need to create DynamoDB tablas and S3 bucket. This bucket will be for your SPA website hosting, and storing your photos. Replace these properties `AWS_S3_BUCKET_NAME` along with `PHOTO_ALBUMS_TABLE_NAME`, `PHOTO_ALBUM_TAGS_TABLE_NAME`, `PHOTO_USER_PERMISSION_TABLE_NAME`, `TRAVEL_RECORDS_TABLE_NAME` and `DATA_AGGREGATIONS_TABLE_NAME` with the table name you want to use in `.env.example` and modify file name to `.env`. When you run `bun run cdk:deploy`, it will use those environment variables to create S3 bucket and tables, so you don't have to create S3 bucket and tables manually. Once the S3 bucket and tables are created, you can check them in AWS console. You will also need to replace `VITE_IMAGEKIT_CDN_URL` with the CloudFront Domain name URL Serverless Framework created for you.
 
 ### AWS Permissions
 
