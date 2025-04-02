@@ -28,9 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import useAlbums from '@/composables/use-albums';
-import useDialog from '@/composables/use-dialog';
-import usePhotos from '@/composables/use-photos';
+import { useAlbums, useDialog, usePhotos } from '@/composables';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { getStaticFileUrl } from '@/utils/helper';
@@ -43,10 +41,7 @@ import {
   IconTrash,
 } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
-import Button from 'primevue/button';
-import Menu from 'primevue/menu';
-import Tag from 'primevue/tag';
-import { useToast } from 'primevue/usetoast';
+import { Button, Menu, Tag, useToast } from 'primevue';
 import { ref, toRefs } from 'vue';
 
 const props = defineProps({

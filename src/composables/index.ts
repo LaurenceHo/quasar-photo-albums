@@ -7,6 +7,7 @@ import useDialog from '@/composables/use-dialog';
 import useFeaturedAlbums from '@/composables/use-featured-albums';
 import useFileList from '@/composables/use-file-list';
 import useFileUploader from '@/composables/use-file-uploader';
+import useLoading from '@/composables/use-loading';
 import usePhotos from '@/composables/use-photos';
 import useUserConfig from '@/composables/use-user-config';
 
@@ -20,6 +21,7 @@ export {
   useFeaturedAlbums,
   useFileList,
   useFileUploader,
+  useLoading,
   usePhotos,
-  useUserConfig
+  useUserConfig,
 };
