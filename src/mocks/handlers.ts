@@ -1,9 +1,25 @@
-import { getAlbumWithLocation, getCountAlbumsByYear, getFeaturedAlbums } from '@/mocks/aggregate-handler';
+import {
+  getAlbumWithLocation,
+  getCountAlbumsByYear,
+  getFeaturedAlbums,
+} from '@/mocks/aggregate-handler';
 import { createAlbum, deleteAlbum, getAlbumsByYear, updateAlbum } from '@/mocks/album-handler';
 import { createAlbumTag, deleteAlbumTag, getAlbumTags } from '@/mocks/album-tag-handler';
 import { getUserPermission, userLogin, userLogout } from '@/mocks/auth-handler';
 import { searchPlaces } from '@/mocks/location-handler';
-import { deletePhotos, getPhotos, movePhotos, renamePhoto, uploadPhotos } from '@/mocks/photos-handler';
+import {
+  deletePhotos,
+  getPhotos,
+  movePhotos,
+  renamePhoto,
+  uploadPhotos,
+} from '@/mocks/photos-handler';
+import {
+  getTravelRecords,
+  deleteTravelRecord,
+  updateTravelRecords,
+  createTravelRecords,
+} from '@/mocks/travel-records-handler';
 import { http, passthrough } from 'msw';
 
 const imageCDNUrl = import.meta.env.VITE_IMAGEKIT_CDN_URL;
@@ -39,5 +55,10 @@ export const handlers = [
   movePhotos,
   deletePhotos,
   uploadPhotos,
-  renamePhoto
+  renamePhoto,
+  /** Travel Record **/
+  getTravelRecords,
+  deleteTravelRecord,
+  updateTravelRecords,
+  createTravelRecords,
 ];

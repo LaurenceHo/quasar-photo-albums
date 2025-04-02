@@ -15,6 +15,7 @@ import { verifyJwtClaim, verifyUserPermission } from './routes/auth-middleware.j
 import authRoute from './routes/auth-route.js';
 import locationRoute from './routes/location-route.js';
 import photoRoute from './routes/photo-route.js';
+import travelRecordRoute from './routes/travel-record-route.js';
 import JsonResponse from './utils/json-response.js';
 
 const ACCEPTED_MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -87,11 +88,12 @@ app
   .decorate('verifyJwtClaim', verifyJwtClaim)
   .decorate('verifyUserPermission', verifyUserPermission);
 
-app.register(authRoute);
+app.register(aggregateRoute);
 app.register(albumRoute);
 app.register(albumTagsRoute);
-app.register(photoRoute);
+app.register(authRoute);
 app.register(locationRoute);
-app.register(aggregateRoute);
+app.register(photoRoute);
+app.register(travelRecordRoute);
 
 export const handler = serverless(app as any);

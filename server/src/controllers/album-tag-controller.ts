@@ -51,6 +51,7 @@ export default class AlbumTagController extends BaseController {
   delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const tag = (request.params as any)['tagId'] as string;
     try {
+      request.log.info('##### Delete tag:', tag);
       const result = await albumTagService.delete({ tag });
 
       if (result) {

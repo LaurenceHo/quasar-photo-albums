@@ -21,5 +21,4 @@ coverage
 *.tsbuildinfo
 .env
 *~
-server/cdkout/*
 cdk.context.json

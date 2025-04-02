@@ -20,7 +20,7 @@ export const AuthService = {
     return response.json();
   },
 
-  userInfo: async (): Promise<ApiResponse<UserPermission>> => {
+  getUserInfo: async (): Promise<ApiResponse<UserPermission>> => {
     const response = await BaseApiRequestService.perform('GET', `${ApiBaseUrl}/auth/userInfo`);
     return response.json();
   },
