@@ -32,7 +32,7 @@ const mapCentreLng = Number(import.meta.env.VITE_MAP_CENTRE_LNG ?? 174.7633);
 const mapCentreLat = Number(import.meta.env.VITE_MAP_CENTRE_LAT ?? -36.8484);
 const { darkMode } = useUserConfig();
 const { isFetching, albumLocationGeoJson } = useAlbumLocations();
-const { isFetching: isTravelRecordsFetching, travelRecords } = useTravelRecords();
+const { isFetching: isTravelRecordsFetching, travelRecordGeoJson } = useTravelRecords();
 const map = ref<Map | null>(null);
 
 type ClusterEvent = (MapMouseEvent | MapTouchEvent) & {
@@ -157,51 +157,32 @@ const initializeMapLayers = (mapInstance: Map) => {
     }
   });
 
-  const coordinates: Position[][] = [];
-  travelRecords.value?.forEach((record) => {
-    coordinates.push(
-      ...interpolateGreatCircle(
-        [record.departure?.longitude ?? 0, record.departure?.latitude ?? 0],
-        [record.destination?.longitude ?? 0, record.destination?.latitude ?? 0],
-        20,
-      ),
+  if (!mapInstance.getSource('travel-route')) {
+    mapInstance.addSource('travel-route', {
+      type: 'geojson',
+      data: travelRecordGeoJson.value,
+    });
+  }
+
+  if (!mapInstance.getLayer('travel-route-layer')) {
+    mapInstance.addLayer(
+      {
+        id: 'travel-route-layer',
+        type: 'line',
+        source: 'travel-route',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': '#FF0000',
+          'line-width': 2,
+          'line-opacity': 0.75,
+        },
+      },
+      'clusters',
     );
-  });
-
-  const travelHistory: GeoJSON.Feature = {
-    type: 'Feature',
-    geometry: {
-      type: 'MultiLineString',
-      coordinates,
-    },
-    properties: {},
-  };
-
-  mapInstance.addSource('travel-route', {
-    type: 'geojson',
-    data: travelHistory,
-  });
-
-  mapInstance.addLayer(
-    {
-      id: 'travel-route-layer',
-      type: 'line',
-      source: 'travel-route',
-      layout: {
-        'line-join': 'round',
-        'line-cap': 'round',
-      },
-      paint: {
-        'line-color': '#FF0000',
-        'line-width': 2,
-        'line-opacity': 0.75,
-      },
-    },
-    'clusters',
-  );
-
-  console.log('Travel route source:', mapInstance.getSource('travel-route'));
-  console.log('Travel route layer:', mapInstance.getLayer('travel-route-layer'));
+  }
 };
 
 onMounted(async () => {
@@ -269,6 +250,19 @@ watch(
     if (!map.value) return;
 
     const source = map.value.getSource('albums') as GeoJSONSource;
+    if (source && newData) {
+      source.setData(newData);
+    }
+  },
+  { deep: true },
+);
+
+watch(
+  travelRecordGeoJson,
+  (newData) => {
+    if (!map.value) return;
+
+    const source = map.value.getSource('travel-route') as GeoJSONSource;
     if (source && newData) {
       source.setData(newData);
     }
