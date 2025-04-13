@@ -3,10 +3,10 @@
     <template #start>
       <router-link class="flex items-center" to="/">
         <img
-          alt="Website logo"
-          class="logo"
           :height="isMediumDevice ? '48' : '36'"
           :width="isMediumDevice ? '48' : '36'"
+          alt="Website logo"
+          class="logo"
           src="/logo.png"
         />
         <h1 class="hidden text-2xl font-bold sm:block">{{ appName }}</h1>
@@ -81,7 +81,7 @@
       </Button>
       <Menu id="overlay_menu" ref="menu" :model="items" :popup="true">
         <template #item="{ item }">
-          <button class="flex items-center p-2">
+          <button class="flex cursor-pointer items-center p-2">
             <component :is="item.icon" :size="24" />
             <span class="ml-2">{{ item.label }}</span>
           </button>
@@ -105,6 +105,7 @@ import {
   IconLibraryPhoto,
   IconLogout,
   IconMap2,
+  IconMapPins,
   IconMoonStars,
   IconSearch,
   IconSun,
@@ -119,7 +120,8 @@ const route = useRoute();
 const routeName = computed(() => route.name);
 
 const { isFetching, userPermission, darkMode, setDarkMode, setEnabled } = useUserConfig();
-const { setUpdateAlbumDialogState, setShowAlbumTagsDialogState } = useDialog();
+const { setUpdateAlbumDialogState, setShowAlbumTagsDialogState, setShowTravelRecordsDialogState } =
+  useDialog();
 const { isMediumDevice } = useDevice();
 const { filterState } = useAlbumFilter();
 
@@ -141,6 +143,12 @@ const items = [
     icon: IconTags as any,
     visible: () => routeName.value === 'albumsByYear',
     command: () => setShowAlbumTagsDialogState(true),
+  },
+  {
+    label: 'Manage Travel Records',
+    icon: IconMapPins as any,
+    visible: () => routeName.value === 'albumMap',
+    command: () => setShowTravelRecordsDialogState(true),
   },
   {
     label: 'Logout',

@@ -11,10 +11,15 @@
       `${isFetching ? 'mt-[72px]' : 'mt-14 md:mt-16'}`,
     ]"
   ></div>
+
+  <CreateTravelRecords v-if="createTravelRecordsDialogState" />
+  <ShowTravelRecords v-if="showTravelRecordsDialogState" />
 </template>
 
 <script lang="ts" setup>
-import { useAlbumLocations, useTravelRecords, useUserConfig } from '@/composables';
+import { CreateTravelRecords, ShowTravelRecords } from '@/components/dialog';
+import { useAlbumLocations, useDialog, useUserConfig } from '@/composables';
+import { useTravelRecordsStore } from '@/stores';
 import type { Feature, Point } from 'geojson';
 import mapboxgl, {
   type GeoJSONSource,
@@ -26,12 +31,17 @@ import mapboxgl, {
 } from 'mapbox-gl';
 import { ProgressBar } from 'primevue';
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 
 const mapCentreLng = Number(import.meta.env.VITE_MAP_CENTRE_LNG ?? 174.7633);
 const mapCentreLat = Number(import.meta.env.VITE_MAP_CENTRE_LAT ?? -36.8484);
 const { darkMode } = useUserConfig();
 const { isFetching, albumLocationGeoJson } = useAlbumLocations();
-const { isFetching: isTravelRecordsFetching, travelRecordGeoJson } = useTravelRecords();
+const { createTravelRecordsDialogState, showTravelRecordsDialogState } = useDialog();
+
+const travelRecordsStore = useTravelRecordsStore();
+const { isFetching: isTravelRecordsFetching, travelRecordGeoJson } =
+  storeToRefs(travelRecordsStore);
 const map = ref<Map | null>(null);
 
 type ClusterEvent = (MapMouseEvent | MapTouchEvent) & {

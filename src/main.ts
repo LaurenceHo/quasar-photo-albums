@@ -3,6 +3,7 @@ import './assets/primevue-override.css';
 import { definePreset } from '@primevue/themes';
 import Aura from '@primevue/themes/aura';
 import { VueQueryPlugin } from '@tanstack/vue-query';
+import { createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
@@ -38,6 +39,7 @@ const prepareApp = async () => {
   });
 };
 
+const pinia = createPinia();
 const app = createApp(App);
 
 const myThemePreset = definePreset(Aura, {
@@ -72,6 +74,7 @@ app.use(PrimeVue, {
 });
 app.use(router);
 app.use(VueQueryPlugin);
+app.use(pinia);
 app.use(ToastService);
 app.directive('tooltip', Tooltip);
 

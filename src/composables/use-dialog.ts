@@ -46,7 +46,7 @@ export default function useDialog() {
   };
 
   const setCreateTravelRecordsDialogState = (state: boolean) => {
-    createAlbumTagDialogState.value = state;
+    createTravelRecordsDialogState.value = state;
   };
 
   const setShowTravelRecordsDialogState = (state: boolean) => {

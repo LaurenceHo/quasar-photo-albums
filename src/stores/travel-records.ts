@@ -1,10 +1,12 @@
+import { defineStore } from 'pinia';
 import { TravelRecordService } from '@/services/travel-record-service';
 import { interpolateGreatCircle } from '@/utils/helper';
 import { useQuery } from '@tanstack/vue-query';
-import type { Position } from 'geojson';
 import { computed } from 'vue';
+import type { Position, Feature, MultiLineString } from 'geojson';
 
-export default function useTravelRecords() {
+export const useTravelRecordsStore = defineStore('travelRecords', () => {
+  // Query for fetching travel records
   const { isFetching, data } = useQuery({
     queryKey: ['getTravelRecords'],
     queryFn: TravelRecordService.getTravelRecords,
@@ -12,37 +14,36 @@ export default function useTravelRecords() {
     refetchOnReconnect: false,
   });
 
-  const travelRecords = computed(() =>
-    data.value?.data?.map((travelRecord) => ({
-      departure: travelRecord.departure?.location,
-      destination: travelRecord.destination?.location,
-    })),
-  );
-
-  const travelRecordGeoJson = computed(() => {
+  // Computed property for GeoJSON
+  const travelRecordGeoJson = computed<Feature<MultiLineString>>(() => {
     const coordinates: Position[][] = [];
-    travelRecords.value?.forEach((record) => {
-      coordinates.push(
-        ...interpolateGreatCircle(
+    data.value?.data
+      ?.map((travelRecord) => ({
+        departure: travelRecord.departure?.location,
+        destination: travelRecord.destination?.location,
+      }))
+      ?.forEach((record) => {
+        const interpolated = interpolateGreatCircle(
           [record.departure?.longitude ?? 0, record.departure?.latitude ?? 0],
           [record.destination?.longitude ?? 0, record.destination?.latitude ?? 0],
           20,
-        ),
-      );
-    });
+        );
+        coordinates.push(...interpolated);
+      });
 
     return {
       type: 'Feature',
       geometry: {
         type: 'MultiLineString',
-        coordinates: coordinates,
+        coordinates,
       },
       properties: {},
-    } as any;
+    };
   });
 
   return {
+    travelRecords: computed(() => data.value?.data ?? []),
     isFetching,
     travelRecordGeoJson,
   };
-}
+});
