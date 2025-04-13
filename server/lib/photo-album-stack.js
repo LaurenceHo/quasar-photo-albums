@@ -105,6 +105,7 @@ class PhotoAlbumStack extends cdk.Stack {
         );
         console.log(`Reusing existing S3 bucket: ${process.env.AWS_S3_BUCKET_NAME}`);
       } catch (e) {
+        console.log('Error: ', e);
         console.log(`S3 bucket ${process.env.AWS_S3_BUCKET_NAME} not found, creating new one...`);
         photoBucket = this.createNewS3Bucket(envType);
       }
@@ -293,6 +294,7 @@ class PhotoAlbumStack extends cdk.Stack {
         }
         return dynamodb.Table.fromTableName(this, id, tableName);
       } catch (e) {
+        console.log('Error: ', e);
         console.log(`DynamoDB table ${tableName} not found, creating new one...`);
         return new dynamodb.Table(this, id, { tableName, ...tableProps });
       }
