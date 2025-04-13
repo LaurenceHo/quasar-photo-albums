@@ -119,7 +119,7 @@ const route = useRoute();
 const routeName = computed(() => route.name);
 
 const { isFetching, userPermission, darkMode, setDarkMode, setEnabled } = useUserConfig();
-const { setUpdateAlbumDialogState, setUpdateAlbumTagsDialogState } = useDialog();
+const { setUpdateAlbumDialogState, setShowAlbumTagsDialogState } = useDialog();
 const { isMediumDevice } = useDevice();
 const { filterState } = useAlbumFilter();
 
@@ -140,7 +140,7 @@ const items = [
     label: 'Manage Album Tags',
     icon: IconTags as any,
     visible: () => routeName.value === 'albumsByYear',
-    command: () => setUpdateAlbumTagsDialogState(true),
+    command: () => setShowAlbumTagsDialogState(true),
   },
   {
     label: 'Logout',

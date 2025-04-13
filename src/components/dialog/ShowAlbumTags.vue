@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="updateAlbumTagsDialogState"
+    v-model:visible="showAlbumTagsDialogState"
     :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
     :closable="false"
     class="w-96"
@@ -44,7 +44,7 @@
       </ul>
     </div>
     <template #footer>
-      <Button label="Close" text @click="setUpdateAlbumTagsDialogState(false)" />
+      <Button label="Close" text @click="setShowAlbumTagsDialogState(false)" />
     </template>
   </Dialog>
 
@@ -103,7 +103,7 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const toast = useToast();
 
-const { updateAlbumTagsDialogState, setUpdateAlbumTagsDialogState, setCreateAlbumTagDialogState } =
+const { showAlbumTagsDialogState, setShowAlbumTagsDialogState, setCreateAlbumTagDialogState } =
   useDialog();
 const { albumTags, fetchAlbumTags } = useAlbumTags();
 const { fetchAlbumsByYear } = useAlbums();

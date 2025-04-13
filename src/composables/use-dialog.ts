@@ -4,16 +4,22 @@ const renamePhotoDialogState = ref(false);
 const movePhotoDialogState = ref(false);
 const deletePhotoDialogState = ref(false);
 const updateAlbumDialogState = ref(false);
+
 const createAlbumTagDialogState = ref(false);
-const updateAlbumTagsDialogState = ref(false);
+const showAlbumTagsDialogState = ref(false);
+
+const createTravelRecordsDialogState = ref(false);
+const showTravelRecordsDialogState = ref(false);
 
 export default function useDialog() {
   const getRenamePhotoDialogState = computed(() => renamePhotoDialogState.value);
   const getMovePhotoDialogState = computed(() => movePhotoDialogState.value);
+
   const getDeletePhotoDialogState = computed(() => deletePhotoDialogState.value);
   const getUpdateAlbumDialogState = computed(() => updateAlbumDialogState.value);
+
   const getCreateAlbumTagDialogState = computed(() => createAlbumTagDialogState.value);
-  const getUpdateAlbumTagsDialogState = computed(() => updateAlbumTagsDialogState.value);
+  const getShowAlbumTagsDialogState = computed(() => showAlbumTagsDialogState.value);
 
   const setRenamePhotoDialogState = (state: boolean) => {
     renamePhotoDialogState.value = state;
@@ -35,8 +41,16 @@ export default function useDialog() {
     createAlbumTagDialogState.value = state;
   };
 
-  const setUpdateAlbumTagsDialogState = (state: boolean) => {
-    updateAlbumTagsDialogState.value = state;
+  const setShowAlbumTagsDialogState = (state: boolean) => {
+    showAlbumTagsDialogState.value = state;
+  };
+
+  const setCreateTravelRecordsDialogState = (state: boolean) => {
+    createAlbumTagDialogState.value = state;
+  };
+
+  const setShowTravelRecordsDialogState = (state: boolean) => {
+    showTravelRecordsDialogState.value = state;
   };
 
   return {
@@ -44,14 +58,22 @@ export default function useDialog() {
     movePhotoDialogState: getMovePhotoDialogState,
     deletePhotoDialogState: getDeletePhotoDialogState,
     updateAlbumDialogState: getUpdateAlbumDialogState,
+
     createAlbumTagDialogState: getCreateAlbumTagDialogState,
-    updateAlbumTagsDialogState: getUpdateAlbumTagsDialogState,
+    showAlbumTagsDialogState: getShowAlbumTagsDialogState,
+
+    createTravelRecordsDialogState,
+    showTravelRecordsDialogState,
 
     setRenamePhotoDialogState,
     setMovePhotoDialogState,
     setDeletePhotoDialogState,
     setUpdateAlbumDialogState,
+
     setCreateAlbumTagDialogState,
-    setUpdateAlbumTagsDialogState
+    setShowAlbumTagsDialogState,
+
+    setCreateTravelRecordsDialogState,
+    setShowTravelRecordsDialogState,
   };
 }
