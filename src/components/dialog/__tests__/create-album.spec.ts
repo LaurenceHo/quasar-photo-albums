@@ -1,18 +1,14 @@
 import router from '@/router';
 import { AlbumService } from '@/services/album-service';
 import { LocationService } from '@/services/location-service';
+import { QueryClient, VueQueryPlugin, type VueQueryPluginOptions } from '@tanstack/vue-query';
 import { flushPromises, mount } from '@vue/test-utils';
 import AutoComplete from 'primevue/autocomplete';
-import Button from 'primevue/button';
 import PrimeVue from 'primevue/config';
-import InputText from 'primevue/inputtext';
-import Select from 'primevue/select';
-import Textarea from 'primevue/textarea';
 import ToggleSwitch from 'primevue/toggleswitch';
 import { useToast } from 'primevue/usetoast';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { computed, ref } from 'vue';
-import { VueQueryPlugin, QueryClient, type VueQueryPluginOptions } from '@tanstack/vue-query';
 import CreateAlbum from '../CreateAlbum.vue';
 
 // Mock services
@@ -35,7 +31,6 @@ vi.mock('@/services/location-service', () => ({
   },
 }));
 
-// Mock composables
 vi.mock('primevue/usetoast', () => ({
   useToast: vi.fn(),
 }));
@@ -106,15 +101,7 @@ describe('CreateAlbum', () => {
               '<div class="p-dialog" v-if="visible"><slot name="header"></slot><slot></slot></div>',
             props: ['visible'],
           },
-          FloatLabel: {
-            template: '<div class="p-float-label"><slot></slot></div>',
-          },
-          Button,
-          InputText,
-          Select,
-          ToggleSwitch,
           AutoComplete,
-          Textarea,
         },
       },
     });

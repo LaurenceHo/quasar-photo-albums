@@ -40,8 +40,8 @@
           >
             <template #option="{ option }">
               <div class="flex flex-col">
-                <span class="font-bold">{{ option.displayName }}</span>
-                <span class="text-sm text-gray-600">{{ option.formattedAddress }}</span>
+                <span class="font-bold">{{ option?.displayName }}</span>
+                <span class="text-sm text-gray-600">{{ option?.formattedAddress }}</span>
               </div>
             </template>
             <template #empty>
@@ -68,8 +68,8 @@
           >
             <template #option="{ option }">
               <div class="flex flex-col">
-                <span class="font-bold">{{ option.displayName }}</span>
-                <span class="text-sm text-gray-600">{{ option.formattedAddress }}</span>
+                <span class="font-bold">{{ option?.displayName }}</span>
+                <span class="text-sm text-gray-600">{{ option?.formattedAddress }}</span>
               </div>
             </template>
             <template #empty>
@@ -81,7 +81,14 @@
         <small v-if="v$.destination.$invalid" class="p-error">Destination is required</small>
       </div>
       <div class="flex justify-end">
-        <Button :disabled="isCreatingRecord" class="mr-2" label="Cancel" text @click="onReset" />
+        <Button
+          :disabled="isCreatingRecord"
+          class="mr-2"
+          data-test-id="cancel-button"
+          label="Cancel"
+          text
+          @click="onReset"
+        />
         <Button :disabled="v$.$invalid" :loading="isCreatingRecord" label="Save" type="submit" />
       </div>
     </form>
@@ -97,7 +104,8 @@ import { useTravelRecordsStore } from '@/stores';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, required } from '@vuelidate/validators';
-import { AutoComplete, Button, DatePicker, Dialog, FloatLabel, useToast } from 'primevue';
+import { AutoComplete, Button, DatePicker, Dialog, FloatLabel } from 'primevue';
+import { useToast } from 'primevue/usetoast';
 import { computed, ref } from 'vue';
 
 const toast = useToast();
