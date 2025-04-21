@@ -1,9 +1,5 @@
 <template>
-  <ProgressBar
-    v-if="isFetching || isTravelRecordsFetching"
-    mode="indeterminate"
-    style="height: 4px"
-  ></ProgressBar>
+  <ProgressBar v-if="isFetching" mode="indeterminate" style="height: 4px"></ProgressBar>
   <div
     id="album-location-map"
     :class="[
@@ -20,6 +16,7 @@
 import { CreateTravelRecords, ShowTravelRecords } from '@/components/dialog';
 import { useAlbumLocations, useDialog, useUserConfig } from '@/composables';
 import { useTravelRecordsStore } from '@/stores';
+import { useIsFetching, useIsMutating } from '@tanstack/vue-query';
 import type { Feature, Point } from 'geojson';
 import mapboxgl, {
   type GeoJSONSource,
@@ -29,24 +26,30 @@ import mapboxgl, {
   type MapTouchEvent,
   type SourceSpecification,
 } from 'mapbox-gl';
-import { ProgressBar } from 'primevue';
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
+import { ProgressBar } from 'primevue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const mapCentreLng = Number(import.meta.env.VITE_MAP_CENTRE_LNG ?? 174.7633);
 const mapCentreLat = Number(import.meta.env.VITE_MAP_CENTRE_LAT ?? -36.8484);
-const { darkMode } = useUserConfig();
-const { isFetching, albumLocationGeoJson } = useAlbumLocations();
-const { createTravelRecordsDialogState, showTravelRecordsDialogState } = useDialog();
 
+const globalIsFetching = useIsFetching();
+const globalIsMutating = useIsMutating();
+const { darkMode } = useUserConfig();
+const { albumLocationGeoJson } = useAlbumLocations();
+const { createTravelRecordsDialogState, showTravelRecordsDialogState } = useDialog();
 const travelRecordsStore = useTravelRecordsStore();
-const { isFetching: isTravelRecordsFetching, travelRecordGeoJson } =
-  storeToRefs(travelRecordsStore);
+
+const { travelRecordGeoJson } = storeToRefs(travelRecordsStore);
 const map = ref<Map | null>(null);
 
 type ClusterEvent = (MapMouseEvent | MapTouchEvent) & {
   features?: mapboxgl.GeoJSONFeature[];
 };
+
+const isFetching = computed(() => {
+  return globalIsFetching.value || globalIsMutating.value;
+});
 
 const inspectCluster = (map: Map, e: ClusterEvent) => {
   const features: Feature[] = map.queryRenderedFeatures(e.point, {

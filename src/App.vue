@@ -95,6 +95,7 @@
   <template v-else>
     <router-view />
   </template>
+  <Toast position="bottom-center" />
 </template>
 <script lang="ts" setup>
 import { useAlbumFilter, useDevice, useDialog, useUserConfig } from '@/composables';
@@ -112,7 +113,16 @@ import {
   IconTags,
   IconUser,
 } from '@tabler/icons-vue';
-import { Button, IconField, InputIcon, InputText, Menu, ProgressSpinner, Toolbar } from 'primevue';
+import {
+  Button,
+  IconField,
+  InputIcon,
+  InputText,
+  Menu,
+  ProgressSpinner,
+  Toast,
+  Toolbar,
+} from 'primevue';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 

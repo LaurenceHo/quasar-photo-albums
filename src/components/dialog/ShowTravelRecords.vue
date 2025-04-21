@@ -3,7 +3,6 @@
     v-model:visible="showTravelRecordsDialogState"
     :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
     :closable="false"
-    class="w-96"
     modal
   >
     <template #header>
@@ -20,87 +19,64 @@
       </div>
     </template>
     <div class="max-h-[50vh] overflow-y-auto">
-      <ul class="m-0 list-none divide-y p-0">
-        <li
-          v-for="(albumTag, i) in albumTags"
-          :key="albumTag.tag"
-          class="flex items-center justify-between py-2"
-        >
-          <span>{{ albumTag.tag }}</span>
-          <Button
-            :data-test-id="`delete-tag-button-${i}`"
-            severity="secondary"
-            text
-            @click="
-              () => {
-                deleteTravelRecord = true;
-                tagName = albumTag.tag;
-              }
-            "
-          >
-            <IconTrash :size="24" />
-          </Button>
-        </li>
-      </ul>
+      <DataTable :value="travelRecords" tableStyle="min-width: 20rem">
+        <Column field="id" header="Id"></Column>
+        <Column field="travelDate" header="Date">
+          <template #body="{ data }">
+            {{ data.travelDate ? new Date(data.travelDate).toLocaleDateString() : '--' }}
+          </template>
+        </Column>
+        <Column field="departure" header="Departure">
+          <template #body="{ data }">
+            {{ data.departure.displayName }}
+          </template>
+        </Column>
+        <Column field="destination" header="Destination">
+          <template #body="{ data }">
+            {{ data.destination.displayName }}
+          </template>
+        </Column>
+        <Column field="manage" header="Manage">
+          <template #body="{ data }">
+            <Button
+              :data-test-id="`delete-record-button-${data.id}`"
+              severity="secondary"
+              text
+              @click="confirmDelete(data.id)"
+            >
+              <IconTrash :size="24" />
+            </Button>
+          </template>
+        </Column>
+      </DataTable>
     </div>
     <template #footer>
       <Button label="Close" text @click="setShowTravelRecordsDialogState(false)" />
     </template>
   </Dialog>
-
-  <Dialog
-    v-model:visible="deleteTravelRecord"
-    :closable="false"
-    class="w-96"
-    data-test-id="delete-tag-dialog"
-    modal
-  >
-    <template #header>
-      <div class="flex">
+  <ConfirmDialog>
+    <template #message="slotProps">
+      <div class="flex items-center">
         <IconAlertCircle :size="40" class="flex-shrink-0 pr-2 text-red-400" />
         <span class="text-xl font-semibold" data-test-id="confirm-delete-album-dialog-title">
-          Do you want to delete tag "{{ tagName }}"?
+          {{ slotProps.message.message }} "{{ selectedRecordId }}"?
         </span>
       </div>
     </template>
-    <template #footer>
-      <Button
-        :disabled="isDeletingTag"
-        label="Cancel"
-        text
-        @click="
-          () => {
-            reset();
-            deleteTravelRecord = false;
-          }
-        "
-      />
-      <Button
-        :loading="isDeletingTag"
-        autofocus
-        data-test-id="confirm-delete-tag-button"
-        label="Confirm"
-        @click="confirmDeleteTag"
-      />
-    </template>
-  </Dialog>
+  </ConfirmDialog>
 </template>
 
 <script lang="ts" setup>
-import useAlbumTags from '@/composables/use-album-tags';
-import useAlbums, { type FilteredAlbumsByYear } from '@/composables/use-albums';
 import useDialog from '@/composables/use-dialog';
-import { AlbumTagService } from '@/services/album-tag-service';
-import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
+import { TravelRecordService } from '@/services/travel-record-service';
+import { useTravelRecordsStore } from '@/stores';
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import { useToast } from 'primevue/usetoast';
-import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { Button, Column, ConfirmDialog, DataTable, Dialog, useConfirm, useToast } from 'primevue';
+import { ref } from 'vue';
 
-const route = useRoute();
+const confirm = useConfirm();
 const toast = useToast();
 
 const {
@@ -108,47 +84,52 @@ const {
   setShowTravelRecordsDialogState,
   setCreateTravelRecordsDialogState,
 } = useDialog();
-const { albumTags, fetchAlbumTags } = useAlbumTags();
-const { fetchAlbumsByYear } = useAlbums();
 
-const deleteTravelRecord = ref(false);
-const tagName = ref('');
+const travelRecordsStore = useTravelRecordsStore();
+const { travelRecords } = storeToRefs(travelRecordsStore);
+const selectedRecordId = ref('');
 
-const paramsYear = computed(() => route.params['year'] as string);
-const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(
-  <string>localStorage.getItem(FILTERED_ALBUMS_BY_YEAR),
-);
+const confirmDelete = (id: string) => {
+  selectedRecordId.value = id;
 
-const {
-  isPending: isDeletingTag,
-  mutate: deleteAlbumTag,
-  reset,
-} = useMutation({
-  mutationFn: async () => await AlbumTagService.deleteAlbumTag(tagName.value),
+  confirm.require({
+    message: 'Do you want to delete record',
+    header: 'Confirmation',
+    rejectProps: {
+      label: 'Cancel',
+      text: true,
+    },
+    acceptProps: {
+      label: 'Confirm',
+    },
+    accept: () => {
+      deleteRecord();
+    },
+    reject: () => {
+      reset();
+    },
+  });
+};
+
+const { mutate: deleteRecord, reset } = useMutation({
+  mutationFn: async () => await TravelRecordService.deleteTravelRecord(selectedRecordId.value),
   onSuccess: async () => {
     toast.add({
       severity: 'success',
       summary: 'Success',
-      detail: `Tag "${tagName.value}" deleted.`,
+      detail: `Record "${selectedRecordId.value}" deleted.`,
       life: 3000,
     });
-    await fetchAlbumTags(true);
-    await fetchAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year, true);
-    deleteTravelRecord.value = false;
-    tagName.value = '';
+    travelRecordsStore.refetchTravelRecords();
+    selectedRecordId.value = '';
   },
   onError: () => {
     toast.add({
       severity: 'error',
       summary: 'Error',
-      detail: 'Error while deleting tag. Please try again later.',
+      detail: 'Error while deleting record. Please try again later.',
       life: 3000,
     });
   },
 });
-
-const confirmDeleteTag = (e: MouseEvent) => {
-  e.preventDefault();
-  deleteAlbumTag();
-};
 </script>

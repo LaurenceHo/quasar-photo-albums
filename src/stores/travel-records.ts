@@ -1,13 +1,17 @@
-import { defineStore } from 'pinia';
 import { TravelRecordService } from '@/services/travel-record-service';
 import { interpolateGreatCircle } from '@/utils/helper';
 import { useQuery } from '@tanstack/vue-query';
+import type { Feature, MultiLineString, Position } from 'geojson';
+import { defineStore } from 'pinia';
 import { computed } from 'vue';
-import type { Position, Feature, MultiLineString } from 'geojson';
 
 export const useTravelRecordsStore = defineStore('travelRecords', () => {
   // Query for fetching travel records
-  const { isFetching, data } = useQuery({
+  const {
+    isFetching,
+    data,
+    refetch: refetchTravelRecords,
+  } = useQuery({
     queryKey: ['getTravelRecords'],
     queryFn: TravelRecordService.getTravelRecords,
     refetchOnWindowFocus: false,
@@ -45,5 +49,6 @@ export const useTravelRecordsStore = defineStore('travelRecords', () => {
     travelRecords: computed(() => data.value?.data ?? []),
     isFetching,
     travelRecordGeoJson,
+    refetchTravelRecords,
   };
 });

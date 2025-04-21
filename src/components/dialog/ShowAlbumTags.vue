@@ -31,12 +31,7 @@
             :data-test-id="`delete-tag-button-${i}`"
             severity="secondary"
             text
-            @click="
-              () => {
-                deleteTagDialog = true;
-                tagName = albumTag.tag;
-              }
-            "
+            @click="confirmDelete(albumTag.tag)"
           >
             <IconTrash :size="24" />
           </Button>
@@ -48,58 +43,30 @@
     </template>
   </Dialog>
 
-  <Dialog
-    v-model:visible="deleteTagDialog"
-    :closable="false"
-    class="w-96"
-    data-test-id="delete-tag-dialog"
-    modal
-  >
-    <template #header>
-      <div class="flex">
+  <ConfirmDialog>
+    <template #message="slotProps">
+      <div class="flex items-center">
         <IconAlertCircle :size="40" class="flex-shrink-0 pr-2 text-red-400" />
         <span class="text-xl font-semibold" data-test-id="confirm-delete-album-dialog-title">
-          Do you want to delete tag "{{ tagName }}"?
+          {{ slotProps.message.message }} "{{ tagName }}"?
         </span>
       </div>
     </template>
-    <template #footer>
-      <Button
-        :disabled="isDeletingTag"
-        label="Cancel"
-        text
-        @click="
-          () => {
-            reset();
-            deleteTagDialog = false;
-          }
-        "
-      />
-      <Button
-        :loading="isDeletingTag"
-        autofocus
-        data-test-id="confirm-delete-tag-button"
-        label="Confirm"
-        @click="confirmDeleteTag"
-      />
-    </template>
-  </Dialog>
+  </ConfirmDialog>
 </template>
 
 <script lang="ts" setup>
-import useAlbumTags from '@/composables/use-album-tags';
-import useAlbums, { type FilteredAlbumsByYear } from '@/composables/use-albums';
-import useDialog from '@/composables/use-dialog';
+import { useAlbumTags, useAlbums, useDialog } from '@/composables';
+import { type FilteredAlbumsByYear } from '@/composables/use-albums';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import { useToast } from 'primevue/usetoast';
+import { Button, ConfirmDialog, Dialog, useConfirm, useToast } from 'primevue';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
+const confirm = useConfirm();
 const route = useRoute();
 const toast = useToast();
 
@@ -108,7 +75,6 @@ const { showAlbumTagsDialogState, setShowAlbumTagsDialogState, setCreateAlbumTag
 const { albumTags, fetchAlbumTags } = useAlbumTags();
 const { fetchAlbumsByYear } = useAlbums();
 
-const deleteTagDialog = ref(false);
 const tagName = ref('');
 
 const paramsYear = computed(() => route.params['year'] as string);
@@ -116,11 +82,28 @@ const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(
   <string>localStorage.getItem(FILTERED_ALBUMS_BY_YEAR),
 );
 
-const {
-  isPending: isDeletingTag,
-  mutate: deleteAlbumTag,
-  reset,
-} = useMutation({
+const confirmDelete = (tag: string) => {
+  tagName.value = tag;
+  confirm.require({
+    message: 'Do you want to delete tag',
+    header: 'Confirmation',
+    rejectProps: {
+      label: 'Cancel',
+      text: true,
+    },
+    acceptProps: {
+      label: 'Confirm',
+    },
+    accept: () => {
+      deleteAlbumTag();
+    },
+    reject: () => {
+      reset();
+    },
+  });
+};
+
+const { mutate: deleteAlbumTag, reset } = useMutation({
   mutationFn: async () => await AlbumTagService.deleteAlbumTag(tagName.value),
   onSuccess: async () => {
     toast.add({
@@ -131,7 +114,6 @@ const {
     });
     await fetchAlbumTags(true);
     await fetchAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year, true);
-    deleteTagDialog.value = false;
     tagName.value = '';
   },
   onError: () => {
@@ -143,9 +125,4 @@ const {
     });
   },
 });
-
-const confirmDeleteTag = (e: MouseEvent) => {
-  e.preventDefault();
-  deleteAlbumTag();
-};
 </script>

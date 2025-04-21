@@ -71,8 +71,6 @@
   <CreateAlbum v-if="updateAlbumDialogState" />
   <CreateAlbumTag v-if="createAlbumTagDialogState" />
   <ShowAlbumTags v-if="showAlbumTagsDialogState" />
-
-  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
@@ -98,7 +96,6 @@ import {
   Paginator,
   ScrollTop,
   Skeleton,
-  Toast,
   ToggleSwitch,
 } from 'primevue';
 import { useToast } from 'primevue/usetoast';
