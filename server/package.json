@@ -54,7 +54,7 @@
     "@vitest/coverage-v8": "^3.1.1",
     "aws-cdk": "^2.1010.0",
     "aws-sdk-client-mock": "^4.1.0",
-    "esbuild": "0.25.1",
+    "esbuild": "0.25.2",
     "eslint": "^9.25.0",
     "eslint-config-prettier": "^10.1.2",
     "form-auto-content": "^3.2.1",

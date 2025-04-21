@@ -70,15 +70,13 @@
 
   <CreateAlbum v-if="updateAlbumDialogState" />
   <CreateAlbumTag v-if="createAlbumTagDialogState" />
-  <UpdateAlbumTags v-if="updateAlbumTagsDialogState" />
-
-  <Toast position="bottom-center" />
+  <ShowAlbumTags v-if="showAlbumTagsDialogState" />
 </template>
 
 <script lang="ts" setup>
 import Album from '@/components/Album.vue';
 import Carousel from '@/components/Carousel.vue';
-import { CreateAlbum, CreateAlbumTag, UpdateAlbumTags } from '@/components/dialog';
+import { CreateAlbum, CreateAlbumTag, ShowAlbumTags } from '@/components/dialog';
 import SelectTags from '@/components/select/SelectTags.vue';
 import SelectYear from '@/components/select/SelectYear.vue';
 import {
@@ -98,7 +96,6 @@ import {
   Paginator,
   ScrollTop,
   Skeleton,
-  Toast,
   ToggleSwitch,
 } from 'primevue';
 import { useToast } from 'primevue/usetoast';
@@ -113,8 +110,7 @@ const { isAdmin } = useUserConfig();
 const { isFetchingAlbums, fetchAlbumsByYear } = useAlbums();
 const { isFetching: isFetchingFeaturedAlbums, data: featuredAlbums } = useFeaturedAlbums();
 const { isXSmallDevice } = useDevice();
-const { updateAlbumTagsDialogState, updateAlbumDialogState, createAlbumTagDialogState } =
-  useDialog();
+const { showAlbumTagsDialogState, updateAlbumDialogState, createAlbumTagDialogState } = useDialog();
 
 // Pagination state
 const pageNumber = ref(1);

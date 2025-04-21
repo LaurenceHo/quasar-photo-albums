@@ -127,9 +127,9 @@
               class="ml-2"
             />
           </div>
-          <small v-if="privateAlbum" class="text-gray-500"
-            >Cannot be featured album if album is private.</small
-          >
+          <small v-if="privateAlbum" class="text-gray-500">
+            Cannot be featured album if album is private.
+          </small>
         </div>
 
         <div class="mb-4">
@@ -141,21 +141,21 @@
               :suggestions="placeSuggestions"
               class="w-full"
               input-class="w-full"
-              input-id="search-location"
+              input-id="album-location"
               option-label="displayName"
               @complete="searchPlace"
             >
-              <template #option="slotProps">
+              <template #option="{ option }">
                 <div class="flex flex-col">
-                  <span class="font-bold">{{ slotProps.option.displayName }}</span>
-                  <span class="text-sm text-gray-600">{{ slotProps.option.formattedAddress }}</span>
+                  <span class="font-bold">{{ option.displayName }}</span>
+                  <span class="text-sm text-gray-600">{{ option.formattedAddress }}</span>
                 </div>
               </template>
               <template #empty>
                 <div class="text-gray-500 italic">No suggestion found</div>
               </template>
             </AutoComplete>
-            <label for="search-location">Search Location</label>
+            <label for="album-location">Album Location</label>
           </FloatLabel>
         </div>
 
@@ -189,9 +189,7 @@
 <script lang="ts" setup>
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SelectTags from '@/components/select/SelectTags.vue';
-import useAlbumTags from '@/composables/use-album-tags';
-import useAlbums from '@/composables/use-albums';
-import useDialog from '@/composables/use-dialog';
+import { useAlbumTags, useAlbums, useDialog } from '@/composables';
 import type { Album, Place } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { AlbumTagService } from '@/services/album-tag-service';
@@ -201,14 +199,16 @@ import { IconPlus } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
-import AutoComplete from 'primevue/autocomplete';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import FloatLabel from 'primevue/floatlabel';
-import InputText from 'primevue/inputtext';
-import Select from 'primevue/select';
-import Textarea from 'primevue/textarea';
-import ToggleSwitch from 'primevue/toggleswitch';
+import {
+  AutoComplete,
+  Button,
+  Dialog,
+  FloatLabel,
+  InputText,
+  Select,
+  Textarea,
+  ToggleSwitch,
+} from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { isEmpty } from 'radash';
 import { computed, ref, watch } from 'vue';
@@ -228,9 +228,9 @@ const albumName = ref('');
 const albumDesc = ref('');
 const privateAlbum = ref(false);
 const featuredAlbum = ref<boolean | undefined>(undefined);
-const selectedAlbumTags = ref([] as string[]);
-const selectedPlace = ref(null as Place | null);
-const placeSuggestions = ref([] as Place[]);
+const selectedAlbumTags = ref<string[]>([]);
+const selectedPlace = ref<Place | null>(null);
+const placeSuggestions = ref<Place[]>([]);
 const isSearching = ref(false);
 
 const storedTagsStringArray = computed(() => albumTags.value.map((tag) => tag.tag));

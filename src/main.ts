@@ -1,13 +1,15 @@
-import 'mapbox-gl/dist/mapbox-gl.css';
-import './assets/primevue-override.css';
 import { definePreset } from '@primevue/themes';
 import Aura from '@primevue/themes/aura';
 import { VueQueryPlugin } from '@tanstack/vue-query';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
+import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 import { createApp } from 'vue';
 import App from './App.vue';
+import './assets/primevue-override.css';
 import router from './router';
 
 declare global {
@@ -38,6 +40,7 @@ const prepareApp = async () => {
   });
 };
 
+const pinia = createPinia();
 const app = createApp(App);
 
 const myThemePreset = definePreset(Aura, {
@@ -72,7 +75,9 @@ app.use(PrimeVue, {
 });
 app.use(router);
 app.use(VueQueryPlugin);
+app.use(pinia);
 app.use(ToastService);
+app.use(ConfirmationService);
 app.directive('tooltip', Tooltip);
 
 if (import.meta.env.MODE === 'MSW') {

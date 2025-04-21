@@ -1,9 +1,5 @@
 <template>
-  <ProgressBar
-    v-if="isFetching || isTravelRecordsFetching"
-    mode="indeterminate"
-    style="height: 4px"
-  ></ProgressBar>
+  <ProgressBar v-if="isFetching" mode="indeterminate" style="height: 4px"></ProgressBar>
   <div
     id="album-location-map"
     :class="[
@@ -11,10 +7,16 @@
       `${isFetching ? 'mt-[72px]' : 'mt-14 md:mt-16'}`,
     ]"
   ></div>
+
+  <CreateTravelRecords v-if="createTravelRecordsDialogState" />
+  <ShowTravelRecords v-if="showTravelRecordsDialogState" />
 </template>
 
 <script lang="ts" setup>
-import { useAlbumLocations, useTravelRecords, useUserConfig } from '@/composables';
+import { CreateTravelRecords, ShowTravelRecords } from '@/components/dialog';
+import { useAlbumLocations, useDialog, useUserConfig } from '@/composables';
+import { useTravelRecordsStore } from '@/stores';
+import { useIsFetching, useIsMutating } from '@tanstack/vue-query';
 import type { Feature, Point } from 'geojson';
 import mapboxgl, {
   type GeoJSONSource,
@@ -24,19 +26,30 @@ import mapboxgl, {
   type MapTouchEvent,
   type SourceSpecification,
 } from 'mapbox-gl';
+import { storeToRefs } from 'pinia';
 import { ProgressBar } from 'primevue';
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const mapCentreLng = Number(import.meta.env.VITE_MAP_CENTRE_LNG ?? 174.7633);
 const mapCentreLat = Number(import.meta.env.VITE_MAP_CENTRE_LAT ?? -36.8484);
+
+const globalIsFetching = useIsFetching();
+const globalIsMutating = useIsMutating();
 const { darkMode } = useUserConfig();
-const { isFetching, albumLocationGeoJson } = useAlbumLocations();
-const { isFetching: isTravelRecordsFetching, travelRecordGeoJson } = useTravelRecords();
+const { albumLocationGeoJson } = useAlbumLocations();
+const { createTravelRecordsDialogState, showTravelRecordsDialogState } = useDialog();
+const travelRecordsStore = useTravelRecordsStore();
+
+const { travelRecordGeoJson } = storeToRefs(travelRecordsStore);
 const map = ref<Map | null>(null);
 
 type ClusterEvent = (MapMouseEvent | MapTouchEvent) & {
   features?: mapboxgl.GeoJSONFeature[];
 };
+
+const isFetching = computed(() => {
+  return globalIsFetching.value || globalIsMutating.value;
+});
 
 const inspectCluster = (map: Map, e: ClusterEvent) => {
   const features: Feature[] = map.queryRenderedFeatures(e.point, {

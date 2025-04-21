@@ -11,7 +11,7 @@ export const TravelRecordService = {
     return response.json();
   },
 
-  createTravelRecords: async (travelRecord: TravelRecord): Promise<ResponseStatus> => {
+  createTravelRecord: async (travelRecord: TravelRecord): Promise<ResponseStatus> => {
     const response = await BaseApiRequestService.perform(
       'POST',
       `${ApiBaseUrl}/travelRecords`,
@@ -23,7 +23,7 @@ export const TravelRecordService = {
     return response.json();
   },
 
-  updateTravelRecords: async (travelRecord: TravelRecord): Promise<ResponseStatus> => {
+  updateTravelRecord: async (travelRecord: TravelRecord): Promise<ResponseStatus> => {
     const response = await BaseApiRequestService.perform(
       'PUT',
       `${ApiBaseUrl}/travelRecords`,
@@ -36,9 +36,10 @@ export const TravelRecordService = {
   },
 
   deleteTravelRecord: async (recordId: string): Promise<ResponseStatus> => {
+    const encodedRecordId = encodeURIComponent(recordId);
     const response = await BaseApiRequestService.perform(
       'DELETE',
-      `${ApiBaseUrl}/travelRecords/${recordId}`,
+      `${ApiBaseUrl}/travelRecords/${encodedRecordId}`,
     );
     if (!response.ok) {
       throw new Error(response.statusText);

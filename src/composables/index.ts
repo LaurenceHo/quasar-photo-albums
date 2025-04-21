@@ -9,7 +9,6 @@ import useFileList from '@/composables/use-file-list';
 import useFileUploader from '@/composables/use-file-uploader';
 import useLoading from '@/composables/use-loading';
 import usePhotos from '@/composables/use-photos';
-import useTravelRecords from '@/composables/use-travel-records';
 import useUserConfig from '@/composables/use-user-config';
 
 export {
@@ -24,6 +23,5 @@ export {
   useFileUploader,
   useLoading,
   usePhotos,
-  useTravelRecords,
   useUserConfig,
 };
