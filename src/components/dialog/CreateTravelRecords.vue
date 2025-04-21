@@ -10,90 +10,188 @@
       <span class="text-xl font-semibold">New travel records</span>
     </template>
     <form @submit.prevent="validateAndSubmit" @reset.prevent="onReset">
+      <div class="mb-4 pb-4">
+        <FloatLabel>
+          <DatePicker
+            v-model="travelDate"
+            :disabled="isCreatingRecord"
+            :invalid="v$.travelDate.$invalid"
+            dateFormat="yy-mm-dd"
+            fluid
+            name="travel-date"
+          />
+          <label for="travel-date">Travel date</label>
+        </FloatLabel>
+        <small v-if="v$.travelDate.$invalid" class="p-error">Travel date is required</small>
+      </div>
+      <div class="mb-4 pb-4">
+        <FloatLabel>
+          <AutoComplete
+            v-model="selectedDeparture"
+            :disabled="isCreatingRecord"
+            :invalid="v$.departure.$invalid"
+            :loading="isSearchingDeparture"
+            :suggestions="placeSuggestions"
+            class="w-full"
+            input-class="w-full"
+            input-id="departure"
+            option-label="displayName"
+            @complete="(e) => searchPlace(e, 'departure')"
+          >
+            <template #option="{ option }">
+              <div class="flex flex-col">
+                <span class="font-bold">{{ option.displayName }}</span>
+                <span class="text-sm text-gray-600">{{ option.formattedAddress }}</span>
+              </div>
+            </template>
+            <template #empty>
+              <div class="text-gray-500 italic">No suggestion found</div>
+            </template>
+          </AutoComplete>
+          <label for="departure">Departure</label>
+        </FloatLabel>
+        <small v-if="v$.departure.$invalid" class="p-error">Departure is required</small>
+      </div>
       <div class="mb-4">
-        <InputText
-          v-model="tagName"
-          :disabled="isCreatingTag"
-          :invalid="v$.tagName.$invalid && v$.tagName.$dirty"
-          class="w-full"
-          data-test-id="input-album-tag"
-          placeholder="Tag"
-          @blur="v$.tagName.$touch()"
-          @input="v$.tagName.$touch()"
-        />
-        <div class="mt-1 flex items-center justify-between">
-          <small v-if="v$.tagName.$error" class="text-red-600">
-            {{ v$.tagName.$errors[0].$message }}
-          </small>
-          <small class="ml-auto text-gray-500">{{ tagName.length }}/20</small>
-        </div>
+        <FloatLabel>
+          <AutoComplete
+            v-model="selectedDestination"
+            :disabled="isCreatingRecord"
+            :invalid="v$.destination.$invalid"
+            :loading="isSearchingDestination"
+            :suggestions="placeSuggestions"
+            class="w-full"
+            input-class="w-full"
+            input-id="destination"
+            option-label="displayName"
+            @complete="(e) => searchPlace(e, 'destination')"
+          >
+            <template #option="{ option }">
+              <div class="flex flex-col">
+                <span class="font-bold">{{ option.displayName }}</span>
+                <span class="text-sm text-gray-600">{{ option.formattedAddress }}</span>
+              </div>
+            </template>
+            <template #empty>
+              <div class="text-gray-500 italic">No suggestion found</div>
+            </template>
+          </AutoComplete>
+          <label for="destination">Destination</label>
+        </FloatLabel>
+        <small v-if="v$.destination.$invalid" class="p-error">Destination is required</small>
       </div>
       <div class="flex justify-end">
-        <Button :disabled="isCreatingTag" class="mr-2" label="Cancel" text @click="onReset" />
-        <Button :disabled="v$.$invalid" :loading="isCreatingTag" label="Save" type="submit" />
+        <Button :disabled="isCreatingRecord" class="mr-2" label="Cancel" text @click="onReset" />
+        <Button :disabled="v$.$invalid" :loading="isCreatingRecord" label="Save" type="submit" />
       </div>
     </form>
   </Dialog>
 </template>
 
 <script lang="ts" setup>
-import useAlbumTags from '@/composables/use-album-tags';
-import useDialog from '@/composables/use-dialog';
-import { AlbumTagService } from '@/services/album-tag-service';
+import { useDialog } from '@/composables';
+import type { Place } from '@/schema';
+import { LocationService } from '@/services/location-service';
+import { TravelRecordService } from '@/services/travel-record-service';
+import { useTravelRecordsStore } from '@/stores';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
-import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
-import { useToast } from 'primevue/usetoast';
+import { helpers, required } from '@vuelidate/validators';
+import { AutoComplete, Button, DatePicker, Dialog, FloatLabel, useToast } from 'primevue';
 import { computed, ref } from 'vue';
 
 const toast = useToast();
 
 const { createTravelRecordsDialogState, setCreateTravelRecordsDialogState } = useDialog();
-const { fetchAlbumTags } = useAlbumTags();
+const { refetchTravelRecords } = useTravelRecordsStore();
 
-const tagName = ref('');
+const travelDate = ref();
+const selectedDeparture = ref<Place | null>(null);
+const selectedDestination = ref<Place | null>(null);
+const placeSuggestions = ref([] as Place[]);
+const isSearchingDeparture = ref(false);
+const isSearchingDestination = ref(false);
+const departure = computed(() => selectedDeparture.value?.displayName || '');
+const destination = computed(() => selectedDestination.value?.displayName || '');
 
 const rules = computed(() => ({
-  tagName: {
+  travelDate: {
     required: helpers.withMessage('This field is required.', required),
-    minLength: helpers.withMessage('Tag must be at least 2 characters long.', minLength(2)),
-    maxLength: helpers.withMessage('Tag cannot exceed 20 characters.', maxLength(20)),
-    alphaNum: helpers.withMessage(
-      'Tag must contain only lowercase letters and numbers.',
-      helpers.regex(/^[a-z0-9]+$/),
-    ),
+  },
+  departure: {
+    required: helpers.withMessage('This field is required.', required),
+  },
+  destination: {
+    required: helpers.withMessage('This field is required.', required),
   },
 }));
 
-const v$ = useVuelidate(rules, { tagName });
+const v$ = useVuelidate(rules, { travelDate, departure, destination });
+
+const searchPlace = async (event: { query: string }, field: 'departure' | 'destination') => {
+  if (event.query) {
+    // Set searching state based on field
+    if (field === 'departure') {
+      isSearchingDeparture.value = true;
+    } else {
+      isSearchingDestination.value = true;
+    }
+    const { data } = await LocationService.searchPlaces(event.query);
+    // Set searching states to false after data is returned
+    isSearchingDeparture.value = false;
+    isSearchingDestination.value = false;
+    placeSuggestions.value = data ?? [];
+  } else {
+    placeSuggestions.value = [];
+    // Reset searching states when query is empty
+    isSearchingDeparture.value = false;
+    isSearchingDestination.value = false;
+  }
+};
 
 const validateAndSubmit = async () => {
   const isFormCorrect = await v$.value.$validate();
   if (isFormCorrect) {
-    createAlbumTag();
+    createRecord();
   }
 };
 
-const { isPending: isCreatingTag, mutate: createAlbumTag } = useMutation({
-  mutationFn: () => AlbumTagService.createAlbumTags([{ tag: tagName.value }]),
+const { isPending: isCreatingRecord, mutate: createRecord } = useMutation({
+  mutationFn: () => {
+    if (!selectedDeparture.value || !selectedDestination.value) {
+      throw new Error('Departure and destination must be selected');
+    }
+
+    const isoDateOnly = travelDate.value.toISOString().split('T')[0];
+    const id =
+      isoDateOnly +
+      '#' +
+      selectedDeparture.value?.displayName?.split(' ')[0] +
+      '#' +
+      selectedDestination.value?.displayName?.split(' ')[0];
+    const travelRecord = {
+      id,
+      travelDate: travelDate.value,
+      departure: selectedDeparture.value,
+      destination: selectedDestination.value,
+    };
+    return TravelRecordService.createTravelRecord(travelRecord);
+  },
   onSuccess: async () => {
     toast.add({
       severity: 'success',
       summary: 'Success',
-      detail: `Tag "${tagName.value}" created.`,
+      detail: `Travel record created.`,
       life: 3000,
     });
-    await fetchAlbumTags(true);
+    refetchTravelRecords();
     onReset();
   },
   onError: () => {
     toast.add({
       severity: 'error',
       summary: 'Error',
-      detail: 'Error while creating tag. Please try again later.',
+      detail: 'Error while creating travel record. Please try again later.',
       life: 3000,
     });
   },
@@ -101,6 +199,8 @@ const { isPending: isCreatingTag, mutate: createAlbumTag } = useMutation({
 
 const onReset = () => {
   setCreateTravelRecordsDialogState(false);
-  tagName.value = '';
+  travelDate.value = '';
+  selectedDeparture.value = null;
+  selectedDestination.value = null;
 };
 </script>

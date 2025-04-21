@@ -37,16 +37,12 @@
 </template>
 
 <script lang="ts" setup>
-import useAlbumTags from '@/composables/use-album-tags';
-import useDialog from '@/composables/use-dialog';
+import { useAlbumTags, useDialog } from '@/composables';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
-import { useToast } from 'primevue/usetoast';
+import { Button, Dialog, InputText, useToast } from 'primevue';
 import { computed, ref } from 'vue';
 
 const toast = useToast();
