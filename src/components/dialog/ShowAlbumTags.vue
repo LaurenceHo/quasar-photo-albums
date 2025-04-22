@@ -56,22 +56,24 @@
 </template>
 
 <script lang="ts" setup>
-import { useAlbumTags, useAlbums, useDialog } from '@/composables';
+import { useAlbumTags, useAlbums } from '@/composables';
 import { type FilteredAlbumsByYear } from '@/composables/use-albums';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
+import { storeToRefs } from 'pinia';
 import { Button, ConfirmDialog, Dialog, useConfirm, useToast } from 'primevue';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { useDialogStore } from '@/stores';
 
 const confirm = useConfirm();
 const route = useRoute();
 const toast = useToast();
-
-const { showAlbumTagsDialogState, setShowAlbumTagsDialogState, setCreateAlbumTagDialogState } =
-  useDialog();
+const dialogStore = useDialogStore();
+const { setShowAlbumTagsDialogState, setCreateAlbumTagDialogState } = dialogStore;
+const { showAlbumTagsDialogState } = storeToRefs(dialogStore);
 const { albumTags, fetchAlbumTags } = useAlbumTags();
 const { fetchAlbumsByYear } = useAlbums();
 

@@ -55,14 +55,12 @@
 
 <script lang="ts" setup>
 import useAlbums, { initialAlbum } from '@/composables/use-albums';
-import useDialog from '@/composables/use-dialog';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
+import { useDialogStore } from '@/stores';
 import { IconAlertCircle, IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import Menu from 'primevue/menu';
+import { Button, Dialog, Menu } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { ref, toRefs } from 'vue';
 import { useRoute } from 'vue-router';
@@ -78,8 +76,9 @@ const props = defineProps({
 const { albumItem } = toRefs(props);
 const route = useRoute();
 const toast = useToast();
+const dialogStore = useDialogStore();
+const { setUpdateAlbumDialogState } = dialogStore;
 const { fetchAlbumsByYear, setAlbumToBeUpdated } = useAlbums();
-const { setUpdateAlbumDialogState } = useDialog();
 
 const deleteAlbumDialog = ref(false);
 const albumName = ref(albumItem.value.albumName);

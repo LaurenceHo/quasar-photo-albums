@@ -141,21 +141,21 @@ import useDevice from '@/composables/use-device';
 import usePhotos from '@/composables/use-photos';
 import useUserConfig from '@/composables/use-user-config';
 import {
-IconCalendarTime,
-IconCamera,
-IconChevronLeft,
-IconChevronRight,
-IconPhoto,
-IconView360Number,
-IconX,
+  IconCalendarTime,
+  IconCamera,
+  IconChevronLeft,
+  IconChevronRight,
+  IconPhoto,
+  IconView360Number,
+  IconX,
 } from '@tabler/icons-vue';
 import type {
-ExifTags,
-FileTags,
-NumberTag,
-RationalTag,
-StringArrayTag,
-ValueTag,
+  ExifTags,
+  FileTags,
+  NumberTag,
+  RationalTag,
+  StringArrayTag,
+  ValueTag,
 } from 'exifreader';
 import ExifReader from 'exifreader';
 import Button from 'primevue/button';
@@ -289,13 +289,13 @@ const isPanoramaPhoto = computed(() => {
 
 /** Compute image display size begin */
 const imageStyles = computed(() => {
-  const styles = {height: '', width: ''};
+  const styles = { height: '', width: '' };
   const aspectRatio = imageOriginalWidth.value / imageOriginalHeight.value;
 
   // Calculate maximum dimensions based on container
   const maxWidth = Math.min(
     imageOriginalWidth.value,
-    imageContainerWidth.value > 1080 ? 1080 : imageContainerWidth.value
+    imageContainerWidth.value > 1080 ? 1080 : imageContainerWidth.value,
   );
   const maxHeight = Math.min(imageOriginalHeight.value, imageContainerHeight.value);
 

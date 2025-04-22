@@ -61,16 +61,19 @@ interface GoogleIdentityServices {
     use_fedcm_for_prompt?: boolean;
     state?: string; // Add state to initialization
   }): void;
-  renderButton(element: HTMLElement | null, options: {
-    theme?: 'outline' | 'filled_blue' | 'filled_black';
-    size?: 'large' | 'medium' | 'small';
-    text?: 'signin_with' | 'signup_with' | 'continue_with' | 'signin';
-    shape?: 'rectangular' | 'pill' | 'circle' | 'square';
-    logo_alignment?: 'left' | 'center';
-    width?: string;
-    locale?: string;
-    state?: string;
-  }): void;
+  renderButton(
+    element: HTMLElement | null,
+    options: {
+      theme?: 'outline' | 'filled_blue' | 'filled_black';
+      size?: 'large' | 'medium' | 'small';
+      text?: 'signin_with' | 'signup_with' | 'continue_with' | 'signin';
+      shape?: 'rectangular' | 'pill' | 'circle' | 'square';
+      logo_alignment?: 'left' | 'center';
+      width?: string;
+      locale?: string;
+      state?: string;
+    },
+  ): void;
   prompt(): void;
 }
 
@@ -94,7 +97,6 @@ const loading = ref(false);
 const { userPermission, setUserPermission } = useUserConfig();
 const csrfState = ref<string>('');
 
-
 onMounted(async () => {
   if (!window.google) {
     await new Promise((resolve) => {
@@ -111,7 +113,10 @@ onMounted(async () => {
 
     try {
       loading.value = true;
-      const { data: userPermission } = await AuthService.login(response.credential, csrfState.value);
+      const { data: userPermission } = await AuthService.login(
+        response.credential,
+        csrfState.value,
+      );
 
       if (!isEmpty(userPermission) && userPermission !== undefined) {
         setUserPermission(userPermission);

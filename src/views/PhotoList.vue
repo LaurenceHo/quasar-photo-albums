@@ -225,12 +225,10 @@ import PhotoDetail from '@/components/PhotoDetail.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SkeletonPhotoList from '@/components/SkeletonPhotoList.vue';
 import UploadPhotos from '@/components/UploadPhotos.vue';
-import useAlbums from '@/composables/use-albums';
-import useDialog from '@/composables/use-dialog';
-import usePhotos from '@/composables/use-photos';
-import useUserConfig from '@/composables/use-user-config';
+import { useAlbums, usePhotos, useUserConfig } from '@/composables';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
+import { useDialogStore } from '@/stores';
 import {
   IconArrowNarrowLeft,
   IconChecks,
@@ -244,6 +242,7 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-vue';
+import { storeToRefs } from 'pinia';
 import Button from 'primevue/button';
 import Popover from 'primevue/popover';
 import ScrollTop from 'primevue/scrolltop';
@@ -258,14 +257,15 @@ import { useRoute, useRouter } from 'vue-router';
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
+const dialogStore = useDialogStore();
 
 const {
-  deletePhotoDialogState,
   setDeletePhotoDialogState,
-  movePhotoDialogState,
+
   setMovePhotoDialogState,
-  renamePhotoDialogState,
-} = useDialog();
+} = dialogStore;
+const { deletePhotoDialogState, movePhotoDialogState, renamePhotoDialogState } =
+  storeToRefs(dialogStore);
 const { isAdmin } = useUserConfig();
 const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } =
   usePhotos();

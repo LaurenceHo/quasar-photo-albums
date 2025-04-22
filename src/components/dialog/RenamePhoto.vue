@@ -53,20 +53,18 @@
 </template>
 
 <script lang="ts" setup>
-import useAlbums from '@/composables/use-albums';
-import useDialog from '@/composables/use-dialog';
-import usePhotos from '@/composables/use-photos';
+import { useAlbums, usePhotos } from '@/composables';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
+import { storeToRefs } from 'pinia';
+import { Button, Dialog, InputText } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { isEmpty } from 'radash';
 import { computed, ref, toRefs, watch } from 'vue';
+import { useDialogStore } from '@/stores';
 
 const props = defineProps({
   albumId: {
@@ -91,9 +89,12 @@ const rules = computed(() => ({
 }));
 
 const toast = useToast();
+const dialogStore = useDialogStore();
 
 const { albumId } = toRefs(props);
-const { renamePhotoDialogState, setRenamePhotoDialogState } = useDialog();
+const { setRenamePhotoDialogState } = dialogStore;
+const { renamePhotoDialogState } = storeToRefs(dialogStore);
+
 const { currentPhotoToBeRenamed, findPhotoIndex } = usePhotos();
 const { fetchAlbumsByYear, isAlbumCover: checkIsAlbumCover, currentAlbum } = useAlbums();
 

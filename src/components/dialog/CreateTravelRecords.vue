@@ -96,21 +96,23 @@
 </template>
 
 <script lang="ts" setup>
-import { useDialog } from '@/composables';
 import type { Place } from '@/schema';
 import { LocationService } from '@/services/location-service';
 import { TravelRecordService } from '@/services/travel-record-service';
-import { useTravelRecordsStore } from '@/stores';
+import { useTravelRecordsStore, useDialogStore } from '@/stores';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, required } from '@vuelidate/validators';
+import { storeToRefs } from 'pinia';
 import { AutoComplete, Button, DatePicker, Dialog, FloatLabel } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { computed, ref } from 'vue';
 
 const toast = useToast();
 
-const { createTravelRecordsDialogState, setCreateTravelRecordsDialogState } = useDialog();
+const dialogStore = useDialogStore();
+const { setCreateTravelRecordsDialogState } = dialogStore;
+const { createTravelRecordsDialogState } = storeToRefs(dialogStore);
 const { refetchTravelRecords } = useTravelRecordsStore();
 
 const travelDate = ref();

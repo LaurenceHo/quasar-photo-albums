@@ -14,8 +14,8 @@
 
 <script lang="ts" setup>
 import { CreateTravelRecords, ShowTravelRecords } from '@/components/dialog';
-import { useAlbumLocations, useDialog, useUserConfig } from '@/composables';
-import { useTravelRecordsStore } from '@/stores';
+import { useAlbumLocations, useUserConfig } from '@/composables';
+import { useTravelRecordsStore, useDialogStore } from '@/stores';
 import { useIsFetching, useIsMutating } from '@tanstack/vue-query';
 import type { Feature, Point } from 'geojson';
 import mapboxgl, {
@@ -37,9 +37,10 @@ const globalIsFetching = useIsFetching();
 const globalIsMutating = useIsMutating();
 const { darkMode } = useUserConfig();
 const { albumLocationGeoJson } = useAlbumLocations();
-const { createTravelRecordsDialogState, showTravelRecordsDialogState } = useDialog();
+const dialogStore = useDialogStore();
 const travelRecordsStore = useTravelRecordsStore();
 
+const { createTravelRecordsDialogState, showTravelRecordsDialogState } = storeToRefs(dialogStore);
 const { travelRecordGeoJson } = storeToRefs(travelRecordsStore);
 const map = ref<Map | null>(null);
 
@@ -188,7 +189,7 @@ const initializeMapLayers = (mapInstance: Map) => {
         },
         paint: {
           'line-color': '#FF0000',
-          'line-width': 2,
+          'line-width': 1,
           'line-opacity': 0.75,
         },
       },

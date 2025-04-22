@@ -20,7 +20,8 @@
     </template>
     <div class="max-h-[50vh] overflow-y-auto">
       <DataTable :value="travelRecords" tableStyle="min-width: 20rem">
-        <Column field="id" header="Id"></Column>
+        <template #empty> No travel records found.</template>
+
         <Column field="travelDate" header="Date">
           <template #body="{ data }">
             {{ data.travelDate ? new Date(data.travelDate).toLocaleDateString() : '--' }}
@@ -67,9 +68,8 @@
 </template>
 
 <script lang="ts" setup>
-import useDialog from '@/composables/use-dialog';
 import { TravelRecordService } from '@/services/travel-record-service';
-import { useTravelRecordsStore } from '@/stores';
+import { useTravelRecordsStore, useDialogStore } from '@/stores';
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
 import { storeToRefs } from 'pinia';
@@ -78,12 +78,9 @@ import { ref } from 'vue';
 
 const confirm = useConfirm();
 const toast = useToast();
-
-const {
-  showTravelRecordsDialogState,
-  setShowTravelRecordsDialogState,
-  setCreateTravelRecordsDialogState,
-} = useDialog();
+const dialogStore = useDialogStore();
+const { setShowTravelRecordsDialogState, setCreateTravelRecordsDialogState } = dialogStore;
+const { showTravelRecordsDialogState } = storeToRefs(dialogStore);
 
 const travelRecordsStore = useTravelRecordsStore();
 const { travelRecords } = storeToRefs(travelRecordsStore);

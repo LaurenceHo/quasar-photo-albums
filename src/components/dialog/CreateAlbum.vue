@@ -168,9 +168,9 @@
         <Button
           :disabled="isCreatingAlbum"
           class="mr-2"
+          data-test-id="cancel-button"
           label="Cancel"
           text
-          data-test-id="cancel-button"
           @click="resetAlbum"
         />
         <Button
@@ -189,16 +189,18 @@
 <script lang="ts" setup>
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SelectTags from '@/components/select/SelectTags.vue';
-import { useAlbumTags, useAlbums, useDialog } from '@/composables';
+import { useAlbums, useAlbumTags } from '@/composables';
 import type { Album, Place } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { LocationService } from '@/services/location-service';
+import { useDialogStore } from '@/stores';
 import { getYearOptions } from '@/utils/helper';
 import { IconPlus } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
+import { storeToRefs } from 'pinia';
 import {
   AutoComplete,
   Button,
@@ -217,8 +219,9 @@ import { useRouter } from 'vue-router';
 const toast = useToast();
 const router = useRouter();
 
-const { updateAlbumDialogState, setUpdateAlbumDialogState, setCreateAlbumTagDialogState } =
-  useDialog();
+const dialogStore = useDialogStore();
+const { setUpdateAlbumDialogState, setCreateAlbumTagDialogState } = dialogStore;
+const { updateAlbumDialogState } = storeToRefs(dialogStore);
 const { albumToBeUpdate, setAlbumToBeUpdated, fetchAlbumsByYear } = useAlbums();
 const { albumTags } = useAlbumTags();
 
