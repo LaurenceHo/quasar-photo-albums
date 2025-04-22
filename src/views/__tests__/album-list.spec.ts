@@ -1,9 +1,9 @@
 import AlbumList from '@/views/AlbumList.vue';
+import { createTestingPinia } from '@pinia/testing';
 import { mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 
-// Mock composables as default functions
 vi.mock('@/composables/use-album-filter', () => ({
   default: vi.fn(() => ({
     filterState: ref({ sortOrder: 'asc', privateOnly: false, selectedTags: [] }),
@@ -52,8 +52,14 @@ describe('AlbumList.vue', () => {
   let wrapper: any;
 
   beforeEach(() => {
+    const pinia = createTestingPinia({
+      createSpy: vi.fn,
+      stubActions: false,
+    });
+
     wrapper = mount(AlbumList, {
       global: {
+        plugins: [pinia],
         stubs: {
           Button: true,
           SelectYear: true,

@@ -214,8 +214,6 @@
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
-
-  <Toast position="bottom-center" />
 </template>
 
 <script lang="ts" setup>
@@ -243,13 +241,7 @@ import {
   IconX,
 } from '@tabler/icons-vue';
 import { storeToRefs } from 'pinia';
-import Button from 'primevue/button';
-import Popover from 'primevue/popover';
-import ScrollTop from 'primevue/scrolltop';
-import SelectButton from 'primevue/selectbutton';
-import Tag from 'primevue/tag';
-import Toast from 'primevue/toast';
-import Toolbar from 'primevue/toolbar';
+import { Button, Popover, ScrollTop, SelectButton, Tag, Toolbar } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -259,11 +251,7 @@ const route = useRoute();
 const router = useRouter();
 const dialogStore = useDialogStore();
 
-const {
-  setDeletePhotoDialogState,
-
-  setMovePhotoDialogState,
-} = dialogStore;
+const { setDeletePhotoDialogState, setMovePhotoDialogState } = dialogStore;
 const { deletePhotoDialogState, movePhotoDialogState, renamePhotoDialogState } =
   storeToRefs(dialogStore);
 const { isAdmin } = useUserConfig();
