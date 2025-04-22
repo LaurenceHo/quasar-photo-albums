@@ -1,15 +1,16 @@
+import CreateAlbum from '@/components/dialog/CreateAlbum.vue';
 import router from '@/router';
 import { AlbumService } from '@/services/album-service';
 import { LocationService } from '@/services/location-service';
+import { useDialogStore } from '@/stores';
 import { QueryClient, VueQueryPlugin, type VueQueryPluginOptions } from '@tanstack/vue-query';
 import { flushPromises, mount } from '@vue/test-utils';
-import AutoComplete from 'primevue/autocomplete';
+import { AutoComplete, ToggleSwitch } from 'primevue';
 import PrimeVue from 'primevue/config';
-import ToggleSwitch from 'primevue/toggleswitch';
 import { useToast } from 'primevue/usetoast';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { computed, ref } from 'vue';
-import CreateAlbum from '../CreateAlbum.vue';
+import { ref } from 'vue';
+import { createTestingPinia } from '@pinia/testing';
 
 // Mock services
 vi.mock('@/services/album-service', () => ({
@@ -33,21 +34,6 @@ vi.mock('@/services/location-service', () => ({
 
 vi.mock('primevue/usetoast', () => ({
   useToast: vi.fn(),
-}));
-
-const dialogState = ref(true);
-const mockSetUpdateAlbumDialogState = vi.fn((state: boolean) => {
-  dialogState.value = state;
-});
-
-// Mock dialog context
-vi.mock('@/composables/use-dialog', () => ({
-  default: () => ({
-    updateAlbumDialogState: computed(() => dialogState.value),
-    setUpdateAlbumDialogState: mockSetUpdateAlbumDialogState,
-    createAlbumTagDialogState: ref(false),
-    setCreateAlbumTagDialogState: vi.fn(),
-  }),
 }));
 
 // Mock albums context
@@ -85,16 +71,21 @@ const queryClient = new QueryClient({
 });
 
 describe('CreateAlbum', () => {
+  let dialogStore: ReturnType<typeof useDialogStore>;
+  const pinia = createTestingPinia({
+    createSpy: vi.fn,
+    stubActions: false,
+  });
+
   const mountComponent = () => {
     // Reset dialog state before each mount
-    dialogState.value = true;
     const options: VueQueryPluginOptions = {
       queryClient,
     };
 
     return mount(CreateAlbum, {
       global: {
-        plugins: [router, PrimeVue, [VueQueryPlugin, options]],
+        plugins: [pinia, router, PrimeVue, [VueQueryPlugin, options]],
         stubs: {
           Dialog: {
             template:
@@ -108,6 +99,9 @@ describe('CreateAlbum', () => {
   };
 
   beforeEach(() => {
+    dialogStore = useDialogStore();
+    dialogStore.setUpdateAlbumDialogState(true);
+
     vi.clearAllMocks();
     queryClient.clear(); // Clear query cache between tests
     (useToast as any).mockReturnValue({
@@ -277,7 +271,6 @@ describe('CreateAlbum', () => {
     const wrapper = mountComponent();
     await wrapper.find('[data-test-id="cancel-button"]').trigger('click');
 
-    expect(mockSetUpdateAlbumDialogState).toHaveBeenCalledWith(false);
-    expect(dialogState.value).toBe(false);
+    expect(dialogStore.updateAlbumDialogState).toBe(false);
   });
 });

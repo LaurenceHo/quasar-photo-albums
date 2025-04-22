@@ -98,8 +98,9 @@
   <Toast position="bottom-center" />
 </template>
 <script lang="ts" setup>
-import { useAlbumFilter, useDevice, useDialog, useUserConfig } from '@/composables';
+import { useAlbumFilter, useDevice, useUserConfig } from '@/composables';
 import { AuthService } from '@/services/auth-service';
+import { useDialogStore } from '@/stores';
 import { DARK_MODE_ENABLED } from '@/utils/local-storage-key';
 import {
   IconFolderPlus,
@@ -130,8 +131,9 @@ const route = useRoute();
 const routeName = computed(() => route.name);
 
 const { isFetching, userPermission, darkMode, setDarkMode, setEnabled } = useUserConfig();
+const dialogStore = useDialogStore();
 const { setUpdateAlbumDialogState, setShowAlbumTagsDialogState, setShowTravelRecordsDialogState } =
-  useDialog();
+  dialogStore;
 const { isMediumDevice } = useDevice();
 const { filterState } = useAlbumFilter();
 

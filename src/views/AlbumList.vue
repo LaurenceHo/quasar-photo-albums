@@ -83,21 +83,15 @@ import {
   useAlbumFilter,
   useAlbums,
   useDevice,
-  useDialog,
   useFeaturedAlbums,
   useUserConfig,
 } from '@/composables';
+import { useDialogStore } from '@/stores';
 import { type FilteredAlbumsByYear } from '@/composables/use-albums';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
 import { IconSortAscendingLetters, IconSortDescendingLetters } from '@tabler/icons-vue';
-import {
-  Button,
-  type PageState,
-  Paginator,
-  ScrollTop,
-  Skeleton,
-  ToggleSwitch,
-} from 'primevue';
+import { storeToRefs } from 'pinia';
+import { Button, type PageState, Paginator, ScrollTop, Skeleton, ToggleSwitch } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -110,7 +104,9 @@ const { isAdmin } = useUserConfig();
 const { isFetchingAlbums, fetchAlbumsByYear } = useAlbums();
 const { isFetching: isFetchingFeaturedAlbums, data: featuredAlbums } = useFeaturedAlbums();
 const { isXSmallDevice } = useDevice();
-const { showAlbumTagsDialogState, updateAlbumDialogState, createAlbumTagDialogState } = useDialog();
+const dialogStore = useDialogStore();
+const { showAlbumTagsDialogState, updateAlbumDialogState, createAlbumTagDialogState } =
+  storeToRefs(dialogStore);
 
 // Pagination state
 const pageNumber = ref(1);

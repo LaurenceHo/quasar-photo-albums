@@ -1,7 +1,6 @@
 import CreateTravelRecordsDialog from '@/components/dialog/CreateTravelRecords.vue';
-import { useDialog } from '@/composables';
 import { LocationService } from '@/services/location-service';
-import { useTravelRecordsStore } from '@/stores';
+import { useTravelRecordsStore, useDialogStore } from '@/stores';
 import { createTestingPinia } from '@pinia/testing';
 import { useMutation, useQuery } from '@tanstack/vue-query';
 import { flushPromises, mount } from '@vue/test-utils';
@@ -48,7 +47,7 @@ vi.mock('@/services/travel-record-service', () => ({
 
 describe('CreateTravelRecordsDialog', () => {
   let wrapper: any;
-  let dialogStore: ReturnType<typeof useDialog>;
+  let dialogStore: ReturnType<typeof useDialogStore>;
   let travelRecordsStore: ReturnType<typeof useTravelRecordsStore>;
 
   beforeEach(() => {
@@ -59,7 +58,7 @@ describe('CreateTravelRecordsDialog', () => {
       stubActions: false,
     });
 
-    dialogStore = useDialog();
+    dialogStore = useDialogStore();
     travelRecordsStore = useTravelRecordsStore();
 
     dialogStore.setCreateTravelRecordsDialogState(true);
@@ -149,7 +148,7 @@ describe('CreateTravelRecordsDialog', () => {
   });
 
   it('resets form and closes dialog on cancel', async () => {
-    expect(dialogStore.createTravelRecordsDialogState.value).toBe(true);
+    expect(dialogStore.createTravelRecordsDialogState).toBe(true);
     wrapper.vm.travelDate = new Date('2023-10-01');
     wrapper.vm.selectedDeparture = { displayName: 'New York', formattedAddress: 'NY, USA' };
     wrapper.vm.selectedDestination = { displayName: 'London', formattedAddress: 'UK' };
@@ -159,7 +158,7 @@ describe('CreateTravelRecordsDialog', () => {
     await wrapper.find('[data-test-id="cancel-button"]').trigger('click');
     await wrapper.vm.$nextTick();
 
-    expect(dialogStore.createTravelRecordsDialogState.value).toBe(false);
+    expect(dialogStore.createTravelRecordsDialogState).toBe(false);
     expect(wrapper.vm.travelDate).toBe('');
     expect(wrapper.vm.selectedDeparture).toBe(null);
     expect(wrapper.vm.selectedDestination).toBe(null);

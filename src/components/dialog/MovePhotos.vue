@@ -77,16 +77,16 @@
 
 <script lang="ts" setup>
 import SelectYear from '@/components/select/SelectYear.vue';
-import useDialog from '@/composables/use-dialog';
 import usePhotos from '@/composables/use-photos';
 import type { Photo } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
+import { useDialogStore } from '@/stores';
 import { IconFileAlert } from '@tabler/icons-vue';
 import { useMutation, useQuery } from '@tanstack/vue-query';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import Select, { type SelectFilterEvent } from 'primevue/select';
+import { storeToRefs } from 'pinia';
+import { Button, Dialog, Select } from 'primevue';
+import { type SelectFilterEvent } from 'primevue/select';
 import { useToast } from 'primevue/usetoast';
 import { computed, ref, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -102,7 +102,9 @@ const { albumId } = toRefs(props);
 
 const route = useRoute();
 const toast = useToast();
-const { movePhotoDialogState, setMovePhotoDialogState } = useDialog();
+const dialogStore = useDialogStore();
+const { setMovePhotoDialogState } = dialogStore;
+const { movePhotoDialogState } = storeToRefs(dialogStore);
 const { selectedPhotos } = usePhotos();
 
 const selectedYear = ref<string>((route.params['year'] as string) || 'na');

@@ -1,25 +1,24 @@
-﻿import { computed, ref } from 'vue';
+import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
 
-const renamePhotoDialogState = ref(false);
-const movePhotoDialogState = ref(false);
-const deletePhotoDialogState = ref(false);
-const updateAlbumDialogState = ref(false);
+export const useDialogStore = defineStore('dialogStore', () => {
+  const renamePhotoDialogState = ref(false);
+  const movePhotoDialogState = ref(false);
+  const deletePhotoDialogState = ref(false);
+  const updateAlbumDialogState = ref(false);
+  const createAlbumTagDialogState = ref(false);
+  const showAlbumTagsDialogState = ref(false);
+  const createTravelRecordsDialogState = ref(false);
+  const showTravelRecordsDialogState = ref(false);
 
-const createAlbumTagDialogState = ref(false);
-const showAlbumTagsDialogState = ref(false);
-
-const createTravelRecordsDialogState = ref(false);
-const showTravelRecordsDialogState = ref(false);
-
-export default function useDialog() {
   const getRenamePhotoDialogState = computed(() => renamePhotoDialogState.value);
   const getMovePhotoDialogState = computed(() => movePhotoDialogState.value);
-
   const getDeletePhotoDialogState = computed(() => deletePhotoDialogState.value);
   const getUpdateAlbumDialogState = computed(() => updateAlbumDialogState.value);
-
   const getCreateAlbumTagDialogState = computed(() => createAlbumTagDialogState.value);
   const getShowAlbumTagsDialogState = computed(() => showAlbumTagsDialogState.value);
+  const getCreateTravelRecordDialogState = computed(() => createTravelRecordsDialogState.value);
+  const getShowTravelRecordDialogState = computed(() => showTravelRecordsDialogState.value);
 
   const setRenamePhotoDialogState = (state: boolean) => {
     renamePhotoDialogState.value = state;
@@ -62,8 +61,8 @@ export default function useDialog() {
     createAlbumTagDialogState: getCreateAlbumTagDialogState,
     showAlbumTagsDialogState: getShowAlbumTagsDialogState,
 
-    createTravelRecordsDialogState,
-    showTravelRecordsDialogState,
+    createTravelRecordsDialogState: getCreateTravelRecordDialogState,
+    showTravelRecordsDialogState: getShowTravelRecordDialogState,
 
     setRenamePhotoDialogState,
     setMovePhotoDialogState,
@@ -76,4 +75,4 @@ export default function useDialog() {
     setCreateTravelRecordsDialogState,
     setShowTravelRecordsDialogState,
   };
-}
+});

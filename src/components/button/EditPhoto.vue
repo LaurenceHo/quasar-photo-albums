@@ -28,9 +28,10 @@
 </template>
 
 <script lang="ts" setup>
-import { useAlbums, useDialog, usePhotos } from '@/composables';
+import { useAlbums, usePhotos } from '@/composables';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
+import { useDialogStore } from '@/stores';
 import { getStaticFileUrl } from '@/utils/helper';
 import {
   IconDotsVertical,
@@ -60,11 +61,12 @@ const { photoKey } = toRefs(props);
 const showPhotoCopiedTag = ref(false);
 
 const toast = useToast();
+const dialogStore = useDialogStore();
 
 const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = usePhotos();
 const { currentAlbum, fetchAlbumsByYear, setCurrentAlbum, isAlbumCover } = useAlbums();
 const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } =
-  useDialog();
+  dialogStore;
 
 const { mutate } = useMutation({
   mutationFn: async () => {

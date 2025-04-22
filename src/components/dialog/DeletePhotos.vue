@@ -35,13 +35,13 @@
 </template>
 
 <script lang="ts" setup>
-import useDialog from '@/composables/use-dialog';
 import usePhotos from '@/composables/use-photos';
 import { PhotoService } from '@/services/photo-service';
+import { useDialogStore } from '@/stores';
 import { IconAlertCircle } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
+import { storeToRefs } from 'pinia';
+import { Button, Dialog } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { computed, toRefs } from 'vue';
 
@@ -55,7 +55,9 @@ const props = defineProps({
 const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 
 const toast = useToast();
-const { deletePhotoDialogState, setDeletePhotoDialogState } = useDialog();
+const dialogStore = useDialogStore();
+const { setDeletePhotoDialogState } = dialogStore;
+const { deletePhotoDialogState } = storeToRefs(dialogStore);
 const { selectedPhotos } = usePhotos();
 const { albumId } = toRefs(props);
 
