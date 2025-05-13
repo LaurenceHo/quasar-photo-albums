@@ -35,11 +35,10 @@ export const compareDbUpdatedTime = async (
   const timeJson = await fetchDbUpdatedTime();
   return {
     isLatest:
-      timeJson === null
-        ? false
-        : type === 'album'
-          ? localDbUpdatedTime === timeJson?.album
-          : localDbUpdatedTime === timeJson?.travel,
+      !!timeJson &&
+      (type === 'album'
+        ? timeJson.album && localDbUpdatedTime === timeJson.album
+        : timeJson.travel && localDbUpdatedTime === timeJson.travel),
     dbUpdatedTime: type === 'album' ? timeJson?.album || '' : timeJson?.travel || '',
   };
 };

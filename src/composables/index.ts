@@ -1,5 +1,4 @@
 import useAlbumFilter from '@/composables/use-album-filter';
-import useAlbumLocations from '@/composables/use-album-locations';
 import useAlbumTags from '@/composables/use-album-tags';
 import useAlbums from '@/composables/use-albums';
 import useDevice from '@/composables/use-device';
@@ -12,7 +11,6 @@ import useUserConfig from '@/composables/use-user-config';
 
 export {
   useAlbumFilter,
-  useAlbumLocations,
   useAlbums,
   useAlbumTags,
   useDevice,

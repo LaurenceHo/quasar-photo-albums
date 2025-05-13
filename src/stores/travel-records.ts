@@ -46,7 +46,8 @@ const _fetchTravelRecordsAndSetToLocalStorage = async (
     const { data: travelRecords, code, message } = await TravelRecordService.getTravelRecords();
 
     if (code !== 200) {
-      throw new Error(message);
+      console.error('Error fetching travel records:', message);
+      return [];
     }
 
     if (travelRecords) {

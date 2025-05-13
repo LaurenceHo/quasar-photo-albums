@@ -1,11 +1,11 @@
-import type { Album, Album as AlbumItem, ApiResponse } from '@/schema';
+import type { Album as AlbumItem, ApiResponse } from '@/schema';
 import { AggregateService } from '@/services/aggregate-service';
 import { compareDbUpdatedTime, fetchDbUpdatedTime } from '@/utils/helper';
 import { ALBUMS_WITH_LOCATION } from '@/utils/local-storage-key';
 import { useQuery } from '@tanstack/vue-query';
 import DOMPurify from 'dompurify';
 import type { Feature, Point } from 'geojson';
-import { get } from 'radash';
+import { defineStore } from 'pinia';
 import { computed } from 'vue';
 
 interface GeoJson {
@@ -18,56 +18,65 @@ interface AlbumsWithLocation {
   albums: AlbumItem[];
 }
 
+const _getStoredAlbumLocations = (): AlbumsWithLocation | null => {
+  try {
+    const stored = localStorage.getItem(ALBUMS_WITH_LOCATION);
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+};
+
+const _storeAlbumLocations = (data: AlbumsWithLocation) => {
+  localStorage.setItem(ALBUMS_WITH_LOCATION, JSON.stringify(data));
+};
+
+const _shouldRefetch = async (): Promise<boolean> => {
+  const stored = _getStoredAlbumLocations();
+  if (!stored) return true;
+  const { isLatest } = await compareDbUpdatedTime(stored.dbUpdatedTime, 'album');
+  return !isLatest;
+};
+
 /** Get albums with location and set to local storage */
-const _fetchAlbumsWithLocationAndSetToLocationStorage = async (dbUpdatedTime?: string | null) => {
-  let time = dbUpdatedTime;
-  if (!time) {
+const _fetchAlbumsWithLocationAndSetToLocationStorage = async () => {
+  try {
+    if (!(await _shouldRefetch())) {
+      const albumLocationsWithDBTime = _getStoredAlbumLocations();
+      return albumLocationsWithDBTime ? albumLocationsWithDBTime.albums : [];
+    }
+
     const timeJson = await fetchDbUpdatedTime();
-    time = timeJson?.album || '';
-  }
+    const {
+      data: albums,
+      code,
+      message,
+    } = (await AggregateService.getAggregateData('albumsWithLocation')) as ApiResponse<AlbumItem[]>;
 
-  const {
-    data: albums,
-    code,
-    message,
-  } = (await AggregateService.getAggregateData('albumsWithLocation')) as ApiResponse<AlbumItem[]>;
+    if (code !== 200) {
+      console.error('Error fetching album locations:', message);
+      return [];
+    }
 
-  if (code !== 200) {
-    throw Error(message);
-  }
+    if (albums) {
+      _storeAlbumLocations({ dbUpdatedTime: timeJson?.album || '', albums } as AlbumsWithLocation);
 
-  if (albums) {
-    localStorage.setItem(
-      ALBUMS_WITH_LOCATION,
-      JSON.stringify({ dbUpdatedTime: time, albums } as AlbumsWithLocation),
-    );
+      return albums;
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Error fetching album locations:', error);
+    throw error;
   }
 };
 
 const cdnURL = import.meta.env.VITE_IMAGEKIT_CDN_URL as string;
 
-export default function useAlbumLocations() {
+export const useAlbumLocationsStore = defineStore('albumLocations', () => {
   const { data, isFetching } = useQuery({
     queryKey: ['albumsWithLocation'],
-    queryFn: async () => {
-      if (!localStorage.getItem(ALBUMS_WITH_LOCATION)) {
-        await _fetchAlbumsWithLocationAndSetToLocationStorage();
-      } else {
-        const compareResult = await compareDbUpdatedTime(
-          JSON.parse(<string>localStorage.getItem(ALBUMS_WITH_LOCATION)).dbUpdatedTime,
-          'album',
-        );
-        if (!compareResult.isLatest) {
-          await _fetchAlbumsWithLocationAndSetToLocationStorage(compareResult.dbUpdatedTime);
-        }
-      }
-
-      return get(
-        JSON.parse(localStorage.getItem(ALBUMS_WITH_LOCATION) || '{}') as AlbumsWithLocation,
-        'albums',
-        [],
-      ) as Album[];
-    },
+    queryFn: _fetchAlbumsWithLocationAndSetToLocationStorage,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
@@ -115,4 +124,4 @@ export default function useAlbumLocations() {
     isFetching,
     albumLocationGeoJson,
   };
-}
+});

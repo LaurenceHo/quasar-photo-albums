@@ -1,4 +1,5 @@
-import { useTravelRecordsStore } from '@/stores/travel-records';
+import { useAlbumLocationsStore } from '@/stores/album-locations';
 import { useDialogStore } from '@/stores/dialog';
+import { useTravelRecordsStore } from '@/stores/travel-records';
 
-export { useTravelRecordsStore, useDialogStore };
+export { useAlbumLocationsStore, useDialogStore, useTravelRecordsStore };
