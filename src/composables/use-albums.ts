@@ -15,7 +15,7 @@ export const initialAlbum: Album = {
 };
 
 export interface FilteredAlbumsByYear {
-  dbUpdatedTime: string | null;
+  dbUpdatedTime: string;
   year: string;
   albums: Album[];
 }
@@ -35,7 +35,11 @@ const _storeAlbums = (data: FilteredAlbumsByYear) => {
 };
 
 const _fetchAlbumsAndSetToLocalStorage = async (year: string, dbUpdatedTime?: string) => {
-  const timestamp = dbUpdatedTime || (await fetchDbUpdatedTime());
+  let time = dbUpdatedTime;
+  if (!time) {
+    const timeJson = await fetchDbUpdatedTime();
+    time = timeJson?.album || '';
+  }
 
   const { data: albums, code, message } = await AlbumService.getAlbumsByYear(year);
   if (code !== 200) {
@@ -44,7 +48,7 @@ const _fetchAlbumsAndSetToLocalStorage = async (year: string, dbUpdatedTime?: st
 
   if (albums) {
     _storeAlbums({
-      dbUpdatedTime: timestamp,
+      dbUpdatedTime: time,
       year,
       albums,
     });
@@ -63,12 +67,10 @@ const _shouldRefetchAlbums = async (year?: string, forceUpdate = false): Promise
 
   // If local storage is not the latest data or request year (query parameter) is different from local storage
   // (user selects year from the dropdown),we should get albums from database
-  const { isLatest } = await compareDbUpdatedTime(stored.dbUpdatedTime);
+  const { isLatest } = await compareDbUpdatedTime(stored.dbUpdatedTime, 'album');
   if (!isLatest) return true;
 
-  if (year !== undefined && year !== stored.year) return true;
-
-  return false;
+  return year !== undefined && year !== stored.year;
 };
 
 const currentAlbum = ref(initialAlbum);

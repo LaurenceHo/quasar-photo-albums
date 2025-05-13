@@ -11,8 +11,11 @@ export const getYearOptions = () => {
   return yearOptions;
 };
 
-export const fetchDbUpdatedTime: () => Promise<string | null> = async () => {
-  let dbUpdatedTimeJSON: { time: string } = { time: '' };
+export const fetchDbUpdatedTime: () => Promise<{
+  album: string;
+  travel: string;
+} | null> = async () => {
+  let dbUpdatedTimeJSON: { album: string; travel: string } = { album: '', travel: '' };
   try {
     const response = await fetch(getStaticFileUrl('updateDatabaseAt.json'));
     dbUpdatedTimeJSON = await response.json();
@@ -21,15 +24,23 @@ export const fetchDbUpdatedTime: () => Promise<string | null> = async () => {
     // Might encounter CORS issue. Do nothing
     return null;
   }
-  return dbUpdatedTimeJSON.time;
+  return dbUpdatedTimeJSON;
 };
 
-export const compareDbUpdatedTime = async (localDbUpdatedTime: string | null) => {
+export const compareDbUpdatedTime = async (
+  localDbUpdatedTime: string | null,
+  type: 'album' | 'travel',
+) => {
   // Get updated time from s3
-  const time = await fetchDbUpdatedTime();
+  const timeJson = await fetchDbUpdatedTime();
   return {
-    isLatest: time === null ? false : localDbUpdatedTime === time,
-    dbUpdatedTime: time,
+    isLatest:
+      timeJson === null
+        ? false
+        : type === 'album'
+          ? localDbUpdatedTime === timeJson?.album
+          : localDbUpdatedTime === timeJson?.travel,
+    dbUpdatedTime: type === 'album' ? timeJson?.album : timeJson?.travel,
   };
 };
 
@@ -71,8 +82,7 @@ export const interpolateGreatCircle = (
   λ2 = λ1 + Δλ;
 
   // Great-circle distance (Haversine)
-  const a =
-    Math.sin((φ2 - φ1) / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+  const a = Math.sin((φ2 - φ1) / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
   const distance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   // Calculate the distance in degrees for scaling the curvature exaggeration

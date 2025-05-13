@@ -5,11 +5,27 @@ import logger from 'pino';
 import { get, isEmpty } from 'radash';
 import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
-import S3Service from '../services/s3-service.js';
+import { S3Service } from '../services/s3-service.js';
 
 const s3BucketName = process.env['AWS_S3_BUCKET_NAME'];
 const albumService = new AlbumService();
 const s3Service = new S3Service();
+
+export const updateDatabaseAt = async (type: 'album' | 'travel') => {
+  const result: { album: string; travel: string } = await s3Service.read({
+    Bucket: s3BucketName,
+    Key: 'updateDatabaseAt.json',
+  });
+
+  await uploadObject(
+    'updateDatabaseAt.json',
+    JSON.stringify({
+      ...result,
+      ...(type === 'album' && { album: new Date().toISOString() }),
+      ...(type === 'travel' && { travel: new Date().toISOString() }),
+    }),
+  );
+};
 
 export const updatePhotoAlbum = async (album: Album, email = 'unknown') => {
   try {
@@ -26,10 +42,7 @@ export const updatePhotoAlbum = async (album: Album, email = 'unknown') => {
 
     if (result) {
       logger().info(`##### Album updated: ${album.id}`);
-      await uploadObject(
-        'updateDatabaseAt.json',
-        JSON.stringify({ time: new Date().toISOString() }),
-      );
+      await updateDatabaseAt('album');
     }
     return result;
   } catch (err) {

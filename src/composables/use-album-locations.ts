@@ -20,12 +20,16 @@ interface AlbumsWithLocation {
 
 /** Get albums with location and set to local storage */
 const _fetchAlbumsWithLocationAndSetToLocationStorage = async (dbUpdatedTime?: string | null) => {
-  const timestamp = dbUpdatedTime || (await fetchDbUpdatedTime());
+  let time = dbUpdatedTime;
+  if (!time) {
+    const timeJson = await fetchDbUpdatedTime();
+    time = timeJson?.album || '';
+  }
 
   const {
     data: albums,
     code,
-    message
+    message,
   } = (await AggregateService.getAggregateData('albumsWithLocation')) as ApiResponse<AlbumItem[]>;
 
   if (code !== 200) {
@@ -35,7 +39,7 @@ const _fetchAlbumsWithLocationAndSetToLocationStorage = async (dbUpdatedTime?: s
   if (albums) {
     localStorage.setItem(
       ALBUMS_WITH_LOCATION,
-      JSON.stringify({ dbUpdatedTime: timestamp, albums } as AlbumsWithLocation)
+      JSON.stringify({ dbUpdatedTime: time, albums } as AlbumsWithLocation),
     );
   }
 };
@@ -50,7 +54,8 @@ export default function useAlbumLocations() {
         await _fetchAlbumsWithLocationAndSetToLocationStorage();
       } else {
         const compareResult = await compareDbUpdatedTime(
-          JSON.parse(<string>localStorage.getItem(ALBUMS_WITH_LOCATION)).dbUpdatedTime
+          JSON.parse(<string>localStorage.getItem(ALBUMS_WITH_LOCATION)).dbUpdatedTime,
+          'album',
         );
         if (!compareResult.isLatest) {
           await _fetchAlbumsWithLocationAndSetToLocationStorage(compareResult.dbUpdatedTime);
@@ -60,11 +65,11 @@ export default function useAlbumLocations() {
       return get(
         JSON.parse(localStorage.getItem(ALBUMS_WITH_LOCATION) || '{}') as AlbumsWithLocation,
         'albums',
-        []
+        [],
       ) as Album[];
     },
     refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    refetchOnReconnect: false,
   });
 
   const albumLocationGeoJson = computed(
@@ -84,7 +89,7 @@ export default function useAlbumLocations() {
               type: 'Feature',
               geometry: {
                 type: 'Point',
-                coordinates: [longitude, latitude]
+                coordinates: [longitude, latitude],
               } as Point,
               properties: {
                 name: album.albumName,
@@ -97,17 +102,17 @@ export default function useAlbumLocations() {
                         : ''
                     }` +
                     `${album.description ? `<p>${album.description}</p>` : ''}` +
-                    `<a href='/album/${album.year}/${album.id}'>View Album</a>`
-                )
-              }
+                    `<a href='/album/${album.year}/${album.id}'>View Album</a>`,
+                ),
+              },
             };
           })
-          .filter(Boolean)
-      }) as GeoJson
+          .filter(Boolean),
+      }) as GeoJson,
   );
 
   return {
     isFetching,
-    albumLocationGeoJson
+    albumLocationGeoJson,
   };
 }

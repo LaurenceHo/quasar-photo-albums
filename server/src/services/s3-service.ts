@@ -4,6 +4,8 @@ import {
   CopyObjectCommandInput,
   DeleteObjectsCommand,
   DeleteObjectsCommandInput,
+  GetObjectCommand,
+  GetObjectCommandInput,
   HeadBucketCommand,
   HeadBucketCommandInput,
   HeadObjectCommand,
@@ -20,7 +22,7 @@ import { get } from 'radash';
 import { BaseService, Photo } from '../types';
 import { configuration } from './config.js';
 
-export default class S3Service implements BaseService<Photo> {
+export class S3Service implements BaseService<Photo> {
   public readonly s3Client = new S3Client(configuration);
   public readonly cdnURL = process.env['VITE_IMAGEKIT_CDN_URL'];
 
@@ -44,6 +46,19 @@ export default class S3Service implements BaseService<Photo> {
     });
 
     return Promise.resolve(photos);
+  }
+
+  async read(params: GetObjectCommandInput): Promise<any> {
+    const response = await this.s3Client.send(new GetObjectCommand(params));
+    if (!response.Body) {
+      throw new Error('No data found in the S3 object');
+    }
+
+    // Convert the response body (ReadableStream) to a string
+    const bodyContents = await response.Body.transformToString();
+
+    // Parse the string as JSON
+    return JSON.parse(bodyContents);
   }
 
   async create(params: PutObjectCommandInput): Promise<boolean> {

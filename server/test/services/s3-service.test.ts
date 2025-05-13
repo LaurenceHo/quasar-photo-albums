@@ -8,7 +8,7 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import S3Service from '../../src/services/s3-service';
+import { S3Service } from '../../src/services/s3-service';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const s3Mock = mockClient(S3Client);

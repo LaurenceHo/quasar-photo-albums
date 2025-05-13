@@ -12,12 +12,16 @@ interface FeaturedAlbums {
 
 /** Get featured albums and set to local storage **/
 const _fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string | null) => {
-  const timestamp = dbUpdatedTime || (await fetchDbUpdatedTime());
+  let time = dbUpdatedTime;
+  if (!time) {
+    const timeJson = await fetchDbUpdatedTime();
+    time = timeJson?.album || '';
+  }
 
   const {
     data: albums,
     code,
-    message
+    message,
   } = (await AggregateService.getAggregateData('featuredAlbums')) as ApiResponse<AlbumItem[]>;
   if (code !== 200) {
     throw Error(message);
@@ -27,9 +31,9 @@ const _fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string |
     localStorage.setItem(
       FEATURED_ALBUMS,
       JSON.stringify({
-        dbUpdatedTime: timestamp,
-        albums
-      } as FeaturedAlbums)
+        dbUpdatedTime: time,
+        albums,
+      } as FeaturedAlbums),
     );
   }
 };
@@ -44,7 +48,7 @@ export default function useFeaturedAlbums() {
       } else {
         try {
           const parsedData = JSON.parse(storedData) as FeaturedAlbums;
-          const compareResult = await compareDbUpdatedTime(parsedData.dbUpdatedTime);
+          const compareResult = await compareDbUpdatedTime(parsedData.dbUpdatedTime, 'album');
           if (!compareResult.isLatest) {
             await _fetchFeaturedAlbumsAndSetToLocalStorage(compareResult.dbUpdatedTime);
           }
@@ -65,7 +69,7 @@ export default function useFeaturedAlbums() {
       }
     },
     refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+    refetchOnReconnect: false,
   });
 
   return { data, isFetching };

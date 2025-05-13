@@ -194,7 +194,7 @@ const { isPending: isCreatingRecord, mutate: createRecord } = useMutation({
       detail: `Travel record created.`,
       life: 3000,
     });
-    refetchTravelRecords();
+    await refetchTravelRecords(true);
     onReset();
   },
   onError: () => {
