@@ -8,9 +8,7 @@ const authMock = vi.hoisted(() => ({
 }));
 
 vi.mock('../../src/controllers/helpers', async () => ({
-  updatePhotoAlbum: () => Promise.resolve(true),
-  emptyS3Folder: () => Promise.resolve(true),
-  uploadObject: () => Promise.resolve(true),
+  updateDatabaseAt: () => Promise.resolve(true),
 }));
 
 vi.mock('../../src/routes/auth-middleware', async () => ({

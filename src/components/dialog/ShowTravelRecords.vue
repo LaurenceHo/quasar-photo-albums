@@ -117,7 +117,7 @@ const { mutate: deleteRecord, reset } = useMutation({
       detail: `Record "${selectedRecordId.value}" deleted.`,
       life: 3000,
     });
-    travelRecordsStore.refetchTravelRecords();
+    await travelRecordsStore.refetchTravelRecords(true);
     selectedRecordId.value = '';
   },
   onError: () => {

@@ -1,4 +1,3 @@
-import { mockClient } from 'aws-sdk-client-mock';
 import {
   CopyObjectCommand,
   DeleteObjectsCommand,
@@ -8,8 +7,9 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import { mockClient } from 'aws-sdk-client-mock';
+import { beforeEach, describe, expect, it } from 'vitest';
 import S3Service from '../../src/services/s3-service';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const s3Mock = mockClient(S3Client);
 

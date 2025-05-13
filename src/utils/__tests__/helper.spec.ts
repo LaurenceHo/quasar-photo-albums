@@ -37,16 +37,14 @@ describe('Helpers', () => {
   describe('fetchDbUpdatedTime', () => {
     it('should return the time from the fetched JSON', async () => {
       vi.stubEnv('VITE_STATIC_FILES_URL', 'https://example.com/static');
-      const mockResponse = { time: '2023-10-01T12:00:00Z' };
+      const mockResponse = { album: '2023-10-01T12:00:00Z' };
       (global.fetch as any).mockResolvedValue({
         json: vi.fn().mockResolvedValue(mockResponse),
       });
 
       const result = await fetchDbUpdatedTime();
-      expect(fetch).toHaveBeenCalledWith(
-        'https://example.com/static/updateDatabaseAt.json',
-      );
-      expect(result).toBe('2023-10-01T12:00:00Z');
+      expect(fetch).toHaveBeenCalledWith('https://example.com/static/updateDatabaseAt.json');
+      expect(result).toHaveProperty('album', '2023-10-01T12:00:00Z');
     });
 
     it('should return null if fetch fails', async () => {
@@ -67,13 +65,13 @@ describe('Helpers', () => {
         'https://example.com/static/updateDatabaseAt.json',
       );
 
-      const mockResponse = { time: '2023-10-01T12:00:00Z' };
+      const mockResponse = { album: '2023-10-01T12:00:00Z' };
       (global.fetch as any).mockResolvedValue({
         json: vi.fn().mockResolvedValue(mockResponse),
       });
 
       const localDbUpdatedTime = '2023-10-01T12:00:00Z';
-      const result = await compareDbUpdatedTime(localDbUpdatedTime);
+      const result = await compareDbUpdatedTime(localDbUpdatedTime, 'album');
       expect(result).toEqual({
         isLatest: true,
         dbUpdatedTime: '2023-10-01T12:00:00Z',
@@ -87,13 +85,13 @@ describe('Helpers', () => {
         'https://example.com/static/updateDatabaseAt.json',
       );
 
-      const mockResponse = { time: '2023-10-01T12:00:00Z' };
+      const mockResponse = { album: '2023-10-01T12:00:00Z' };
       (global.fetch as any).mockResolvedValue({
         json: vi.fn().mockResolvedValue(mockResponse),
       });
 
       const localDbUpdatedTime = '2023-09-01T12:00:00Z';
-      const result = await compareDbUpdatedTime(localDbUpdatedTime);
+      const result = await compareDbUpdatedTime(localDbUpdatedTime, 'album');
       expect(result).toEqual({
         isLatest: false,
         dbUpdatedTime: '2023-10-01T12:00:00Z',
@@ -110,10 +108,10 @@ describe('Helpers', () => {
       (global.fetch as any).mockRejectedValue(new Error('CORS issue'));
 
       const localDbUpdatedTime = '2023-09-01T12:00:00Z';
-      const result = await compareDbUpdatedTime(localDbUpdatedTime);
+      const result = await compareDbUpdatedTime(localDbUpdatedTime, 'album');
       expect(result).toEqual({
         isLatest: false,
-        dbUpdatedTime: null,
+        dbUpdatedTime: '',
       });
 
       vi.spyOn({ getStaticFileUrl }, 'getStaticFileUrl').mockRestore();
@@ -267,7 +265,7 @@ describe('Helpers', () => {
 
       // Check first point of first segment (Tokyo) with tolerance
       expect(result[0][0][0]).toBeCloseTo(139.6917, 5); // Longitude
-      expect(result[0][0][1]).toBeCloseTo(35.6895, 5);  // Latitude
+      expect(result[0][0][1]).toBeCloseTo(35.6895, 5); // Latitude
 
       // Check last point of first segment (at 180° longitude)
       expect(result[0][result[0].length - 1][0]).toBeCloseTo(180, 5);
@@ -277,7 +275,7 @@ describe('Helpers', () => {
 
       // Check last point of second segment (LA) with tolerance
       expect(result[1][result[1].length - 1][0]).toBeCloseTo(-118.2437, 5); // Longitude
-      expect(result[1][result[1].length - 1][1]).toBeCloseTo(34.0522, 5);   // Latitude
+      expect(result[1][result[1].length - 1][1]).toBeCloseTo(34.0522, 5); // Latitude
     });
 
     it('should apply curvature exaggeration correctly', () => {

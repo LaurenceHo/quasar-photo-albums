@@ -3,7 +3,13 @@ import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
 import { RequestWithUser } from '../types';
 import { BaseController } from './base-controller.js';
-import { emptyS3Folder, updatePhotoAlbum, uploadObject, verifyIfIsAdmin } from './helpers.js';
+import {
+  emptyS3Folder,
+  updateDatabaseAt,
+  updatePhotoAlbum,
+  uploadObject,
+  verifyIfIsAdmin,
+} from './helpers.js';
 
 const albumService = new AlbumService();
 
@@ -61,10 +67,7 @@ export default class AlbumController extends BaseController {
       const result = await albumService.create(album);
 
       if (result) {
-        await uploadObject(
-          'updateDatabaseAt.json',
-          JSON.stringify({ time: new Date().toISOString() }),
-        );
+        await updateDatabaseAt('album');
         // Create folder in S3
         await uploadObject(album.id + '/', null);
         return this.ok(reply, 'Album created');
@@ -104,10 +107,7 @@ export default class AlbumController extends BaseController {
         const result = await albumService.delete(requestBody);
 
         if (result) {
-          await uploadObject(
-            'updateDatabaseAt.json',
-            JSON.stringify({ time: new Date().toISOString() }),
-          );
+          await updateDatabaseAt('album');
           return this.ok(reply, 'Album deleted');
         }
         return this.fail(reply, 'Failed to delete photo album');

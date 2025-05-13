@@ -21,9 +21,7 @@ export const initialiseS3Bucket = async () => {
     }
   } catch (err) {
     logger().error(err);
-    throw Error(
-      `Bucket ${s3BucketName} does not exist. Please run 'bun run cdk:deploy' first.`,
-    );
+    throw Error(`Bucket ${s3BucketName} does not exist. Please run 'bun run cdk:deploy' first.`);
   }
 
   const exists = await s3Service.checkIfFileExists({
@@ -47,7 +45,10 @@ export const initialiseS3Bucket = async () => {
       logger().info(`Example photo 2 uploaded to ${s3BucketName} bucket.`);
     });
 
-    await uploadObject('updateDatabaseAt.json', JSON.stringify({ time: new Date().toISOString() }));
+    await uploadObject(
+      'updateDatabaseAt.json',
+      JSON.stringify({ album: new Date().toISOString(), travel: new Date().toISOString() }),
+    );
     logger().info(`Uploaded updateDatabaseAt.json to ${s3BucketName} bucket.`);
   }
 };

@@ -4,7 +4,7 @@ import AlbumService from '../services/album-service.js';
 import AlbumTagService from '../services/album-tag-service.js';
 import { RequestWithUser } from '../types';
 import { BaseController } from './base-controller.js';
-import { uploadObject } from './helpers.js';
+import { updateDatabaseAt } from './helpers.js';
 
 const albumTagService = new AlbumTagService();
 const albumService = new AlbumService();
@@ -34,10 +34,7 @@ export default class AlbumTagController extends BaseController {
       const result = await albumTagService.create(tagsToCreate);
 
       if (result) {
-        await uploadObject(
-          'updateDatabaseAt.json',
-          JSON.stringify({ time: new Date().toISOString() }),
-        );
+        await updateDatabaseAt('album');
         return this.ok(reply, 'Album tag created');
       }
 
@@ -77,10 +74,7 @@ export default class AlbumTagController extends BaseController {
         }
 
         await Promise.all(promises);
-        await uploadObject(
-          'updateDatabaseAt.json',
-          JSON.stringify({ time: new Date().toISOString() }),
-        );
+        await updateDatabaseAt('album');
         return this.ok(reply, 'Album tag deleted');
       }
 

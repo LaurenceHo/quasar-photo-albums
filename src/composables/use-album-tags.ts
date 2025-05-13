@@ -9,7 +9,8 @@ import { computed, ref } from 'vue';
 const _fetchAlbumTagsAndSetToLocalStorage = async (dbUpdatedTime?: string | null) => {
   let time = dbUpdatedTime;
   if (!time) {
-    time = await fetchDbUpdatedTime();
+    const timeJson = await fetchDbUpdatedTime();
+    time = timeJson?.album || '';
   }
 
   const { data: tags, code, message } = await AlbumTagService.getAlbumTags();
@@ -23,8 +24,8 @@ const _fetchAlbumTagsAndSetToLocalStorage = async (dbUpdatedTime?: string | null
       ALBUM_TAGS,
       JSON.stringify({
         dbUpdatedTime: time,
-        tags: sortByKey(tags, 'tag', 'asc')
-      } as AlbumTags)
+        tags: sortByKey(tags, 'tag', 'asc'),
+      } as AlbumTags),
     );
   }
 };
@@ -41,7 +42,12 @@ export default function useAlbumTags() {
         await _fetchAlbumTagsAndSetToLocalStorage();
       } else {
         const compareResult = await compareDbUpdatedTime(
-          get(JSON.parse(localStorage.getItem(ALBUM_TAGS) || '{}') as AlbumTags, 'dbUpdatedTime', null)
+          get(
+            JSON.parse(localStorage.getItem(ALBUM_TAGS) || '{}') as AlbumTags,
+            'dbUpdatedTime',
+            null,
+          ),
+          'album',
         );
         if (forceUpdate || !compareResult.isLatest) {
           await _fetchAlbumTagsAndSetToLocalStorage(compareResult.dbUpdatedTime);
@@ -52,7 +58,7 @@ export default function useAlbumTags() {
       albumTags.value = get(
         JSON.parse(localStorage.getItem(ALBUM_TAGS) || '{}') as AlbumTags,
         'tags',
-        []
+        [],
       ) as AlbumTag[];
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
@@ -67,6 +73,6 @@ export default function useAlbumTags() {
   return {
     fetchAlbumTags,
     albumTags: getAlbumTags,
-    isFetchingAlbumTags
+    isFetchingAlbumTags,
   };
 }
