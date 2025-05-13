@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import logger from 'pino';
 import { uploadObject } from '../controllers/helpers.js';
 import { configuration } from './config.js';
-import { S3Service } from './s3-service.js';
+import S3Service from './s3-service.js';
 
 const s3Client = new S3Client(configuration);
 const s3BucketName = process.env['AWS_S3_BUCKET_NAME'];

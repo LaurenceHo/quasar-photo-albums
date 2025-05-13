@@ -11,18 +11,19 @@ export default mergeConfig(
         provider: 'v8',
         reportsDirectory: 'coverage',
         exclude: [
+          '**/node_modules/**',
           '**/**.js',
           '**/**.d.ts',
           '*.config.*',
           '**/**/__tests__/**',
           'src/mocks/**',
           'server/**',
-          'src/schema/**'
-        ]
+          'src/schema/**',
+        ],
       },
       environment: 'jsdom',
       exclude: [...configDefaults.exclude, 'e2e/**', 'server/**'],
-      root: fileURLToPath(new URL('./', import.meta.url))
-    }
-  })
+      root: fileURLToPath(new URL('./', import.meta.url)),
+    },
+  }),
 );

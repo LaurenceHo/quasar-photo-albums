@@ -24,6 +24,7 @@ vi.mock('../../src/routes/auth-middleware', async () => ({
 }));
 
 vi.mock('../../src/controllers/helpers', async () => ({
+  updateDatabaseAt: () => Promise.resolve(true),
   updatePhotoAlbum: () => Promise.resolve(true),
   emptyS3Folder: () => Promise.resolve(true),
   uploadObject: () => Promise.resolve(true),

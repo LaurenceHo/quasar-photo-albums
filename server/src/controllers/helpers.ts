@@ -5,7 +5,7 @@ import logger from 'pino';
 import { get, isEmpty } from 'radash';
 import { Album } from '../schemas/album.js';
 import AlbumService from '../services/album-service.js';
-import { S3Service } from '../services/s3-service.js';
+import S3Service from '../services/s3-service.js';
 
 const s3BucketName = process.env['AWS_S3_BUCKET_NAME'];
 const albumService = new AlbumService();

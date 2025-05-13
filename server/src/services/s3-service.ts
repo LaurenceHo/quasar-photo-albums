@@ -22,7 +22,7 @@ import { get } from 'radash';
 import { BaseService, Photo } from '../types';
 import { configuration } from './config.js';
 
-export class S3Service implements BaseService<Photo> {
+export default class S3Service implements BaseService<Photo> {
   public readonly s3Client = new S3Client(configuration);
   public readonly cdnURL = process.env['VITE_IMAGEKIT_CDN_URL'];
 

@@ -40,7 +40,7 @@ export const compareDbUpdatedTime = async (
         : type === 'album'
           ? localDbUpdatedTime === timeJson?.album
           : localDbUpdatedTime === timeJson?.travel,
-    dbUpdatedTime: type === 'album' ? timeJson?.album : timeJson?.travel,
+    dbUpdatedTime: type === 'album' ? timeJson?.album || '' : timeJson?.travel || '',
   };
 };
 

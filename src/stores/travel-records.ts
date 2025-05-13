@@ -13,8 +13,12 @@ export interface TravelRecords {
 }
 
 const _getStoredTravelRecords = (): TravelRecords | null => {
-  const stored = localStorage.getItem(TRAVEL_RECORDS);
-  return stored ? JSON.parse(stored) : null;
+  try {
+    const stored = localStorage.getItem(TRAVEL_RECORDS);
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
 };
 
 const _storeTravelRecords = (data: TravelRecords) => {
