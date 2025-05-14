@@ -3,6 +3,7 @@ import { TravelRecord } from '../schemas/travel-record.js';
 import TravelRecordService from '../services/travel-record-service.js';
 import { RequestWithUser } from '../types';
 import { BaseController } from './base-controller.js';
+import { updateDatabaseAt } from './helpers';
 
 const travelRecordService = new TravelRecordService();
 
@@ -34,6 +35,8 @@ export default class TravelRecordController extends BaseController {
       const result = await travelRecordService.create(travelRecord);
 
       if (result) {
+        await updateDatabaseAt('travel');
+
         return this.ok(reply, 'Travel record created');
       }
       return this.fail(reply, 'Failed to create travel record');
@@ -58,6 +61,8 @@ export default class TravelRecordController extends BaseController {
       const result = await travelRecordService.update({ id: travelRecord.id }, clonedRecord);
 
       if (result) {
+        await updateDatabaseAt('travel');
+
         return this.ok(reply, 'Travel record updated');
       }
       return this.fail(reply, 'Failed to update travel record');
@@ -75,6 +80,8 @@ export default class TravelRecordController extends BaseController {
       const result = await travelRecordService.delete({ id: record });
 
       if (result) {
+        await updateDatabaseAt('travel');
+
         return this.ok(reply, 'Travel record deleted');
       }
     } catch (err: any) {
