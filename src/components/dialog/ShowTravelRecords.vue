@@ -47,7 +47,7 @@
         </Column>
         <Column field="transportType" header="Transport Type" :sortable="true">
           <template #body="{ data }">
-            {{ data.transportType }}
+            {{ data.transportType ? data.transportType : 'flight' }}
           </template>
         </Column>
         <Column field="manage" header="Manage">
