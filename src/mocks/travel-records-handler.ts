@@ -84,6 +84,7 @@ export const mockRecords = [
       },
     },
     id: 'Taipei#ChiangMai',
+    transportType: 'flight',
   },
   // Route 5: Taipei to Doha
   {
@@ -105,6 +106,7 @@ export const mockRecords = [
       },
     },
     id: 'Taipei#Doha',
+    transportType: 'flight',
   },
   // Route 6: Auckland to Sydney
   {
@@ -126,6 +128,7 @@ export const mockRecords = [
       },
     },
     id: 'Auckland#Sydney',
+    transportType: 'flight',
   },
   // Route 7: Auckland to Melbourne
   {
@@ -147,6 +150,7 @@ export const mockRecords = [
       },
     },
     id: 'Auckland#Melbourne',
+    transportType: 'flight',
   },
   // Route 8: Doha to Milan
   {
@@ -168,6 +172,7 @@ export const mockRecords = [
       },
     },
     id: 'Doha#Milan',
+    transportType: 'flight',
   },
   // Route 9: LA to Atlanta
   {
@@ -189,6 +194,7 @@ export const mockRecords = [
       },
     },
     id: 'LA#Atlanta',
+    transportType: 'flight',
   },
   // Route 10: Atlanta to Lima
   {
@@ -210,6 +216,28 @@ export const mockRecords = [
       },
     },
     id: 'Atlanta#Lima',
+    transportType: 'flight',
+  },
+  {
+    travelDate: '2025-04-12T02:39:56.439Z',
+    departure: {
+      formattedAddress: 'Milan, Italy',
+      displayName: 'Milan',
+      location: {
+        latitude: 45.4642,
+        longitude: 9.1899,
+      },
+    },
+    destination: {
+      formattedAddress: 'Vienna, Austria',
+      displayName: 'Vienna',
+      location: {
+        latitude: 48.2081743,
+        longitude: 16.3738189,
+      },
+    },
+    id: 'Milan#Vienna',
+    transportType: 'train',
   },
 ];
 

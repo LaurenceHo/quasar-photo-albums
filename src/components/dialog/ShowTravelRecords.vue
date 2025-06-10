@@ -19,22 +19,35 @@
       </div>
     </template>
     <div class="max-h-[50vh] overflow-y-auto">
-      <DataTable :value="travelRecords" tableStyle="min-width: 20rem">
+      <DataTable
+        :value="travelRecords"
+        tableStyle="min-width: 20rem"
+        paginator
+        :rows="10"
+        :rowsPerPageOptions="[10, 20, 50]"
+        sortField="travelDate"
+        :sortOrder="-1"
+      >
         <template #empty> No travel records found.</template>
 
-        <Column field="travelDate" header="Date">
+        <Column field="travelDate" header="Date" :sortable="true">
           <template #body="{ data }">
             {{ data.travelDate ? new Date(data.travelDate).toLocaleDateString() : '--' }}
           </template>
         </Column>
-        <Column field="departure" header="Departure">
+        <Column field="departure" header="Departure" :sortable="true">
           <template #body="{ data }">
             {{ data.departure.displayName }}
           </template>
         </Column>
-        <Column field="destination" header="Destination">
+        <Column field="destination" header="Destination" :sortable="true">
           <template #body="{ data }">
             {{ data.destination.displayName }}
+          </template>
+        </Column>
+        <Column field="transportType" header="Transport Type" :sortable="true">
+          <template #body="{ data }">
+            {{ data.transportType }}
           </template>
         </Column>
         <Column field="manage" header="Manage">

@@ -80,6 +80,14 @@
         </FloatLabel>
         <small v-if="v$.destination.$invalid" class="p-error">Destination is required</small>
       </div>
+      <div class="mb-4">
+        <Select
+          v-model="selectedTransportType"
+          :options="transportTypes"
+          class="w-full"
+          optionLabel="name"
+        />
+      </div>
       <div class="flex justify-end">
         <Button
           :disabled="isCreatingRecord"
@@ -97,17 +105,26 @@
 
 <script lang="ts" setup>
 import type { Place } from '@/schema';
+import { TravelRecordSchema } from '@/schema/travel-record';
 import { LocationService } from '@/services/location-service';
 import { TravelRecordService } from '@/services/travel-record-service';
-import { useTravelRecordsStore, useDialogStore } from '@/stores';
+import { useDialogStore, useTravelRecordsStore } from '@/stores';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, required } from '@vuelidate/validators';
 import { storeToRefs } from 'pinia';
-import { AutoComplete, Button, DatePicker, Dialog, FloatLabel } from 'primevue';
+import { AutoComplete, Button, DatePicker, Dialog, FloatLabel, Select } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { computed, ref } from 'vue';
 
+const transportTypes = [
+  { name: 'Flight', code: 'flight' },
+  { name: 'Train', code: 'train' },
+  {
+    name: 'Bus',
+    code: 'bus',
+  },
+];
 const toast = useToast();
 
 const dialogStore = useDialogStore();
@@ -121,6 +138,8 @@ const selectedDestination = ref<Place | null>(null);
 const placeSuggestions = ref([] as Place[]);
 const isSearchingDeparture = ref(false);
 const isSearchingDestination = ref(false);
+const selectedTransportType = ref({ name: 'Flight', code: 'flight' });
+
 const departure = computed(() => selectedDeparture.value?.displayName || '');
 const destination = computed(() => selectedDestination.value?.displayName || '');
 
@@ -179,11 +198,17 @@ const { isPending: isCreatingRecord, mutate: createRecord } = useMutation({
       selectedDeparture.value?.displayName?.split(' ')[0] +
       '#' +
       selectedDestination.value?.displayName?.split(' ')[0];
+
+    const transportType = TravelRecordSchema.shape.transportType.parse(
+      selectedTransportType.value?.code,
+    );
+
     const travelRecord = {
       id,
       travelDate: travelDate.value,
       departure: selectedDeparture.value,
       destination: selectedDestination.value,
+      transportType,
     };
     return TravelRecordService.createTravelRecord(travelRecord);
   },

@@ -5,7 +5,7 @@ import type { TravelRecord } from '@/schema';
 import { TravelRecordService } from '@/services/travel-record-service';
 import { compareDbUpdatedTime, fetchDbUpdatedTime, interpolateGreatCircle } from '@/utils/helper';
 import { TRAVEL_RECORDS } from '@/utils/local-storage-key';
-import type { Feature, MultiLineString, Position } from 'geojson';
+import type { Feature, FeatureCollection, LineString } from 'geojson';
 
 export interface TravelRecords {
   dbUpdatedTime: string;
@@ -96,29 +96,45 @@ export const useTravelRecordsStore = defineStore('travelRecords', () => {
     return refetchQuery();
   };
 
-  const travelRecordGeoJson = computed<Feature<MultiLineString>>(() => {
-    const coordinates: Position[][] = [];
-    data.value
-      ?.map((travelRecord) => ({
-        departure: travelRecord.departure?.location,
-        destination: travelRecord.destination?.location,
-      }))
-      ?.forEach((record) => {
-        const interpolated = interpolateGreatCircle(
-          [record.departure?.longitude ?? 0, record.departure?.latitude ?? 0],
-          [record.destination?.longitude ?? 0, record.destination?.latitude ?? 0],
+  const travelRecordGeoJson = computed<FeatureCollection<LineString>>(() => {
+    const features: Feature<LineString>[] = (data.value ?? []).reduce(
+      (acc: Feature<LineString>[], record) => {
+        // Validate coordinates
+        if (
+          record.departure?.location?.latitude == null ||
+          record.departure?.location?.longitude == null ||
+          record.destination?.location?.latitude == null ||
+          record.destination?.location?.longitude == null
+        ) {
+          console.warn(`Skipping travel record with ID ${record.id} due to missing coordinates`);
+          return acc;
+        }
+
+        const coordinates = interpolateGreatCircle(
+          [record.departure!.location!.longitude, record.departure!.location!.latitude],
+          [record.destination!.location!.longitude, record.destination!.location!.latitude],
           20,
-        );
-        coordinates.push(...interpolated);
-      });
+        )[0]; // Take the first array since interpolateGreatCircle returns an array of arrays
+
+        acc.push({
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates,
+          },
+          properties: {
+            transportType: record.transportType || 'flight', // Use record.transportType, fallback to 'flight'
+          },
+        });
+
+        return acc;
+      },
+      [],
+    );
 
     return {
-      type: 'Feature',
-      geometry: {
-        type: 'MultiLineString',
-        coordinates,
-      },
-      properties: {},
+      type: 'FeatureCollection',
+      features,
     };
   });
 
