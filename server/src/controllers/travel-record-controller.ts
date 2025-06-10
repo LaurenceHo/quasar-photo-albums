@@ -17,7 +17,7 @@ export default class TravelRecordController extends BaseController {
           key: { gsi1pk: 'travelrecords' },
           order: 'asc',
         },
-        ['id', 'travelDate', 'departure', 'destination'],
+        ['id', 'travelDate', 'departure', 'destination', 'transportType'],
       );
       return this.ok<TravelRecord[]>(reply, 'ok', travelRecords);
     } catch (err: any) {

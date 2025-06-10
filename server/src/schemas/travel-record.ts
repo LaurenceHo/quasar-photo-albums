@@ -31,6 +31,11 @@ export const TravelRecordEntity = new Entity(
       destination: {
         type: CustomAttributeType<PlaceAttributes>('any'),
       },
+      transportType: {
+        type: ['flight', 'bus', 'train'] as const,
+        required: true,
+        default: 'flight',
+      },
       createdAt: {
         type: 'string',
         required: true,

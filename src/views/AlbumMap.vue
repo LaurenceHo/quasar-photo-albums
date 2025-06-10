@@ -190,8 +190,18 @@ const initializeMapLayers = (mapInstance: Map) => {
           'line-cap': 'round',
         },
         paint: {
-          'line-color': '#FF0000',
-          'line-width': 1,
+          'line-color': [
+            'match',
+            ['get', 'transportType'],
+            'flight',
+            '#FF0000', // Red for flight
+            'bus',
+            '#008000', // Green for bus
+            'train',
+            '#800080', // Purple for train
+            '#0000FF', // Blue as default
+          ],
+          'line-width': 2,
           'line-opacity': 0.75,
         },
       },

@@ -125,7 +125,7 @@ class PhotoAlbumStack extends cdk.Stack {
         deletionProtection: true,
         pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: true },
         billingMode: dynamodb.BillingMode.PROVISIONED,
-        ProvisionedThroughput: { ReadCapacityUnits: 4, WriteCapacityUnits: 4 },
+        ProvisionedThroughput: { ReadCapacityUnits: 4, WriteCapacityUnits: 1 },
       },
       process.env.PHOTO_ALBUMS_STREAM_ARN,
     );

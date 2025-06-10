@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useAlbums, useLoading } from '@/composables';
+import { useAlbums } from '@/composables';
 import { IconFolders, IconLibraryPhoto } from '@tabler/icons-vue';
 import { useIsFetching, useIsMutating } from '@tanstack/vue-query';
 import { Breadcrumb, ProgressBar } from 'primevue';
@@ -33,10 +33,9 @@ const globalIsMutating = useIsMutating();
 
 const route = useRoute();
 const { currentAlbum } = useAlbums();
-const { isLoading } = useLoading();
 
 const isFetching = computed(() => {
-  return globalIsFetching.value || globalIsMutating.value || isLoading.value;
+  return globalIsFetching.value || globalIsMutating.value;
 });
 
 const breadcrumbs = computed((): { label: string }[] => {
