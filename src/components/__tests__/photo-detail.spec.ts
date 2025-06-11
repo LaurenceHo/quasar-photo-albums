@@ -1,5 +1,6 @@
 import PhotoDetail from '@/components/PhotoDetail.vue';
 import router from '@/router';
+import { createTestingPinia } from '@pinia/testing';
 import { QueryClient, VueQueryPlugin, type VueQueryPluginOptions } from '@tanstack/vue-query';
 import { mount } from '@vue/test-utils';
 import PrimeVue from 'primevue/config';
@@ -43,12 +44,6 @@ vi.mock('../../composables/use-photos', () => ({
   })),
 }));
 
-vi.mock('@/composables/use-user-config', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    isAdmin: ref(false),
-  })),
-}));
-
 vi.mock('exifreader', () => ({
   default: {
     load: vi.fn().mockResolvedValue({}),
@@ -72,7 +67,19 @@ describe('PhotoDetail.vue', () => {
   beforeEach(() => {
     wrapper = mount(PhotoDetail, {
       global: {
-        plugins: [router, PrimeVue, [VueQueryPlugin, options]],
+        plugins: [
+          router,
+          PrimeVue,
+          [VueQueryPlugin, options],
+          createTestingPinia({
+            createSpy: vi.fn,
+            initialState: {
+              userConfig: {
+                isAdmin: false,
+              },
+            },
+          }),
+        ],
       },
     });
   });

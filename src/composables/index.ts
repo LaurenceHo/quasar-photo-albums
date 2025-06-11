@@ -6,7 +6,6 @@ import useFeaturedAlbums from '@/composables/use-featured-albums';
 import useFileList from '@/composables/use-file-list';
 import useFileUploader from '@/composables/use-file-uploader';
 import usePhotos from '@/composables/use-photos';
-import useUserConfig from '@/composables/use-user-config';
 
 export {
   useAlbumFilter,
@@ -17,5 +16,4 @@ export {
   useFileList,
   useFileUploader,
   usePhotos,
-  useUserConfig,
 };

@@ -1,14 +1,15 @@
 import type { UserPermission } from '@/schema';
-import { AuthService } from '@/services/auth-service.js';
+import { AuthService } from '@/services/auth-service';
 import { DARK_MODE_ENABLED } from '@/utils/local-storage-key';
 import { useQuery } from '@tanstack/vue-query';
+import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-const darkMode = ref(localStorage.getItem(DARK_MODE_ENABLED) === 'true');
-const userState = ref<UserPermission | null>(null);
-
-export default function useUserConfig() {
+export const useUserConfigStore = defineStore('userConfig', () => {
+  const darkMode = ref(localStorage.getItem(DARK_MODE_ENABLED) === 'true');
+  const userState = ref<UserPermission | null>(null);
   const isEnabled = ref(false);
+
   const getDarkMode = computed(() => darkMode.value);
   const isAdmin = computed(() => userState.value?.role === 'admin');
 
@@ -49,4 +50,4 @@ export default function useUserConfig() {
     setDarkMode,
     setEnabled,
   };
-}
+});

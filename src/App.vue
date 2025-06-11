@@ -98,9 +98,9 @@
   <Toast position="bottom-center" />
 </template>
 <script lang="ts" setup>
-import { useAlbumFilter, useDevice, useUserConfig } from '@/composables';
+import { useAlbumFilter, useDevice } from '@/composables';
 import { AuthService } from '@/services/auth-service';
-import { useDialogStore } from '@/stores';
+import { useDialogStore, useUserConfigStore } from '@/stores';
 import { DARK_MODE_ENABLED } from '@/utils/local-storage-key';
 import {
   IconFolderPlus,
@@ -114,6 +114,7 @@ import {
   IconTags,
   IconUser,
 } from '@tabler/icons-vue';
+import { storeToRefs } from 'pinia';
 import {
   Button,
   IconField,
@@ -130,10 +131,12 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const routeName = computed(() => route.name);
 
-const { isFetching, userPermission, darkMode, setDarkMode, setEnabled } = useUserConfig();
+const userConfigStore = useUserConfigStore();
 const dialogStore = useDialogStore();
 const { setUpdateAlbumDialogState, setShowAlbumTagsDialogState, setShowTravelRecordsDialogState } =
   dialogStore;
+const { setDarkMode, setEnabled } = userConfigStore;
+const { isFetching, userPermission, darkMode } = storeToRefs(userConfigStore);
 const { isMediumDevice } = useDevice();
 const { filterState } = useAlbumFilter();
 

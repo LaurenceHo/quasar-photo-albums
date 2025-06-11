@@ -137,9 +137,8 @@
 import { EditPhotoButton } from '@/components/button';
 import PanoramaViewer from '@/components/PanoramaViewer.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
-import useDevice from '@/composables/use-device';
 import usePhotos from '@/composables/use-photos';
-import useUserConfig from '@/composables/use-user-config';
+import { useUserConfigStore } from '@/stores';
 import {
   IconCalendarTime,
   IconCamera,
@@ -158,9 +157,8 @@ import type {
   ValueTag,
 } from 'exifreader';
 import ExifReader from 'exifreader';
-import Button from 'primevue/button';
-import Divider from 'primevue/divider';
-import ProgressSpinner from 'primevue/progressspinner';
+import { storeToRefs } from 'pinia';
+import { Button, Divider, ProgressSpinner } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { computed, type ComputedRef, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -175,9 +173,10 @@ const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 const toast = useToast();
 const router = useRouter();
 const route = useRoute();
-const { isAdmin } = useUserConfig();
+
+const userConfigStore = useUserConfigStore();
+const { isAdmin } = storeToRefs(userConfigStore);
 const { photosInAlbum, isFetchingPhotos, findPhotoByIndex, findPhotoIndex } = usePhotos();
-const { windowSize } = useDevice();
 
 const selectedImageIndex = ref(-1);
 const photoFileName = ref('');

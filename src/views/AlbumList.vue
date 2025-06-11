@@ -79,15 +79,9 @@ import Carousel from '@/components/Carousel.vue';
 import { CreateAlbum, CreateAlbumTag, ShowAlbumTags } from '@/components/dialog';
 import SelectTags from '@/components/select/SelectTags.vue';
 import SelectYear from '@/components/select/SelectYear.vue';
-import {
-  useAlbumFilter,
-  useAlbums,
-  useDevice,
-  useFeaturedAlbums,
-  useUserConfig,
-} from '@/composables';
-import { useDialogStore } from '@/stores';
+import { useAlbumFilter, useAlbums, useDevice, useFeaturedAlbums } from '@/composables';
 import { type FilteredAlbumsByYear } from '@/composables/use-albums';
+import { useDialogStore, useUserConfigStore } from '@/stores';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
 import { IconSortAscendingLetters, IconSortDescendingLetters } from '@tabler/icons-vue';
 import { storeToRefs } from 'pinia';
@@ -100,11 +94,14 @@ const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 
-const { isAdmin } = useUserConfig();
 const { isFetchingAlbums, fetchAlbumsByYear } = useAlbums();
 const { isFetching: isFetchingFeaturedAlbums, data: featuredAlbums } = useFeaturedAlbums();
 const { isXSmallDevice } = useDevice();
+
+const userConfigStore = useUserConfigStore();
 const dialogStore = useDialogStore();
+
+const { isAdmin } = storeToRefs(userConfigStore);
 const { showAlbumTagsDialogState, updateAlbumDialogState, createAlbumTagDialogState } =
   storeToRefs(dialogStore);
 

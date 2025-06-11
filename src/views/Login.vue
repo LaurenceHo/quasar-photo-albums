@@ -35,11 +35,10 @@
 </template>
 
 <script lang="ts" setup>
-import useUserConfig from '@/composables/use-user-config';
 import { AuthService } from '@/services/auth-service';
-import Panel from 'primevue/panel';
-import ProgressSpinner from 'primevue/progressspinner';
-import Toast from 'primevue/toast';
+import { useUserConfigStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+import { Panel, ProgressSpinner, Toast } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { isEmpty } from 'radash';
 import { onMounted, ref } from 'vue';
@@ -61,6 +60,7 @@ interface GoogleIdentityServices {
     use_fedcm_for_prompt?: boolean;
     state?: string; // Add state to initialization
   }): void;
+
   renderButton(
     element: HTMLElement | null,
     options: {
@@ -74,6 +74,7 @@ interface GoogleIdentityServices {
       state?: string;
     },
   ): void;
+
   prompt(): void;
 }
 
@@ -87,6 +88,7 @@ declare global {
       accounts: GoogleIdentity;
     };
   }
+
   const google: {
     accounts: GoogleIdentity;
   };
@@ -94,8 +96,11 @@ declare global {
 
 const toast = useToast();
 const loading = ref(false);
-const { userPermission, setUserPermission } = useUserConfig();
 const csrfState = ref<string>('');
+
+const userConfigStore = useUserConfigStore();
+const { setUserPermission } = userConfigStore;
+const { userPermission } = storeToRefs(userConfigStore);
 
 onMounted(async () => {
   if (!window.google) {

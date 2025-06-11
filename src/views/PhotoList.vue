@@ -223,10 +223,10 @@ import PhotoDetail from '@/components/PhotoDetail.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SkeletonPhotoList from '@/components/SkeletonPhotoList.vue';
 import UploadPhotos from '@/components/UploadPhotos.vue';
-import { useAlbums, usePhotos, useUserConfig } from '@/composables';
+import { useAlbums, usePhotos } from '@/composables';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
-import { useDialogStore } from '@/stores';
+import { useDialogStore, useUserConfigStore } from '@/stores';
 import {
   IconArrowNarrowLeft,
   IconChecks,
@@ -249,12 +249,15 @@ import { useRoute, useRouter } from 'vue-router';
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
+
+const userConfigStore = useUserConfigStore();
 const dialogStore = useDialogStore();
 
 const { setDeletePhotoDialogState, setMovePhotoDialogState } = dialogStore;
 const { deletePhotoDialogState, movePhotoDialogState, renamePhotoDialogState } =
   storeToRefs(dialogStore);
-const { isAdmin } = useUserConfig();
+const { isAdmin } = storeToRefs(userConfigStore);
+
 const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } =
   usePhotos();
 const { currentAlbum, fetchAlbumsByYear } = useAlbums();

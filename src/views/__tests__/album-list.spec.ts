@@ -1,5 +1,6 @@
 import AlbumList from '@/views/AlbumList.vue';
 import { createTestingPinia } from '@pinia/testing';
+import { QueryClient, VueQueryPlugin, type VueQueryPluginOptions } from '@tanstack/vue-query';
 import { mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
@@ -25,12 +26,6 @@ vi.mock('@/composables/use-featured-albums', () => ({
   })),
 }));
 
-vi.mock('@/composables/use-user-config', () => ({
-  default: vi.fn(() => ({
-    isAdmin: ref(false),
-  })),
-}));
-
 const mockPush = vi.fn();
 
 vi.mock('vue-router', () => ({
@@ -48,10 +43,22 @@ vi.mock('primevue/usetoast', () => ({
   })),
 }));
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
+
 describe('AlbumList.vue', () => {
   let wrapper: any;
 
   beforeEach(() => {
+    const options: VueQueryPluginOptions = {
+      queryClient,
+    };
+
     const pinia = createTestingPinia({
       createSpy: vi.fn,
       stubActions: false,
@@ -59,7 +66,7 @@ describe('AlbumList.vue', () => {
 
     wrapper = mount(AlbumList, {
       global: {
-        plugins: [pinia],
+        plugins: [[VueQueryPlugin, options], pinia],
         stubs: {
           Button: true,
           SelectYear: true,

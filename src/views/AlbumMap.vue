@@ -14,8 +14,12 @@
 
 <script lang="ts" setup>
 import { CreateTravelRecords, ShowTravelRecords } from '@/components/dialog';
-import { useUserConfig } from '@/composables';
-import { useTravelRecordsStore, useDialogStore, useAlbumLocationsStore } from '@/stores';
+import {
+  useAlbumLocationsStore,
+  useDialogStore,
+  useTravelRecordsStore,
+  useUserConfigStore,
+} from '@/stores';
 import { useIsFetching, useIsMutating } from '@tanstack/vue-query';
 import type { Feature, Point } from 'geojson';
 import mapboxgl, {
@@ -35,12 +39,13 @@ const mapCentreLat = Number(import.meta.env.VITE_MAP_CENTRE_LAT ?? -36.8484);
 
 const globalIsFetching = useIsFetching();
 const globalIsMutating = useIsMutating();
-const { darkMode } = useUserConfig();
 
+const userConfigStore = useUserConfigStore();
 const albumLocationsStore = useAlbumLocationsStore();
 const dialogStore = useDialogStore();
 const travelRecordsStore = useTravelRecordsStore();
 
+const { darkMode } = storeToRefs(userConfigStore);
 const { albumLocationGeoJson } = storeToRefs(albumLocationsStore);
 const { createTravelRecordsDialogState, showTravelRecordsDialogState } = storeToRefs(dialogStore);
 const { travelRecordGeoJson } = storeToRefs(travelRecordsStore);

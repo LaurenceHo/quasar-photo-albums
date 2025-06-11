@@ -88,11 +88,9 @@
 <script lang="ts" setup>
 import DropZone from '@/components/file-uploader/DropZone.vue';
 import FilePreview from '@/components/file-uploader/FilePreview.vue';
-import useFileList from '@/composables/use-file-list';
-import useFileUploader from '@/composables/use-file-uploader';
+import { useFileList, useFileUploader } from '@/composables';
 import { IconX } from '@tabler/icons-vue';
-import Button from 'primevue/button';
-import Message from 'primevue/message';
+import { Button, Message } from 'primevue';
 import { computed, ref, toRefs, watch } from 'vue';
 
 const emits = defineEmits(['refreshPhotoList', 'closePhotoUploader']);

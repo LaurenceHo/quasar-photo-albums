@@ -47,9 +47,10 @@ import NoImagePlaceholder from '@/components/NoImagePlaceholder.vue';
 import SquareImage from '@/components/SquareImage.vue';
 import { initialAlbum } from '@/composables/use-albums';
 import useDevice from '@/composables/use-device';
-import useUserConfig from '@/composables/use-user-config';
 import type { Album } from '@/schema';
+import { useUserConfigStore } from '@/stores';
 import { IconLock, IconStarFilled } from '@tabler/icons-vue';
+import { storeToRefs } from 'pinia';
 import Tag from 'primevue/tag';
 import { computed, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
@@ -64,7 +65,9 @@ const props = defineProps({
   },
 });
 
-const { isAdmin } = useUserConfig();
+const userConfigStore = useUserConfigStore();
+const { isAdmin } = storeToRefs(userConfigStore);
+
 const { isXSmallDevice } = useDevice();
 const { albumItem } = toRefs(props);
 const router = useRouter();
