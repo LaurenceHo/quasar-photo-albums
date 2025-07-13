@@ -134,8 +134,6 @@ const routeName = computed(() => route.name);
 const albumStore = useAlbumStore();
 const userConfigStore = useUserConfigStore();
 const dialogStore = useDialogStore();
-const { setUpdateAlbumDialogState, setShowAlbumTagsDialogState, setShowTravelRecordsDialogState } =
-  dialogStore;
 const { setDarkMode, setEnabled } = userConfigStore;
 const { isFetching, userPermission, darkMode } = storeToRefs(userConfigStore);
 const { filterState } = storeToRefs(albumStore);
@@ -153,19 +151,19 @@ const items = [
     label: 'New Album',
     icon: IconFolderPlus as any,
     visible: () => routeName.value === 'albumsByYear',
-    command: () => setUpdateAlbumDialogState(true),
+    command: () => dialogStore.setDialogState('updateAlbum', true),
   },
   {
     label: 'Manage Album Tags',
     icon: IconTags as any,
     visible: () => routeName.value === 'albumsByYear',
-    command: () => setShowAlbumTagsDialogState(true),
+    command: () => dialogStore.setDialogState('showAlbumTags', true),
   },
   {
     label: 'Manage Travel Records',
     icon: IconMapPins as any,
     visible: () => routeName.value === 'albumMap',
-    command: () => setShowTravelRecordsDialogState(true),
+    command: () => dialogStore.setDialogState('showTravelRecords', true),
   },
   {
     label: 'Logout',

@@ -76,7 +76,7 @@ const props = defineProps({
 const { albumItem } = toRefs(props);
 const route = useRoute();
 const toast = useToast();
-const { setUpdateAlbumDialogState } = useDialogStore();
+const dialogStore = useDialogStore();
 const { setAlbumToBeUpdated, refetchAlbums } = useAlbumStore();
 
 const deleteAlbumDialog = ref(false);
@@ -89,7 +89,7 @@ const toggleMenu = (event: any) => {
 
 const setAlbum = () => {
   setAlbumToBeUpdated(albumItem.value);
-  setUpdateAlbumDialogState(true);
+  dialogStore.setDialogState('updateAlbum', true);
 };
 
 const {

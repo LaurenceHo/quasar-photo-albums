@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="createTravelRecordsDialogState"
+    v-model:visible="dialogStates.createTravelRecords"
     :closable="false"
     class="w-80"
     data-test-id="show-travel-records-dialog"
@@ -128,8 +128,7 @@ const transportTypes = [
 const toast = useToast();
 
 const dialogStore = useDialogStore();
-const { setCreateTravelRecordsDialogState } = dialogStore;
-const { createTravelRecordsDialogState } = storeToRefs(dialogStore);
+const { dialogStates } = storeToRefs(dialogStore);
 const { refetchTravelRecords } = useTravelRecordsStore();
 
 const travelDate = ref();
@@ -233,7 +232,7 @@ const { isPending: isCreatingRecord, mutate: createRecord } = useMutation({
 });
 
 const onReset = () => {
-  setCreateTravelRecordsDialogState(false);
+  dialogStore.setDialogState('createTravelRecords', false);
   travelDate.value = '';
   selectedDeparture.value = null;
   selectedDestination.value = null;

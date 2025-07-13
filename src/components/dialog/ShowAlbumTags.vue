@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="showAlbumTagsDialogState"
+    v-model:visible="dialogStates.showAlbumTags"
     :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
     :closable="false"
     class="w-96"
@@ -12,7 +12,7 @@
           data-test-id="create-tag-button"
           severity="secondary"
           text
-          @click="setCreateAlbumTagDialogState(true)"
+          @click="dialogStore.setDialogState('createAlbumTag', true)"
         >
           <IconPlus :size="24" />
         </Button>
@@ -39,7 +39,7 @@
       </ul>
     </div>
     <template #footer>
-      <Button label="Close" text @click="setShowAlbumTagsDialogState(false)" />
+      <Button label="Close" text @click="dialogStore.setDialogState('showAlbumTags', false)" />
     </template>
   </Dialog>
 
@@ -72,8 +72,8 @@ const confirm = useConfirm();
 const route = useRoute();
 const toast = useToast();
 
-const { setShowAlbumTagsDialogState, setCreateAlbumTagDialogState } = useDialogStore();
-const { showAlbumTagsDialogState } = storeToRefs(useDialogStore());
+const dialogStore = useDialogStore();
+const { dialogStates } = storeToRefs(dialogStore);
 const { albumTags, fetchAlbumTags } = useAlbumTags();
 const { refetchAlbums } = useAlbumStore();
 

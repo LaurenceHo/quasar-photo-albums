@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="deletePhotoDialogState"
+    v-model:visible="dialogStates.deletePhoto"
     :closable="false"
     class="w-[450px]"
     header="Confirm"
@@ -25,7 +25,7 @@
         @click="
           () => {
             reset();
-            setDeletePhotoDialogState(false);
+            dialogStore.setDialogState('deletePhoto', false);
           }
         "
       />
@@ -56,8 +56,7 @@ const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 
 const toast = useToast();
 const dialogStore = useDialogStore();
-const { setDeletePhotoDialogState } = dialogStore;
-const { deletePhotoDialogState } = storeToRefs(dialogStore);
+const { dialogStates } = storeToRefs(dialogStore);
 const { selectedPhotos } = usePhotos();
 const { albumId } = toRefs(props);
 
@@ -82,7 +81,7 @@ const {
       life: 3000,
     });
     setTimeout(() => {
-      setDeletePhotoDialogState(false);
+      dialogStore.setDialogState('deletePhoto', false);
       emits('closePhotoDetail');
       emits('refreshPhotoList');
     }, 2000);

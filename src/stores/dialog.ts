@@ -1,78 +1,57 @@
 import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
-export const useDialogStore = defineStore('dialogStore', () => {
-  const renamePhotoDialogState = ref(false);
-  const movePhotoDialogState = ref(false);
-  const deletePhotoDialogState = ref(false);
-  const updateAlbumDialogState = ref(false);
-  const createAlbumTagDialogState = ref(false);
-  const showAlbumTagsDialogState = ref(false);
-  const createTravelRecordsDialogState = ref(false);
-  const showTravelRecordsDialogState = ref(false);
+// Define the possible dialog keys for type safety
+type DialogKey =
+  | 'renamePhoto'
+  | 'movePhoto'
+  | 'deletePhoto'
+  | 'updateAlbum'
+  | 'createAlbumTag'
+  | 'showAlbumTags'
+  | 'createTravelRecords'
+  | 'showTravelRecords';
 
-  const getRenamePhotoDialogState = computed(() => renamePhotoDialogState.value);
-  const getMovePhotoDialogState = computed(() => movePhotoDialogState.value);
-  const getDeletePhotoDialogState = computed(() => deletePhotoDialogState.value);
-  const getUpdateAlbumDialogState = computed(() => updateAlbumDialogState.value);
-  const getCreateAlbumTagDialogState = computed(() => createAlbumTagDialogState.value);
-  const getShowAlbumTagsDialogState = computed(() => showAlbumTagsDialogState.value);
-  const getCreateTravelRecordDialogState = computed(() => createTravelRecordsDialogState.value);
-  const getShowTravelRecordDialogState = computed(() => showTravelRecordsDialogState.value);
+// Define the shape of the dialog state explicitly
+interface DialogStates {
+  renamePhoto: boolean;
+  movePhoto: boolean;
+  deletePhoto: boolean;
+  updateAlbum: boolean;
+  createAlbumTag: boolean;
+  showAlbumTags: boolean;
+  createTravelRecords: boolean;
+  showTravelRecords: boolean;
+}
 
-  const setRenamePhotoDialogState = (state: boolean) => {
-    renamePhotoDialogState.value = state;
+export const useDialogStore = defineStore('dialog', () => {
+  // Initialize all dialog states as false
+  const dialogStates = ref<DialogStates>({
+    renamePhoto: false,
+    movePhoto: false,
+    deletePhoto: false,
+    updateAlbum: false,
+    createAlbumTag: false,
+    showAlbumTags: false,
+    createTravelRecords: false,
+    showTravelRecords: false,
+  });
+
+  // Single setter function for all dialog states
+  const setDialogState = (dialog: DialogKey, state: boolean) => {
+    dialogStates.value[dialog] = state;
   };
 
-  const setMovePhotoDialogState = (state: boolean) => {
-    movePhotoDialogState.value = state;
-  };
-
-  const setDeletePhotoDialogState = (state: boolean) => {
-    deletePhotoDialogState.value = state;
-  };
-
-  const setUpdateAlbumDialogState = (state: boolean) => {
-    updateAlbumDialogState.value = state;
-  };
-
-  const setCreateAlbumTagDialogState = (state: boolean) => {
-    createAlbumTagDialogState.value = state;
-  };
-
-  const setShowAlbumTagsDialogState = (state: boolean) => {
-    showAlbumTagsDialogState.value = state;
-  };
-
-  const setCreateTravelRecordsDialogState = (state: boolean) => {
-    createTravelRecordsDialogState.value = state;
-  };
-
-  const setShowTravelRecordsDialogState = (state: boolean) => {
-    showTravelRecordsDialogState.value = state;
+  // Reset all dialog states to false
+  const resetDialogStates = () => {
+    Object.keys(dialogStates.value).forEach((key) => {
+      dialogStates.value[key as DialogKey] = false;
+    });
   };
 
   return {
-    renamePhotoDialogState: getRenamePhotoDialogState,
-    movePhotoDialogState: getMovePhotoDialogState,
-    deletePhotoDialogState: getDeletePhotoDialogState,
-    updateAlbumDialogState: getUpdateAlbumDialogState,
-
-    createAlbumTagDialogState: getCreateAlbumTagDialogState,
-    showAlbumTagsDialogState: getShowAlbumTagsDialogState,
-
-    createTravelRecordsDialogState: getCreateTravelRecordDialogState,
-    showTravelRecordsDialogState: getShowTravelRecordDialogState,
-
-    setRenamePhotoDialogState,
-    setMovePhotoDialogState,
-    setDeletePhotoDialogState,
-    setUpdateAlbumDialogState,
-
-    setCreateAlbumTagDialogState,
-    setShowAlbumTagsDialogState,
-
-    setCreateTravelRecordsDialogState,
-    setShowTravelRecordsDialogState,
+    dialogStates,
+    setDialogState,
+    resetDialogStates,
   };
 });

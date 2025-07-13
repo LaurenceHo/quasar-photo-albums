@@ -100,7 +100,7 @@ describe('CreateAlbum', () => {
 
   beforeEach(() => {
     dialogStore = useDialogStore();
-    dialogStore.setUpdateAlbumDialogState(true);
+    dialogStore.setDialogState('updateAlbum', true);
 
     vi.clearAllMocks();
     queryClient.clear(); // Clear query cache between tests
@@ -271,6 +271,6 @@ describe('CreateAlbum', () => {
     const wrapper = mountComponent();
     await wrapper.find('[data-test-id="cancel-button"]').trigger('click');
 
-    expect(dialogStore.updateAlbumDialogState).toBe(false);
+    expect(dialogStore.dialogStates.updateAlbum).toBe(false);
   });
 });

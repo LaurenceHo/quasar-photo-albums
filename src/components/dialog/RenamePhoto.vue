@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model:visible="renamePhotoDialogState" :closable="false" class="w-96" modal>
+  <Dialog v-model:visible="dialogStates.renamePhoto" :closable="false" class="w-96" modal>
     <template #header>
       <span class="text-xl font-semibold">Rename Photo</span>
     </template>
@@ -32,7 +32,7 @@
           @click="
             () => {
               reset();
-              setRenamePhotoDialogState(false);
+              dialogStore.setDialogState('renamePhoto', false);
             }
           "
         />
@@ -56,6 +56,7 @@
 import { usePhotos } from '@/composables';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
+import { useAlbumStore, useDialogStore } from '@/stores';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
@@ -64,7 +65,6 @@ import { Button, Dialog, InputText } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { isEmpty } from 'radash';
 import { computed, ref, toRefs, watch } from 'vue';
-import { useAlbumStore, useDialogStore } from '@/stores';
 
 const props = defineProps({
   albumId: {
@@ -90,8 +90,8 @@ const rules = computed(() => ({
 
 const toast = useToast();
 const { albumId } = toRefs(props);
-const { setRenamePhotoDialogState } = useDialogStore();
-const { renamePhotoDialogState } = storeToRefs(useDialogStore());
+const dialogStore = useDialogStore();
+const { dialogStates } = storeToRefs(dialogStore);
 const { refetchAlbums, isAlbumCover: checkIsAlbumCover } = useAlbumStore();
 const { currentAlbum } = storeToRefs(useAlbumStore());
 
@@ -146,7 +146,7 @@ const {
         life: 3000,
       });
       setTimeout(() => {
-        setRenamePhotoDialogState(false);
+        dialogStore.setDialogState('renamePhoto', false);
         emits('closePhotoDetail');
         emits('refreshPhotoList');
       }, 2000);

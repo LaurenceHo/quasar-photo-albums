@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="showTravelRecordsDialogState"
+    v-model:visible="dialogStates.showTravelRecords"
     :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
     :closable="false"
     modal
@@ -11,7 +11,7 @@
           data-test-id="create-travel-record-button"
           severity="secondary"
           text
-          @click="setCreateTravelRecordsDialogState(true)"
+          @click="dialogStore.setDialogState('createTravelRecords', true)"
         >
           <IconPlus :size="24" />
         </Button>
@@ -20,32 +20,32 @@
     </template>
     <div class="max-h-[50vh] overflow-y-auto">
       <DataTable
-        :value="travelRecords"
-        tableStyle="min-width: 20rem"
-        paginator
         :rows="10"
         :rowsPerPageOptions="[10, 20, 50]"
-        sortField="travelDate"
         :sortOrder="-1"
+        :value="travelRecords"
+        paginator
+        sortField="travelDate"
+        tableStyle="min-width: 20rem"
       >
         <template #empty> No travel records found.</template>
 
-        <Column field="travelDate" header="Date" :sortable="true">
+        <Column :sortable="true" field="travelDate" header="Date">
           <template #body="{ data }">
             {{ data.travelDate ? new Date(data.travelDate).toLocaleDateString() : '--' }}
           </template>
         </Column>
-        <Column field="departure" header="Departure" :sortable="true">
+        <Column :sortable="true" field="departure" header="Departure">
           <template #body="{ data }">
             {{ data.departure.displayName }}
           </template>
         </Column>
-        <Column field="destination" header="Destination" :sortable="true">
+        <Column :sortable="true" field="destination" header="Destination">
           <template #body="{ data }">
             {{ data.destination.displayName }}
           </template>
         </Column>
-        <Column field="transportType" header="Transport Type" :sortable="true">
+        <Column :sortable="true" field="transportType" header="Transport Type">
           <template #body="{ data }">
             {{ data.transportType ? data.transportType : 'flight' }}
           </template>
@@ -65,7 +65,7 @@
       </DataTable>
     </div>
     <template #footer>
-      <Button label="Close" text @click="setShowTravelRecordsDialogState(false)" />
+      <Button label="Close" text @click="dialogStore.setDialogState('showTravelRecords', false)" />
     </template>
   </Dialog>
   <ConfirmDialog>
@@ -82,7 +82,7 @@
 
 <script lang="ts" setup>
 import { TravelRecordService } from '@/services/travel-record-service';
-import { useTravelRecordsStore, useDialogStore } from '@/stores';
+import { useDialogStore, useTravelRecordsStore } from '@/stores';
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
 import { storeToRefs } from 'pinia';
@@ -92,8 +92,7 @@ import { ref } from 'vue';
 const confirm = useConfirm();
 const toast = useToast();
 const dialogStore = useDialogStore();
-const { setShowTravelRecordsDialogState, setCreateTravelRecordsDialogState } = dialogStore;
-const { showTravelRecordsDialogState } = storeToRefs(dialogStore);
+const { dialogStates } = storeToRefs(dialogStore);
 
 const travelRecordsStore = useTravelRecordsStore();
 const { travelRecords } = storeToRefs(travelRecordsStore);

@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="updateAlbumDialogState"
+    v-model:visible="dialogStates.updateAlbum"
     :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
     :closable="false"
     class="w-[450px]"
@@ -112,7 +112,7 @@
             data-test-id="create-tag-button"
             severity="secondary"
             text
-            @click="setCreateAlbumTagDialogState(true)"
+            @click="dialogStore.setDialogState('createAlbumTag', true)"
           >
             <IconPlus :size="24" />
           </Button>
@@ -219,8 +219,8 @@ import { useRouter } from 'vue-router';
 const toast = useToast();
 const router = useRouter();
 
-const { setUpdateAlbumDialogState, setCreateAlbumTagDialogState } = useDialogStore();
-const { updateAlbumDialogState } = storeToRefs(useDialogStore());
+const dialogStore = useDialogStore();
+const { dialogStates } = storeToRefs(dialogStore);
 const { setAlbumToBeUpdated, refetchAlbums } = useAlbumStore();
 const { albumToBeUpdate } = storeToRefs(useAlbumStore());
 const { albumTags } = useAlbumTags();
@@ -364,13 +364,13 @@ const resetAlbum = () => {
     tags: [],
     isPrivate: true,
   });
-  setUpdateAlbumDialogState(false);
+  dialogStore.setDialogState('updateAlbum', false);
 };
 
 const yearOptions = getYearOptions();
 
 watch(
-  updateAlbumDialogState,
+  () => dialogStates.value.updateAlbum,
   (newValue) => {
     if (newValue) {
       selectedYear.value = albumToBeUpdate.value.year || String(new Date().getFullYear());

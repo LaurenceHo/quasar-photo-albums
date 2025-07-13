@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="movePhotoDialogState"
+    v-model:visible="dialogStates.movePhoto"
     :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
     class="w-[450px]"
     modal
@@ -103,8 +103,7 @@ const { albumId } = toRefs(props);
 const route = useRoute();
 const toast = useToast();
 const dialogStore = useDialogStore();
-const { setMovePhotoDialogState } = dialogStore;
-const { movePhotoDialogState } = storeToRefs(dialogStore);
+const { dialogStates } = storeToRefs(dialogStore);
 const { selectedPhotos } = usePhotos();
 
 const selectedYear = ref<string>((route.params['year'] as string) || 'na');
@@ -198,7 +197,7 @@ const {
           life: 3000,
         });
         setTimeout(() => {
-          setMovePhotoDialogState(false);
+          dialogStore.setDialogState('movePhoto', false);
           emits('closePhotoDetail');
           emits('refreshPhotoList');
         }, 2000);
@@ -232,7 +231,7 @@ const closeMovePhotoDialog = (e: MouseEvent) => {
     emits('refreshPhotoList');
   }
   reset();
-  setMovePhotoDialogState(false);
+  dialogStore.setDialogState('movePhoto', false);
 };
 
 // Watch for changes in mappedAlbumList and update selectedAlbum

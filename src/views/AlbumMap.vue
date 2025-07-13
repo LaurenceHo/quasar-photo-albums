@@ -8,8 +8,8 @@
     ]"
   ></div>
 
-  <CreateTravelRecords v-if="createTravelRecordsDialogState" />
-  <ShowTravelRecords v-if="showTravelRecordsDialogState" />
+  <CreateTravelRecords v-if="dialogStates.createTravelRecords" />
+  <ShowTravelRecords v-if="dialogStates.showTravelRecords" />
 </template>
 
 <script lang="ts" setup>
@@ -47,7 +47,7 @@ const travelRecordsStore = useTravelRecordsStore();
 
 const { darkMode } = storeToRefs(userConfigStore);
 const { albumLocationGeoJson } = storeToRefs(albumLocationsStore);
-const { createTravelRecordsDialogState, showTravelRecordsDialogState } = storeToRefs(dialogStore);
+const { dialogStates } = storeToRefs(dialogStore);
 const { travelRecordGeoJson } = storeToRefs(travelRecordsStore);
 const map = ref<Map | null>(null);
 

@@ -64,8 +64,7 @@ const showPhotoCopiedTag = ref(false);
 const toast = useToast();
 const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = usePhotos();
 const { refetchAlbums, setCurrentAlbum, isAlbumCover } = useAlbumStore();
-const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } =
-  useDialogStore();
+const dialogStore = useDialogStore();
 const { currentAlbum } = storeToRefs(useAlbumStore());
 
 const { mutate } = useMutation({
@@ -109,17 +108,17 @@ const makeCoverPhoto = () => {
 
 const deletePhoto = () => {
   setSelectedPhotos([photoKey.value]);
-  setDeletePhotoDialogState(true);
+  dialogStore.setDialogState('deletePhoto', true);
 };
 
 const movePhoto = () => {
   setSelectedPhotos([photoKey.value]);
-  setMovePhotoDialogState(true);
+  dialogStore.setDialogState('movePhoto', true);
 };
 
 const renamePhoto = () => {
   setCurrentPhotoToBeRenamed(photoKey.value);
-  setRenamePhotoDialogState(true);
+  dialogStore.setDialogState('renamePhoto', true);
 };
 
 const copyPhotoLink = () => {

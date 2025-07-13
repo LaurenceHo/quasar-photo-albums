@@ -133,7 +133,7 @@
             v-tooltip.left="'Delete selected photos'"
             severity="secondary"
             text
-            @click="setDeletePhotoDialogState(true)"
+            @click="dialogStore.setDialogState('deletePhoto', true)"
           >
             <template #icon>
               <IconTrash :size="24" />
@@ -144,7 +144,7 @@
             v-tooltip.left="'Move selected photos'"
             severity="secondary"
             text
-            @click="setMovePhotoDialogState(true)"
+            @click="dialogStore.setDialogState('movePhoto', true)"
           >
             <template #icon>
               <IconFileExport :size="24" />
@@ -197,19 +197,19 @@
   </template>
 
   <MovePhotos
-    v-if="movePhotoDialogState"
+    v-if="dialogStates.movePhoto"
     :album-id="currentAlbum?.id"
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
   <DeletePhotos
-    v-if="deletePhotoDialogState"
+    v-if="dialogStates.deletePhoto"
     :album-id="currentAlbum?.id"
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
   <RenamePhoto
-    v-if="renamePhotoDialogState"
+    v-if="dialogStates.renamePhoto"
     :album-id="currentAlbum?.id"
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
@@ -250,9 +250,8 @@ const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 
-const { setDeletePhotoDialogState, setMovePhotoDialogState } = useDialogStore();
-const { deletePhotoDialogState, movePhotoDialogState, renamePhotoDialogState } =
-  storeToRefs(useDialogStore());
+const dialogStore = useDialogStore();
+const { dialogStates } = storeToRefs(dialogStore);
 const { isAdmin } = storeToRefs(useUserConfigStore());
 
 const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } =

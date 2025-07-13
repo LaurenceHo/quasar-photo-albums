@@ -68,9 +68,9 @@
   </template>
   <ScrollTop />
 
-  <CreateAlbum v-if="updateAlbumDialogState" />
-  <CreateAlbumTag v-if="createAlbumTagDialogState" />
-  <ShowAlbumTags v-if="showAlbumTagsDialogState" />
+  <CreateAlbum v-if="dialogStates.updateAlbum" />
+  <CreateAlbumTag v-if="dialogStates.createAlbumTag" />
+  <ShowAlbumTags v-if="dialogStates.showAlbumTags" />
 </template>
 
 <script lang="ts" setup>
@@ -111,8 +111,8 @@ const {
 const { isFetching: isFetchingFeaturedAlbums, data: featuredAlbums } =
   storeToRefs(useFeaturedAlbumsStore());
 const { isAdmin } = storeToRefs(useUserConfigStore());
-const { showAlbumTagsDialogState, updateAlbumDialogState, createAlbumTagDialogState } =
-  storeToRefs(useDialogStore());
+const dialogStore = useDialogStore();
+const { dialogStates } = storeToRefs(dialogStore);
 
 // Pagination state
 const pageNumber = ref(1);

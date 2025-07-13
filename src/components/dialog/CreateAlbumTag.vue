@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="createAlbumTagDialogState"
+    v-model:visible="dialogStates.createAlbumTag"
     :closable="false"
     class="w-80"
     data-test-id="create-tag-dialog"
@@ -49,8 +49,7 @@ import { computed, ref } from 'vue';
 
 const toast = useToast();
 const dialogStore = useDialogStore();
-const { setCreateAlbumTagDialogState } = dialogStore;
-const { createAlbumTagDialogState } = storeToRefs(dialogStore);
+const { dialogStates } = storeToRefs(dialogStore);
 const { fetchAlbumTags } = useAlbumTags();
 
 const tagName = ref('');
@@ -99,7 +98,7 @@ const { isPending: isCreatingTag, mutate: createAlbumTag } = useMutation({
 });
 
 const onReset = () => {
-  setCreateAlbumTagDialogState(false);
+  dialogStore.setDialogState('createAlbumTag', false);
   tagName.value = '';
 };
 </script>
