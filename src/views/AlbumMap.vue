@@ -206,7 +206,7 @@ const initializeMapLayers = (mapInstance: Map) => {
             '#800080', // Purple for train
             '#0000FF', // Blue as default
           ],
-          'line-width': 2,
+          'line-width': 1.5,
           'line-opacity': 0.75,
         },
       },
