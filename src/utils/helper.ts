@@ -63,87 +63,64 @@ export const interpolateGreatCircle = (
   end: [number, number],
   steps: number,
 ): [number, number][][] => {
+  // Destructure start and end coordinates into longitude and latitude
   const [lon1, lat1] = start;
   const [lon2, lat2] = end;
 
-  // Convert to radians
-  const φ1 = (lat1 * Math.PI) / 180;
-  const φ2 = (lat2 * Math.PI) / 180;
-  const λ1 = (lon1 * Math.PI) / 180;
-  let λ2 = (lon2 * Math.PI) / 180;
+  // Converting latitude and longitude from degrees to radians for spherical calculations
+  const φ1 = (lat1 * Math.PI) / 180; // Latitude of start point in radians
+  const φ2 = (lat2 * Math.PI) / 180; // Latitude of end point in radians
+  const λ1 = (lon1 * Math.PI) / 180; // Longitude of start point in radians
+  const λ2 = (lon2 * Math.PI) / 180; // Longitude of end point in radians
 
-  // Calculate the longitude difference, ensuring the shortest path
-  let Δλ = lon2 - lon1;
-  if (Math.abs(Δλ) > 180) {
-    Δλ = Δλ > 0 ? Δλ - 360 : Δλ + 360;
-  }
-  Δλ = (Δλ * Math.PI) / 180; // Convert to radians
-  λ2 = λ1 + Δλ;
+  // Adjusting the longitude difference to find the shortest path across the antimeridian
+  let Δλ = λ2 - λ1; // Initial difference in longitude
+  if (Δλ > Math.PI) Δλ -= 2 * Math.PI; // Adjust if crossing more than 180° eastward
+  if (Δλ < -Math.PI) Δλ += 2 * Math.PI; // Adjust if crossing more than 180° westward
 
-  // Great-circle distance (Haversine)
-  const a = Math.sin((φ2 - φ1) / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
-  const distance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  // Calculating the great-circle distance using the haversine formula
+  const a = Math.sin((φ2 - φ1) / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2; // Haversine intermediate value
+  const distance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); // Angular distance in radians
+  const distanceDegrees = Math.sqrt((lon2 - lon1) ** 2 + (lat2 - lat1) ** 2); // Approximate Euclidean distance in degrees
 
-  // Calculate the distance in degrees for scaling the curvature exaggeration
-  const distanceDegrees = Math.sqrt((lon2 - lon1) ** 2 + (lat2 - lat1) ** 2);
-
-  // Generate points along the great-circle path
+  // Initializing an array to store the interpolated points along the great-circle path
   const points: [number, number][] = [];
   for (let i = 0; i <= steps; i++) {
+    // Calculating the interpolation factor for the current step
     const f = i / steps;
-    const A = Math.sin((1 - f) * distance) / Math.sin(distance);
-    const B = Math.sin(f * distance) / Math.sin(distance);
+    // Computing coefficients for spherical linear interpolation
+    const A = Math.sin((1 - f) * distance) / Math.sin(distance); // Weight for start point
+    const B = Math.sin(f * distance) / Math.sin(distance); // Weight for end point
 
-    const x = A * Math.cos(φ1) * Math.cos(λ1) + B * Math.cos(φ2) * Math.cos(λ2);
-    const y = A * Math.cos(φ1) * Math.sin(λ1) + B * Math.cos(φ2) * Math.sin(λ2);
-    const z = A * Math.sin(φ1) + B * Math.sin(φ2);
+    // Performing spherical interpolation to get Cartesian coordinates
+    const x = A * Math.cos(φ1) * Math.cos(λ1) + B * Math.cos(φ2) * Math.cos(λ2); // X component
+    const y = A * Math.cos(φ1) * Math.sin(λ1) + B * Math.cos(φ2) * Math.sin(λ2); // Y component
+    const z = A * Math.sin(φ1) + B * Math.sin(φ2); // Z component
 
-    const φ = Math.atan2(z, Math.sqrt(x * x + y * y));
-    const λ = Math.atan2(y, x);
+    // Converting back to spherical coordinates (latitude and longitude)
+    const φ = Math.atan2(z, Math.sqrt(x * x + y * y)); // Latitude in radians
+    const λ = Math.atan2(y, x); // Longitude in radians
 
-    let lon = (λ * 180) / Math.PI;
+    // Converting back to degrees
+    let lon = (λ * 180) / Math.PI; // Longitude in degrees
+    let lat = (φ * 180) / Math.PI; // Latitude in degrees
+
+    // Applying natural curvature to enhance visual representation
+    const curveFactor = Math.min(distanceDegrees * 0.2, 10); // Limiting curvature based on distance
+    const t = f; // Interpolation parameter
+    const archHeight = curveFactor * 4 * t * (1 - t); // Parabolic height for natural curve
+    const direction = lat1 < lat2 ? 1 : -1; // Direction of curve based on latitude difference
+    lat += archHeight * direction; // Adding curvature to latitude
+
+    // Normalizing longitude to the [-180, 180] range and handling antimeridian transition
     lon = ((lon + 540) % 360) - 180; // Normalize to [-180, 180]
-
-    let lat = (φ * 180) / Math.PI;
-
-    // Exaggerate the curvature by adjusting the latitude
-    const t = f; // Parameter from 0 to 1
-    const curveFactor = Math.min(distanceDegrees * 0.2, 10); // Reduced for shorter routes
-    const archHeight = curveFactor * 4 * t * (1 - t); // Parabolic shape: peaks at t = 0.5
-    const direction = lat1 < lat2 ? 1 : -1; // Curve upward if going north, downward if going south
-    lat += archHeight * direction;
-
-    points.push([Number(lon.toFixed(6)), Number(lat.toFixed(6))]);
-  }
-
-  // Check for antimeridian crossing and split if necessary
-  const segments: [number, number][][] = [];
-  let currentSegment: [number, number][] = [points[0]];
-
-  for (let i = 1; i < points.length; i++) {
-    const prevLon = points[i - 1][0];
-    const currLon = points[i][0];
-
-    // Detect antimeridian crossing
-    if (Math.abs(currLon - prevLon) > 180) {
-      // Calculate the crossing point at ±180°
-      const fraction = (180 - Math.abs(prevLon)) / Math.abs(currLon - prevLon);
-      const latCross = points[i - 1][1] + fraction * (points[i][1] - points[i - 1][1]);
-      const crossingPoint: [number, number] = [prevLon < 0 ? -180 : 180, latCross];
-
-      // End the current segment at the crossing point
-      currentSegment.push(crossingPoint);
-      segments.push(currentSegment);
-
-      // Start a new segment from the other side of the antimeridian
-      currentSegment = [[currLon < 0 ? -180 : 180, latCross]];
+    if (i > 0 && Math.abs(lon - points[i - 1][0]) > 180) {
+      // Adjusting longitude to prevent abrupt jumps across antimeridian
+      lon = lon < 0 ? lon + 360 : lon - 360;
     }
-
-    currentSegment.push(points[i]);
+    points.push([Number(lon.toFixed(6)), Number(lat.toFixed(6))]); // Store with 6 decimal precision
   }
 
-  // Add the final segment
-  segments.push(currentSegment);
-
-  return segments;
+  // Returning the points as a single segment array
+  return [points];
 };

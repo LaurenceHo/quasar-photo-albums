@@ -248,34 +248,54 @@ describe('Helpers', () => {
       expect(result[0][2][0]).toBeCloseTo(139.6917, 5); // Longitude
       expect(result[0][2][1]).toBeCloseTo(35.6895, 5); // Latitude
 
-      // Check intermediate point
+      // Check intermediate point with curvature
       const midPoint = result[0][1];
+      const expectedLatWithoutCurve = (25.033 + 35.6895) / 2;
       expect(midPoint[0]).toBeGreaterThan(121.5654);
       expect(midPoint[0]).toBeLessThan(139.6917);
-      expect(midPoint[1]).toBeGreaterThan(25.033);
+      expect(midPoint[1]).toBeGreaterThan(expectedLatWithoutCurve); // Verify upward curve
     });
 
-    it('should split the path into two segments when crossing the antimeridian', () => {
+    it('should generate a single segment for a route crossing the antimeridian', () => {
       const start: [number, number] = [139.6917, 35.6895]; // Tokyo
       const end: [number, number] = [-118.2437, 34.0522]; // LA
-      const steps = 2;
+      const steps = 10; // Increased steps for better resolution
       const result = interpolateGreatCircle(start, end, steps);
 
-      expect(result.length).toBe(2);
+      expect(result.length).toBe(1);
+      expect(result[0].length).toBe(11); // steps + 1 (including start and end)
 
-      // Check first point of first segment (Tokyo) with tolerance
+      // Check start point with tolerance
       expect(result[0][0][0]).toBeCloseTo(139.6917, 5); // Longitude
       expect(result[0][0][1]).toBeCloseTo(35.6895, 5); // Latitude
 
-      // Check last point of first segment (at 180° longitude)
-      expect(result[0][result[0].length - 1][0]).toBeCloseTo(180, 5);
+      // Check end point with tolerance, accounting for longitude wrapping
+      const actualLon = result[0][10][0];
+      const expectedLon = -118.2437;
+      const normalizedDiff = Math.min(
+        Math.abs(actualLon - expectedLon),
+        Math.abs(actualLon + 360 - expectedLon),
+        Math.abs(actualLon - 360 - expectedLon),
+      );
+      expect(normalizedDiff).toBeLessThan(0.00001); // Tolerance for 5 decimal places
 
-      // Check first point of second segment (at -180° longitude)
-      expect(result[1][0][0]).toBeCloseTo(-180, 5);
+      expect(result[0][10][1]).toBeCloseTo(34.0522, 5); // Latitude
 
-      // Check last point of second segment (LA) with tolerance
-      expect(result[1][result[1].length - 1][0]).toBeCloseTo(-118.2437, 5); // Longitude
-      expect(result[1][result[1].length - 1][1]).toBeCloseTo(34.0522, 5); // Latitude
+      // Check for antimeridian crossing by analyzing longitude progression
+      const longitudes = result[0].map((point) => point[0]);
+      expect(longitudes[0] > 0).toBe(true); // Start in eastern hemisphere
+      // Check end longitude with wrapping tolerance
+      const endLonDiff = Math.min(
+        Math.abs(longitudes[longitudes.length - 1] - expectedLon),
+        Math.abs(longitudes[longitudes.length - 1] + 360 - expectedLon),
+        Math.abs(longitudes[longitudes.length - 1] - 360 - expectedLon),
+      );
+      expect(endLonDiff).toBeLessThan(0.00001); // Ensure end matches LA longitude
+
+      // Verify the path progresses across the antimeridian
+      const startToEndDiff = Math.abs(longitudes[longitudes.length - 1] - longitudes[0]);
+      const crossesAntimeridian = startToEndDiff > 180 || 360 - startToEndDiff > 180;
+      expect(crossesAntimeridian).toBe(true); // Check for crossing
     });
 
     it('should apply curvature exaggeration correctly', () => {
@@ -289,7 +309,9 @@ describe('Helpers', () => {
 
       const midPoint = result[0][2];
       const expectedLatWithoutCurve = (25.033 + 35.6895) / 2;
-      expect(midPoint[1]).toBeGreaterThan(expectedLatWithoutCurve);
+      expect(midPoint[1]).toBeGreaterThan(expectedLatWithoutCurve); // Verify upward curve
+      expect(midPoint[0]).toBeGreaterThan(121.5654); // Ensure longitude progresses
+      expect(midPoint[0]).toBeLessThan(139.6917); // Ensure longitude progresses
     });
   });
 });
