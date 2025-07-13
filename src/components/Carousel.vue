@@ -1,5 +1,5 @@
 <template>
-  <div class="embla q-mb-xl-xl q-mb-lg-lg q-mb-md relative">
+  <div class="embla relative mb-8 md:mb-4 lg:mb-8 xl:mb-12">
     <div ref="emblaRef" class="embla__viewport">
       <div class="embla__container">
         <template v-for="albumItem in featuredAlbums" :key="albumItem.id">
@@ -25,8 +25,8 @@
     </div>
     <Button
       v-if="!prevBtnDisabled && !nextBtnDisabled"
+      class="absolute top-[35%] left-0"
       rounded
-      class="!absolute !top-[35%] !left-0"
       @click="scrollPrev"
     >
       <template #icon>
@@ -36,8 +36,8 @@
 
     <Button
       v-if="!prevBtnDisabled && !nextBtnDisabled"
+      class="absolute top-[35%] right-0"
       rounded
-      class="!absolute !top-[35%] !right-0"
       @click="scrollNext"
     >
       <template #icon>
