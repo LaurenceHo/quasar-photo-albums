@@ -59,7 +59,7 @@ const _fetchAlbumsWithLocationAndSetToLocationStorage = async () => {
     }
 
     if (albums) {
-      _storeAlbumLocations({ dbUpdatedTime: timeJson?.album || '', albums } as AlbumsWithLocation);
+      _storeAlbumLocations({ dbUpdatedTime: timeJson?.album || '', albums });
 
       return albums;
     }

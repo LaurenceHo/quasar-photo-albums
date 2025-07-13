@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useAlbums, usePhotos } from '@/composables';
+import { usePhotos } from '@/composables';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
 import { useMutation } from '@tanstack/vue-query';
@@ -64,7 +64,7 @@ import { Button, Dialog, InputText } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { isEmpty } from 'radash';
 import { computed, ref, toRefs, watch } from 'vue';
-import { useDialogStore } from '@/stores';
+import { useAlbumStore, useDialogStore } from '@/stores';
 
 const props = defineProps({
   albumId: {
@@ -89,14 +89,13 @@ const rules = computed(() => ({
 }));
 
 const toast = useToast();
-const dialogStore = useDialogStore();
-
 const { albumId } = toRefs(props);
-const { setRenamePhotoDialogState } = dialogStore;
-const { renamePhotoDialogState } = storeToRefs(dialogStore);
+const { setRenamePhotoDialogState } = useDialogStore();
+const { renamePhotoDialogState } = storeToRefs(useDialogStore());
+const { refetchAlbums, isAlbumCover: checkIsAlbumCover } = useAlbumStore();
+const { currentAlbum } = storeToRefs(useAlbumStore());
 
 const { currentPhotoToBeRenamed, findPhotoIndex } = usePhotos();
-const { fetchAlbumsByYear, isAlbumCover: checkIsAlbumCover, currentAlbum } = useAlbums();
 
 const findFileTypeIndex = computed(() => currentPhotoToBeRenamed.value.lastIndexOf('.'));
 const fileType = computed(() => currentPhotoToBeRenamed.value.slice(findFileTypeIndex.value));
@@ -137,7 +136,7 @@ const {
         };
         const response = await AlbumService.updateAlbum(albumToBeUpdated);
         if (response.code === 200) {
-          await fetchAlbumsByYear(albumToBeUpdated.year, true);
+          await refetchAlbums(albumToBeUpdated.year, true);
         }
       }
       toast.add({

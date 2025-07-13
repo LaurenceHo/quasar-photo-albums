@@ -56,9 +56,10 @@
 </template>
 
 <script lang="ts" setup>
-import { useAlbumTags, useAlbums } from '@/composables';
-import { type FilteredAlbumsByYear } from '@/composables/use-albums';
+import { useAlbumTags } from '@/composables';
 import { AlbumTagService } from '@/services/album-tag-service';
+import { useAlbumStore, useDialogStore } from '@/stores';
+import type { FilteredAlbumsByYear } from '@/stores/album';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
@@ -66,16 +67,15 @@ import { storeToRefs } from 'pinia';
 import { Button, ConfirmDialog, Dialog, useConfirm, useToast } from 'primevue';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { useDialogStore } from '@/stores';
 
 const confirm = useConfirm();
 const route = useRoute();
 const toast = useToast();
-const dialogStore = useDialogStore();
-const { setShowAlbumTagsDialogState, setCreateAlbumTagDialogState } = dialogStore;
-const { showAlbumTagsDialogState } = storeToRefs(dialogStore);
+
+const { setShowAlbumTagsDialogState, setCreateAlbumTagDialogState } = useDialogStore();
+const { showAlbumTagsDialogState } = storeToRefs(useDialogStore());
 const { albumTags, fetchAlbumTags } = useAlbumTags();
-const { fetchAlbumsByYear } = useAlbums();
+const { refetchAlbums } = useAlbumStore();
 
 const tagName = ref('');
 
@@ -115,7 +115,7 @@ const { mutate: deleteAlbumTag, reset } = useMutation({
       life: 3000,
     });
     await fetchAlbumTags(true);
-    await fetchAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year, true);
+    await refetchAlbums(paramsYear.value || filteredAlbumsByYear?.year, true);
     tagName.value = '';
   },
   onError: () => {

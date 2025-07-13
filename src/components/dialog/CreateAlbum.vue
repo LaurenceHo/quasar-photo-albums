@@ -189,12 +189,12 @@
 <script lang="ts" setup>
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SelectTags from '@/components/select/SelectTags.vue';
-import { useAlbums, useAlbumTags } from '@/composables';
+import { useAlbumTags } from '@/composables';
 import type { Album, Place } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { LocationService } from '@/services/location-service';
-import { useDialogStore } from '@/stores';
+import { useAlbumStore, useDialogStore } from '@/stores';
 import { getYearOptions } from '@/utils/helper';
 import { IconPlus } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
@@ -219,10 +219,10 @@ import { useRouter } from 'vue-router';
 const toast = useToast();
 const router = useRouter();
 
-const dialogStore = useDialogStore();
-const { setUpdateAlbumDialogState, setCreateAlbumTagDialogState } = dialogStore;
-const { updateAlbumDialogState } = storeToRefs(dialogStore);
-const { albumToBeUpdate, setAlbumToBeUpdated, fetchAlbumsByYear } = useAlbums();
+const { setUpdateAlbumDialogState, setCreateAlbumTagDialogState } = useDialogStore();
+const { updateAlbumDialogState } = storeToRefs(useDialogStore());
+const { setAlbumToBeUpdated, refetchAlbums } = useAlbumStore();
+const { albumToBeUpdate } = storeToRefs(useAlbumStore());
 const { albumTags } = useAlbumTags();
 
 const selectedYear = ref(String(new Date().getFullYear()));
@@ -338,7 +338,7 @@ const { isPending: isCreatingAlbum, mutate: createAlbum } = useMutation({
 
       setTimeout(async () => {
         resetAlbum();
-        await fetchAlbumsByYear(album.year, true);
+        await refetchAlbums(album.year, true);
         await router.push({ name: 'albumsByYear', params: { year: album.year } });
       }, 2000);
     }

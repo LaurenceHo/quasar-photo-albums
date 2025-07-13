@@ -54,10 +54,10 @@
 </template>
 
 <script lang="ts" setup>
-import useAlbums, { initialAlbum } from '@/composables/use-albums';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
-import { useDialogStore } from '@/stores';
+import { useAlbumStore, useDialogStore } from '@/stores';
+import { initialAlbum } from '@/stores/album';
 import { IconAlertCircle, IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
 import { Button, Dialog, Menu } from 'primevue';
@@ -76,9 +76,8 @@ const props = defineProps({
 const { albumItem } = toRefs(props);
 const route = useRoute();
 const toast = useToast();
-const dialogStore = useDialogStore();
-const { setUpdateAlbumDialogState } = dialogStore;
-const { fetchAlbumsByYear, setAlbumToBeUpdated } = useAlbums();
+const { setUpdateAlbumDialogState } = useDialogStore();
+const { setAlbumToBeUpdated, refetchAlbums } = useAlbumStore();
 
 const deleteAlbumDialog = ref(false);
 const albumName = ref(albumItem.value.albumName);
@@ -106,7 +105,7 @@ const {
       detail: 'Album deleted.',
       life: 3000,
     });
-    await fetchAlbumsByYear(route.params.year as string, true);
+    await refetchAlbums(route.params.year as string, true);
     deleteAlbumDialog.value = false;
   },
   onError: () => {

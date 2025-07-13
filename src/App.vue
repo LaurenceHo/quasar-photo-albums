@@ -98,9 +98,9 @@
   <Toast position="bottom-center" />
 </template>
 <script lang="ts" setup>
-import { useAlbumFilter, useDevice } from '@/composables';
+import { useDevice } from '@/composables';
 import { AuthService } from '@/services/auth-service';
-import { useDialogStore, useUserConfigStore } from '@/stores';
+import { useAlbumStore, useDialogStore, useUserConfigStore } from '@/stores';
 import { DARK_MODE_ENABLED } from '@/utils/local-storage-key';
 import {
   IconFolderPlus,
@@ -131,14 +131,16 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const routeName = computed(() => route.name);
 
+const albumStore = useAlbumStore();
 const userConfigStore = useUserConfigStore();
 const dialogStore = useDialogStore();
 const { setUpdateAlbumDialogState, setShowAlbumTagsDialogState, setShowTravelRecordsDialogState } =
   dialogStore;
 const { setDarkMode, setEnabled } = userConfigStore;
 const { isFetching, userPermission, darkMode } = storeToRefs(userConfigStore);
+const { filterState } = storeToRefs(albumStore);
+
 const { isMediumDevice } = useDevice();
-const { filterState } = useAlbumFilter();
 
 const appName = import.meta.env.VITE_ALBUM_APP_TITLE;
 const title = document.getElementsByTagName('title')?.[0];
@@ -184,7 +186,7 @@ onMounted(() => {
 
 const searchKey = computed({
   get: () => filterState.value.searchKey,
-  set: (value: string) => (filterState.value.searchKey = value),
+  set: (value: string) => albumStore.setSearchKey(value),
 });
 
 const toggle = (event: any) => {

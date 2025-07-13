@@ -1,0 +1,202 @@
+import type { Album } from '@/schema';
+import { AlbumService } from '@/services/album-service';
+import { compareDbUpdatedTime, fetchDbUpdatedTime, sortByKey } from '@/utils/helper';
+import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
+import { useQuery, useQueryClient } from '@tanstack/vue-query';
+import { defineStore } from 'pinia';
+import { isEmpty } from 'radash';
+import { computed, ref, watch } from 'vue';
+
+export const initialAlbum: Album = {
+  year: '',
+  id: '',
+  albumName: '',
+  albumCover: '',
+  description: '',
+  tags: [],
+  isPrivate: true,
+};
+
+export interface FilteredAlbumsByYear {
+  dbUpdatedTime: string;
+  year: string;
+  albums: Album[];
+}
+
+export interface AlbumFilterState {
+  searchKey: string;
+  selectedTags: string[];
+  privateOnly: boolean;
+  sortOrder: 'asc' | 'desc';
+}
+
+const _getStoredAlbums = (): FilteredAlbumsByYear | null => {
+  try {
+    const stored = localStorage.getItem(FILTERED_ALBUMS_BY_YEAR);
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+};
+
+const _storeAlbums = (data: FilteredAlbumsByYear) => {
+  localStorage.setItem(FILTERED_ALBUMS_BY_YEAR, JSON.stringify(data));
+};
+
+const _shouldRefetchAlbums = async (year?: string, forceUpdate = false): Promise<boolean> => {
+  const stored = _getStoredAlbums();
+  if (!stored) return true;
+  if (forceUpdate) return true;
+  const { isLatest } = await compareDbUpdatedTime(stored.dbUpdatedTime, 'album');
+  if (!isLatest) return true;
+  return year !== undefined && year !== stored.year;
+};
+
+const _fetchAlbumsAndSetToLocalStorage = async (year: string, forceUpdate: boolean) => {
+  try {
+    if (!(await _shouldRefetchAlbums(year, forceUpdate))) {
+      const albumLocationsWithDBTime = _getStoredAlbums();
+      return albumLocationsWithDBTime ? albumLocationsWithDBTime.albums : [];
+    }
+
+    const timeJson = await fetchDbUpdatedTime();
+    const { data: albums, code, message } = await AlbumService.getAlbumsByYear(year);
+
+    if (code !== 200) {
+      console.error('Error fetching albums:', message);
+      return [];
+    }
+
+    if (albums) {
+      _storeAlbums({
+        dbUpdatedTime: timeJson?.album || '',
+        year,
+        albums,
+      });
+      return albums;
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Error fetching albums:', error);
+    throw error;
+  }
+};
+
+export const useAlbumStore = defineStore('album', () => {
+  const queryClient = useQueryClient();
+
+  const selectedYear = ref<string>('na');
+  const currentAlbum = ref(initialAlbum);
+  const albumToBeUpdate = ref(initialAlbum);
+  const filterState = ref<AlbumFilterState>({
+    searchKey: '',
+    selectedTags: [],
+    privateOnly: false,
+    sortOrder: 'desc',
+  });
+  const filteredAlbums = ref<Album[]>([]);
+
+  const {
+    data,
+    isFetching,
+    isError,
+    refetch: refetchQuery,
+  } = useQuery({
+    queryKey: ['fetchAlbumsByYears'],
+    queryFn: async () => _fetchAlbumsAndSetToLocalStorage(selectedYear.value, false),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+
+  const applyFilters = () => {
+    let result = [...(data.value || [])];
+
+    if (filterState.value.privateOnly) {
+      result = result.filter((album) => album.isPrivate);
+    }
+
+    if (filterState.value.searchKey) {
+      const searchTerm = filterState.value.searchKey.toLowerCase();
+      result = result.filter(
+        (album) =>
+          album.albumName.toLowerCase().includes(searchTerm) ||
+          album.description?.toLowerCase().includes(searchTerm),
+      );
+    }
+
+    if (!isEmpty(filterState.value.selectedTags)) {
+      result = result.filter((album) =>
+        filterState.value.selectedTags.some((tag) => album.tags?.includes(tag)),
+      );
+    }
+
+    filteredAlbums.value = sortByKey(result, 'albumName', filterState.value.sortOrder);
+  };
+
+  watch(
+    () => data.value,
+    (newAlbums) => {
+      filteredAlbums.value = sortByKey(newAlbums || [], 'albumName', filterState.value.sortOrder);
+    },
+  );
+
+  watch(
+    () => filterState.value,
+    () => {
+      if (data.value?.length) {
+        applyFilters();
+      }
+    },
+    { deep: true },
+  );
+
+  const refetchAlbums = async (year: string, forceRefetch = false) => {
+    if (forceRefetch) {
+      await queryClient.invalidateQueries({ queryKey: ['fetchAlbumsByYears'] });
+      return queryClient.fetchQuery({
+        queryKey: ['fetchAlbumsByYears'],
+        queryFn: () => _fetchAlbumsAndSetToLocalStorage(year, true),
+      });
+    }
+    return refetchQuery();
+  };
+
+  const setAlbumToBeUpdated = (album: Album) => (albumToBeUpdate.value = album);
+  const setCurrentAlbum = (album: Album) => (currentAlbum.value = album);
+  const isAlbumCover = (photoKey: string) => photoKey === currentAlbum.value.albumCover;
+  const setSelectedYear = (value: string) => (selectedYear.value = value);
+  const setSearchKey = (value: string) => (filterState.value.searchKey = value);
+  const setPrivateOnly = (value: boolean) => (filterState.value.privateOnly = value);
+  const setSortOrder = (value: 'asc' | 'desc') => (filterState.value.sortOrder = value);
+  const setSelectedTags = (value: string[]) => (filterState.value.selectedTags = value);
+
+  const clearFilters = () => {
+    filterState.value = {
+      searchKey: '',
+      selectedTags: [],
+      privateOnly: false,
+      sortOrder: 'desc',
+    };
+  };
+
+  return {
+    isFetching,
+    isError,
+    selectedYear,
+    currentAlbum,
+    albumToBeUpdate,
+    filterState,
+    filteredAlbums: computed(() => filteredAlbums.value),
+    setAlbumToBeUpdated,
+    setCurrentAlbum,
+    isAlbumCover,
+    refetchAlbums,
+    setSelectedYear,
+    setSearchKey,
+    setPrivateOnly,
+    setSortOrder,
+    setSelectedTags,
+    clearFilters,
+  };
+});

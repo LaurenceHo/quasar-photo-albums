@@ -1,10 +1,14 @@
-﻿import type { AlbumTags } from '@/composables/use-albums';
-import type { AlbumTag } from '@/schema';
+﻿import type { AlbumTag } from '@/schema';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { compareDbUpdatedTime, fetchDbUpdatedTime, sortByKey } from '@/utils/helper';
 import { ALBUM_TAGS } from '@/utils/local-storage-key';
 import { get } from 'radash';
 import { computed, ref } from 'vue';
+
+export interface AlbumTags {
+  dbUpdatedTime: string;
+  tags: AlbumTag[];
+}
 
 const _fetchAlbumTagsAndSetToLocalStorage = async (dbUpdatedTime?: string | null) => {
   let time = dbUpdatedTime;

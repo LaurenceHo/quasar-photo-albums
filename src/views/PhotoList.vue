@@ -223,10 +223,10 @@ import PhotoDetail from '@/components/PhotoDetail.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SkeletonPhotoList from '@/components/SkeletonPhotoList.vue';
 import UploadPhotos from '@/components/UploadPhotos.vue';
-import { useAlbums, usePhotos } from '@/composables';
+import { usePhotos } from '@/composables';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
-import { useDialogStore, useUserConfigStore } from '@/stores';
+import { useAlbumStore, useDialogStore, useUserConfigStore } from '@/stores';
 import {
   IconArrowNarrowLeft,
   IconChecks,
@@ -250,17 +250,15 @@ const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 
-const userConfigStore = useUserConfigStore();
-const dialogStore = useDialogStore();
-
-const { setDeletePhotoDialogState, setMovePhotoDialogState } = dialogStore;
+const { setDeletePhotoDialogState, setMovePhotoDialogState } = useDialogStore();
 const { deletePhotoDialogState, movePhotoDialogState, renamePhotoDialogState } =
-  storeToRefs(dialogStore);
-const { isAdmin } = storeToRefs(userConfigStore);
+  storeToRefs(useDialogStore());
+const { isAdmin } = storeToRefs(useUserConfigStore());
 
 const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } =
   usePhotos();
-const { currentAlbum, fetchAlbumsByYear } = useAlbums();
+const { refetchAlbums } = useAlbumStore();
+const { currentAlbum } = storeToRefs(useAlbumStore());
 
 const albumId = computed(() => route.params['albumId'] as string);
 const albumYear = computed(() => route.params['year'] as string);
@@ -311,7 +309,7 @@ const refreshPhotoList = async () => {
   if (albumToBeUpdated) {
     const result = await AlbumService.updateAlbum(albumToBeUpdated);
     if (result.code === 200) {
-      await fetchAlbumsByYear(albumToBeUpdated.year, true);
+      await refetchAlbums(albumToBeUpdated.year, true);
     }
   }
 

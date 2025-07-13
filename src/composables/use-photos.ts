@@ -1,8 +1,10 @@
-import useAlbums, { initialAlbum } from '@/composables/use-albums';
 import type { Photo } from '@/schema';
 import { PhotoService } from '@/services/photo-service';
+import { initialAlbum } from '@/stores/album';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
+import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
+import { useAlbumStore } from '@/stores';
 
 const photosInAlbum = ref([] as Photo[]);
 const isFetchingPhotos = ref(false);
@@ -10,7 +12,8 @@ const selectedPhotos = ref([] as string[]);
 const currentPhotoToBeRenamed = ref('');
 
 export default function usePhotos() {
-  const { currentAlbum, setCurrentAlbum } = useAlbums();
+  const { setCurrentAlbum } = useAlbumStore();
+  const { currentAlbum } = storeToRefs(useAlbumStore());
 
   const getIsFetchingPhotos = computed(() => isFetchingPhotos.value);
   const getPhotosInAlbum = computed(() => photosInAlbum.value);

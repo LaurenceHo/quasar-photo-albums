@@ -21,18 +21,19 @@
 </template>
 
 <script lang="ts" setup>
-import { useAlbums } from '@/composables';
 import { IconFolders, IconLibraryPhoto } from '@tabler/icons-vue';
 import { useIsFetching, useIsMutating } from '@tanstack/vue-query';
+import { storeToRefs } from 'pinia';
 import { Breadcrumb, ProgressBar } from 'primevue';
 import { computed, type FunctionalComponent } from 'vue';
 import { useRoute } from 'vue-router';
+import { useAlbumStore } from '@/stores';
 
 const globalIsFetching = useIsFetching();
 const globalIsMutating = useIsMutating();
 
 const route = useRoute();
-const { currentAlbum } = useAlbums();
+const { currentAlbum } = storeToRefs(useAlbumStore());
 
 const isFetching = computed(() => {
   return globalIsFetching.value || globalIsMutating.value;
