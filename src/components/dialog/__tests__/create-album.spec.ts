@@ -270,11 +270,17 @@ describe('CreateAlbum', () => {
     expect(wrapper.find('[data-test-id="dialog-title"]').text()).toBe('Edit Album');
     expect(wrapper.find('[data-test-id="select-album-year"]').classes()).toContain('p-disabled');
     expect(wrapper.find('[data-test-id="input-album-id"]').attributes('disabled')).toBe('');
-    expect((wrapper.find('[data-test-id="input-album-name"]').element as HTMLInputElement).value).toBe('Existing Album');
-    expect((wrapper.find('[data-test-id="input-album-desc"]').element as HTMLTextAreaElement).value).toBe('Existing Description');
+    expect(
+      (wrapper.find('[data-test-id="input-album-name"]').element as HTMLInputElement).value,
+    ).toBe('Existing Album');
+    expect(
+      (wrapper.find('[data-test-id="input-album-desc"]').element as HTMLTextAreaElement).value,
+    ).toBe('Existing Description');
     expect(wrapper.findComponent(ToggleSwitch).props('modelValue')).toBe(false);
     expect(wrapper.findAllComponents(ToggleSwitch)[1].props('modelValue')).toBe(true);
-    expect((wrapper.find('.p-autocomplete-input').element as HTMLInputElement).value).toBe('Test Place');
+    expect((wrapper.find('.p-autocomplete-input').element as HTMLInputElement).value).toBe(
+      'Test Place',
+    );
     expect(wrapper.findComponent({ name: 'PhotoLocationMap' }).exists()).toBe(true);
   });
 
@@ -294,16 +300,20 @@ describe('CreateAlbum', () => {
     await wrapper.find('form').trigger('submit');
     await flushPromises();
 
-    expect(AlbumService.updateAlbum).toHaveBeenCalledWith(expect.objectContaining({
-      albumName: 'New Name',
-    }));
+    expect(AlbumService.updateAlbum).toHaveBeenCalledWith(
+      expect.objectContaining({
+        albumName: 'New Name',
+      }),
+    );
 
     const toast = useToast();
-    expect(toast.add).toHaveBeenCalledWith(expect.objectContaining({
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Album "New Name" updated.',
-    }));
+    expect(toast.add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Album "New Name" updated.',
+      }),
+    );
   });
 
   it('validates album name and description length', async () => {
@@ -332,7 +342,5 @@ describe('CreateAlbum', () => {
     autoComplete.vm.$emit('complete', { query: '' });
     await flushPromises();
     expect(LocationService.searchPlaces).not.toHaveBeenCalled();
-    // You might need to check the component's internal state if possible
-    // For example, expect(wrapper.vm.placeSuggestions).toEqual([]);
   });
 });

@@ -28,10 +28,9 @@
 </template>
 
 <script lang="ts" setup>
-import { usePhotos } from '@/composables';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
-import { useAlbumStore, useDialogStore } from '@/stores';
+import { useAlbumStore, useDialogStore, usePhotoStore } from '@/stores';
 import { getStaticFileUrl } from '@/utils/helper';
 import {
   IconDotsVertical,
@@ -62,7 +61,8 @@ const { photoKey } = toRefs(props);
 const showPhotoCopiedTag = ref(false);
 
 const toast = useToast();
-const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = usePhotos();
+const photoStore = usePhotoStore();
+const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = photoStore;
 const { refetchAlbums, setCurrentAlbum, isAlbumCover } = useAlbumStore();
 const dialogStore = useDialogStore();
 const { currentAlbum } = storeToRefs(useAlbumStore());

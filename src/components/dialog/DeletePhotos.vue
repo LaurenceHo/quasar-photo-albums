@@ -35,9 +35,8 @@
 </template>
 
 <script lang="ts" setup>
-import usePhotos from '@/composables/use-photos';
 import { PhotoService } from '@/services/photo-service';
-import { useDialogStore } from '@/stores';
+import { useDialogStore, usePhotoStore } from '@/stores';
 import { IconAlertCircle } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
 import { storeToRefs } from 'pinia';
@@ -57,7 +56,8 @@ const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 const toast = useToast();
 const dialogStore = useDialogStore();
 const { dialogStates } = storeToRefs(dialogStore);
-const { selectedPhotos } = usePhotos();
+const photoStore = usePhotoStore();
+const { selectedPhotos } = storeToRefs(photoStore);
 const { albumId } = toRefs(props);
 
 const photoKeysArray = computed(() =>

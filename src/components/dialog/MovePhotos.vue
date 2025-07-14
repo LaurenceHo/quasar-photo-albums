@@ -77,11 +77,10 @@
 
 <script lang="ts" setup>
 import SelectYear from '@/components/select/SelectYear.vue';
-import usePhotos from '@/composables/use-photos';
 import type { Photo } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
-import { useDialogStore } from '@/stores';
+import { useDialogStore, usePhotoStore } from '@/stores';
 import { IconFileAlert } from '@tabler/icons-vue';
 import { useMutation, useQuery } from '@tanstack/vue-query';
 import { storeToRefs } from 'pinia';
@@ -104,7 +103,8 @@ const route = useRoute();
 const toast = useToast();
 const dialogStore = useDialogStore();
 const { dialogStates } = storeToRefs(dialogStore);
-const { selectedPhotos } = usePhotos();
+const photoStore = usePhotoStore();
+const { selectedPhotos } = storeToRefs(photoStore);
 
 const selectedYear = ref<string>((route.params['year'] as string) || 'na');
 

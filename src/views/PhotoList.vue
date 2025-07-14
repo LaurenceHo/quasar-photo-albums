@@ -223,10 +223,9 @@ import PhotoDetail from '@/components/PhotoDetail.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SkeletonPhotoList from '@/components/SkeletonPhotoList.vue';
 import UploadPhotos from '@/components/UploadPhotos.vue';
-import { usePhotos } from '@/composables';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
-import { useAlbumStore, useDialogStore, useUserConfigStore } from '@/stores';
+import { useAlbumStore, useDialogStore, usePhotoStore, useUserConfigStore } from '@/stores';
 import {
   IconArrowNarrowLeft,
   IconChecks,
@@ -254,8 +253,9 @@ const dialogStore = useDialogStore();
 const { dialogStates } = storeToRefs(dialogStore);
 const { isAdmin } = storeToRefs(useUserConfigStore());
 
-const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } =
-  usePhotos();
+const photoStore = usePhotoStore();
+const { isFetchingPhotos, photosInAlbum, selectedPhotos } = storeToRefs(photoStore);
+const { setSelectedPhotos, fetchPhotos } = photoStore;
 const { refetchAlbums } = useAlbumStore();
 const { currentAlbum } = storeToRefs(useAlbumStore());
 

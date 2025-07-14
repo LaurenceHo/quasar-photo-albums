@@ -53,10 +53,9 @@
 </template>
 
 <script lang="ts" setup>
-import { usePhotos } from '@/composables';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
-import { useAlbumStore, useDialogStore } from '@/stores';
+import { useAlbumStore, useDialogStore, usePhotoStore } from '@/stores';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
@@ -94,8 +93,9 @@ const dialogStore = useDialogStore();
 const { dialogStates } = storeToRefs(dialogStore);
 const { refetchAlbums, isAlbumCover: checkIsAlbumCover } = useAlbumStore();
 const { currentAlbum } = storeToRefs(useAlbumStore());
-
-const { currentPhotoToBeRenamed, findPhotoIndex } = usePhotos();
+const photoStore = usePhotoStore();
+const { currentPhotoToBeRenamed } = storeToRefs(photoStore);
+const { findPhotoIndex } = photoStore;
 
 const findFileTypeIndex = computed(() => currentPhotoToBeRenamed.value.lastIndexOf('.'));
 const fileType = computed(() => currentPhotoToBeRenamed.value.slice(findFileTypeIndex.value));

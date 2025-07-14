@@ -64,8 +64,8 @@
 <script lang="ts" setup>
 import { EditPhotoButton } from '@/components/button';
 import SquareImage from '@/components/SquareImage.vue';
-import { useDevice, usePhotos } from '@/composables';
-import { useAlbumStore, useUserConfigStore } from '@/stores';
+import { useDevice } from '@/composables';
+import { useAlbumStore, usePhotoStore, useUserConfigStore } from '@/stores';
 import { IconCircleCheckFilled, IconInfoCircle } from '@tabler/icons-vue';
 import { storeToRefs } from 'pinia';
 import Button from 'primevue/button';
@@ -92,7 +92,9 @@ const router = useRouter();
 
 const { isAdmin, darkMode } = storeToRefs(useUserConfigStore());
 const { isAlbumCover } = useAlbumStore();
-const { selectedPhotos, setSelectedPhotos } = usePhotos();
+const photoStore = usePhotoStore();
+const { selectedPhotos } = storeToRefs(photoStore);
+const { setSelectedPhotos } = photoStore;
 const { isXSmallDevice } = useDevice();
 
 const photoId = computed(() => photo.value['key'].split('/')[1]);
