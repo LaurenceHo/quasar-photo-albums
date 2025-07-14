@@ -86,8 +86,6 @@ import {
   useFeaturedAlbumsStore,
   useUserConfigStore,
 } from '@/stores';
-import type { FilteredAlbumsByYear } from '@/stores/album';
-import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
 import { IconSortAscendingLetters, IconSortDescendingLetters } from '@tabler/icons-vue';
 import { storeToRefs } from 'pinia';
 import { Button, type PageState, Paginator, ScrollTop, Skeleton, ToggleSwitch } from 'primevue';
@@ -107,6 +105,7 @@ const {
   filteredAlbums,
   filterState,
   isError: isFetchingAlbumError,
+  filteredAlbumsByYear,
 } = storeToRefs(albumStore);
 const { isFetching: isFetchingFeaturedAlbums, data: featuredAlbums } =
   storeToRefs(useFeaturedAlbumsStore());
@@ -139,10 +138,6 @@ const chunkAlbumList = computed(() =>
   filteredAlbums.value.slice(firstIndex.value, lastIndex.value),
 );
 
-const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(
-  localStorage.getItem(FILTERED_ALBUMS_BY_YEAR) || '{}',
-);
-
 const onPageChange = (event: PageState) => {
   pageNumber.value = event.page + 1;
   itemsPerPage.value = event.rows;
@@ -155,16 +150,20 @@ const setSelectedTags = (tags: string[]) => albumStore.setSelectedTags(tags);
 const setSelectedYear = (year: string) =>
   router.push({ name: 'albumsByYear', params: { year: year } });
 
-watch(isFetchingAlbumError, (newValue) => {
-  if (newValue) {
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'Error while fetching albums. Please try again later.',
-      life: 3000,
-    });
-  }
-});
+watch(
+  isFetchingAlbumError,
+  (newValue) => {
+    if (newValue) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while fetching albums. Please try again later.',
+        life: 3000,
+      });
+    }
+  },
+  { immediate: true },
+);
 
 watch(paramsYear, (newValue) => {
   albumStore.setSelectedYear(newValue);
@@ -172,7 +171,10 @@ watch(paramsYear, (newValue) => {
 
 watch(isFetchingAlbums, (newValue) => {
   if (!newValue && !paramsYear.value) {
-    router.push({ name: 'albumsByYear', params: { year: filteredAlbumsByYear?.year || 'na' } });
+    router.push({
+      name: 'albumsByYear',
+      params: { year: filteredAlbumsByYear.value?.year || 'na' },
+    });
   }
 });
 </script>

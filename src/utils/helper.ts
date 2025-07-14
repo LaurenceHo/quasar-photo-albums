@@ -1,3 +1,26 @@
+import type { FilteredAlbumsByYear } from '@/stores/album';
+import type { AlbumsWithLocation } from '@/stores/album-locations';
+import { ALBUMS_WITH_LOCATION, FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
+type Key = typeof ALBUMS_WITH_LOCATION | typeof FILTERED_ALBUMS_BY_YEAR;
+
+export const getDataFromLocalStorage = (
+  key: Key,
+): FilteredAlbumsByYear | AlbumsWithLocation | null => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+};
+
+export const setDataIntoLocalStorage = (
+  key: Key,
+  data: FilteredAlbumsByYear | AlbumsWithLocation,
+) => {
+  localStorage.setItem(key, JSON.stringify(data));
+};
+
 export const getStaticFileUrl = (objectKey: string): string => {
   return `${import.meta.env.VITE_STATIC_FILES_URL}/${objectKey}`;
 };
