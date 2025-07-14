@@ -2,15 +2,14 @@ import CreateAlbum from '@/components/dialog/CreateAlbum.vue';
 import router from '@/router';
 import { AlbumService } from '@/services/album-service';
 import { LocationService } from '@/services/location-service';
-import { useDialogStore } from '@/stores';
+import { useDialogStore, useAlbumStore } from '@/stores';
+import { createTestingPinia } from '@pinia/testing';
 import { QueryClient, VueQueryPlugin, type VueQueryPluginOptions } from '@tanstack/vue-query';
 import { flushPromises, mount } from '@vue/test-utils';
 import { AutoComplete, ToggleSwitch } from 'primevue';
 import PrimeVue from 'primevue/config';
 import { useToast } from 'primevue/usetoast';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ref } from 'vue';
-import { createTestingPinia } from '@pinia/testing';
 
 // Mock services
 vi.mock('@/services/album-service', () => ({
@@ -34,31 +33,6 @@ vi.mock('@/services/location-service', () => ({
 
 vi.mock('primevue/usetoast', () => ({
   useToast: vi.fn(),
-}));
-
-// Mock albums context
-vi.mock('@/composables/use-albums', () => ({
-  default: () => ({
-    albumToBeUpdate: ref({
-      year: String(new Date().getFullYear()),
-      id: '',
-      albumName: '',
-      albumCover: '',
-      description: '',
-      tags: [],
-      isPrivate: true,
-    }),
-    setAlbumToBeUpdated: vi.fn(),
-    fetchAlbumsByYear: vi.fn(),
-  }),
-}));
-
-// Mock album tags context
-vi.mock('@/composables/use-album-tags', () => ({
-  default: () => ({
-    albumTags: ref([]),
-    fetchAlbumTags: vi.fn(),
-  }),
 }));
 
 // Create a test query client for tests
@@ -272,5 +246,93 @@ describe('CreateAlbum', () => {
     await wrapper.find('[data-test-id="cancel-button"]').trigger('click');
 
     expect(dialogStore.dialogStates.updateAlbum).toBe(false);
+  });
+
+  it('displays existing album data when editing', async () => {
+    const albumStore = useAlbumStore();
+    albumStore.albumToBeUpdate = {
+      year: '2023',
+      id: 'existing-album',
+      albumName: 'Existing Album',
+      description: 'Existing Description',
+      isPrivate: false,
+      isFeatured: true,
+      tags: ['existing-tag'],
+      place: {
+        displayName: 'Test Place',
+        formattedAddress: 'Test Address',
+        location: { latitude: 10, longitude: 20 },
+      },
+    };
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    expect(wrapper.find('[data-test-id="dialog-title"]').text()).toBe('Edit Album');
+    expect(wrapper.find('[data-test-id="select-album-year"]').classes()).toContain('p-disabled');
+    expect(wrapper.find('[data-test-id="input-album-id"]').attributes('disabled')).toBe('');
+    expect((wrapper.find('[data-test-id="input-album-name"]').element as HTMLInputElement).value).toBe('Existing Album');
+    expect((wrapper.find('[data-test-id="input-album-desc"]').element as HTMLTextAreaElement).value).toBe('Existing Description');
+    expect(wrapper.findComponent(ToggleSwitch).props('modelValue')).toBe(false);
+    expect(wrapper.findAllComponents(ToggleSwitch)[1].props('modelValue')).toBe(true);
+    expect((wrapper.find('.p-autocomplete-input').element as HTMLInputElement).value).toBe('Test Place');
+    expect(wrapper.findComponent({ name: 'PhotoLocationMap' }).exists()).toBe(true);
+  });
+
+  it('successfully updates an existing album', async () => {
+    const albumStore = useAlbumStore();
+    albumStore.albumToBeUpdate = {
+      year: '2023',
+      id: 'existing-album',
+      albumName: 'Old Name',
+      description: 'Old Description',
+      isPrivate: true,
+    };
+    const wrapper = mountComponent();
+    await flushPromises();
+
+    await wrapper.find('[data-test-id="input-album-name"]').setValue('New Name');
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(AlbumService.updateAlbum).toHaveBeenCalledWith(expect.objectContaining({
+      albumName: 'New Name',
+    }));
+
+    const toast = useToast();
+    expect(toast.add).toHaveBeenCalledWith(expect.objectContaining({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Album "New Name" updated.',
+    }));
+  });
+
+  it('validates album name and description length', async () => {
+    const wrapper = mountComponent();
+    const albumNameInput = wrapper.find('[data-test-id="input-album-name"]');
+    const albumDescInput = wrapper.find('[data-test-id="input-album-desc"]');
+
+    await albumNameInput.setValue('a');
+    expect(wrapper.text()).toContain('It must be at least 2 characters long');
+    await albumNameInput.setValue('a'.repeat(51));
+    expect(wrapper.text()).toContain('It cannot exceed 50 characters');
+
+    await albumDescInput.setValue('a'.repeat(201));
+    expect(wrapper.text()).toContain('It cannot exceed 200 characters');
+  });
+
+  it('opens create tag dialog when button is clicked', async () => {
+    const wrapper = mountComponent();
+    await wrapper.find('[data-test-id="create-tag-button"]').trigger('click');
+    expect(dialogStore.setDialogState).toHaveBeenCalledWith('createAlbumTag', true);
+  });
+
+  it('handles empty place search query', async () => {
+    const wrapper = mountComponent();
+    const autoComplete = wrapper.findComponent(AutoComplete);
+    autoComplete.vm.$emit('complete', { query: '' });
+    await flushPromises();
+    expect(LocationService.searchPlaces).not.toHaveBeenCalled();
+    // You might need to check the component's internal state if possible
+    // For example, expect(wrapper.vm.placeSuggestions).toEqual([]);
   });
 });

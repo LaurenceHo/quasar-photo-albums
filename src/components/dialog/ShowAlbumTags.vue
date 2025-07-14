@@ -56,9 +56,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useAlbumTags } from '@/composables';
 import { AlbumTagService } from '@/services/album-tag-service';
-import { useAlbumStore, useDialogStore } from '@/stores';
+import { useAlbumStore, useAlbumTagsStore, useDialogStore } from '@/stores';
 import type { FilteredAlbumsByYear } from '@/stores/album';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-vue';
@@ -74,7 +73,8 @@ const toast = useToast();
 
 const dialogStore = useDialogStore();
 const { dialogStates } = storeToRefs(dialogStore);
-const { albumTags, fetchAlbumTags } = useAlbumTags();
+const albumTagsStore = useAlbumTagsStore();
+const { data: albumTags } = storeToRefs(albumTagsStore);
 const { refetchAlbums } = useAlbumStore();
 
 const tagName = ref('');
@@ -114,7 +114,7 @@ const { mutate: deleteAlbumTag, reset } = useMutation({
       detail: `Tag "${tagName.value}" deleted.`,
       life: 3000,
     });
-    await fetchAlbumTags(true);
+    await albumTagsStore.refetchAlbumTags(true);
     await refetchAlbums(paramsYear.value || filteredAlbumsByYear?.year, true);
     tagName.value = '';
   },

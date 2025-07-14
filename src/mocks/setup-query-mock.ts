@@ -1,5 +1,6 @@
-import { featuredAlbums } from '@/mocks/aggregate-handler';
+import { mockFeaturedAlbums } from '@/mocks/aggregate-handler';
 import { mockAlbums } from '@/mocks/album-handler';
+import { mockTravelRecords } from '@/mocks/travel-records-handler';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { vi } from 'vitest';
 import { ref } from 'vue';
@@ -41,7 +42,9 @@ export const setupQueryMocks = (overrides: { useQuery?: any; useQueryClient?: an
       case 'fetchAlbumsByYears':
         return createBaseMockQueryReturn(mockAlbums, overrides.useQuery);
       case 'featuredAlbums':
-        return createBaseMockQueryReturn(featuredAlbums, overrides.useQuery);
+        return createBaseMockQueryReturn(mockFeaturedAlbums, overrides.useQuery);
+      case 'getTravelRecords':
+        return createBaseMockQueryReturn(mockTravelRecords, overrides.useQuery);
       default:
         return createBaseMockQueryReturn(null);
     }

@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from 'msw';
 
-export const mockRecords = [
+export const mockTravelRecords = [
   // Route 1: Taipei to Tokyo
   {
     travelDate: '2025-04-03T02:39:56.439Z',
@@ -253,7 +253,7 @@ export const getTravelRecords = http.get('/api/travelRecords', async () => {
     code: 200,
     status: 'Success',
     message: 'ok',
-    data: mockRecords,
+    data: mockTravelRecords,
   });
 });
 

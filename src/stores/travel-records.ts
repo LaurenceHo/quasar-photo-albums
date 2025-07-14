@@ -1,33 +1,27 @@
-import { useQuery, useQueryClient } from '@tanstack/vue-query';
-import { defineStore } from 'pinia';
-import { computed } from 'vue';
 import type { TravelRecord } from '@/schema';
 import { TravelRecordService } from '@/services/travel-record-service';
-import { compareDbUpdatedTime, fetchDbUpdatedTime, interpolateGreatCircle } from '@/utils/helper';
+import {
+  compareDbUpdatedTime,
+  fetchDbUpdatedTime,
+  getDataFromLocalStorage,
+  interpolateGreatCircle,
+  setDataIntoLocalStorage,
+} from '@/utils/helper';
 import { TRAVEL_RECORDS } from '@/utils/local-storage-key';
+import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import type { Feature, FeatureCollection, LineString } from 'geojson';
+import { defineStore } from 'pinia';
+import { computed } from 'vue';
 
 export interface TravelRecords {
   dbUpdatedTime: string;
   travelRecords: TravelRecord[];
 }
 
-const _getStoredTravelRecords = (): TravelRecords | null => {
-  try {
-    const stored = localStorage.getItem(TRAVEL_RECORDS);
-    return stored ? JSON.parse(stored) : null;
-  } catch {
-    return null;
-  }
-};
-
-const _storeTravelRecords = (data: TravelRecords) => {
-  localStorage.setItem(TRAVEL_RECORDS, JSON.stringify(data));
-};
-
-const _shouldRefetch = async (): Promise<boolean> => {
-  const stored = _getStoredTravelRecords();
+const _shouldRefetch = async (forceUpdate = false): Promise<boolean> => {
+  const stored = getDataFromLocalStorage(TRAVEL_RECORDS);
   if (!stored) return true;
+  if (forceUpdate) return true;
   const { isLatest } = await compareDbUpdatedTime(stored.dbUpdatedTime, 'travel');
   return !isLatest;
 };
@@ -37,8 +31,8 @@ const _fetchTravelRecordsAndSetToLocalStorage = async (
 ): Promise<TravelRecord[]> => {
   try {
     // Bypass _shouldRefetch if forceRefetch is true
-    if (!forceRefetch && !(await _shouldRefetch())) {
-      const travelRecordsWithDBTime = _getStoredTravelRecords();
+    if (!(await _shouldRefetch(forceRefetch))) {
+      const travelRecordsWithDBTime = getDataFromLocalStorage(TRAVEL_RECORDS) as TravelRecords;
       return travelRecordsWithDBTime ? travelRecordsWithDBTime.travelRecords : [];
     }
 
@@ -51,7 +45,7 @@ const _fetchTravelRecordsAndSetToLocalStorage = async (
     }
 
     if (travelRecords) {
-      _storeTravelRecords({
+      setDataIntoLocalStorage(TRAVEL_RECORDS, {
         dbUpdatedTime: timeJson?.travel || '',
         travelRecords,
       });

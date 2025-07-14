@@ -1,11 +1,23 @@
 import type { FilteredAlbumsByYear } from '@/stores/album';
 import type { AlbumsWithLocation } from '@/stores/album-locations';
-import { ALBUMS_WITH_LOCATION, FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
-type Key = typeof ALBUMS_WITH_LOCATION | typeof FILTERED_ALBUMS_BY_YEAR;
+import type { AlbumTags } from '@/stores/album-tags';
+import type { TravelRecords } from '@/stores/travel-records';
+import {
+  ALBUM_TAGS,
+  ALBUMS_WITH_LOCATION,
+  FILTERED_ALBUMS_BY_YEAR,
+  TRAVEL_RECORDS,
+} from '@/utils/local-storage-key';
+
+type LocalStorageKey =
+  | typeof ALBUMS_WITH_LOCATION
+  | typeof ALBUM_TAGS
+  | typeof FILTERED_ALBUMS_BY_YEAR
+  | typeof TRAVEL_RECORDS;
 
 export const getDataFromLocalStorage = (
-  key: Key,
-): FilteredAlbumsByYear | AlbumsWithLocation | null => {
+  key: LocalStorageKey,
+): FilteredAlbumsByYear | AlbumsWithLocation | TravelRecords | AlbumTags | null => {
   try {
     const stored = localStorage.getItem(key);
     return stored ? JSON.parse(stored) : null;
@@ -15,8 +27,8 @@ export const getDataFromLocalStorage = (
 };
 
 export const setDataIntoLocalStorage = (
-  key: Key,
-  data: FilteredAlbumsByYear | AlbumsWithLocation,
+  key: LocalStorageKey,
+  data: FilteredAlbumsByYear | AlbumsWithLocation | TravelRecords | AlbumTags,
 ) => {
   localStorage.setItem(key, JSON.stringify(data));
 };

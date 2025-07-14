@@ -37,9 +37,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useAlbumTags } from '@/composables';
-import { useDialogStore } from '@/stores';
 import { AlbumTagService } from '@/services/album-tag-service';
+import { useAlbumTagsStore, useDialogStore } from '@/stores';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
@@ -50,7 +49,7 @@ import { computed, ref } from 'vue';
 const toast = useToast();
 const dialogStore = useDialogStore();
 const { dialogStates } = storeToRefs(dialogStore);
-const { fetchAlbumTags } = useAlbumTags();
+const albumTagsStore = useAlbumTagsStore();
 
 const tagName = ref('');
 
@@ -84,7 +83,7 @@ const { isPending: isCreatingTag, mutate: createAlbumTag } = useMutation({
       detail: `Tag "${tagName.value}" created.`,
       life: 3000,
     });
-    await fetchAlbumTags(true);
+    await albumTagsStore.refetchAlbumTags(true);
     onReset();
   },
   onError: () => {

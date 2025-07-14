@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from 'msw';
 
-export const featuredAlbums = [
+export const mockFeaturedAlbums = [
   {
     albumName: '1 demo-album 1',
     year: 'na',
@@ -137,7 +137,7 @@ export const getFeaturedAlbums = http.get('/api/aggregate/featuredAlbums', async
     code: 200,
     status: 'Success',
     message: 'ok',
-    data: featuredAlbums,
+    data: mockFeaturedAlbums,
   });
 });
 

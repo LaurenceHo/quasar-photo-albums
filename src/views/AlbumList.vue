@@ -117,10 +117,7 @@ const { dialogStates } = storeToRefs(dialogStore);
 const pageNumber = ref(1);
 const itemsPerPage = ref(20);
 
-const sortOrder = computed({
-  get: () => filterState.value.sortOrder,
-  set: (value: 'asc' | 'desc') => albumStore.setSortOrder(value),
-});
+const sortOrder = computed(() => filterState.value.sortOrder);
 
 const privateOnly = computed({
   get: () => filterState.value.privateOnly,
@@ -143,7 +140,7 @@ const onPageChange = (event: PageState) => {
   itemsPerPage.value = event.rows;
 };
 
-const toggleSortOrder = () => (sortOrder.value = sortOrder.value === 'desc' ? 'asc' : 'desc');
+const toggleSortOrder = () => albumStore.setSortOrder(sortOrder.value === 'desc' ? 'asc' : 'desc');
 
 const setSelectedTags = (tags: string[]) => albumStore.setSelectedTags(tags);
 

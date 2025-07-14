@@ -34,7 +34,9 @@ const _shouldRefetch = async (): Promise<boolean> => {
 const _fetchAlbumsWithLocationAndSetToLocationStorage = async () => {
   try {
     if (!(await _shouldRefetch())) {
-      const albumLocationsWithDBTime = getDataFromLocalStorage(ALBUMS_WITH_LOCATION);
+      const albumLocationsWithDBTime = getDataFromLocalStorage(
+        ALBUMS_WITH_LOCATION,
+      ) as AlbumsWithLocation;
       return albumLocationsWithDBTime ? albumLocationsWithDBTime.albums : [];
     }
 

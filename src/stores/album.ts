@@ -114,6 +114,17 @@ export const useAlbumStore = defineStore('album', () => {
     refetchOnReconnect: false,
   });
 
+  const refetchAlbums = async (year: string, forceRefetch = false) => {
+    if (forceRefetch) {
+      await queryClient.invalidateQueries({ queryKey: ['fetchAlbumsByYears'] });
+      return queryClient.fetchQuery({
+        queryKey: ['fetchAlbumsByYears'],
+        queryFn: () => _fetchAlbumsAndSetToLocalStorage(year, true),
+      });
+    }
+    return refetchQuery();
+  };
+
   const applyFilters = () => {
     let result = [...(data.value || [])];
 
@@ -155,17 +166,6 @@ export const useAlbumStore = defineStore('album', () => {
     },
     { deep: true },
   );
-
-  const refetchAlbums = async (year: string, forceRefetch = false) => {
-    if (forceRefetch) {
-      await queryClient.invalidateQueries({ queryKey: ['fetchAlbumsByYears'] });
-      return queryClient.fetchQuery({
-        queryKey: ['fetchAlbumsByYears'],
-        queryFn: () => _fetchAlbumsAndSetToLocalStorage(year, true),
-      });
-    }
-    return refetchQuery();
-  };
 
   const setAlbumToBeUpdated = (album: Album) => (albumToBeUpdate.value = album);
   const setCurrentAlbum = (album: Album) => (currentAlbum.value = album);

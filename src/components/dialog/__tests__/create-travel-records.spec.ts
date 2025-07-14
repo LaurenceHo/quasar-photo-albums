@@ -1,4 +1,5 @@
 import CreateTravelRecordsDialog from '@/components/dialog/CreateTravelRecords.vue';
+import { setupQueryMocks } from '@/mocks/setup-query-mock';
 import { LocationService } from '@/services/location-service';
 import { useTravelRecordsStore, useDialogStore } from '@/stores';
 import { createTestingPinia } from '@pinia/testing';
@@ -15,18 +16,6 @@ vi.mock('@tanstack/vue-query', () => ({
   useMutation: vi.fn(),
   useQueryClient: vi.fn(),
 }));
-
-vi.mocked(useQuery).mockReturnValue({
-  refetch: vi.fn(),
-  data: ref(null),
-  isFetching: ref(false),
-  isError: ref(false),
-} as any);
-
-vi.mocked(useMutation).mockReturnValue({
-  isPending: ref(false),
-  mutate: vi.fn(),
-} as any);
 
 vi.mock('primevue/usetoast', () => ({
   useToast: vi.fn(),
@@ -50,6 +39,7 @@ describe('CreateTravelRecordsDialog', () => {
   let dialogStore: ReturnType<typeof useDialogStore>;
 
   beforeEach(() => {
+    setupQueryMocks();
     vi.clearAllMocks();
 
     const pinia = createTestingPinia({
@@ -58,7 +48,6 @@ describe('CreateTravelRecordsDialog', () => {
     });
 
     dialogStore = useDialogStore();
-
     dialogStore.setDialogState('createTravelRecords', true);
 
     wrapper = mount(CreateTravelRecordsDialog, {

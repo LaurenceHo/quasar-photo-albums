@@ -189,12 +189,11 @@
 <script lang="ts" setup>
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SelectTags from '@/components/select/SelectTags.vue';
-import { useAlbumTags } from '@/composables';
 import type { Album, Place } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { LocationService } from '@/services/location-service';
-import { useAlbumStore, useDialogStore } from '@/stores';
+import { useAlbumStore, useAlbumTagsStore, useDialogStore } from '@/stores';
 import { getYearOptions } from '@/utils/helper';
 import { IconPlus } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
@@ -223,7 +222,8 @@ const dialogStore = useDialogStore();
 const { dialogStates } = storeToRefs(dialogStore);
 const { setAlbumToBeUpdated, refetchAlbums } = useAlbumStore();
 const { albumToBeUpdate } = storeToRefs(useAlbumStore());
-const { albumTags } = useAlbumTags();
+const albumTagsStore = useAlbumTagsStore();
+const { data: albumTags } = storeToRefs(albumTagsStore);
 
 const selectedYear = ref(String(new Date().getFullYear()));
 const albumId = ref('');
@@ -236,7 +236,9 @@ const selectedPlace = ref<Place | null>(null);
 const placeSuggestions = ref<Place[]>([]);
 const isSearching = ref(false);
 
-const storedTagsStringArray = computed(() => albumTags.value.map((tag) => tag.tag));
+const storedTagsStringArray = computed(() =>
+  albumTags.value ? albumTags.value.map((tag) => tag.tag) : [],
+);
 const locationLatitude = computed(() => selectedPlace.value?.location?.latitude || 0);
 const locationLongitude = computed(() => selectedPlace.value?.location?.longitude || 0);
 
