@@ -79,7 +79,9 @@ export const compareDbUpdatedTime = async (
 };
 
 export const sortByKey = <T>(array: T[], key: keyof T, sortOrder: 'asc' | 'desc'): T[] => {
-  return array.sort((a, b) => {
+  // Create a shallow copy of the array to avoid mutating the input
+  const sortedArray = [...array];
+  return sortedArray.sort((a, b) => {
     const aValue = a[key];
     const bValue = b[key];
 

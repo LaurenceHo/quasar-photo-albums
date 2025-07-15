@@ -315,19 +315,14 @@ const refreshPhotoList = async () => {
   setSelectedPhotos([]);
 };
 
-fetchPhotos(albumId.value, albumYear.value).catch(() => {
-  toast.add({
-    severity: 'error',
-    summary: 'Error',
-    detail: 'Error while fetching photos. Please try again later.',
-    life: 3000,
-  });
-});
-
-watch(albumId, (newValue) => {
-  if (newValue) {
-    fetchPhotos(newValue, albumYear.value);
-    setSelectedPhotos([]);
-  }
-});
+watch(
+  albumId,
+  (newValue) => {
+    if (newValue) {
+      fetchPhotos(newValue, albumYear.value);
+      setSelectedPhotos([]);
+    }
+  },
+  { immediate: true },
+);
 </script>

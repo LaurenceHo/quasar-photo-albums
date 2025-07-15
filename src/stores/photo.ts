@@ -13,6 +13,7 @@ export const usePhotoStore = defineStore('photo', () => {
 
   const albumStore = useAlbumStore();
   const { currentAlbum } = storeToRefs(albumStore);
+  const queryKey = computed(() => ['photos', currentAlbum.value.id, currentAlbum.value.year]);
 
   const {
     data: fetchedPhotosData,
@@ -20,7 +21,7 @@ export const usePhotoStore = defineStore('photo', () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ['photos', currentAlbum],
+    queryKey,
     queryFn: async () => {
       const { id, year } = currentAlbum.value;
       if (!id || !year) return { photos: [], album: initialAlbum };
@@ -36,6 +37,8 @@ export const usePhotoStore = defineStore('photo', () => {
       }
       return data;
     },
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     enabled: computed(() => !!currentAlbum.value.id && !!currentAlbum.value.year),
   });
 
@@ -46,9 +49,8 @@ export const usePhotoStore = defineStore('photo', () => {
     }
   });
 
-  // This is the new fetchPhotos that components will call
   const fetchPhotos = async (albumId: string, albumYear: string, refreshPhotosList?: boolean) => {
-    if (albumId !== currentAlbum.value.id) {
+    if (albumId !== currentAlbum.value.id || albumYear !== currentAlbum.value.year) {
       // This will trigger the useQuery to be enabled and run
       albumStore.setCurrentAlbum({ ...initialAlbum, id: albumId, year: albumYear });
     } else if (refreshPhotosList) {

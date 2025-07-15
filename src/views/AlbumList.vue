@@ -90,35 +90,42 @@ import { IconSortAscendingLetters, IconSortDescendingLetters } from '@tabler/ico
 import { storeToRefs } from 'pinia';
 import { Button, type PageState, Paginator, ScrollTop, Skeleton, ToggleSwitch } from 'primevue';
 import { useToast } from 'primevue/usetoast';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
-
 const { isXSmallDevice } = useDevice();
-
 const albumStore = useAlbumStore();
+const dialogStore = useDialogStore();
+
 const {
   isFetching: isFetchingAlbums,
   filteredAlbums,
   filterState,
   isError: isFetchingAlbumError,
   filteredAlbumsByYear,
+  selectedYear,
 } = storeToRefs(albumStore);
 const { isFetching: isFetchingFeaturedAlbums, data: featuredAlbums } =
   storeToRefs(useFeaturedAlbumsStore());
 const { isAdmin } = storeToRefs(useUserConfigStore());
-const dialogStore = useDialogStore();
 const { dialogStates } = storeToRefs(dialogStore);
+
+onMounted(() => {
+  albumStore.setEnabled(true);
+  // Initialise selectedYear from route params if available, but only if different
+  if (route.params.year && route.params.year !== selectedYear.value) {
+    albumStore.setSelectedYear(route.params.year as string);
+  }
+});
 
 // Pagination state
 const pageNumber = ref(1);
 const itemsPerPage = ref(20);
 
 const sortOrder = computed(() => filterState.value.sortOrder);
-
 const privateOnly = computed({
   get: () => filterState.value.privateOnly,
   set: (value: boolean) => albumStore.setPrivateOnly(value),
@@ -139,13 +146,9 @@ const onPageChange = (event: PageState) => {
   pageNumber.value = event.page + 1;
   itemsPerPage.value = event.rows;
 };
-
 const toggleSortOrder = () => albumStore.setSortOrder(sortOrder.value === 'desc' ? 'asc' : 'desc');
-
 const setSelectedTags = (tags: string[]) => albumStore.setSelectedTags(tags);
-
-const setSelectedYear = (year: string) =>
-  router.push({ name: 'albumsByYear', params: { year: year } });
+const setSelectedYear = (year: string) => albumStore.setSelectedYear(year);
 
 watch(
   isFetchingAlbumError,
@@ -163,7 +166,10 @@ watch(
 );
 
 watch(paramsYear, (newValue) => {
-  albumStore.setSelectedYear(newValue);
+  // Only update selectedYear if it differs from the current store value
+  if (newValue && newValue !== selectedYear.value) {
+    albumStore.setSelectedYear(newValue);
+  }
 });
 
 watch(isFetchingAlbums, (newValue) => {

@@ -12,9 +12,10 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import { defineStore } from 'pinia';
 import { isEmpty } from 'radash';
 import { computed, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 export const initialAlbum: Album = {
-  year: '',
+  year: String(new Date().getFullYear()),
   id: '',
   albumName: '',
   albumCover: '',
@@ -81,7 +82,9 @@ const _fetchAlbumsAndSetToLocalStorage = async (year: string, forceUpdate: boole
 
 export const useAlbumStore = defineStore('album', () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
+  const isEnabled = ref(false);
   const selectedYear = ref<string>('na');
   const currentAlbum = ref(initialAlbum);
   const albumToBeUpdate = ref(initialAlbum);
@@ -96,13 +99,16 @@ export const useAlbumStore = defineStore('album', () => {
     getDataFromLocalStorage(FILTERED_ALBUMS_BY_YEAR) as FilteredAlbumsByYear,
   );
 
+  // Make queryKey reactive by using a computed property
+  const queryKey = computed(() => ['fetchAlbumsByYears', selectedYear.value]);
+
   const {
     data,
     isFetching,
     isError,
     refetch: refetchQuery,
   } = useQuery({
-    queryKey: ['fetchAlbumsByYears'],
+    queryKey, // Use the computed queryKey
     queryFn: async () => {
       const albums = await _fetchAlbumsAndSetToLocalStorage(selectedYear.value, false);
       filteredAlbumsByYear.value = getDataFromLocalStorage(
@@ -112,13 +118,25 @@ export const useAlbumStore = defineStore('album', () => {
     },
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
+    enabled: isEnabled,
   });
+
+  // Watch selectedYear and update route only if necessary
+  watch(
+    selectedYear,
+    async (newYear) => {
+      // Only push route if it differs from current route
+      if (router.currentRoute.value.params.year !== newYear) {
+        await router.push({ name: 'albumsByYear', params: { year: newYear } });
+      }
+    },
+    { immediate: false },
+  );
 
   const refetchAlbums = async (year: string, forceRefetch = false) => {
     if (forceRefetch) {
-      await queryClient.invalidateQueries({ queryKey: ['fetchAlbumsByYears'] });
       return queryClient.fetchQuery({
-        queryKey: ['fetchAlbumsByYears'],
+        queryKey: ['fetchAlbumsByYears', year],
         queryFn: () => _fetchAlbumsAndSetToLocalStorage(year, true),
       });
     }
@@ -175,6 +193,7 @@ export const useAlbumStore = defineStore('album', () => {
   const setPrivateOnly = (value: boolean) => (filterState.value.privateOnly = value);
   const setSortOrder = (value: 'asc' | 'desc') => (filterState.value.sortOrder = value);
   const setSelectedTags = (value: string[]) => (filterState.value.selectedTags = value);
+  const setEnabled = (value: boolean) => (isEnabled.value = value);
 
   const clearFilters = () => {
     filterState.value = {
@@ -192,7 +211,7 @@ export const useAlbumStore = defineStore('album', () => {
     currentAlbum,
     albumToBeUpdate,
     filterState,
-    filteredAlbums: computed(() => filteredAlbums.value),
+    filteredAlbums,
     filteredAlbumsByYear,
     setAlbumToBeUpdated,
     setCurrentAlbum,
@@ -204,5 +223,6 @@ export const useAlbumStore = defineStore('album', () => {
     setSortOrder,
     setSelectedTags,
     clearFilters,
+    setEnabled,
   };
 });

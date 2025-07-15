@@ -49,6 +49,16 @@ const {
 });
 
 watch(
+  selectedYear,
+  (newValue) => {
+    if (newValue !== internalSelectedYear.value) {
+      internalSelectedYear.value = newValue;
+    }
+  },
+  { immediate: true },
+);
+
+watch(
   internalSelectedYear,
   (value) => {
     emits('selectYear', value);

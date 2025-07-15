@@ -194,9 +194,10 @@ import { AlbumService } from '@/services/album-service';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { LocationService } from '@/services/location-service';
 import { useAlbumStore, useAlbumTagsStore, useDialogStore } from '@/stores';
+import { initialAlbum } from '@/stores/album';
 import { getYearOptions } from '@/utils/helper';
 import { IconPlus } from '@tabler/icons-vue';
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
 import { storeToRefs } from 'pinia';
@@ -217,12 +218,15 @@ import { useRouter } from 'vue-router';
 
 const toast = useToast();
 const router = useRouter();
+const queryClient = useQueryClient();
 
 const dialogStore = useDialogStore();
-const { dialogStates } = storeToRefs(dialogStore);
-const { setAlbumToBeUpdated, refetchAlbums } = useAlbumStore();
-const { albumToBeUpdate } = storeToRefs(useAlbumStore());
 const albumTagsStore = useAlbumTagsStore();
+const albumStore = useAlbumStore();
+
+const { setAlbumToBeUpdated } = albumStore;
+const { dialogStates } = storeToRefs(dialogStore);
+const { albumToBeUpdate } = storeToRefs(albumStore);
 const { data: albumTags } = storeToRefs(albumTagsStore);
 
 const selectedYear = ref(String(new Date().getFullYear()));
@@ -340,8 +344,11 @@ const { isPending: isCreatingAlbum, mutate: createAlbum } = useMutation({
 
       setTimeout(async () => {
         resetAlbum();
-        await refetchAlbums(album.year, true);
-        await router.push({ name: 'albumsByYear', params: { year: album.year } });
+        if (router.currentRoute.value.params.year === album.year) {
+          await queryClient.invalidateQueries({ queryKey: ['fetchAlbumsByYears', album.year] });
+        } else {
+          await router.push({ name: 'albumsByYear', params: { year: album.year } });
+        }
       }, 2000);
     }
   },
@@ -357,15 +364,7 @@ const { isPending: isCreatingAlbum, mutate: createAlbum } = useMutation({
 
 const resetAlbum = () => {
   selectedPlace.value = null;
-  setAlbumToBeUpdated({
-    year: String(new Date().getFullYear()),
-    id: '',
-    albumName: '',
-    albumCover: '',
-    description: '',
-    tags: [],
-    isPrivate: true,
-  });
+  setAlbumToBeUpdated(initialAlbum);
   dialogStore.setDialogState('updateAlbum', false);
 };
 
