@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="updateAlbumDialogState"
+    v-model:visible="dialogStates.updateAlbum"
     :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
     :closable="false"
     class="w-[450px]"
@@ -112,7 +112,7 @@
             data-test-id="create-tag-button"
             severity="secondary"
             text
-            @click="setCreateAlbumTagDialogState(true)"
+            @click="dialogStore.setDialogState('createAlbumTag', true)"
           >
             <IconPlus :size="24" />
           </Button>
@@ -189,15 +189,15 @@
 <script lang="ts" setup>
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SelectTags from '@/components/select/SelectTags.vue';
-import { useAlbums, useAlbumTags } from '@/composables';
 import type { Album, Place } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { AlbumTagService } from '@/services/album-tag-service';
 import { LocationService } from '@/services/location-service';
-import { useDialogStore } from '@/stores';
+import { useAlbumStore, useAlbumTagsStore, useDialogStore } from '@/stores';
+import { initialAlbum } from '@/stores/album';
 import { getYearOptions } from '@/utils/helper';
 import { IconPlus } from '@tabler/icons-vue';
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
 import { storeToRefs } from 'pinia';
@@ -218,12 +218,16 @@ import { useRouter } from 'vue-router';
 
 const toast = useToast();
 const router = useRouter();
+const queryClient = useQueryClient();
 
 const dialogStore = useDialogStore();
-const { setUpdateAlbumDialogState, setCreateAlbumTagDialogState } = dialogStore;
-const { updateAlbumDialogState } = storeToRefs(dialogStore);
-const { albumToBeUpdate, setAlbumToBeUpdated, fetchAlbumsByYear } = useAlbums();
-const { albumTags } = useAlbumTags();
+const albumTagsStore = useAlbumTagsStore();
+const albumStore = useAlbumStore();
+
+const { setAlbumToBeUpdated } = albumStore;
+const { dialogStates } = storeToRefs(dialogStore);
+const { albumToBeUpdate } = storeToRefs(albumStore);
+const { data: albumTags } = storeToRefs(albumTagsStore);
 
 const selectedYear = ref(String(new Date().getFullYear()));
 const albumId = ref('');
@@ -236,7 +240,9 @@ const selectedPlace = ref<Place | null>(null);
 const placeSuggestions = ref<Place[]>([]);
 const isSearching = ref(false);
 
-const storedTagsStringArray = computed(() => albumTags.value.map((tag) => tag.tag));
+const storedTagsStringArray = computed(() =>
+  albumTags.value ? albumTags.value.map((tag) => tag.tag) : [],
+);
 const locationLatitude = computed(() => selectedPlace.value?.location?.latitude || 0);
 const locationLongitude = computed(() => selectedPlace.value?.location?.longitude || 0);
 
@@ -338,8 +344,11 @@ const { isPending: isCreatingAlbum, mutate: createAlbum } = useMutation({
 
       setTimeout(async () => {
         resetAlbum();
-        await fetchAlbumsByYear(album.year, true);
-        await router.push({ name: 'albumsByYear', params: { year: album.year } });
+        if (router.currentRoute.value.params.year === album.year) {
+          await queryClient.invalidateQueries({ queryKey: ['fetchAlbumsByYears', album.year] });
+        } else {
+          await router.push({ name: 'albumsByYear', params: { year: album.year } });
+        }
       }, 2000);
     }
   },
@@ -355,22 +364,14 @@ const { isPending: isCreatingAlbum, mutate: createAlbum } = useMutation({
 
 const resetAlbum = () => {
   selectedPlace.value = null;
-  setAlbumToBeUpdated({
-    year: String(new Date().getFullYear()),
-    id: '',
-    albumName: '',
-    albumCover: '',
-    description: '',
-    tags: [],
-    isPrivate: true,
-  });
-  setUpdateAlbumDialogState(false);
+  setAlbumToBeUpdated(initialAlbum);
+  dialogStore.setDialogState('updateAlbum', false);
 };
 
 const yearOptions = getYearOptions();
 
 watch(
-  updateAlbumDialogState,
+  () => dialogStates.value.updateAlbum,
   (newValue) => {
     if (newValue) {
       selectedYear.value = albumToBeUpdate.value.year || String(new Date().getFullYear());

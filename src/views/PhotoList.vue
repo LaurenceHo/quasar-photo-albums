@@ -133,7 +133,7 @@
             v-tooltip.left="'Delete selected photos'"
             severity="secondary"
             text
-            @click="setDeletePhotoDialogState(true)"
+            @click="dialogStore.setDialogState('deletePhoto', true)"
           >
             <template #icon>
               <IconTrash :size="24" />
@@ -144,7 +144,7 @@
             v-tooltip.left="'Move selected photos'"
             severity="secondary"
             text
-            @click="setMovePhotoDialogState(true)"
+            @click="dialogStore.setDialogState('movePhoto', true)"
           >
             <template #icon>
               <IconFileExport :size="24" />
@@ -197,19 +197,19 @@
   </template>
 
   <MovePhotos
-    v-if="movePhotoDialogState"
+    v-if="dialogStates.movePhoto"
     :album-id="currentAlbum?.id"
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
   <DeletePhotos
-    v-if="deletePhotoDialogState"
+    v-if="dialogStates.deletePhoto"
     :album-id="currentAlbum?.id"
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
   />
   <RenamePhoto
-    v-if="renamePhotoDialogState"
+    v-if="dialogStates.renamePhoto"
     :album-id="currentAlbum?.id"
     @close-photo-detail="closePhotoDetail"
     @refresh-photo-list="refreshPhotoList"
@@ -223,10 +223,9 @@ import PhotoDetail from '@/components/PhotoDetail.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
 import SkeletonPhotoList from '@/components/SkeletonPhotoList.vue';
 import UploadPhotos from '@/components/UploadPhotos.vue';
-import { useAlbums, usePhotos } from '@/composables';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
-import { useDialogStore, useUserConfigStore } from '@/stores';
+import { useAlbumStore, useDialogStore, usePhotoStore, useUserConfigStore } from '@/stores';
 import {
   IconArrowNarrowLeft,
   IconChecks,
@@ -250,17 +249,15 @@ const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 
-const userConfigStore = useUserConfigStore();
 const dialogStore = useDialogStore();
+const { dialogStates } = storeToRefs(dialogStore);
+const { isAdmin } = storeToRefs(useUserConfigStore());
 
-const { setDeletePhotoDialogState, setMovePhotoDialogState } = dialogStore;
-const { deletePhotoDialogState, movePhotoDialogState, renamePhotoDialogState } =
-  storeToRefs(dialogStore);
-const { isAdmin } = storeToRefs(userConfigStore);
-
-const { isFetchingPhotos, photosInAlbum, selectedPhotos, setSelectedPhotos, fetchPhotos } =
-  usePhotos();
-const { currentAlbum, fetchAlbumsByYear } = useAlbums();
+const photoStore = usePhotoStore();
+const { isFetchingPhotos, photosInAlbum, selectedPhotos } = storeToRefs(photoStore);
+const { setSelectedPhotos, fetchPhotos } = photoStore;
+const { refetchAlbums } = useAlbumStore();
+const { currentAlbum } = storeToRefs(useAlbumStore());
 
 const albumId = computed(() => route.params['albumId'] as string);
 const albumYear = computed(() => route.params['year'] as string);
@@ -311,26 +308,21 @@ const refreshPhotoList = async () => {
   if (albumToBeUpdated) {
     const result = await AlbumService.updateAlbum(albumToBeUpdated);
     if (result.code === 200) {
-      await fetchAlbumsByYear(albumToBeUpdated.year, true);
+      await refetchAlbums(albumToBeUpdated.year, true);
     }
   }
 
   setSelectedPhotos([]);
 };
 
-fetchPhotos(albumId.value, albumYear.value).catch(() => {
-  toast.add({
-    severity: 'error',
-    summary: 'Error',
-    detail: 'Error while fetching photos. Please try again later.',
-    life: 3000,
-  });
-});
-
-watch(albumId, (newValue) => {
-  if (newValue) {
-    fetchPhotos(newValue, albumYear.value);
-    setSelectedPhotos([]);
-  }
-});
+watch(
+  albumId,
+  (newValue) => {
+    if (newValue) {
+      fetchPhotos(newValue, albumYear.value);
+      setSelectedPhotos([]);
+    }
+  },
+  { immediate: true },
+);
 </script>

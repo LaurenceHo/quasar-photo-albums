@@ -68,9 +68,9 @@
   </template>
   <ScrollTop />
 
-  <CreateAlbum v-if="updateAlbumDialogState" />
-  <CreateAlbumTag v-if="createAlbumTagDialogState" />
-  <ShowAlbumTags v-if="showAlbumTagsDialogState" />
+  <CreateAlbum v-if="dialogStates.updateAlbum" />
+  <CreateAlbumTag v-if="dialogStates.createAlbumTag" />
+  <ShowAlbumTags v-if="dialogStates.showAlbumTags" />
 </template>
 
 <script lang="ts" setup>
@@ -79,52 +79,57 @@ import Carousel from '@/components/Carousel.vue';
 import { CreateAlbum, CreateAlbumTag, ShowAlbumTags } from '@/components/dialog';
 import SelectTags from '@/components/select/SelectTags.vue';
 import SelectYear from '@/components/select/SelectYear.vue';
-import { useAlbumFilter, useAlbums, useDevice, useFeaturedAlbums } from '@/composables';
-import { type FilteredAlbumsByYear } from '@/composables/use-albums';
-import { useDialogStore, useUserConfigStore } from '@/stores';
-import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
+import { useDevice } from '@/composables';
+import {
+  useAlbumStore,
+  useDialogStore,
+  useFeaturedAlbumsStore,
+  useUserConfigStore,
+} from '@/stores';
 import { IconSortAscendingLetters, IconSortDescendingLetters } from '@tabler/icons-vue';
 import { storeToRefs } from 'pinia';
 import { Button, type PageState, Paginator, ScrollTop, Skeleton, ToggleSwitch } from 'primevue';
 import { useToast } from 'primevue/usetoast';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
-
-const { isFetchingAlbums, fetchAlbumsByYear } = useAlbums();
-const { isFetching: isFetchingFeaturedAlbums, data: featuredAlbums } = useFeaturedAlbums();
 const { isXSmallDevice } = useDevice();
-
-const userConfigStore = useUserConfigStore();
+const albumStore = useAlbumStore();
 const dialogStore = useDialogStore();
 
-const { isAdmin } = storeToRefs(userConfigStore);
-const { showAlbumTagsDialogState, updateAlbumDialogState, createAlbumTagDialogState } =
-  storeToRefs(dialogStore);
+const {
+  isFetching: isFetchingAlbums,
+  filteredAlbums,
+  filterState,
+  isError: isFetchingAlbumError,
+  filteredAlbumsByYear,
+  selectedYear,
+} = storeToRefs(albumStore);
+const { isFetching: isFetchingFeaturedAlbums, data: featuredAlbums } =
+  storeToRefs(useFeaturedAlbumsStore());
+const { isAdmin } = storeToRefs(useUserConfigStore());
+const { dialogStates } = storeToRefs(dialogStore);
+
+onMounted(() => {
+  albumStore.setEnabled(true);
+  // Initialise selectedYear from route params if available, but only if different
+  if (route.params.year && route.params.year !== selectedYear.value) {
+    albumStore.setSelectedYear(route.params.year as string);
+  }
+});
 
 // Pagination state
 const pageNumber = ref(1);
 const itemsPerPage = ref(20);
 
-// Filter state management
-const { filterState, filteredAlbums } = useAlbumFilter();
-
-const sortOrder = computed({
-  get: () => filterState.value.sortOrder,
-  set: (value: 'asc' | 'desc') => (filterState.value.sortOrder = value),
-});
-
+const sortOrder = computed(() => filterState.value.sortOrder);
 const privateOnly = computed({
   get: () => filterState.value.privateOnly,
-  set: (value: boolean) => (filterState.value.privateOnly = value),
+  set: (value: boolean) => albumStore.setPrivateOnly(value),
 });
-
-const toggleSortOrder = () => {
-  sortOrder.value = sortOrder.value === 'desc' ? 'asc' : 'desc';
-};
 
 const paramsYear = computed(() => route.params['year'] as string);
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
@@ -137,38 +142,42 @@ const chunkAlbumList = computed(() =>
   filteredAlbums.value.slice(firstIndex.value, lastIndex.value),
 );
 
-const filteredAlbumsByYear: FilteredAlbumsByYear = JSON.parse(
-  localStorage.getItem(FILTERED_ALBUMS_BY_YEAR) || '{}',
-);
-
 const onPageChange = (event: PageState) => {
   pageNumber.value = event.page + 1;
   itemsPerPage.value = event.rows;
 };
+const toggleSortOrder = () => albumStore.setSortOrder(sortOrder.value === 'desc' ? 'asc' : 'desc');
+const setSelectedTags = (tags: string[]) => albumStore.setSelectedTags(tags);
+const setSelectedYear = (year: string) => albumStore.setSelectedYear(year);
 
-const setSelectedTags = (tags: string[]) => {
-  filterState.value.selectedTags = tags;
-};
-const setSelectedYear = (year: string) =>
-  router.push({ name: 'albumsByYear', params: { year: year } });
-
-// Fetch all albums and featured albums and store them in the store
-fetchAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year).catch(() => {
-  toast.add({
-    severity: 'error',
-    summary: 'Error',
-    detail: 'Error while fetching albums. Please try again later.',
-    life: 3000,
-  });
-});
+watch(
+  isFetchingAlbumError,
+  (newValue) => {
+    if (newValue) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while fetching albums. Please try again later.',
+        life: 3000,
+      });
+    }
+  },
+  { immediate: true },
+);
 
 watch(paramsYear, (newValue) => {
-  fetchAlbumsByYear(newValue);
+  // Only update selectedYear if it differs from the current store value
+  if (newValue && newValue !== selectedYear.value) {
+    albumStore.setSelectedYear(newValue);
+  }
 });
 
 watch(isFetchingAlbums, (newValue) => {
   if (!newValue && !paramsYear.value) {
-    router.push({ name: 'albumsByYear', params: { year: filteredAlbumsByYear?.year || 'na' } });
+    router.push({
+      name: 'albumsByYear',
+      params: { year: filteredAlbumsByYear.value?.year || 'na' },
+    });
   }
 });
 </script>

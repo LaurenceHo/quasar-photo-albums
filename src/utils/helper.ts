@@ -1,3 +1,38 @@
+import type { FilteredAlbumsByYear } from '@/stores/album';
+import type { AlbumsWithLocation } from '@/stores/album-locations';
+import type { AlbumTags } from '@/stores/album-tags';
+import type { TravelRecords } from '@/stores/travel-records';
+import {
+  ALBUM_TAGS,
+  ALBUMS_WITH_LOCATION,
+  FILTERED_ALBUMS_BY_YEAR,
+  TRAVEL_RECORDS,
+} from '@/utils/local-storage-key';
+
+type LocalStorageKey =
+  | typeof ALBUMS_WITH_LOCATION
+  | typeof ALBUM_TAGS
+  | typeof FILTERED_ALBUMS_BY_YEAR
+  | typeof TRAVEL_RECORDS;
+
+export const getDataFromLocalStorage = (
+  key: LocalStorageKey,
+): FilteredAlbumsByYear | AlbumsWithLocation | TravelRecords | AlbumTags | null => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+};
+
+export const setDataIntoLocalStorage = (
+  key: LocalStorageKey,
+  data: FilteredAlbumsByYear | AlbumsWithLocation | TravelRecords | AlbumTags,
+) => {
+  localStorage.setItem(key, JSON.stringify(data));
+};
+
 export const getStaticFileUrl = (objectKey: string): string => {
   return `${import.meta.env.VITE_STATIC_FILES_URL}/${objectKey}`;
 };
@@ -44,7 +79,9 @@ export const compareDbUpdatedTime = async (
 };
 
 export const sortByKey = <T>(array: T[], key: keyof T, sortOrder: 'asc' | 'desc'): T[] => {
-  return array.sort((a, b) => {
+  // Create a shallow copy of the array to avoid mutating the input
+  const sortedArray = [...array];
+  return sortedArray.sort((a, b) => {
     const aValue = a[key];
     const bValue = b[key];
 

@@ -28,10 +28,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useAlbums, usePhotos } from '@/composables';
 import type { Album } from '@/schema';
 import { AlbumService } from '@/services/album-service';
-import { useDialogStore } from '@/stores';
+import { useAlbumStore, useDialogStore, usePhotoStore } from '@/stores';
 import { getStaticFileUrl } from '@/utils/helper';
 import {
   IconDotsVertical,
@@ -42,6 +41,7 @@ import {
   IconTrash,
 } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
+import { storeToRefs } from 'pinia';
 import { Button, Menu, Tag, useToast } from 'primevue';
 import { ref, toRefs } from 'vue';
 
@@ -61,12 +61,11 @@ const { photoKey } = toRefs(props);
 const showPhotoCopiedTag = ref(false);
 
 const toast = useToast();
+const photoStore = usePhotoStore();
+const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = photoStore;
+const { refetchAlbums, setCurrentAlbum, isAlbumCover } = useAlbumStore();
 const dialogStore = useDialogStore();
-
-const { setSelectedPhotos, setCurrentPhotoToBeRenamed } = usePhotos();
-const { currentAlbum, fetchAlbumsByYear, setCurrentAlbum, isAlbumCover } = useAlbums();
-const { setDeletePhotoDialogState, setMovePhotoDialogState, setRenamePhotoDialogState } =
-  dialogStore;
+const { currentAlbum } = storeToRefs(useAlbumStore());
 
 const { mutate } = useMutation({
   mutationFn: async () => {
@@ -80,7 +79,7 @@ const { mutate } = useMutation({
   },
   onSuccess: async ({ result, album }) => {
     if (result?.code === 200) {
-      await fetchAlbumsByYear(album.year, true);
+      await refetchAlbums(album.year, true);
       setCurrentAlbum(album);
     }
     toast.add({
@@ -109,17 +108,17 @@ const makeCoverPhoto = () => {
 
 const deletePhoto = () => {
   setSelectedPhotos([photoKey.value]);
-  setDeletePhotoDialogState(true);
+  dialogStore.setDialogState('deletePhoto', true);
 };
 
 const movePhoto = () => {
   setSelectedPhotos([photoKey.value]);
-  setMovePhotoDialogState(true);
+  dialogStore.setDialogState('movePhoto', true);
 };
 
 const renamePhoto = () => {
   setCurrentPhotoToBeRenamed(photoKey.value);
-  setRenamePhotoDialogState(true);
+  dialogStore.setDialogState('renamePhoto', true);
 };
 
 const copyPhotoLink = () => {

@@ -4,16 +4,17 @@
     :class="extraClass"
     :loading="isFetchingAlbumTags"
     :options="albumTags"
+    display="chip"
     filter
+    input-id="select-tags"
     option-label="tag"
     option-value="tag"
-    display="chip"
-    input-id="select-tags"
   />
 </template>
 
 <script lang="ts" setup>
-import useAlbumTags from '@/composables/use-album-tags';
+import { useAlbumTagsStore } from '@/stores';
+import { storeToRefs } from 'pinia';
 import MultiSelect from 'primevue/multiselect';
 import { ref, toRefs, watch } from 'vue';
 
@@ -31,9 +32,8 @@ const props = defineProps({
 
 const { selectedTags } = toRefs(props);
 const internalSelectedTags = ref(selectedTags.value);
-const { fetchAlbumTags, isFetchingAlbumTags, albumTags } = useAlbumTags();
-
-fetchAlbumTags();
+const albumTagsStore = useAlbumTagsStore();
+const { isFetching: isFetchingAlbumTags, data: albumTags } = storeToRefs(albumTagsStore);
 
 watch(
   internalSelectedTags,

@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="showAlbumTagsDialogState"
+    v-model:visible="dialogStates.showAlbumTags"
     :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
     :closable="false"
     class="w-96"
@@ -12,7 +12,7 @@
           data-test-id="create-tag-button"
           severity="secondary"
           text
-          @click="setCreateAlbumTagDialogState(true)"
+          @click="dialogStore.setDialogState('createAlbumTag', true)"
         >
           <IconPlus :size="24" />
         </Button>
@@ -39,7 +39,7 @@
       </ul>
     </div>
     <template #footer>
-      <Button label="Close" text @click="setShowAlbumTagsDialogState(false)" />
+      <Button label="Close" text @click="dialogStore.setDialogState('showAlbumTags', false)" />
     </template>
   </Dialog>
 
@@ -56,9 +56,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useAlbumTags, useAlbums } from '@/composables';
-import { type FilteredAlbumsByYear } from '@/composables/use-albums';
 import { AlbumTagService } from '@/services/album-tag-service';
+import { useAlbumStore, useAlbumTagsStore, useDialogStore } from '@/stores';
+import type { FilteredAlbumsByYear } from '@/stores/album';
 import { FILTERED_ALBUMS_BY_YEAR } from '@/utils/local-storage-key';
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
@@ -66,16 +66,16 @@ import { storeToRefs } from 'pinia';
 import { Button, ConfirmDialog, Dialog, useConfirm, useToast } from 'primevue';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { useDialogStore } from '@/stores';
 
 const confirm = useConfirm();
 const route = useRoute();
 const toast = useToast();
+
 const dialogStore = useDialogStore();
-const { setShowAlbumTagsDialogState, setCreateAlbumTagDialogState } = dialogStore;
-const { showAlbumTagsDialogState } = storeToRefs(dialogStore);
-const { albumTags, fetchAlbumTags } = useAlbumTags();
-const { fetchAlbumsByYear } = useAlbums();
+const { dialogStates } = storeToRefs(dialogStore);
+const albumTagsStore = useAlbumTagsStore();
+const { data: albumTags } = storeToRefs(albumTagsStore);
+const { refetchAlbums } = useAlbumStore();
 
 const tagName = ref('');
 
@@ -114,8 +114,8 @@ const { mutate: deleteAlbumTag, reset } = useMutation({
       detail: `Tag "${tagName.value}" deleted.`,
       life: 3000,
     });
-    await fetchAlbumTags(true);
-    await fetchAlbumsByYear(paramsYear.value || filteredAlbumsByYear?.year, true);
+    await albumTagsStore.refetchAlbumTags(true);
+    await refetchAlbums(paramsYear.value || filteredAlbumsByYear?.year, true);
     tagName.value = '';
   },
   onError: () => {

@@ -45,10 +45,10 @@
 import { EditAlbumButton } from '@/components/button';
 import NoImagePlaceholder from '@/components/NoImagePlaceholder.vue';
 import SquareImage from '@/components/SquareImage.vue';
-import { initialAlbum } from '@/composables/use-albums';
 import useDevice from '@/composables/use-device';
 import type { Album } from '@/schema';
 import { useUserConfigStore } from '@/stores';
+import { initialAlbum } from '@/stores/album';
 import { IconLock, IconStarFilled } from '@tabler/icons-vue';
 import { storeToRefs } from 'pinia';
 import Tag from 'primevue/tag';

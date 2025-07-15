@@ -137,8 +137,7 @@
 import { EditPhotoButton } from '@/components/button';
 import PanoramaViewer from '@/components/PanoramaViewer.vue';
 import PhotoLocationMap from '@/components/PhotoLocationMap.vue';
-import usePhotos from '@/composables/use-photos';
-import { useUserConfigStore } from '@/stores';
+import { usePhotoStore, useUserConfigStore } from '@/stores';
 import {
   IconCalendarTime,
   IconCamera,
@@ -176,7 +175,9 @@ const route = useRoute();
 
 const userConfigStore = useUserConfigStore();
 const { isAdmin } = storeToRefs(userConfigStore);
-const { photosInAlbum, isFetchingPhotos, findPhotoByIndex, findPhotoIndex } = usePhotos();
+const photoStore = usePhotoStore();
+const { photosInAlbum, isFetchingPhotos } = storeToRefs(photoStore);
+const { findPhotoByIndex, findPhotoIndex } = photoStore;
 
 const selectedImageIndex = ref(-1);
 const photoFileName = ref('');

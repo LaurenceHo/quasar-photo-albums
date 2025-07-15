@@ -1,4 +1,5 @@
 import CreateTravelRecordsDialog from '@/components/dialog/CreateTravelRecords.vue';
+import { setupQueryMocks } from '@/mocks/setup-query-mock';
 import { LocationService } from '@/services/location-service';
 import { useTravelRecordsStore, useDialogStore } from '@/stores';
 import { createTestingPinia } from '@pinia/testing';
@@ -15,18 +16,6 @@ vi.mock('@tanstack/vue-query', () => ({
   useMutation: vi.fn(),
   useQueryClient: vi.fn(),
 }));
-
-vi.mocked(useQuery).mockReturnValue({
-  refetch: vi.fn(),
-  data: ref(null),
-  isFetching: ref(false),
-  isError: ref(false),
-} as any);
-
-vi.mocked(useMutation).mockReturnValue({
-  isPending: ref(false),
-  mutate: vi.fn(),
-} as any);
 
 vi.mock('primevue/usetoast', () => ({
   useToast: vi.fn(),
@@ -48,9 +37,9 @@ vi.mock('@/services/travel-record-service', () => ({
 describe('CreateTravelRecordsDialog', () => {
   let wrapper: any;
   let dialogStore: ReturnType<typeof useDialogStore>;
-  let travelRecordsStore: ReturnType<typeof useTravelRecordsStore>;
 
   beforeEach(() => {
+    setupQueryMocks();
     vi.clearAllMocks();
 
     const pinia = createTestingPinia({
@@ -59,9 +48,7 @@ describe('CreateTravelRecordsDialog', () => {
     });
 
     dialogStore = useDialogStore();
-    travelRecordsStore = useTravelRecordsStore();
-
-    dialogStore.setCreateTravelRecordsDialogState(true);
+    dialogStore.setDialogState('createTravelRecords', true);
 
     wrapper = mount(CreateTravelRecordsDialog, {
       global: {
@@ -88,7 +75,7 @@ describe('CreateTravelRecordsDialog', () => {
   });
 
   it('hides dialog when createTravelRecordsDialogState is false', async () => {
-    dialogStore.setCreateTravelRecordsDialogState(false);
+    dialogStore.setDialogState('createTravelRecords', false);
     await wrapper.vm.$nextTick();
     expect(wrapper.find('[data-test-id="show-travel-records-dialog"]').exists()).toBe(false);
   });
@@ -148,7 +135,7 @@ describe('CreateTravelRecordsDialog', () => {
   });
 
   it('resets form and closes dialog on cancel', async () => {
-    expect(dialogStore.createTravelRecordsDialogState).toBe(true);
+    expect(dialogStore.dialogStates.createTravelRecords).toBe(true);
     wrapper.vm.travelDate = new Date('2023-10-01');
     wrapper.vm.selectedDeparture = { displayName: 'New York', formattedAddress: 'NY, USA' };
     wrapper.vm.selectedDestination = { displayName: 'London', formattedAddress: 'UK' };
@@ -158,7 +145,7 @@ describe('CreateTravelRecordsDialog', () => {
     await wrapper.find('[data-test-id="cancel-button"]').trigger('click');
     await wrapper.vm.$nextTick();
 
-    expect(dialogStore.createTravelRecordsDialogState).toBe(false);
+    expect(dialogStore.dialogStates.createTravelRecords).toBe(false);
     expect(wrapper.vm.travelDate).toBe('');
     expect(wrapper.vm.selectedDeparture).toBe(null);
     expect(wrapper.vm.selectedDestination).toBe(null);

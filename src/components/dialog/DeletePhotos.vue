@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="deletePhotoDialogState"
+    v-model:visible="dialogStates.deletePhoto"
     :closable="false"
     class="w-[450px]"
     header="Confirm"
@@ -25,7 +25,7 @@
         @click="
           () => {
             reset();
-            setDeletePhotoDialogState(false);
+            dialogStore.setDialogState('deletePhoto', false);
           }
         "
       />
@@ -35,9 +35,8 @@
 </template>
 
 <script lang="ts" setup>
-import usePhotos from '@/composables/use-photos';
 import { PhotoService } from '@/services/photo-service';
-import { useDialogStore } from '@/stores';
+import { useDialogStore, usePhotoStore } from '@/stores';
 import { IconAlertCircle } from '@tabler/icons-vue';
 import { useMutation } from '@tanstack/vue-query';
 import { storeToRefs } from 'pinia';
@@ -56,9 +55,9 @@ const emits = defineEmits(['refreshPhotoList', 'closePhotoDetail']);
 
 const toast = useToast();
 const dialogStore = useDialogStore();
-const { setDeletePhotoDialogState } = dialogStore;
-const { deletePhotoDialogState } = storeToRefs(dialogStore);
-const { selectedPhotos } = usePhotos();
+const { dialogStates } = storeToRefs(dialogStore);
+const photoStore = usePhotoStore();
+const { selectedPhotos } = storeToRefs(photoStore);
 const { albumId } = toRefs(props);
 
 const photoKeysArray = computed(() =>
@@ -82,7 +81,7 @@ const {
       life: 3000,
     });
     setTimeout(() => {
-      setDeletePhotoDialogState(false);
+      dialogStore.setDialogState('deletePhoto', false);
       emits('closePhotoDetail');
       emits('refreshPhotoList');
     }, 2000);

@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="movePhotoDialogState"
+    v-model:visible="dialogStates.movePhoto"
     :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
     class="w-[450px]"
     modal
@@ -77,11 +77,10 @@
 
 <script lang="ts" setup>
 import SelectYear from '@/components/select/SelectYear.vue';
-import usePhotos from '@/composables/use-photos';
 import type { Photo } from '@/schema';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
-import { useDialogStore } from '@/stores';
+import { useDialogStore, usePhotoStore } from '@/stores';
 import { IconFileAlert } from '@tabler/icons-vue';
 import { useMutation, useQuery } from '@tanstack/vue-query';
 import { storeToRefs } from 'pinia';
@@ -103,9 +102,9 @@ const { albumId } = toRefs(props);
 const route = useRoute();
 const toast = useToast();
 const dialogStore = useDialogStore();
-const { setMovePhotoDialogState } = dialogStore;
-const { movePhotoDialogState } = storeToRefs(dialogStore);
-const { selectedPhotos } = usePhotos();
+const { dialogStates } = storeToRefs(dialogStore);
+const photoStore = usePhotoStore();
+const { selectedPhotos } = storeToRefs(photoStore);
 
 const selectedYear = ref<string>((route.params['year'] as string) || 'na');
 
@@ -198,7 +197,7 @@ const {
           life: 3000,
         });
         setTimeout(() => {
-          setMovePhotoDialogState(false);
+          dialogStore.setDialogState('movePhoto', false);
           emits('closePhotoDetail');
           emits('refreshPhotoList');
         }, 2000);
@@ -232,7 +231,7 @@ const closeMovePhotoDialog = (e: MouseEvent) => {
     emits('refreshPhotoList');
   }
   reset();
-  setMovePhotoDialogState(false);
+  dialogStore.setDialogState('movePhoto', false);
 };
 
 // Watch for changes in mappedAlbumList and update selectedAlbum

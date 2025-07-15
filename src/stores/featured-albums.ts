@@ -3,6 +3,7 @@ import { AggregateService } from '@/services/aggregate-service';
 import { compareDbUpdatedTime, fetchDbUpdatedTime } from '@/utils/helper';
 import { FEATURED_ALBUMS } from '@/utils/local-storage-key';
 import { useQuery } from '@tanstack/vue-query';
+import { defineStore } from 'pinia';
 import { get } from 'radash';
 
 interface FeaturedAlbums {
@@ -38,7 +39,7 @@ const _fetchFeaturedAlbumsAndSetToLocalStorage = async (dbUpdatedTime?: string |
   }
 };
 
-export default function useFeaturedAlbums() {
+export const useFeaturedAlbumsStore = defineStore('featuredAlbums', () => {
   const { data, isFetching } = useQuery({
     queryKey: ['featuredAlbums'],
     queryFn: async () => {
@@ -73,4 +74,4 @@ export default function useFeaturedAlbums() {
   });
 
   return { data, isFetching };
-}
+});

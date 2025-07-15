@@ -1,6 +1,11 @@
 import type { Album as AlbumItem, ApiResponse } from '@/schema';
 import { AggregateService } from '@/services/aggregate-service';
-import { compareDbUpdatedTime, fetchDbUpdatedTime } from '@/utils/helper';
+import {
+  compareDbUpdatedTime,
+  fetchDbUpdatedTime,
+  getDataFromLocalStorage,
+  setDataIntoLocalStorage,
+} from '@/utils/helper';
 import { ALBUMS_WITH_LOCATION } from '@/utils/local-storage-key';
 import { useQuery } from '@tanstack/vue-query';
 import DOMPurify from 'dompurify';
@@ -13,26 +18,13 @@ interface GeoJson {
   features: Feature[];
 }
 
-interface AlbumsWithLocation {
+export interface AlbumsWithLocation {
   dbUpdatedTime: string;
   albums: AlbumItem[];
 }
 
-const _getStoredAlbumLocations = (): AlbumsWithLocation | null => {
-  try {
-    const stored = localStorage.getItem(ALBUMS_WITH_LOCATION);
-    return stored ? JSON.parse(stored) : null;
-  } catch {
-    return null;
-  }
-};
-
-const _storeAlbumLocations = (data: AlbumsWithLocation) => {
-  localStorage.setItem(ALBUMS_WITH_LOCATION, JSON.stringify(data));
-};
-
 const _shouldRefetch = async (): Promise<boolean> => {
-  const stored = _getStoredAlbumLocations();
+  const stored = getDataFromLocalStorage(ALBUMS_WITH_LOCATION);
   if (!stored) return true;
   const { isLatest } = await compareDbUpdatedTime(stored.dbUpdatedTime, 'album');
   return !isLatest;
@@ -42,7 +34,9 @@ const _shouldRefetch = async (): Promise<boolean> => {
 const _fetchAlbumsWithLocationAndSetToLocationStorage = async () => {
   try {
     if (!(await _shouldRefetch())) {
-      const albumLocationsWithDBTime = _getStoredAlbumLocations();
+      const albumLocationsWithDBTime = getDataFromLocalStorage(
+        ALBUMS_WITH_LOCATION,
+      ) as AlbumsWithLocation;
       return albumLocationsWithDBTime ? albumLocationsWithDBTime.albums : [];
     }
 
@@ -59,7 +53,10 @@ const _fetchAlbumsWithLocationAndSetToLocationStorage = async () => {
     }
 
     if (albums) {
-      _storeAlbumLocations({ dbUpdatedTime: timeJson?.album || '', albums } as AlbumsWithLocation);
+      setDataIntoLocalStorage(ALBUMS_WITH_LOCATION, {
+        dbUpdatedTime: timeJson?.album || '',
+        albums,
+      });
 
       return albums;
     }

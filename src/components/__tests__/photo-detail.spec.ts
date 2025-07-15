@@ -29,8 +29,8 @@ vi.mock('primevue/usetoast', () => ({
   })),
 }));
 
-vi.mock('../../composables/use-photos', () => ({
-  default: vi.fn().mockImplementation(() => ({
+vi.mock('../../stores/photo', () => ({
+  usePhotoStore: vi.fn(() => ({
     photosInAlbum: ref([
       { key: 'album/photo1.jpg', url: 'https://example.com/photo1.jpg' },
       { key: 'album/photo2.jpg', url: 'https://example.com/photo2.jpg' },

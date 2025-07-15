@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model:visible="renamePhotoDialogState" :closable="false" class="w-96" modal>
+  <Dialog v-model:visible="dialogStates.renamePhoto" :closable="false" class="w-96" modal>
     <template #header>
       <span class="text-xl font-semibold">Rename Photo</span>
     </template>
@@ -32,7 +32,7 @@
           @click="
             () => {
               reset();
-              setRenamePhotoDialogState(false);
+              dialogStore.setDialogState('renamePhoto', false);
             }
           "
         />
@@ -53,9 +53,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useAlbums, usePhotos } from '@/composables';
 import { AlbumService } from '@/services/album-service';
 import { PhotoService } from '@/services/photo-service';
+import { useAlbumStore, useDialogStore, usePhotoStore } from '@/stores';
 import { useMutation } from '@tanstack/vue-query';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, maxLength, minLength, required } from '@vuelidate/validators';
@@ -64,7 +64,6 @@ import { Button, Dialog, InputText } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { isEmpty } from 'radash';
 import { computed, ref, toRefs, watch } from 'vue';
-import { useDialogStore } from '@/stores';
 
 const props = defineProps({
   albumId: {
@@ -89,14 +88,14 @@ const rules = computed(() => ({
 }));
 
 const toast = useToast();
-const dialogStore = useDialogStore();
-
 const { albumId } = toRefs(props);
-const { setRenamePhotoDialogState } = dialogStore;
-const { renamePhotoDialogState } = storeToRefs(dialogStore);
-
-const { currentPhotoToBeRenamed, findPhotoIndex } = usePhotos();
-const { fetchAlbumsByYear, isAlbumCover: checkIsAlbumCover, currentAlbum } = useAlbums();
+const dialogStore = useDialogStore();
+const { dialogStates } = storeToRefs(dialogStore);
+const { refetchAlbums, isAlbumCover: checkIsAlbumCover } = useAlbumStore();
+const { currentAlbum } = storeToRefs(useAlbumStore());
+const photoStore = usePhotoStore();
+const { currentPhotoToBeRenamed } = storeToRefs(photoStore);
+const { findPhotoIndex } = photoStore;
 
 const findFileTypeIndex = computed(() => currentPhotoToBeRenamed.value.lastIndexOf('.'));
 const fileType = computed(() => currentPhotoToBeRenamed.value.slice(findFileTypeIndex.value));
@@ -137,7 +136,7 @@ const {
         };
         const response = await AlbumService.updateAlbum(albumToBeUpdated);
         if (response.code === 200) {
-          await fetchAlbumsByYear(albumToBeUpdated.year, true);
+          await refetchAlbums(albumToBeUpdated.year, true);
         }
       }
       toast.add({
@@ -147,7 +146,7 @@ const {
         life: 3000,
       });
       setTimeout(() => {
-        setRenamePhotoDialogState(false);
+        dialogStore.setDialogState('renamePhoto', false);
         emits('closePhotoDetail');
         emits('refreshPhotoList');
       }, 2000);
