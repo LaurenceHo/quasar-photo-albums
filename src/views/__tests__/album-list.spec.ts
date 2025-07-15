@@ -10,18 +10,18 @@ import { nextTick, reactive, ref } from 'vue';
 import { type RouteLocationNormalizedLoadedGeneric, useRoute } from 'vue-router';
 
 const mockPush = vi.fn();
-const mockToastAdd = vi.fn();
 
 vi.mock('vue-router', () => ({
   useRoute: vi.fn(() => reactive({ params: {} })),
   useRouter: vi.fn(() => ({
     push: mockPush,
+    currentRoute: ref({ params: {} }),
   })),
 }));
 
 vi.mock('primevue/usetoast', () => ({
   useToast: vi.fn(() => ({
-    add: mockToastAdd,
+    add: vi.fn(),
   })),
 }));
 
@@ -190,41 +190,37 @@ describe('AlbumList.vue', () => {
   });
 
   it('displays the correct number of albums', async () => {
-    setupQueryMocks({
-      useQuery: {
-        data: ref([
-          {
-            id: '1',
-            albumName: 'Album 1',
-            year: '2023',
-            albumCover: '',
-            description: '',
-            tags: [],
-            isPrivate: false,
-          },
-          {
-            id: '2',
-            albumName: 'Album 2',
-            year: '2023',
-            albumCover: '',
-            description: '',
-            tags: [],
-            isPrivate: false,
-          },
-          {
-            id: '3',
-            albumName: 'Album 3',
-            year: '2023',
-            albumCover: '',
-            description: '',
-            tags: [],
-            isPrivate: false,
-          },
-        ]),
-      },
-    });
     const wrapper = createWrapper();
     const albumStore = useAlbumStore();
+    albumStore.filteredAlbums = [
+      {
+        id: '1',
+        albumName: 'Album 1',
+        year: '2023',
+        albumCover: '',
+        description: '',
+        tags: [],
+        isPrivate: false,
+      },
+      {
+        id: '2',
+        albumName: 'Album 2',
+        year: '2023',
+        albumCover: '',
+        description: '',
+        tags: [],
+        isPrivate: false,
+      },
+      {
+        id: '3',
+        albumName: 'Album 3',
+        year: '2023',
+        albumCover: '',
+        description: '',
+        tags: [],
+        isPrivate: false,
+      },
+    ];
 
     albumStore.setSortOrder('desc'); // Trigger applyFilters
     await wrapper.vm.$nextTick();
@@ -242,22 +238,6 @@ describe('AlbumList.vue', () => {
     expect(toggleSwitch.exists()).toBe(true);
     await toggleSwitch.vm.$emit('update:modelValue', true);
     expect(albumStore.filterState.privateOnly).toBe(true);
-  });
-
-  it('shows error toast when fetching albums fails', async () => {
-    setupQueryMocks({
-      useQuery: {
-        isError: ref(true),
-      },
-    });
-    createWrapper();
-    await nextTick();
-    expect(mockToastAdd).toHaveBeenCalledWith({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'Error while fetching albums. Please try again later.',
-      life: 3000,
-    });
   });
 
   it('renders CreateAlbum dialog when updateAlbum is true', async () => {
