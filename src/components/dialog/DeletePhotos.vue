@@ -72,7 +72,11 @@ const {
   mutate: deletePhoto,
   reset,
 } = useMutation({
-  mutationFn: async () => await PhotoService.deletePhotos(albumId.value, photoKeysArray.value),
+  mutationFn: async () =>
+    await PhotoService.deletePhotos(
+      albumId.value,
+      photoKeysArray.value.filter((key): key is string => !!key),
+    ),
   onSuccess: async () => {
     toast.add({
       severity: 'success',

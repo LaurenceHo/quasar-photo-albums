@@ -238,18 +238,27 @@ describe('Helpers', () => {
       const result = interpolateGreatCircle(start, end, steps);
 
       expect(result.length).toBe(1);
-      expect(result[0].length).toBe(3);
+      expect(result[0]!.length).toBe(3);
 
+      const segment = result[0]!;
+      expect(segment).toBeDefined();
+      expect(segment.length).toBe(3);
+
+      const startPoint = segment[0]!;
+      expect(startPoint).toBeDefined();
       // Check start point with tolerance for floating-point precision
-      expect(result[0][0][0]).toBeCloseTo(121.5654, 5); // Longitude
-      expect(result[0][0][1]).toBeCloseTo(25.033, 5); // Latitude
+      expect(startPoint[0]).toBeCloseTo(121.5654, 5); // Longitude
+      expect(startPoint[1]).toBeCloseTo(25.033, 5); // Latitude
 
+      const endPoint = segment[2]!;
+      expect(endPoint).toBeDefined();
       // Check end point with tolerance
-      expect(result[0][2][0]).toBeCloseTo(139.6917, 5); // Longitude
-      expect(result[0][2][1]).toBeCloseTo(35.6895, 5); // Latitude
+      expect(endPoint[0]).toBeCloseTo(139.6917, 5); // Longitude
+      expect(endPoint[1]).toBeCloseTo(35.6895, 5); // Latitude
 
       // Check intermediate point with curvature
-      const midPoint = result[0][1];
+      const midPoint = segment[1]!;
+      expect(midPoint).toBeDefined();
       const expectedLatWithoutCurve = (25.033 + 35.6895) / 2;
       expect(midPoint[0]).toBeGreaterThan(121.5654);
       expect(midPoint[0]).toBeLessThan(139.6917);
@@ -263,14 +272,22 @@ describe('Helpers', () => {
       const result = interpolateGreatCircle(start, end, steps);
 
       expect(result.length).toBe(1);
-      expect(result[0].length).toBe(11); // steps + 1 (including start and end)
+      expect(result[0]!.length).toBe(11); // steps + 1 (including start and end)
 
+      const segment = result[0]!;
+      expect(segment).toBeDefined();
+      expect(segment.length).toBe(11); // steps + 1 (including start and end)
+
+      const startPoint = segment[0]!;
+      expect(startPoint).toBeDefined();
       // Check start point with tolerance
-      expect(result[0][0][0]).toBeCloseTo(139.6917, 5); // Longitude
-      expect(result[0][0][1]).toBeCloseTo(35.6895, 5); // Latitude
+      expect(startPoint[0]).toBeCloseTo(139.6917, 5); // Longitude
+      expect(startPoint[1]).toBeCloseTo(35.6895, 5); // Latitude
 
+      const endPoint = segment[10]!;
+      expect(endPoint).toBeDefined();
       // Check end point with tolerance, accounting for longitude wrapping
-      const actualLon = result[0][10][0];
+      const actualLon = endPoint[0];
       const expectedLon = -118.2437;
       const normalizedDiff = Math.min(
         Math.abs(actualLon - expectedLon),
@@ -279,21 +296,21 @@ describe('Helpers', () => {
       );
       expect(normalizedDiff).toBeLessThan(0.00001); // Tolerance for 5 decimal places
 
-      expect(result[0][10][1]).toBeCloseTo(34.0522, 5); // Latitude
+      expect(endPoint[1]).toBeCloseTo(34.0522, 5); // Latitude
 
       // Check for antimeridian crossing by analyzing longitude progression
-      const longitudes = result[0].map((point) => point[0]);
-      expect(longitudes[0] > 0).toBe(true); // Start in eastern hemisphere
+      const longitudes = segment.map((point) => point[0]);
+      expect(longitudes[0]).toBeGreaterThan(0); // Start in eastern hemisphere
       // Check end longitude with wrapping tolerance
       const endLonDiff = Math.min(
-        Math.abs(longitudes[longitudes.length - 1] - expectedLon),
-        Math.abs(longitudes[longitudes.length - 1] + 360 - expectedLon),
-        Math.abs(longitudes[longitudes.length - 1] - 360 - expectedLon),
+        Math.abs(longitudes[longitudes.length - 1]! - expectedLon),
+        Math.abs(longitudes[longitudes.length - 1]! + 360 - expectedLon),
+        Math.abs(longitudes[longitudes.length - 1]! - 360 - expectedLon),
       );
       expect(endLonDiff).toBeLessThan(0.00001); // Ensure end matches LA longitude
 
       // Verify the path progresses across the antimeridian
-      const startToEndDiff = Math.abs(longitudes[longitudes.length - 1] - longitudes[0]);
+      const startToEndDiff = Math.abs(longitudes[longitudes.length - 1]! - longitudes[0]!);
       const crossesAntimeridian = startToEndDiff > 180 || 360 - startToEndDiff > 180;
       expect(crossesAntimeridian).toBe(true); // Check for crossing
     });
@@ -305,9 +322,14 @@ describe('Helpers', () => {
       const result = interpolateGreatCircle(start, end, steps);
 
       expect(result.length).toBe(1);
-      expect(result[0].length).toBe(5);
+      expect(result[0]!.length).toBe(5);
 
-      const midPoint = result[0][2];
+      const segment = result[0]!;
+      expect(segment).toBeDefined();
+      expect(segment.length).toBe(5);
+
+      const midPoint = segment[2]!;
+      expect(midPoint).toBeDefined();
       const expectedLatWithoutCurve = (25.033 + 35.6895) / 2;
       expect(midPoint[1]).toBeGreaterThan(expectedLatWithoutCurve); // Verify upward curve
       expect(midPoint[0]).toBeGreaterThan(121.5654); // Ensure longitude progresses

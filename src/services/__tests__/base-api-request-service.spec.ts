@@ -72,7 +72,8 @@ describe('BaseApiRequestService', () => {
       body: JSON.stringify(body)
     });
 
-    const calledHeaders = (fetch as Mock).mock.calls[0][1].headers as MockHeaders;
+    expect(fetch).toHaveBeenCalledTimes(1);
+    const calledHeaders = (fetch as Mock).mock.calls[0]![1].headers as MockHeaders;
     expect(calledHeaders.get('Content-Type')).toBe('application/json');
   });
 
@@ -90,7 +91,8 @@ describe('BaseApiRequestService', () => {
       body: expect.any(URLSearchParams)
     });
 
-    const calledHeaders = (fetch as Mock).mock.calls[0][1].headers as MockHeaders;
+    expect(fetch).toHaveBeenCalledTimes(1);
+    const calledHeaders = (fetch as Mock).mock.calls[0]![1].headers as MockHeaders;
     expect(calledHeaders.get('Content-Type')).toBe('application/x-www-form-urlencoded');
   });
 
@@ -108,7 +110,8 @@ describe('BaseApiRequestService', () => {
       body: expect.any(FormData)
     });
 
-    const calledBody = (fetch as Mock).mock.calls[0][1].body as MockFormData;
+    expect(fetch).toHaveBeenCalledTimes(1);
+    const calledBody = (fetch as Mock).mock.calls[0]![1].body as MockFormData;
     expect(calledBody.get('file')).toEqual(formParams.file);
   });
 
@@ -124,7 +127,8 @@ describe('BaseApiRequestService', () => {
       headers: expect.any(Object)
     });
 
-    expect((fetch as Mock).mock.calls[0][1]).not.toHaveProperty('body');
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect((fetch as Mock).mock.calls[0]![1]).not.toHaveProperty('body');
   });
 
   it('should convert method to uppercase', async () => {
@@ -151,7 +155,8 @@ describe('BaseApiRequestService', () => {
       })
     );
 
-    const calledHeaders = (fetch as Mock).mock.calls[0][1].headers as MockHeaders;
+    expect(fetch).toHaveBeenCalledTimes(1);
+    const calledHeaders = (fetch as Mock).mock.calls[0]![1].headers as MockHeaders;
     expect(calledHeaders.get('accept')).toBe('*/*');
   });
 
@@ -167,6 +172,7 @@ describe('BaseApiRequestService', () => {
       headers: expect.any(Object)
     });
 
-    expect((fetch as Mock).mock.calls[0][1]).not.toHaveProperty('body');
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect((fetch as Mock).mock.calls[0]![1]).not.toHaveProperty('body');
   });
 });

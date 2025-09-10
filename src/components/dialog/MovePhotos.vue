@@ -238,7 +238,7 @@ const closeMovePhotoDialog = (e: MouseEvent) => {
 watch(mappedAlbumList, (newList) => {
   if (newList.length > 0) {
     filteredAlbumsList.value = newList;
-    selectedAlbum.value = newList[0].value ?? '';
+    selectedAlbum.value = newList[0]?.value ?? '';
   }
 });
 </script>

@@ -61,7 +61,7 @@ describe('AlbumService', () => {
       const mockResponse = { ok: true, json: vi.fn().mockResolvedValue({ status: 'success' }) };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      await AlbumService.createAlbum(mockAlbums[0]);
+      await AlbumService.createAlbum(mockAlbums[0]!);
 
       expect(BaseApiRequestService.perform).toHaveBeenCalledWith('POST', `${ApiBaseUrl}/albums`, mockAlbums[0]);
     });
@@ -71,7 +71,7 @@ describe('AlbumService', () => {
       const mockResponse = { ok: true, json: vi.fn().mockResolvedValue(mockStatus) };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      const result = await AlbumService.createAlbum(mockAlbums[0]);
+      const result = await AlbumService.createAlbum(mockAlbums[0]!);
 
       expect(result).toEqual(mockStatus);
     });
@@ -80,7 +80,7 @@ describe('AlbumService', () => {
       const mockResponse = { ok: false, statusText: 'Bad Request' };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      await expect(AlbumService.createAlbum(mockAlbums[0])).rejects.toThrow('Bad Request');
+      await expect(AlbumService.createAlbum(mockAlbums[0]!)).rejects.toThrow('Bad Request');
     });
   });
 
@@ -89,9 +89,9 @@ describe('AlbumService', () => {
       const mockResponse = { ok: true, json: vi.fn().mockResolvedValue({ status: 'success' }) };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      await AlbumService.updateAlbum(mockAlbums[1]);
+      await AlbumService.updateAlbum(mockAlbums[1]!);
 
-      expect(BaseApiRequestService.perform).toHaveBeenCalledWith('PUT', `${ApiBaseUrl}/albums`, mockAlbums[1]);
+      expect(BaseApiRequestService.perform).toHaveBeenCalledWith('PUT', `${ApiBaseUrl}/albums`, mockAlbums[1]!);
     });
 
     it('should return the ResponseStatus from the API', async () => {
@@ -99,7 +99,7 @@ describe('AlbumService', () => {
       const mockResponse = { ok: true, json: vi.fn().mockResolvedValue(mockStatus) };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      const result = await AlbumService.updateAlbum(mockAlbums[2]);
+      const result = await AlbumService.updateAlbum(mockAlbums[2]!);
 
       expect(result).toEqual(mockStatus);
     });
@@ -108,7 +108,7 @@ describe('AlbumService', () => {
       const mockResponse = { ok: false, statusText: 'Not Found' };
       (BaseApiRequestService.perform as any).mockResolvedValue(mockResponse);
 
-      await expect(AlbumService.updateAlbum(mockAlbums[1])).rejects.toThrow('Not Found');
+      await expect(AlbumService.updateAlbum(mockAlbums[1]!)).rejects.toThrow('Not Found');
     });
   });
 

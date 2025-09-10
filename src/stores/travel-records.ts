@@ -104,11 +104,23 @@ export const useTravelRecordsStore = defineStore('travelRecords', () => {
           return acc;
         }
 
-        const coordinates = interpolateGreatCircle(
+        const segments = interpolateGreatCircle(
           [record.departure!.location!.longitude, record.departure!.location!.latitude],
           [record.destination!.location!.longitude, record.destination!.location!.latitude],
           20,
-        )[0]; // Take the first array since interpolateGreatCircle returns an array of arrays
+        );
+
+        if (!segments || segments.length === 0) {
+          console.warn(`Skipping travel record with ID ${record.id} due to missing coordinates`);
+          return acc;
+        }
+
+        const coordinates = segments[0];
+
+        if (!coordinates) {
+          console.warn(`Skipping travel record with ID ${record.id} due to missing coordinates`);
+          return acc;
+        }
 
         acc.push({
           type: 'Feature',

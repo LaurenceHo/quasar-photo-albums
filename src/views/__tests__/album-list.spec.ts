@@ -131,7 +131,9 @@ describe('AlbumList.vue', () => {
       params: { year: '2023' },
     });
 
-    const mockRoute = vi.mocked(useRoute).mock.results[0].value as ReturnType<typeof useRoute>;
+    const mockRouteResult = vi.mocked(useRoute).mock.results[0];
+    expect(mockRouteResult).toBeDefined();
+    const mockRoute = mockRouteResult!.value as ReturnType<typeof useRoute>;
     mockRoute.params.year = '2022';
     await nextTick();
     expect(albumStore.selectedYear).toBe('2022');

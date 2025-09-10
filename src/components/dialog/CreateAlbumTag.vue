@@ -22,8 +22,8 @@
           @input="v$.tagName.$touch()"
         />
         <div class="mt-1 flex items-center justify-between">
-          <small v-if="v$.tagName.$error" class="text-red-600">
-            {{ v$.tagName.$errors[0].$message }}
+          <small v-if="v$.tagName.$error && v$.tagName.$errors.length" class="text-red-600">
+            {{ v$.tagName.$errors[0]?.$message }}
           </small>
           <small class="ml-auto text-gray-500">{{ tagName.length }}/20</small>
         </div>

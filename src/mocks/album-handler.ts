@@ -1,6 +1,7 @@
+import type { Album } from '@/schema';
 import { delay, http, HttpResponse } from 'msw';
 
-export const mockAlbums = [
+export const mockAlbums: Album[] = [
   {
     isFeatured: false,
     albumCover: 'demo-album-4/2024-05-02 18.28.53.jpg',

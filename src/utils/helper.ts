@@ -151,9 +151,12 @@ export const interpolateGreatCircle = (
 
     // Normalizing longitude to the [-180, 180] range and handling antimeridian transition
     lon = ((lon + 540) % 360) - 180; // Normalize to [-180, 180]
-    if (i > 0 && Math.abs(lon - points[i - 1][0]) > 180) {
-      // Adjusting longitude to prevent abrupt jumps across antimeridian
-      lon = lon < 0 ? lon + 360 : lon - 360;
+    if (i > 0) {
+      const prevPoint = points[i - 1];
+      if (prevPoint && Math.abs(lon - prevPoint[0]) > 180) {
+        // Adjusting longitude to prevent abrupt jumps across antimeridian
+        lon = lon < 0 ? lon + 360 : lon - 360;
+      }
     }
     points.push([Number(lon.toFixed(6)), Number(lat.toFixed(6))]); // Store with 6 decimal precision
   }

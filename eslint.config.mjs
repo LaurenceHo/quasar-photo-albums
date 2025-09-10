@@ -1,12 +1,11 @@
 import pluginVue from 'eslint-plugin-vue';
-import vueTsEslintConfig from '@vue/eslint-config-typescript';
+import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
 import pluginVitest from '@vitest/eslint-plugin';
-import skipFormatting from '@vue/eslint-config-prettier/skip-formatting';
+import prettierSkipFormatting from '@vue/eslint-config-prettier/skip-formatting';
 
-export default [
-  ...pluginVue.configs['flat/essential'],
-  ...vueTsEslintConfig(),
-
+export default defineConfigWithVueTs(
+  pluginVue.configs['flat/essential'],
+  vueTsConfigs.recommended,
   {
     files: ['**/*.{ts,mts,tsx,vue}'],
     rules: {
@@ -14,23 +13,21 @@ export default [
         'warn',
         'single',
         {
-          avoidEscape: true
-        }
+          avoidEscape: true,
+        },
       ],
       'no-undef': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': 'warn',
-      'vue/multi-word-component-names': 'off'
-    }
+      'vue/multi-word-component-names': 'off',
+    },
   },
-
   {
-    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**', 'server', '*.config.*', '*.d.ts']
+    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**', 'server', '*.config.*', '*.d.ts'],
   },
-
   {
     ...pluginVitest.configs.recommended,
-    files: ['src/**/__tests__/*']
+    files: ['src/**/__tests__/*'],
   },
-  skipFormatting
-];
+  prettierSkipFormatting,
+);
