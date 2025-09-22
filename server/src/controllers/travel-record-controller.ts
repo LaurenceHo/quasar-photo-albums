@@ -75,7 +75,7 @@ export default class TravelRecordController extends BaseController {
   delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const record = (request.params as any)['recordId'] as string;
-      request.log.info('##### Delete travel record:', record);
+      request.log.info('##### Delete travel record: %s', record);
 
       const result = await travelRecordService.delete({ id: record });
 

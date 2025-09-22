@@ -81,7 +81,7 @@ export default class AuthController extends BaseController {
         return this.fail(reply, 'Error while user login');
       }
     } catch (err) {
-      request.log.error('Error while getting user permission:', err);
+      request.log.error('Error while getting user permission: %s', err);
       return this.fail(reply, 'Error while user login');
     }
   };
