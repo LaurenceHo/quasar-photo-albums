@@ -35,9 +35,11 @@ DROP TABLE IF EXISTS travel_records;
 CREATE TABLE travel_records (
   id TEXT PRIMARY KEY,
   travelDate TEXT NOT NULL,
-  departure TEXT,
-  destination TEXT,
+  departure TEXT NOT NULL CHECK (json_valid(departure)),
+  destination TEXT NOT NULL CHECK (json_valid(destination)),
   transportType TEXT NOT NULL,
+  flightNumber TEXT,
+  distance INTEGER NOT NULL,
   createdAt TEXT NOT NULL,
   createdBy TEXT NOT NULL
 );

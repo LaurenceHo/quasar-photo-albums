@@ -1,0 +1,9 @@
+name = "d1-bluebottle-albums-worker"
+main = "src/index.ts"
+compatibility_date = "2025-10-20"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "${D1_BLUEBOTTLE_DATABASE_NAME}"
+database_id = "${D1_BLUEBOTTLE_DATABASE_ID}"
