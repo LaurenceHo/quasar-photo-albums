@@ -141,7 +141,7 @@ export default class PhotoController extends BaseController {
               deleteObjects([sourcePhotoKey])
                 .then((result) => {
                   if (result) {
-                    request.log.info('##### Photo moved:', sourcePhotoKey);
+                    request.log.info(`##### Photo moved: ${sourcePhotoKey}`);
                     resolve('Photo moved');
                   } else {
                     reject('Failed to delete photo');
