@@ -4,18 +4,16 @@ import jwt from 'jsonwebtoken';
 import { get } from 'radash';
 import { setJwtCookies } from '../routes/auth-middleware.js';
 import { UserPermission } from '../schemas/user-permission.js';
-import UserService from '../services/user-service.js';
 import { BaseController } from './base-controller.js';
 
 // Reference:
 // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
 
-const userService = new UserService();
 const client = new OAuth2Client();
 
 export default class AuthController extends BaseController {
   // Get user info from token
-  findOne: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+  readUserInfoFromToken: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const token = get(request, 'cookies.jwt', '');
       const result = reply.unsignCookie(token);
@@ -65,9 +63,20 @@ export default class AuthController extends BaseController {
 
       // Only process if the authorised user just logged in within the last 5 minutes
       if (new Date().getTime() / 1000 - auth_time < 5 * 60) {
-        const userPermission = await userService.findOne({ uid, email });
+        const workerUrl = process.env['WORKER_URL'];
+        const environment = process.env['ENVIRONMENT'] || 'dev';
+        const response = await fetch(`${workerUrl}/user_permissions`, {
+          method: 'GET',
+          headers: {
+            'X-Uid': uid,
+            'X-Email': email,
+            'X-Environment': environment,
+            'Content-Type': 'application/json',
+          },
+        });
 
-        if (userPermission) {
+        if (response.status === 200) {
+          const userPermission = (await response.json()) as UserPermission;
           const token = jwt.sign(userPermission, process.env['JWT_SECRET'] as string, {
             expiresIn: '7d',
           });
@@ -96,6 +105,10 @@ export default class AuthController extends BaseController {
       request.log.error(err);
       return this.fail(reply, '');
     }
+  };
+
+  findOne: RouteHandler = async () => {
+    throw new Error('Method not implemented.');
   };
 
   findAll: RouteHandler = async () => {

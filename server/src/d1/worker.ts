@@ -1,6 +1,7 @@
 import { D1Service } from './d1-service';
 import TravelRecordService from './travel-record-service';
 import { Database } from '@cloudflare/d1';
+import UserService from './user-service';
 
 interface Env {
   DEV_DB: Database; // Default binding (dev)
@@ -69,16 +70,33 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
-
     const environment = process.env['ENVIRONMENT'] || 'dev';
     const db = environment === 'prod' ? env.PROD_DB : env.DEV_DB;
-    const travelRecordService = new TravelRecordService(db);
 
-    if (path.startsWith('/travel-records')) {
+    const travelRecordService = new TravelRecordService(db);
+    const userService = new UserService(db);
+
+    if (path.startsWith('/travel_records')) {
       return handleServiceRequest(travelRecordService, request, path, '/travel-records', [
+        'travelDate',
+        'departure',
         'destination',
-        'date',
+        'transportType',
+        'distance',
       ]);
+    }
+
+    if (path.startsWith('/user_permissions') && request.method === 'GET') {
+      const uid = request.headers.get('X-Uid');
+      const email = request.headers.get('X-Email');
+      if (!uid || !email) {
+        return new Response('Missing uid or email', { status: 400 });
+      }
+      const user = await userService.findOne({ uid, email });
+      return new Response(JSON.stringify(user), {
+        status: user ? 200 : 404,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     return new Response('Not found', { status: 404 });

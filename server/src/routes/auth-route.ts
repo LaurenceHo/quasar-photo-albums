@@ -19,7 +19,7 @@ const authRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done)
     return { state };
   });
 
-  instance.get('/api/auth/userInfo', controller.findOne);
+  instance.get('/api/auth/userInfo', controller.readUserInfoFromToken);
 
   instance.post('/api/auth/verifyIdToken', {
     handler: controller.verifyIdToken,
