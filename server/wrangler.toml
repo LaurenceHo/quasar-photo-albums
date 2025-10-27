@@ -1,9 +1,16 @@
-name = "d1-bluebottle-albums-worker"
-main = "src/index.ts"
+name = "${D1_PHOTO_ALBUMS_WORKER}"
+main = "src/d1/worker.ts"
 compatibility_date = "2025-10-20"
 compatibility_flags = ["nodejs_compat"]
 
+# Default (dev) binding
 [[d1_databases]]
-binding = "DB"
-database_name = "${D1_BLUEBOTTLE_DATABASE_NAME}"
-database_id = "${D1_BLUEBOTTLE_DATABASE_ID}"
+binding = "DEV_DB"
+database_name = "${DEV_D1_BLUEBOTTLE_DATABASE_NAME}"
+database_id = "${DEV_D1_BLUEBOTTLE_DATABASE_ID}"
+
+# Production binding
+[[d1_databases]]
+binding = "PROD_DB"
+database_name = "${PROD_D1_BLUEBOTTLE_DATABASE_NAME}"
+database_id = "${PROD_D1_BLUEBOTTLE_DATABASE_ID}"

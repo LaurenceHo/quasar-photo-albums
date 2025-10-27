@@ -32,6 +32,7 @@ jobs:
       DATA_AGGREGATIONS_TABLE_NAME: ${{ secrets.DATA_AGGREGATIONS_TABLE_NAME }}
       TRAVEL_RECORDS_TABLE_NAME: ${{ secrets.TRAVEL_RECORDS_TABLE_NAME }}
       PHOTO_ALBUMS_STREAM_ARN: ${{ secrets.PHOTO_ALBUMS_STREAM_ARN }}
+      ENVIRONMENT: prod
 
     steps:
       - uses: actions/checkout@v4
