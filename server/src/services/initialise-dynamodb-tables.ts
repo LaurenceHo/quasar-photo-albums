@@ -2,12 +2,6 @@ import { DescribeTableCommand } from '@aws-sdk/client-dynamodb';
 import logger from 'pino';
 import { AlbumTag, AlbumTagEntity, albumTagsTableName } from '../schemas/album-tag.js';
 import { Album, AlbumEntity, albumTableName } from '../schemas/album.js';
-import {
-  TravelRecord,
-  TravelRecordEntity,
-  travelRecordTableName,
-} from '../schemas/travel-record.js';
-import { UserPermission, UserPermissionEntity, userTableName } from '../schemas/user-permission.js';
 import { ddbDocClient } from './dynamodb-client.js';
 
 const getTableStatus = async (tableName: string) => {
@@ -104,116 +98,8 @@ const initialiseAlbumTagsTable = async () => {
   }
 };
 
-const initialiseUserTable = async () => {
-  try {
-    await getTableStatus(userTableName);
-  } catch (error) {
-    logger().error(error);
-    throw Error(`Table ${userTableName} does not exist. Please run 'bun run cdk:deploy' first.`);
-  }
-
-  try {
-    logger().info(`Checking ${userTableName} has data......`);
-    await waitForTable(userTableName, async (value) => {
-      if (value) {
-        const items = await UserPermissionEntity.scan.go({ limit: 1, ignoreOwnership: true });
-        if (items.data.length === 0) {
-          logger().info(`Insert mock data into ${userTableName} table......`);
-          await UserPermissionEntity.create({
-            uid: 'test-uid-1',
-            email: 'test@example.com',
-            displayName: 'Test User',
-            role: 'admin',
-          } as UserPermission).go({ response: 'none' });
-          logger().info(`Mock data inserted into ${userTableName} table.`);
-        }
-      }
-    });
-    logger().info(`${userTableName} table all set.`);
-  } catch (error) {
-    logger().error(`Error when checking ${userTableName}: ${error}`);
-  }
-};
-
-const initialiseTravelRecordTable = async () => {
-  try {
-    await getTableStatus(travelRecordTableName);
-  } catch (error) {
-    logger().error(error);
-    throw Error(
-      `Table ${travelRecordTableName} does not exist. Please run 'bun run cdk:deploy' first.`,
-    );
-  }
-
-  try {
-    logger().info(`Checking ${travelRecordTableName} has data......`);
-    await waitForTable(travelRecordTableName, async (value) => {
-      if (value) {
-        const items = await TravelRecordEntity.scan.go({ limit: 1, ignoreOwnership: true });
-        if (items.data.length === 0) {
-          logger().info(`Insert mock data into ${travelRecordTableName} table......`);
-          await TravelRecordEntity.create({
-            id: 'Tokyo#LA',
-            travelDate: new Date().toISOString(),
-            departure: {
-              displayName: 'Tokyo',
-              formattedAddress: 'Tokyo, Japan',
-              location: {
-                latitude: 35.6895,
-                longitude: 139.6917,
-              },
-            } as any,
-            destination: {
-              displayName: 'LA',
-              formattedAddress: 'LA, USA',
-              location: {
-                latitude: 34.0522,
-                longitude: -118.2437,
-              },
-            } as any,
-            createdBy: 'System',
-            updatedBy: 'System',
-          } as TravelRecord).go({ response: 'none' });
-
-          await TravelRecordEntity.create({
-            id: 'LA#Atlanta',
-            travelDate: new Date().toISOString(),
-            departure: {
-              displayName: 'LA',
-              formattedAddress: 'LA, USA',
-              location: {
-                latitude: 34.0522,
-                longitude: -118.2437,
-              },
-            } as any,
-            destination: {
-              formattedAddress: 'Atlanta, USA',
-              displayName: 'Atlanta',
-              location: {
-                latitude: 33.749,
-                longitude: -84.388,
-              },
-            } as any,
-            createdBy: 'System',
-            updatedBy: 'System',
-          } as TravelRecord).go({ response: 'none' });
-          logger().info(`Mock data inserted into ${travelRecordTableName} table.`);
-        }
-      }
-    });
-    logger().info(`${travelRecordTableName} table all set.`);
-  } catch (error) {
-    logger().error(`Error when checking ${travelRecordTableName}: ${error}`);
-  }
-};
-
 export const initialiseDynamodbTables = async () => {
   logger().info('Verifying DynamoDB tables......');
 
-  await Promise.all([
-    initialiseAlbumTable(),
-    initialiseAlbumTagsTable(),
-    initialiseUserTable(),
-    initialiseTravelRecordTable(),
-  ]);
+  await Promise.all([initialiseAlbumTable(), initialiseAlbumTagsTable()]);
 };

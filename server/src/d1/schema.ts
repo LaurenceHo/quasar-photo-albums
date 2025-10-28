@@ -59,16 +59,16 @@ async function createTable(db: Database, table: string) {
         distance INTEGER NOT NULL,
         createdAt TEXT NOT NULL,
         createdBy TEXT NOT NULL,
-        INDEX idx_id (id) -- Optional index
-      );
+        updatedAt TEXT NOT NULL,
+        updatedBy TEXT NOT NULL
+      ) STRICT;
     `,
     user_permissions: `
       CREATE TABLE user_permissions (
         uid TEXT PRIMARY KEY,
         email TEXT NOT NULL,
         displayName TEXT NOT NULL,
-        role TEXT NOT NULL,
-        INDEX idx_uid (uid) -- Optional index
+        role TEXT NOT NULL
       );
     `,
   };

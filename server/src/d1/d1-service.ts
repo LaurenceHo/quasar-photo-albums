@@ -1,5 +1,30 @@
 import { Database } from '@cloudflare/d1';
 
+type Primitive = string | number | boolean | null;
+
+/**
+ * Recursively flattens an object into primitive values.
+ * Dates → ISO string, nested objects → rejected with error.
+ */
+function flattenForD1(value: unknown): Primitive {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number') return value;
+  if (typeof value === 'boolean') return value;
+  if (value instanceof Date) return value.toISOString();
+
+  // For JSON columns: convert object/array to JSON string
+  if (typeof value === 'object') {
+    try {
+      return JSON.stringify(value);
+    } catch (e) {
+      throw new Error(`Failed to stringify JSON field: ${e}`);
+    }
+  }
+
+  throw new Error(`Unsupported value for D1: ${value} (${typeof value})`);
+}
+
 export class D1Service<T> {
   private readonly db: Database;
   private readonly tableName: string;
@@ -9,59 +34,117 @@ export class D1Service<T> {
     this.tableName = tableName;
   }
 
+  /* ------------------------------------------------------------------ */
+  /* READ OPERATIONS                                                    */
+  /* ------------------------------------------------------------------ */
   async getAll(): Promise<T[]> {
-    const stmt = this.db.prepare(`SELECT * FROM ${this.tableName}`);
-    const { results } = await stmt.all();
+    const { results } = await this.db.prepare(`SELECT * FROM ${this.tableName}`).all();
     return (results as T[]) || [];
   }
 
   async getById(id: string): Promise<T | null> {
-    const stmt = this.db.prepare(`SELECT * FROM ${this.tableName} WHERE id = ?`);
-    return (await stmt.bind(id).first()) as T | null;
+    return (await this.db
+      .prepare(`SELECT * FROM ${this.tableName} WHERE id = ?`)
+      .bind(id)
+      .first()) as T | null;
   }
 
   async findAll(where: Partial<T>): Promise<T[]> {
     const { clause, values } = this.buildWhereClause(where);
-    const stmt = this.db.prepare(`SELECT * FROM ${this.tableName} WHERE ${clause}`);
-    const { results } = await stmt.bind(...values).all();
+    const { results } = await this.db
+      .prepare(`SELECT * FROM ${this.tableName} WHERE ${clause}`)
+      .bind(...values)
+      .all();
     return (results as T[]) || [];
   }
 
   async findOne(where: Partial<T>): Promise<T | null> {
     const { clause, values } = this.buildWhereClause(where);
-    const stmt = this.db.prepare(`SELECT * FROM ${this.tableName} WHERE ${clause}`);
-    return (await stmt.bind(...values).first()) as T | null;
+    return (await this.db
+      .prepare(`SELECT * FROM ${this.tableName} WHERE ${clause}`)
+      .bind(...values)
+      .first()) as T | null;
   }
 
+  /* ------------------------------------------------------------------ */
+  /* CREATE                                                             */
+  /* ------------------------------------------------------------------ */
   async create(item: T): Promise<any> {
-    const keys = Object.keys(item as object).join(', ');
-    const values = Object.values(item as object);
-    const placeholders = values.map(() => '?').join(', ');
+    const obj = item as any;
 
-    const stmt = this.db.prepare(
-      `INSERT INTO ${this.tableName} (${keys}) VALUES (${placeholders})`,
-    );
-    return await stmt.bind(...values).run();
+    // Explicitly list columns (recommended) OR use Object.keys
+    const keys: string[] = [];
+    const bindValues: Primitive[] = [];
+
+    for (const [key, value] of Object.entries(obj)) {
+      if (value === undefined) continue; // skip undefined
+      keys.push(key);
+      bindValues.push(flattenForD1(value));
+    }
+
+    if (keys.length === 0) {
+      throw new Error('No valid fields to insert');
+    }
+
+    const placeholders = keys.map(() => '?').join(', ');
+    const sql = `INSERT INTO ${this.tableName} (${keys.join(', ')}) VALUES (${placeholders})`;
+
+    return await this.db
+      .prepare(sql)
+      .bind(...bindValues)
+      .run();
   }
 
+  /* ------------------------------------------------------------------ */
+  /* UPDATE                                                             */
+  /* ------------------------------------------------------------------ */
   async update(id: string, item: Partial<T>): Promise<any> {
-    const keys = Object.keys(item as object);
-    const values = Object.values(item as object);
-    const setClause = keys.map((key) => `${key} = ?`).join(', ');
+    const obj = item as any;
+    const setParts: string[] = [];
+    const bindValues: Primitive[] = [];
 
-    const stmt = this.db.prepare(`UPDATE ${this.tableName} SET ${setClause} WHERE id = ?`);
-    return await stmt.bind(...values, id).run();
+    for (const [key, value] of Object.entries(obj)) {
+      if (value === undefined) continue;
+      setParts.push(`${key} = ?`);
+      bindValues.push(flattenForD1(value));
+    }
+
+    if (setParts.length === 0) {
+      throw new Error('No fields to update');
+    }
+
+    bindValues.push(id); // WHERE id = ?
+
+    const sql = `UPDATE ${this.tableName} SET ${setParts.join(', ')} WHERE id = ?`;
+
+    return await this.db
+      .prepare(sql)
+      .bind(...bindValues)
+      .run();
   }
 
+  /* ------------------------------------------------------------------ */
+  /* DELETE                                                             */
+  /* ------------------------------------------------------------------ */
   async delete(id: string): Promise<any> {
-    const stmt = this.db.prepare(`DELETE FROM ${this.tableName} WHERE id = ?`);
-    return await stmt.bind(id).run();
+    return await this.db.prepare(`DELETE FROM ${this.tableName} WHERE id = ?`).bind(id).run();
   }
 
-  private buildWhereClause(where: Partial<T>): { clause: string; values: any[] } {
-    const keys = Object.keys(where as object);
-    const values = Object.values(where as object);
-    const clause = keys.map((key) => `${key} = ?`).join(' AND ');
-    return { clause, values };
+  /* ------------------------------------------------------------------ */
+  /* HELPERS                                                            */
+  /* ------------------------------------------------------------------ */
+  private buildWhereClause(where: Partial<T>): { clause: string; values: Primitive[] } {
+    const entries = Object.entries(where as any).filter(([, v]) => v !== undefined);
+    if (entries.length === 0) {
+      return { clause: '1=1', values: [] };
+    }
+
+    const clauseParts = entries.map(([k]) => `${k} = ?`);
+    const values = entries.map(([, v]) => flattenForD1(v));
+
+    return {
+      clause: clauseParts.join(' AND '),
+      values,
+    };
   }
 }

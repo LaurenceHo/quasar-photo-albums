@@ -1,6 +1,7 @@
+import { Database } from '@cloudflare/d1';
+import logger from 'pino';
 import { D1Service } from './d1-service';
 import TravelRecordService from './travel-record-service';
-import { Database } from '@cloudflare/d1';
 import UserService from './user-service';
 
 interface Env {
@@ -76,8 +77,10 @@ export default {
     const travelRecordService = new TravelRecordService(db);
     const userService = new UserService(db);
 
+    logger().info('Path: ', path, 'Method: ', request.method);
+
     if (path.startsWith('/travel_records')) {
-      return handleServiceRequest(travelRecordService, request, path, '/travel-records', [
+      return handleServiceRequest(travelRecordService, request, path, '/travel_records', [
         'travelDate',
         'departure',
         'destination',
