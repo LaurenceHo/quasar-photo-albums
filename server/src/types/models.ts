@@ -1,5 +1,5 @@
 import { FastifyRequest, RouteHandler } from 'fastify';
-import { UserPermission } from '../schemas/user-permission.js';
+import { UserPermission } from './user-permission';
 
 export type RequestWithUser = FastifyRequest & { user?: UserPermission | null };
 

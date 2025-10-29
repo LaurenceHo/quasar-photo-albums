@@ -2,9 +2,9 @@ import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import logger from 'pino';
 import { D1Client } from '../d1/d1-client.js';
 import { RequestWithUser } from '../types';
-import { TravelRecord } from '../types/types';
+import { TravelRecord } from '../types/travel-record';
 import { BaseController } from './base-controller.js';
-import { updateDatabaseAt } from './helpers';
+import { haversineDistance, isValidCoordination, updateDatabaseAt } from './helpers';
 
 const travelClient = new D1Client('travel_records', ['departure', 'destination']);
 
@@ -23,9 +23,33 @@ export default class TravelRecordController extends BaseController {
     const body = request.body as TravelRecord;
     const userEmail = (request as RequestWithUser).user?.email ?? 'unknown';
 
+    // TODO: If departure and destination are present, calculate the distance using latitude and longitude
+    // If airline and flight number are present, calculate the distance using flight API
+    // If all of them are present, calculate the distance using the latitude and longitude
+
+    let distance = 0;
+    if (body.departure && body.destination) {
+      if (
+        !isValidCoordination(body.departure.location.latitude, body.departure.location.longitude) ||
+        !isValidCoordination(
+          body.destination.location.latitude,
+          body.destination.location.longitude,
+        )
+      ) {
+        return this.fail(reply, 'Invalid coordinates');
+      }
+
+      distance = haversineDistance(
+        body.departure.location.latitude,
+        body.departure.location.longitude,
+        body.destination.location.latitude,
+        body.destination.location.longitude,
+      );
+    }
+
     const payload: TravelRecord = {
       ...body,
-      distance: 1000, // FIXME, need to calculate the real distance later
+      distance,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: userEmail,

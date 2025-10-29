@@ -1,4 +1,4 @@
-import { TravelRecord } from '../types/types';
+import { TravelRecord } from '../types/travel-record';
 import { D1Service } from './d1-service';
 import { Database } from '@cloudflare/d1';
 

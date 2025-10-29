@@ -55,6 +55,7 @@ async function createTable(db: Database, table: string) {
         departure TEXT NOT NULL CHECK (json_valid(departure)),
         destination TEXT NOT NULL CHECK (json_valid(destination)),
         transportType TEXT NOT NULL,
+        airline TEXT,
         flightNumber TEXT,
         distance INTEGER NOT NULL,
         createdAt TEXT NOT NULL,
@@ -70,6 +71,9 @@ async function createTable(db: Database, table: string) {
         displayName TEXT NOT NULL,
         role TEXT NOT NULL
       );
+
+      INSERT INTO "user_permissions"
+      VALUES ('test-uid-1', 'test@example.com', 'Test User', 'admin');
     `,
   };
 

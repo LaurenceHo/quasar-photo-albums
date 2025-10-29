@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import logger from 'pino';
 import { get } from 'radash';
 import { setJwtCookies } from '../routes/auth-middleware.js';
-import { UserPermission } from '../schemas/user-permission.js';
+import { UserPermission } from '../types/user-permission';
 import { BaseController } from './base-controller.js';
 
 // Reference:

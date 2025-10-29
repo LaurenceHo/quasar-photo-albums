@@ -3,8 +3,8 @@ import { CookieSerializeOptions } from '@fastify/cookie';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { get } from 'radash';
-import { UserPermission } from '../schemas/user-permission';
 import { RequestWithUser } from '../types';
+import { UserPermission } from '../types/user-permission';
 import JsonResponse from '../utils/json-response.js';
 
 export const setJwtCookies = async (reply: FastifyReply, token: string) => {
