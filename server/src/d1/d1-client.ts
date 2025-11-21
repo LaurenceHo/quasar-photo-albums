@@ -90,7 +90,7 @@ export class D1Client {
 
   async find<T>(params: Record<string, string | number | boolean>): Promise<T[]> {
     const search = new URLSearchParams(
-      Object.entries(params).map(([k, v]) => [k, String(v)]),
+      Object.entries(params).map(([k, v]) => [k, String(v)]) as [string, string][],
     ).toString();
     return this.request<T[]>(`?${search}`);
   }

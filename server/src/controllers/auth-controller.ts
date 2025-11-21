@@ -52,7 +52,7 @@ export default class AuthController extends BaseController {
       try {
         const decoded = jwt.verify(result.value, process.env['JWT_SECRET']!) as UserPermission;
         return this.ok<UserPermission>(reply, 'ok', decoded);
-      } catch (error) {
+      } catch (error: any) {
         logger().info('Invalid JWT:', error);
         reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
         return this.ok(reply, 'ok');

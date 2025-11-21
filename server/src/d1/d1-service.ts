@@ -1,5 +1,3 @@
-import { Database } from '@cloudflare/d1';
-
 type Primitive = string | number | boolean | null;
 
 /**
@@ -26,10 +24,10 @@ function flattenForD1(value: unknown): Primitive {
 }
 
 export class D1Service<T> {
-  private readonly db: Database;
+  private readonly db: D1Database;
   private readonly tableName: string;
 
-  constructor(db: Database, tableName: string) {
+  constructor(db: D1Database, tableName: string) {
     this.db = db;
     this.tableName = tableName;
   }

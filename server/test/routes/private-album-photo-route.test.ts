@@ -3,17 +3,27 @@ import { app } from '../../src/app';
 import { updatePhotoAlbum } from '../../src/controllers/helpers';
 import { mockAlbumList, mockPhotoList, mockSignedCookies } from '../mock-data';
 
-vi.mock('../../src/services/album-service', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    findOne: () => Promise.resolve(mockAlbumList[2]), // private album
-  })),
-}));
+vi.mock('../../src/services/album-service', async () => {
+  const { mockAlbumList } = await import('../mock-data');
+  return {
+    default: class {
+      findOne() {
+        return Promise.resolve(mockAlbumList[2]); // private album
+      }
+    },
+  };
+});
 
-vi.mock('../../src/services/s3-service', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    findAll: () => Promise.resolve(mockPhotoList),
-  })),
-}));
+vi.mock('../../src/services/s3-service', async () => {
+  const { mockPhotoList } = await import('../mock-data');
+  return {
+    default: class {
+      findAll() {
+        return Promise.resolve(mockPhotoList);
+      }
+    },
+  };
+});
 
 vi.mock('../../src/controllers/helpers', async () => ({
   updatePhotoAlbum: () => Promise.resolve(true),

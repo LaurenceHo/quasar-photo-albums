@@ -64,6 +64,7 @@ const createAppLambdaFunction = (scope, id, envType) => {
       PHOTO_USER_PERMISSION_TABLE_NAME: process.env.PHOTO_USER_PERMISSION_TABLE_NAME,
       DATA_AGGREGATIONS_TABLE_NAME: process.env.DATA_AGGREGATIONS_TABLE_NAME,
       TRAVEL_RECORDS_TABLE_NAME: process.env.TRAVEL_RECORDS_TABLE_NAME,
+      WORKER_URL: process.env.WORKER_URL,
       JWT_SECRET: process.env.JWT_SECRET,
       NODE_OPTIONS: '--experimental-vm-modules',
       ENVIRONMENT: envType,
