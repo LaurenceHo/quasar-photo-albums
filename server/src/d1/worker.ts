@@ -5,8 +5,7 @@ import TravelRecordService from './travel-record-service';
 import UserService from './user-service';
 
 interface Env {
-  DEV_DB: Database; // Default binding (dev)
-  PROD_DB: Database; // Production binding
+  DB: Database;
 }
 
 async function handleServiceRequest<T>(
@@ -71,8 +70,7 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
-    const environment = process.env['ENVIRONMENT'] || 'dev';
-    const db = environment === 'prod' ? env.PROD_DB : env.DEV_DB;
+    const db = env.DB;
 
     const travelRecordService = new TravelRecordService(db);
     const userService = new UserService(db);

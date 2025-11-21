@@ -69,7 +69,7 @@ export class D1Client {
 
   // POST /table
   async create<T>(data: T): Promise<string> {
-    return this.request('/' as any, {
+    return this.request('' as any, {
       method: 'POST',
       body: JSON.stringify(data),
     });

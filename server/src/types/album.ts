@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { PlaceSchema } from './place';
 
 export const AlbumSchema = z.object({
   id: z.string(),
@@ -8,7 +9,7 @@ export const AlbumSchema = z.object({
   albumCover: z.string().optional(),
   isPrivate: z.boolean(),
   isFeatured: z.boolean().optional(),
-  place: z.string().optional(),
+  place: PlaceSchema.optional(),
   tags: z.array(z.string()).optional(),
   createdAt: z.string(),
   createdBy: z.string(),

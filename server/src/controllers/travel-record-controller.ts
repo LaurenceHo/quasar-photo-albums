@@ -39,12 +39,14 @@ export default class TravelRecordController extends BaseController {
         return this.fail(reply, 'Invalid coordinates');
       }
 
-      distance = haversineDistance(
+      const rawDistance = haversineDistance(
         body.departure.location.latitude,
         body.departure.location.longitude,
         body.destination.location.latitude,
         body.destination.location.longitude,
       );
+
+      distance = Math.round(rawDistance);
     }
 
     const payload: TravelRecord = {
