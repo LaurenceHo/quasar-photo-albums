@@ -32,6 +32,7 @@ jobs:
       DATA_AGGREGATIONS_TABLE_NAME: ${{ secrets.DATA_AGGREGATIONS_TABLE_NAME }}
       TRAVEL_RECORDS_TABLE_NAME: ${{ secrets.TRAVEL_RECORDS_TABLE_NAME }}
       PHOTO_ALBUMS_STREAM_ARN: ${{ secrets.PHOTO_ALBUMS_STREAM_ARN }}
+      WORKER_URL: ${{ secrets.WORKER_URL }}
       ENVIRONMENT: prod
 
     steps:
@@ -55,3 +56,25 @@ jobs:
           cd ./server
           bun cdk acknowledge 32775
           bun cdk deploy PhotoAlbumProdStack --quiet --require-approval never | grep -E "✅|time"
+
+      - name: Deploy Cloudflare Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          D1_PHOTO_ALBUMS_WORKER: ${{ vars.D1_PHOTO_ALBUMS_WORKER }}
+          PROD_PHOTO_ALBUMS_DB_NAME: ${{ secrets.PROD_PHOTO_ALBUMS_DB_NAME }}
+          PROD_PHOTO_ALBUMS_DB_ID: ${{ secrets.PROD_PHOTO_ALBUMS_DB_ID }}
+          # Dummy values for Dev vars to satisfy wrangler.toml validation
+          DEV_PHOTO_ALBUMS_DB_NAME: "placeholder-dev-db"
+          DEV_PHOTO_ALBUMS_DB_ID: "placeholder-dev-id"
+        run: |
+          cd ./server
+          # Install gettext-base for envsubst if not present (usually is on ubuntu-latest)
+          sudo apt-get update && sudo apt-get install -y gettext-base
+          
+          # Substitute environment variables in wrangler.toml
+          envsubst < wrangler.toml > wrangler.temp.toml
+          mv wrangler.temp.toml wrangler.toml
+          
+          # Deploy to production environment
+          npx wrangler deploy --env production
