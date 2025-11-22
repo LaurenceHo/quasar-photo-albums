@@ -68,14 +68,16 @@ jobs:
           DEV_PHOTO_ALBUMS_DB_NAME: "placeholder-dev-db"
           DEV_PHOTO_ALBUMS_DB_ID: "placeholder-dev-id"
         run: |
-          # Go to the exact folder that contains wrangler.toml
+          # Go to the folder that contains wrangler.toml
           cd "$GITHUB_WORKSPACE/server"
 
-          # Substitute only the two DB vars that actually change
+          # Export the prod DB vars so envsubst can replace them
           export PROD_PHOTO_ALBUMS_DB_NAME
           export PROD_PHOTO_ALBUMS_DB_ID
+
+          # Substitute variables in wrangler.toml
           envsubst < wrangler.toml > wrangler.tmp.toml
           mv wrangler.tmp.toml wrangler.toml
 
-          # Deploy
-          npx wrangler deploy --name "$D1_PHOTO_ALBUMS_WORKER" --env=""
+          # Deploy to the **production** environment
+          npx wrangler deploy --name "$D1_PHOTO_ALBUMS_WORKER" --env production
