@@ -11,37 +11,46 @@ const helperMock = vi.hoisted(() => ({
   verifyIfIsAdmin: vi.fn(() => true),
 }));
 
-vi.mock('../../src/services/data-aggregation-service', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    findOne: ({ key }: { key: string }) => {
-      if (key === ALBUMS_WITH_LOCATION) {
-        return Promise.resolve({
-          key: ALBUMS_WITH_LOCATION,
-          value: mockAlbumList,
-        });
-      } else if (key === COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE) {
-        return Promise.resolve({
-          key: COUNT_ALBUMS_BY_YEAR,
-          value: [
-            { year: '2020', count: 10 },
-            { year: '2021', count: 20 },
-          ],
-        });
-      } else if (key === COUNT_ALBUMS_BY_YEAR) {
-        return Promise.resolve({
-          key: COUNT_ALBUMS_BY_YEAR,
-          value: [
-            { year: '2018', count: 1 },
-            { year: '2019', count: 11 },
-            { year: '2020', count: 10 },
-            { year: '2021', count: 20 },
-          ],
-        });
+vi.mock('../../src/services/data-aggregation-service', async () => {
+  const {
+    ALBUMS_WITH_LOCATION,
+    COUNT_ALBUMS_BY_YEAR,
+    COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
+  } = await import('../../src/schemas/aggregation');
+  const { mockAlbumList } = await import('../mock-data');
+
+  return {
+    default: class {
+      findOne({ key }: { key: string }) {
+        if (key === ALBUMS_WITH_LOCATION) {
+          return Promise.resolve({
+            key: ALBUMS_WITH_LOCATION,
+            value: mockAlbumList,
+          });
+        } else if (key === COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE) {
+          return Promise.resolve({
+            key: COUNT_ALBUMS_BY_YEAR,
+            value: [
+              { year: '2020', count: 10 },
+              { year: '2021', count: 20 },
+            ],
+          });
+        } else if (key === COUNT_ALBUMS_BY_YEAR) {
+          return Promise.resolve({
+            key: COUNT_ALBUMS_BY_YEAR,
+            value: [
+              { year: '2018', count: 1 },
+              { year: '2019', count: 11 },
+              { year: '2020', count: 10 },
+              { year: '2021', count: 20 },
+            ],
+          });
+        }
+        return Promise.reject('Invalid key');
       }
-      return Promise.reject('Invalid key');
     },
-  })),
-}));
+  };
+});
 
 vi.mock('../../src/controllers/helpers', () => ({
   verifyIfIsAdmin: () => helperMock.verifyIfIsAdmin,

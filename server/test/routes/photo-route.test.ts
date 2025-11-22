@@ -4,12 +4,19 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { app } from '../../src/app';
 import { mockAlbumList, mockPhotoList } from '../mock-data';
 
-vi.mock('../../src/services/s3-service', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    findAll: () => Promise.resolve(mockPhotoList),
-    copy: () => Promise.resolve(true),
-  })),
-}));
+vi.mock('../../src/services/s3-service', async () => {
+  const { mockPhotoList } = await import('../mock-data');
+  return {
+    default: class {
+      findAll() {
+        return Promise.resolve(mockPhotoList);
+      }
+      copy() {
+        return Promise.resolve(true);
+      }
+    },
+  };
+});
 
 vi.mock('../../src/routes/auth-middleware', async () => ({
   verifyJwtClaim: () => Promise.resolve(),
@@ -22,11 +29,16 @@ vi.mock('../../src/controllers/helpers', async () => ({
   uploadObject: () => Promise.resolve(true),
 }));
 
-vi.mock('../../src/services/album-service', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    findOne: () => Promise.resolve(mockAlbumList[0]),
-  })),
-}));
+vi.mock('../../src/services/album-service', async () => {
+  const { mockAlbumList } = await import('../mock-data');
+  return {
+    default: class {
+      findOne() {
+        return Promise.resolve(mockAlbumList[0]);
+      }
+    },
+  };
+});
 
 describe('photo route', () => {
   afterEach(() => {

@@ -3,20 +3,29 @@ import { app } from '../../src/app';
 import { Album } from '../../src/schemas/album';
 import { mockAlbumList } from '../mock-data';
 
-vi.mock('../../src/services/album-service', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    findAll: (method?: string) => {
-      if (method === 'scan') {
-        return Promise.resolve([]);
-      } else {
-        return Promise.resolve(mockAlbumList);
+vi.mock('../../src/services/album-service', async () => {
+  const { mockAlbumList } = await import('../mock-data');
+  return {
+    default: class {
+      findAll(method?: string) {
+        if (method === 'scan') {
+          return Promise.resolve([]);
+        } else {
+          return Promise.resolve(mockAlbumList);
+        }
+      }
+      create() {
+        return Promise.resolve(true);
+      }
+      update() {
+        return Promise.resolve(true);
+      }
+      delete() {
+        return Promise.resolve(true);
       }
     },
-    create: () => Promise.resolve(true),
-    update: () => Promise.resolve(true),
-    delete: () => Promise.resolve(true),
-  })),
-}));
+  };
+});
 
 vi.mock('../../src/routes/auth-middleware', async () => ({
   verifyJwtClaim: () => Promise.resolve(),
