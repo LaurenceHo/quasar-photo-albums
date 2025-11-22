@@ -69,11 +69,6 @@ jobs:
           # Go to the exact folder that contains wrangler.toml
           cd "$GITHUB_WORKSPACE/server"
 
-          # Safety check + debug
-          echo "Current directory: $(pwd)"
-          test -f wrangler.toml || { echo "wrangler.toml not found!"; exit 1; }
-          echo "Deploying worker named: '$D1_PHOTO_ALBUMS_WORKER' (length: ${#D1_PHOTO_ALBUMS_WORKER})"
-
           # Substitute only the two DB vars that actually change
           export DEV_PHOTO_ALBUMS_DB_NAME
           export DEV_PHOTO_ALBUMS_DB_ID
