@@ -153,3 +153,46 @@ export const verifyIfIsAdmin = (request: FastifyRequest, reply: FastifyReply) =>
   }
   return isAdmin;
 };
+
+/**
+ * Calculate distance between two points in kilometers
+ * @param lat1 Latitude of point 1
+ * @param lon1 Longitude of point 1
+ * @param lat2 Latitude of point 2
+ * @param lon2 Longitude of point 2
+ * @returns Distance in kilometers
+ */
+export const haversineDistance = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number => {
+  const inputs = [lat1, lon1, lat2, lon2];
+
+  // Only throw for non-number types (string, null, undefined, object)
+  for (const input of inputs) {
+    if (typeof input !== 'number') {
+      throw new Error('All inputs must be numbers');
+    }
+  }
+
+  const R = 6371;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const lat1Rad = toRad(lat1);
+  const lat2Rad = toRad(lat2);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 + Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(dLon / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distance in km
+};
+
+export const isValidCoordination = (lat: number, lon: number): boolean => {
+  return typeof lat === 'number' && typeof lon === 'number' && !isNaN(lat) && !isNaN(lon);
+};

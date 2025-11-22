@@ -10,3 +10,4 @@ typings/
 .build/
 coverage/
 cdk.out/*
+.wrangler

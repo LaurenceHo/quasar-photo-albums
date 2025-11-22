@@ -66,7 +66,7 @@ await app.register(throttle, {
 
 // Route
 app.addHook('onRequest', (request, _reply, done) => {
-  request.log.info('##### Request: ', request.method, request.url);
+  request.log.info('##### Request: %s %s', request.method, request.url);
   done();
 });
 

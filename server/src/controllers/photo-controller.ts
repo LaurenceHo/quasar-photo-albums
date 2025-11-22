@@ -86,7 +86,7 @@ export default class PhotoController extends BaseController {
       }
       return this.notFoundError(reply, 'Album does not exist');
     } catch (err: any) {
-      request.log.error('Failed to get photos:', err);
+      request.log.error('Failed to get photos: %s', err);
       return this.fail(reply, 'Failed to get photos');
     }
   };
@@ -114,7 +114,7 @@ export default class PhotoController extends BaseController {
       request.log.info(`##### Generated presigned URL for file: ${filePath}`);
       return this.ok(reply, 'ok', { uploadUrl });
     } catch (err: any) {
-      request.log.error('Failed to generate presigned URL:', err);
+      request.log.error('Failed to generate presigned URL: %s', err);
       return this.fail(reply, 'Failed to generate upload URL');
     }
   };
@@ -141,7 +141,7 @@ export default class PhotoController extends BaseController {
               deleteObjects([sourcePhotoKey])
                 .then((result) => {
                   if (result) {
-                    request.log.info(`##### Photo moved: ${sourcePhotoKey}`);
+                    request.log.info('##### Photo moved: %s', sourcePhotoKey);
                     resolve('Photo moved');
                   } else {
                     reject('Failed to delete photo');
@@ -164,7 +164,7 @@ export default class PhotoController extends BaseController {
       await Promise.all(promises);
       return this.ok(reply, 'Photo moved');
     } catch (err: any) {
-      request.log.error('Failed to move photos:', err);
+      request.log.error('Failed to move photos: %s', err);
       return this.fail(reply, 'Failed to move photos');
     }
   };
@@ -186,7 +186,7 @@ export default class PhotoController extends BaseController {
       }
       return this.fail(reply, 'Failed to rename photo');
     } catch (err: any) {
-      request.log.error('Failed to rename photo:', err);
+      request.log.error('Failed to rename photo: %s', err);
       return this.fail(reply, 'Failed to rename photo');
     }
   };
@@ -202,7 +202,7 @@ export default class PhotoController extends BaseController {
       }
       return this.fail(reply, 'Failed to delete photos');
     } catch (err: any) {
-      request.log.error('Failed to delete photos:', err);
+      request.log.error('Failed to delete photos: %s', err);
       return this.fail(reply, 'Failed to delete photos');
     }
   };
