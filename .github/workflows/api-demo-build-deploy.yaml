@@ -66,14 +66,24 @@ jobs:
           PROD_PHOTO_ALBUMS_DB_NAME: "placeholder-prod-db"
           PROD_PHOTO_ALBUMS_DB_ID: "placeholder-prod-id"
         run: |
-          cd ./server
+          echo "=== DEBUG INFO ==="
+          echo "WORKER_NAME env var length: ${#D1_PHOTO_ALBUMS_WORKER}"
+          echo "D1_PHOTO_ALBUMS_WORKER (raw): '$D1_PHOTO_ALBUMS_WORKER'"
+          echo "D1_PHOTO_ALBUMS_WORKER (escaped): $(printf '%q' "$D1_PHOTO_ALBUMS_WORKER")"
+          echo "All env vars containing D1_PHOTO_ALBUMS_WORKER:"
+          env | grep -i D1_PHOTO_ALBUMS_WORKER || true
+          echo "=================="
 
-          export DEV_PHOTO_ALBUMS_DB_NAME="${DEV_PHOTO_ALBUMS_DB_NAME}"
-          export DEV_PHOTO_ALBUMS_DB_ID="${DEV_PHOTO_ALBUMS_DB_ID}"
-          envsubst '${DEV_PHOTO_ALBUMS_DB_NAME} ${DEV_PHOTO_ALBUMS_DB_ID}' < wrangler.toml > wrangler.temp.toml
-          mv wrangler.temp.toml wrangler.toml
+          # If it's empty or has spaces/newlines → fail fast
+          if [ -z "$D1_PHOTO_ALBUMS_WORKER" ]; then
+            echo "ERROR: D1_PHOTO_ALBUMS_WORKER is empty or unset!"
+            exit 1
+          fi
 
-          # Deploy explicitly to the top-level (dev) environment and provide name via CLI
-          npx wrangler deploy \
-            --name "$D1_PHOTO_ALBUMS_WORKER" \
-            --env=""
+          # Substitute DB bindings
+          export DEV_PHOTO_ALBUMS_DB_NAME DEV_PHOTO_ALBUMS_DB_ID
+          envsubst < wrangler.toml > wrangler.tmp.toml && mv wrangler.tmp.toml wrangler.toml
+
+          # Final command with maximum verbosity
+          echo "Running: npx wrangler deploy --name \"$D1_PHOTO_ALBUMS_WORKER\" --env=\"\" --verbose"
+          npx wrangler deploy --name "$D1_PHOTO_ALBUMS_WORKER" --env="" --verbose
