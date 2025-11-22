@@ -61,7 +61,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          D1_PHOTO_ALBUMS_WORKER: ${{ vars.D1_PHOTO_ALBUMS_WORKER }}
+          D1_PHOTO_ALBUMS_WORKER: ${{ secrets.D1_PHOTO_ALBUMS_WORKER }}
           PROD_PHOTO_ALBUMS_DB_NAME: ${{ secrets.PROD_PHOTO_ALBUMS_DB_NAME }}
           PROD_PHOTO_ALBUMS_DB_ID: ${{ secrets.PROD_PHOTO_ALBUMS_DB_ID }}
           # Dummy values for Dev vars to satisfy wrangler.toml validation
@@ -69,13 +69,13 @@ jobs:
           DEV_PHOTO_ALBUMS_DB_ID: "placeholder-dev-id"
         run: |
           cd ./server
-          # Install gettext-base for envsubst if not present (usually is on ubuntu-latest)
-          sudo apt-get update && sudo apt-get install -y gettext-base
 
-          # Substitute environment variables in wrangler.toml
-          export D1_PHOTO_ALBUMS_WORKER="${D1_PHOTO_ALBUMS_WORKER}"
-          envsubst < wrangler.toml > wrangler.temp.toml
+          export DEV_PHOTO_ALBUMS_DB_NAME="${DEV_PHOTO_ALBUMS_DB_NAME}"
+          export DEV_PHOTO_ALBUMS_DB_ID="${DEV_PHOTO_ALBUMS_DB_ID}"
+          envsubst '${DEV_PHOTO_ALBUMS_DB_NAME} ${DEV_PHOTO_ALBUMS_DB_ID}' < wrangler.toml > wrangler.temp.toml
           mv wrangler.temp.toml wrangler.toml
 
           # Deploy to production environment
-          npx wrangler deploy --env production
+          npx wrangler deploy \
+            --name "$D1_PHOTO_ALBUMS_WORKER" \
+            --env="production"
