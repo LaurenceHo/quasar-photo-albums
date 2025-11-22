@@ -70,8 +70,12 @@ jobs:
         run: |
           cd ./server
 
-          export PROD_PHOTO_ALBUMS_DB_NAME PROD_PHOTO_ALBUMS_DB_ID
-          envsubst < wrangler.toml > wrangler.tmp.toml && mv wrangler.tmp.toml wrangler.toml
+          export PROD_PHOTO_ALBUMS_DB_NAME="${PROD_PHOTO_ALBUMS_DB_NAME}"
+          export PROD_PHOTO_ALBUMS_DB_ID="${PROD_PHOTO_ALBUMS_DB_ID}"
+          envsubst '${PROD_PHOTO_ALBUMS_DB_NAME} ${PROD_PHOTO_ALBUMS_DB_ID}' < wrangler.toml > wrangler.temp.toml
+          mv wrangler.temp.toml wrangler.toml
 
-          # Deploy explicitly to the top-level (dev) environment and provide name via CLI
-          npx wrangler deploy --name "$D1_PHOTO_ALBUMS_WORKER" --env="production"
+          # Deploy to production environment
+          npx wrangler deploy \
+            --name "$D1_PHOTO_ALBUMS_WORKER" \
+            --env="production"
