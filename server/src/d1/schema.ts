@@ -1,6 +1,4 @@
-import { Database } from '@cloudflare/d1';
-
-export async function initialiseSchema(db: Database) {
+export async function initialiseSchema(db: D1Database) {
   const tables = ['albums', 'album_tags', 'album_tags_map', 'travel_records', 'user_permissions'];
 
   for (const table of tables) {
@@ -14,7 +12,7 @@ export async function initialiseSchema(db: Database) {
   }
 }
 
-async function createTable(db: Database, table: string) {
+async function createTable(db: D1Database, table: string) {
   const schemas = {
     albums: `
       CREATE TABLE albums (

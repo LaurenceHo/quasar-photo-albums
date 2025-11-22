@@ -1,11 +1,10 @@
-import { Database } from '@cloudflare/d1';
 import logger from 'pino';
 import { D1Service } from './d1-service';
 import TravelRecordService from './travel-record-service';
 import UserService from './user-service';
 
 interface Env {
-  DB: Database;
+  DB: D1Database;
 }
 
 async function handleServiceRequest<T>(
@@ -34,7 +33,7 @@ async function handleServiceRequest<T>(
       });
     }
     if (path === basePath && request.method === 'POST') {
-      const body = await request.json();
+      const body = (await request.json()) as any;
       if (requiredFields.some((field) => !body[field])) {
         return new Response(`Missing required fields: ${requiredFields.join(', ')}`, {
           status: 400,
@@ -48,7 +47,7 @@ async function handleServiceRequest<T>(
       return new Response(`${basePath.slice(1)} created`, { status: 201 });
     }
     if (id && request.method === 'PUT') {
-      const body = await request.json();
+      const body = (await request.json()) as any;
       const existingItem = await service.getById(id);
       if (!existingItem) return new Response(`${basePath.slice(1)} not found`, { status: 404 });
       await service.update(id, body);
@@ -75,7 +74,7 @@ export default {
     const travelRecordService = new TravelRecordService(db);
     const userService = new UserService(db);
 
-    logger().info('Path: ', path, 'Method: ', request.method);
+    logger().info({ path, method: request.method }, 'Request received');
 
     if (path.startsWith('/travel_records')) {
       return handleServiceRequest(travelRecordService, request, path, '/travel_records', [
