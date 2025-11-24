@@ -66,7 +66,7 @@
         </div>
         <p
           v-if="currentAlbum?.description"
-          class="mt-2 w-full py-2 text-xl text-gray-600 sm:mt-0 sm:ml-2 sm:w-auto sm:min-w-0 sm:flex-grow"
+          class="mt-2 w-full py-2 text-lg text-gray-600 sm:mt-0 sm:ml-2 sm:w-auto sm:min-w-0 sm:flex-grow"
           data-test-id="album-desc"
         >
           {{ currentAlbum?.description }}

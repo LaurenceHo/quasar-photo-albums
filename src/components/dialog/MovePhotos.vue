@@ -7,12 +7,12 @@
     :closable="false"
   >
     <template #header>
-      <span v-if="duplicatedPhotoKeys.length === 0" class="text-xl font-semibold">
+      <span v-if="duplicatedPhotoKeys.length === 0" class="text-lg font-semibold">
         Move photo{{ selectedPhotos.length > 1 ? 's' : '' }} to another album
       </span>
       <div v-else class="flex">
         <IconFileAlert :size="40" class="mr-2 text-yellow-600" />
-        <span class="text-xl font-semibold">
+        <span class="text-lg font-semibold">
           Photo{{ duplicatedPhotoKeys.length > 1 ? 's' : '' }} exist{{
             duplicatedPhotoKeys.length < 2 ? 's' : ''
           }}

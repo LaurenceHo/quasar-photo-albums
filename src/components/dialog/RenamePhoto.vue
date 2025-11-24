@@ -1,7 +1,7 @@
 <template>
   <Dialog v-model:visible="dialogStates.renamePhoto" :closable="false" class="w-96" modal>
     <template #header>
-      <span class="text-xl font-semibold">Rename Photo</span>
+      <span class="text-lg font-semibold">Rename Photo</span>
     </template>
     <form @submit.prevent="validateAndSubmit" @reset.prevent="onReset">
       <div class="mb-4">

@@ -16,7 +16,7 @@
         >
           <IconPlus :size="24" />
         </Button>
-        <span class="ml-2 text-xl font-semibold">Album tags</span>
+        <span class="ml-2 text-lg font-semibold">Album tags</span>
       </div>
     </template>
     <div class="max-h-[50vh] overflow-y-auto">
@@ -47,7 +47,7 @@
     <template #message="slotProps">
       <div class="flex items-center">
         <IconAlertCircle :size="40" class="flex-shrink-0 pr-2 text-red-400" />
-        <span class="text-xl font-semibold" data-test-id="confirm-delete-album-dialog-title">
+        <span class="text-lg font-semibold" data-test-id="confirm-delete-album-dialog-title">
           {{ slotProps.message.message }} "{{ tagName }}"?
         </span>
       </div>

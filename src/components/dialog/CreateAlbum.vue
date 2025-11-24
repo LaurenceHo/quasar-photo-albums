@@ -7,7 +7,7 @@
     modal
   >
     <template #header>
-      <span class="text-xl font-semibold" data-test-id="dialog-title">
+      <span class="text-lg font-semibold" data-test-id="dialog-title">
         {{ albumToBeUpdate.id ? 'Edit' : 'New' }} Album
       </span>
     </template>

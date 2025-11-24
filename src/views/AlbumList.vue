@@ -63,7 +63,7 @@
       </div>
     </template>
     <template v-else>
-      <div class="text-xl font-semibold">No results.</div>
+      <div class="text-lg font-semibold">No results.</div>
     </template>
   </template>
   <ScrollTop />

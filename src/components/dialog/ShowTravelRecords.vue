@@ -15,7 +15,7 @@
         >
           <IconPlus :size="24" />
         </Button>
-        <span class="ml-2 text-xl font-semibold">Travel Records</span>
+        <span class="ml-2 text-lg font-semibold">Travel Records</span>
       </div>
     </template>
     <div class="max-h-[50vh] overflow-y-auto">
@@ -56,7 +56,7 @@
               :data-test-id="`delete-record-button-${data.id}`"
               severity="secondary"
               text
-              @click="confirmDelete(data.id)"
+              @click="confirmDelete(data)"
             >
               <IconTrash :size="24" />
             </Button>
@@ -72,8 +72,9 @@
     <template #message="slotProps">
       <div class="flex items-center">
         <IconAlertCircle :size="40" class="flex-shrink-0 pr-2 text-red-400" />
-        <span class="text-xl font-semibold" data-test-id="confirm-delete-album-dialog-title">
-          {{ slotProps.message.message }} "{{ selectedRecordId }}"?
+        <span class="text-lg font-semibold" data-test-id="confirm-delete-album-dialog-title">
+          {{ slotProps.message.message }} {{ selectedRecord?.travelDate ? new Date(selectedRecord.travelDate).toLocaleDateString() : '--' }} fly from
+          "{{ selectedRecord?.departure?.displayName }}" to "{{ selectedRecord?.destination?.displayName }}"?
         </span>
       </div>
     </template>
@@ -81,6 +82,7 @@
 </template>
 
 <script lang="ts" setup>
+import type { TravelRecord } from '@/schema/travel-record';
 import { TravelRecordService } from '@/services/travel-record-service';
 import { useDialogStore, useTravelRecordsStore } from '@/stores';
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-vue';
@@ -96,13 +98,15 @@ const { dialogStates } = storeToRefs(dialogStore);
 
 const travelRecordsStore = useTravelRecordsStore();
 const { travelRecords } = storeToRefs(travelRecordsStore);
-const selectedRecordId = ref('');
+const selectedRecord = ref<TravelRecord | null>(null);
+const selectedRecordId = ref<string>('');
 
-const confirmDelete = (id: string) => {
-  selectedRecordId.value = id;
+const confirmDelete = (record: TravelRecord) => {
+  selectedRecord.value = record;
+  selectedRecordId.value = record.id;
 
   confirm.require({
-    message: 'Do you want to delete record',
+    message: 'Do you want to delete record on ',
     header: 'Confirmation',
     rejectProps: {
       label: 'Cancel',
@@ -126,11 +130,11 @@ const { mutate: deleteRecord, reset } = useMutation({
     toast.add({
       severity: 'success',
       summary: 'Success',
-      detail: `Record "${selectedRecordId.value}" deleted.`,
+      detail: `Record "${selectedRecord.value?.id}" deleted.`,
       life: 3000,
     });
     await travelRecordsStore.refetchTravelRecords(true);
-    selectedRecordId.value = '';
+    selectedRecord.value = null;
   },
   onError: () => {
     toast.add({

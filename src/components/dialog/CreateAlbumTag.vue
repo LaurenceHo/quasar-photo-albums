@@ -7,7 +7,7 @@
     modal
   >
     <template #header>
-      <span class="text-xl font-semibold">New tag</span>
+      <span class="text-lg font-semibold">New tag</span>
     </template>
     <form @submit.prevent="validateAndSubmit" @reset.prevent="onReset">
       <div class="mb-4">

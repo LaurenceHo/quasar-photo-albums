@@ -7,7 +7,7 @@
     modal
   >
     <template #header>
-      <span class="text-xl font-semibold">New travel records</span>
+      <span class="text-lg font-semibold">New travel records</span>
     </template>
     <form @submit.prevent="validateAndSubmit" @reset.prevent="onReset">
       <div class="mb-4 pb-4">

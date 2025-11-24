@@ -71,7 +71,7 @@ describe('CreateTravelRecordsDialog', () => {
 
   it('renders dialog when createTravelRecordsDialogState is true', () => {
     expect(wrapper.find('[data-test-id="show-travel-records-dialog"]').exists()).toBe(true);
-    expect(wrapper.find('.text-xl.font-semibold').text()).toBe('New travel records');
+    expect(wrapper.find('.text-lg.font-semibold').text()).toBe('New travel records');
   });
 
   it('hides dialog when createTravelRecordsDialogState is false', async () => {

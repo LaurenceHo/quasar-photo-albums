@@ -17,7 +17,7 @@
         <div
           v-if="!isCompleteUploading && !isUploading"
           :class="{ 'flex flex-1 items-center justify-center': !files.length }"
-          class="text-xl font-bold md:text-4xl"
+          class="text-lg font-bold md:text-4xl"
         >
           <div class="flex flex-col items-center">
             <span v-if="dropZoneActive" class="mb-2 flex flex-col items-center">

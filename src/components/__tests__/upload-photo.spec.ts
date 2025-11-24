@@ -92,7 +92,7 @@ describe('UploadPhotos.vue', () => {
   });
 
   it('renders initial state correctly', () => {
-    expect(wrapper.find('.text-xl').text()).toContain('Drag Your Photos Here');
+    expect(wrapper.find('.text-lg').text()).toContain('Drag Your Photos Here');
     expect(wrapper.find('input[type="file"]').exists()).toBe(true);
     expect(wrapper.find('[data-test-id="upload-file-button"]').exists()).toBe(true);
     expect(wrapper.find('[data-test-id="clear-file-button"]').exists()).toBe(true);
