@@ -52,8 +52,6 @@ export default class TravelRecordController extends BaseController {
     const payload: TravelRecord = {
       ...body,
       distance,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
       createdBy: userEmail,
       updatedBy: userEmail,
     };

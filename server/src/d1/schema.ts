@@ -23,7 +23,7 @@ async function createTable(db: D1Database, table: string) {
         albumCover TEXT,
         isPrivate INTEGER NOT NULL CHECK (isPrivate IN (0, 1)),
         isFeatured INTEGER CHECK (isFeatured IN (0, 1)),
-        place TEXT NOT NULL CHECK (json_valid(place)),
+        place TEXT CHECK (json_valid(place)),
         createdAt TEXT NOT NULL,
         createdBy TEXT NOT NULL,
         updatedAt TEXT NOT NULL,

@@ -12,6 +12,8 @@ import { BaseController } from './base-controller.js';
 // Google OAuth client
 const client = new OAuth2Client();
 
+const WORKER_SECRET = process.env['WORKER_SECRET'];
+
 // Helper: safe fetch with timeout and error parsing
 async function safeFetch(input: string, init?: RequestInit): Promise<Response> {
   const controller = new AbortController();
@@ -107,6 +109,7 @@ export default class AuthController extends BaseController {
           'X-Uid': uid,
           'X-Email': email,
           'X-Environment': environment,
+          'x-worker-secret': WORKER_SECRET || '',
         },
       });
 

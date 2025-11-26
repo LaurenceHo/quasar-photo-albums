@@ -3,10 +3,18 @@ import { D1Service } from './d1-service';
 import TravelRecordService from './travel-record-service';
 import UserService from './user-service';
 
+/**
+ * Environment bindings for the Cloudflare Worker.
+ */
 interface Env {
   DB: D1Database;
+  DEV_WORKER_SECRET: string;
+  PROD_WORKER_SECRET: string;
 }
 
+/**
+ * Generic handler for CRUD operations on a D1Service.
+ */
 async function handleServiceRequest<T>(
   service: D1Service<T>,
   request: Request,
@@ -15,8 +23,8 @@ async function handleServiceRequest<T>(
   requiredFields: string[],
 ): Promise<Response> {
   const id = path.startsWith(`${basePath}/`) ? path.split('/')[2] : null;
-
   try {
+    // LIST all items
     if (path === basePath && request.method === 'GET') {
       const items = await service.getAll();
       return new Response(JSON.stringify(items), {
@@ -24,6 +32,7 @@ async function handleServiceRequest<T>(
         headers: { 'Content-Type': 'application/json' },
       });
     }
+    // GET a single item
     if (id && request.method === 'GET') {
       const item = await service.getById(id);
       if (!item) return new Response(`${basePath.slice(1)} not found`, { status: 404 });
@@ -32,6 +41,7 @@ async function handleServiceRequest<T>(
         headers: { 'Content-Type': 'application/json' },
       });
     }
+    // CREATE a new item
     if (path === basePath && request.method === 'POST') {
       const body = (await request.json()) as any;
       if (requiredFields.some((field) => !body[field])) {
@@ -41,18 +51,22 @@ async function handleServiceRequest<T>(
       }
       await service.create({
         ...body,
-        id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
       });
       return new Response(`${basePath.slice(1)} created`, { status: 201 });
     }
+    // UPDATE an existing item
     if (id && request.method === 'PUT') {
       const body = (await request.json()) as any;
       const existingItem = await service.getById(id);
       if (!existingItem) return new Response(`${basePath.slice(1)} not found`, { status: 404 });
-      await service.update(id, body);
+      await service.update(id, {
+        ...body,
+        updatedAt: new Date().toISOString(),
+      });
       return new Response(`${basePath.slice(1)} updated`, { status: 200 });
     }
+    // DELETE an item
     if (id && request.method === 'DELETE') {
       const existingItem = await service.getById(id);
       if (!existingItem) return new Response(`${basePath.slice(1)} not found`, { status: 404 });
@@ -67,6 +81,15 @@ async function handleServiceRequest<T>(
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    const secret = env.PROD_WORKER_SECRET || env.DEV_WORKER_SECRET;
+    if (!secret) {
+      logger().error('Worker secret not configured');
+      return new Response('Server misconfigured', { status: 500 });
+    }
+    const provided = request.headers.get('x-worker-secret');
+    if (!provided || provided !== secret) {
+      return new Response('Unauthorized', { status: 401 });
+    }
     const url = new URL(request.url);
     const path = url.pathname;
     const db = env.DB;

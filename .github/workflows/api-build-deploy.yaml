@@ -33,6 +33,7 @@ jobs:
       TRAVEL_RECORDS_TABLE_NAME: ${{ secrets.TRAVEL_RECORDS_TABLE_NAME }}
       PHOTO_ALBUMS_STREAM_ARN: ${{ secrets.PHOTO_ALBUMS_STREAM_ARN }}
       WORKER_URL: ${{ secrets.WORKER_URL }}
+      WORKER_SECRET: ${{ secrets.PROD_WORKER_SECRET }}
       ENVIRONMENT: prod
 
     steps:
@@ -64,6 +65,7 @@ jobs:
           D1_PHOTO_ALBUMS_WORKER: ${{ secrets.D1_PHOTO_ALBUMS_WORKER }}
           PROD_PHOTO_ALBUMS_DB_NAME: ${{ secrets.PROD_PHOTO_ALBUMS_DB_NAME }}
           PROD_PHOTO_ALBUMS_DB_ID: ${{ secrets.PROD_PHOTO_ALBUMS_DB_ID }}
+          PROD_WORKER_SECRET: ${{ secrets.PROD_WORKER_SECRET }}
           # Dummy values for Dev vars to satisfy wrangler.toml validation
           DEV_PHOTO_ALBUMS_DB_NAME: "placeholder-dev-db"
           DEV_PHOTO_ALBUMS_DB_ID: "placeholder-dev-id"
@@ -74,6 +76,7 @@ jobs:
           # Export the prod DB vars so envsubst can replace them
           export PROD_PHOTO_ALBUMS_DB_NAME
           export PROD_PHOTO_ALBUMS_DB_ID
+          export PROD_WORKER_SECRET
 
           # Substitute variables in wrangler.toml
           envsubst < wrangler.toml > wrangler.tmp.toml

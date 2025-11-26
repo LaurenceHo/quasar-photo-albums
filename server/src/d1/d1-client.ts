@@ -4,6 +4,7 @@ export class D1Client {
   private readonly baseUrl: string;
   private readonly table: string;
   private readonly jsonColumns: string[];
+  private readonly secret: string;
 
   constructor(table: string, jsonColumns: string[] = []) {
     this.table = table;
@@ -11,6 +12,10 @@ export class D1Client {
     this.baseUrl = process.env['WORKER_URL']!;
     if (!this.baseUrl) {
       throw new Error('WORKER_URL is not set');
+    }
+    this.secret = process.env['WORKER_SECRET']!;
+    if (!this.secret) {
+      throw new Error('WORKER_SECRET is not set');
     }
   }
 
@@ -24,6 +29,7 @@ export class D1Client {
       ...init,
       headers: {
         'Content-Type': 'application/json',
+        'x-worker-secret': this.secret,
         ...init?.headers,
       },
     });
