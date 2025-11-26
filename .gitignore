@@ -9,7 +9,11 @@ coverage
 *.local
 
 # Editor directories and files
+# VSCode workspace settings – keep extensions.json but allow launch/tasks configs
 .vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
 !.vscode/extensions.json
 .idea
 *.suo
