@@ -51,7 +51,6 @@ async function handleServiceRequest<T>(
       }
       await service.create({
         ...body,
-        id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
       });
       return new Response(`${basePath.slice(1)} created`, { status: 201 });
@@ -61,7 +60,10 @@ async function handleServiceRequest<T>(
       const body = (await request.json()) as any;
       const existingItem = await service.getById(id);
       if (!existingItem) return new Response(`${basePath.slice(1)} not found`, { status: 404 });
-      await service.update(id, body);
+      await service.update(id, {
+        ...body,
+        updatedAt: new Date().toISOString(),
+      });
       return new Response(`${basePath.slice(1)} updated`, { status: 200 });
     }
     // DELETE an item
