@@ -24,7 +24,7 @@ function flattenForD1(value: unknown): Primitive {
 }
 
 export class D1Service<T> {
-  private readonly db: D1Database;
+  protected readonly db: D1Database;
   private readonly tableName: string;
 
   constructor(db: D1Database, tableName: string) {

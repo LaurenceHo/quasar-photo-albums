@@ -1,6 +1,6 @@
 import { CustomAttributeType, Entity } from 'electrodb';
 import { ddbDocClient } from '../services/dynamodb-client.js';
-import { Album } from './album.js';
+import { Album } from '../types/album.js';
 
 export type AlbumsByYear = { year: string; count: number }[];
 

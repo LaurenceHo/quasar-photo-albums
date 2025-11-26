@@ -7,7 +7,7 @@ import {
   DataAggregation,
   FEATURED_ALBUMS,
 } from '../schemas/aggregation.js';
-import { Album } from '../schemas/album.js';
+import { Album } from '../types/album.js';
 import DataAggregationService from '../services/data-aggregation-service.js';
 import { BaseController } from './base-controller.js';
 import { verifyIfIsAdmin } from './helpers.js';

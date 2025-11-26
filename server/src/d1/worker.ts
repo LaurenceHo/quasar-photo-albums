@@ -2,6 +2,7 @@ import logger from 'pino';
 import { D1Service } from './d1-service';
 import TravelRecordService from './travel-record-service';
 import UserService from './user-service';
+import AlbumService from './album-service';
 
 /**
  * Environment bindings for the Cloudflare Worker.
@@ -94,6 +95,7 @@ export default {
     const path = url.pathname;
     const db = env.DB;
 
+    const albumService = new AlbumService(db);
     const travelRecordService = new TravelRecordService(db);
     const userService = new UserService(db);
 
@@ -106,6 +108,15 @@ export default {
         'destination',
         'transportType',
         'distance',
+      ]);
+    }
+
+    if (path.startsWith('/albums')) {
+      return handleServiceRequest(albumService, request, path, '/albums', [
+        'id',
+        'year',
+        'albumName',
+        'isPrivate',
       ]);
     }
 

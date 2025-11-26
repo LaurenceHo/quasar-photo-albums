@@ -8,8 +8,10 @@ import {
   DataAggregationEntity,
   FEATURED_ALBUMS,
 } from '../schemas/aggregation.js';
-import { Album } from '../schemas/album.js';
-import AlbumService from '../services/album-service.js';
+import { Album } from '../types/album.js';
+import { D1Client } from '../d1/d1-client.js';
+
+const albumClient = new D1Client('albums', ['place']);
 
 export const countAlbumsByYear = (albums: Album[]): AlbumsByYear =>
   albums
@@ -27,17 +29,7 @@ export const countAlbumsByYear = (albums: Album[]): AlbumsByYear =>
 export const handler: Handler = async (event: DynamoDBStreamEvent, _context, callback) => {
   logger().info(JSON.stringify(event, null, 2));
 
-  const albumService = new AlbumService();
-
-  const albumList = await albumService.findAll('scan', null, [
-    'year',
-    'id',
-    'albumName',
-    'albumCover',
-    'place',
-    'isFeatured',
-    'isPrivate',
-  ]);
+  const albumList = await albumClient.find<Album>({});
 
   const publicAlbums = albumList.filter((album) => album.isPrivate === false);
   const albumsHavePlace = publicAlbums.filter((album) => album.place != null);

@@ -4,15 +4,16 @@ import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { get, isEmpty } from 'radash';
 import { cleanJwtCookie } from '../routes/auth-middleware.js';
-import AlbumService from '../services/album-service.js';
 import S3Service from '../services/s3-service.js';
 import { PhotoResponse, PhotosRequest, RenamePhotoRequest } from '../types';
 import { BaseController } from './base-controller.js';
-import { deleteObjects, updatePhotoAlbum } from './helpers.js';
+import { deleteObjects } from './helpers.js';
+import { D1Client } from '../d1/d1-client.js';
+import { Album } from '../types/album.js';
+
+const albumClient = new D1Client('albums', ['place']);
 
 const s3Service = new S3Service();
-const albumService = new AlbumService();
-
 const bucketName = process.env['AWS_S3_BUCKET_NAME'];
 const s3Client = new S3Client({ region: 'us-east-1' });
 
@@ -21,21 +22,11 @@ export default class PhotoController extends BaseController {
    * Get all photos from an album
    */
   findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const year = (request.params as any)['year'] as string;
     const albumId = (request.params as any)['albumId'] as string;
 
     try {
-      const album = await albumService.findOne({ id: albumId, year }, [
-        'year',
-        'id',
-        'albumName',
-        'albumCover',
-        'description',
-        'tags',
-        'isPrivate',
-        'place',
-        'isFeatured',
-      ]);
+      const album = await albumClient.getById<Album>(albumId);
+
       // Only fetch photos when album exists
       if (!isEmpty(album)) {
         // If album is private, check if user has the admin permission
@@ -67,19 +58,18 @@ export default class PhotoController extends BaseController {
 
         // If photo list is not empty and doesn't have album cover, set album cover
         if (!isEmpty(photos) && isEmpty(album.albumCover)) {
-          await updatePhotoAlbum({
+          await albumClient.update(album.id, {
             ...album,
             albumCover: photos[0]?.key || '',
             updatedBy: 'System',
-            updatedAt: new Date().toISOString(),
           });
+
           // Remove album cover photo when photo list is empty
         } else if (isEmpty(photos) && !isEmpty(album.albumCover)) {
-          await updatePhotoAlbum({
+          await albumClient.update(album.id, {
             ...album,
             albumCover: '',
             updatedBy: 'System',
-            updatedAt: new Date().toISOString(),
           });
         }
         return this.ok<PhotoResponse>(reply, 'ok', { album, photos });
