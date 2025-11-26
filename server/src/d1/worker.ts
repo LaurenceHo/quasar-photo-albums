@@ -81,7 +81,11 @@ async function handleServiceRequest<T>(
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const secret = env.DEV_WORKER_SECRET ?? env.PROD_WORKER_SECRET;
+    const secret = env.PROD_WORKER_SECRET || env.DEV_WORKER_SECRET;
+    if (!secret) {
+      logger().error('Worker secret not configured');
+      return new Response('Server misconfigured', { status: 500 });
+    }
     const provided = request.headers.get('x-worker-secret');
     if (!provided || provided !== secret) {
       return new Response('Unauthorized', { status: 401 });
