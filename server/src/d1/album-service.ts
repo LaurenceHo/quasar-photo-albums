@@ -27,7 +27,7 @@ export default class AlbumService extends D1Service<any> {
         }
 
         const { results } = await this.db.prepare(sql).bind(...values).all();
-        return results.map(this.parseTags);
+        return results.map((item) => this.mapAlbum(item));
     }
 
     override async getById(id: string): Promise<any | null> {
@@ -38,7 +38,7 @@ export default class AlbumService extends D1Service<any> {
       WHERE a.id = ?
     `;
         const result = await this.db.prepare(sql).bind(id).first();
-        return result ? this.parseTags(result) : null;
+        return result ? this.mapAlbum(result) : null;
     }
 
     override async create(item: any): Promise<any> {
@@ -91,7 +91,8 @@ export default class AlbumService extends D1Service<any> {
         }
     }
 
-    private parseTags(item: any): any {
+    private mapAlbum(item: any): any {
+        // Parse tags
         if (item.tags && typeof item.tags === 'string') {
             try {
                 item.tags = JSON.parse(item.tags);
@@ -101,6 +102,16 @@ export default class AlbumService extends D1Service<any> {
         } else if (!item.tags) {
             item.tags = [];
         }
+
+        // Convert booleans
+        // D1/SQLite stores booleans as 0 or 1
+        if (item.isPrivate !== undefined) {
+            item.isPrivate = !!item.isPrivate;
+        }
+        if (item.isFeatured !== undefined) {
+            item.isFeatured = !!item.isFeatured;
+        }
+
         return item;
     }
 }
