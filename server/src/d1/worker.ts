@@ -3,6 +3,7 @@ import { D1Service } from './d1-service';
 import TravelRecordService from './travel-record-service';
 import UserService from './user-service';
 import AlbumService from './album-service';
+import AlbumTagService from './album-tag-service';
 
 /**
  * Environment bindings for the Cloudflare Worker.
@@ -98,6 +99,7 @@ export default {
     const albumService = new AlbumService(db);
     const travelRecordService = new TravelRecordService(db);
     const userService = new UserService(db);
+    const albumTagService = new AlbumTagService(db);
 
     logger().info({ path, method: request.method }, 'Request received');
 
@@ -117,6 +119,12 @@ export default {
         'year',
         'albumName',
         'isPrivate',
+      ]);
+    }
+
+    if (path.startsWith('/album-tags')) {
+      return handleServiceRequest(albumTagService, request, path, '/album-tags', [
+        'tag',
       ]);
     }
 

@@ -1,15 +1,16 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import { AlbumTag } from '../schemas/album-tag.js';
-import AlbumTagService from '../services/album-tag-service.js';
+import { AlbumTag } from '../types/album.js';
 import { RequestWithUser } from '../types';
 import { BaseController } from './base-controller.js';
 import { updateDatabaseAt } from './helpers.js';
+import { D1Client } from '../d1/d1-client.js';
 
-const albumTagService = new AlbumTagService();
+const albumTagClient = new D1Client('album-tags');
+
 export default class AlbumTagController extends BaseController {
   findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const albumTags = await albumTagService.findAll();
+      const albumTags = await albumTagClient.getAll<AlbumTag>();
 
       return this.ok<AlbumTag[]>(reply, 'ok', albumTags);
     } catch (err: any) {
@@ -28,14 +29,10 @@ export default class AlbumTagController extends BaseController {
     });
 
     try {
-      const result = await albumTagService.create(tagsToCreate);
+      await albumTagClient.create(tagsToCreate);
 
-      if (result) {
-        await updateDatabaseAt('album');
-        return this.ok(reply, 'Album tag created');
-      }
-
-      return this.fail(reply, 'Failed to create album tag');
+      await updateDatabaseAt('album');
+      return this.ok(reply, 'Album tag created');
     } catch (err) {
       request.log.error(`Failed to create album tag: ${err}`);
       return this.fail(reply, 'Failed to create album tag');
@@ -46,37 +43,10 @@ export default class AlbumTagController extends BaseController {
     const tag = (request.params as any)['tagId'] as string;
     try {
       request.log.info('##### Delete tag: %s', tag);
-      const result = await albumTagService.delete({ tag });
+      await albumTagClient.delete(tag);
 
-      if (result) {
-        // TODO
-        // const findAlbumsContainingTag = await albumService.findAll(
-        //   'scan',
-        //   null,
-        //   ['year', 'id', 'tags'],
-        //   ({ tags }: any, { contains }: any) => `${contains(tags, tag)}`,
-        // );
-
-        // const promises: Promise<any>[] = [];
-        // for (const album of findAlbumsContainingTag) {
-        //   const { year, id } = album;
-        //   const cloneAlbum: any = { ...album };
-
-        //   cloneAlbum.updatedBy = (request as RequestWithUser).user?.email ?? 'unknown';
-        //   cloneAlbum.updatedAt = new Date().toISOString();
-        //   cloneAlbum.tags = cloneAlbum.tags.filter((t: string) => t !== tag);
-        //   delete cloneAlbum.year;
-        //   delete cloneAlbum.id;
-
-        //   promises.push(albumService.update({ year, id }, cloneAlbum));
-        // }
-
-        // await Promise.all(promises);
-        // await updateDatabaseAt('album');
-        return this.ok(reply, 'Album tag deleted');
-      }
-
-      return this.fail(reply, 'Failed to delete album tag');
+      await updateDatabaseAt('album');
+      return this.ok(reply, 'Album tag deleted');
     } catch (err) {
       request.log.error(`Failed to delete album tag: ${err}`);
       return this.fail(reply, 'Failed to delete album tag');
