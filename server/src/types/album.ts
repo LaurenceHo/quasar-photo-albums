@@ -28,7 +28,9 @@ export const AlbumTagsMapSchema = z.object({
   tag: z.string(),
 });
 
+export const AlbumsByYearSchema = z.array(z.object({ year: z.string(), count: z.number() }));
+
 export type Album = z.infer<typeof AlbumSchema>;
 export type AlbumTag = z.infer<typeof AlbumTagSchema>;
 export type AlbumTagsMap = z.infer<typeof AlbumTagsMapSchema>;
-export type AlbumsByYear = { year: string; count: number }[];
+export type AlbumsByYear = z.infer<typeof AlbumsByYearSchema>;
