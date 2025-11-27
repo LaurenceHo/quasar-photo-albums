@@ -4,7 +4,7 @@ import { Album, AlbumsByYear } from '../types/album.js';
 import { BaseController } from './base-controller.js';
 import { verifyIfIsAdmin } from './helpers.js';
 
-const aggregationClient = new D1Client('aggregations');
+const aggregationClient = new D1Client('aggregations', ['place']);
 
 export default class AggregateController extends BaseController {
   findAll: RouteHandler = async () => {
