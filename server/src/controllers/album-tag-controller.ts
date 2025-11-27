@@ -1,9 +1,9 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import { AlbumTag } from '../types/album.js';
+import { D1Client } from '../d1/d1-client.js';
 import { RequestWithUser } from '../types';
+import { AlbumTag } from '../types/album.js';
 import { BaseController } from './base-controller.js';
 import { updateDatabaseAt } from './helpers.js';
-import { D1Client } from '../d1/d1-client.js';
 
 const albumTagClient = new D1Client('album-tags');
 

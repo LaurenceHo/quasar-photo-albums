@@ -1,14 +1,17 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { app } from '../../src/app';
-import { updatePhotoAlbum } from '../../src/controllers/helpers';
 import { mockAlbumList, mockPhotoList, mockSignedCookies } from '../mock-data';
 
-vi.mock('../../src/services/album-service', async () => {
+vi.mock('../../src/d1/d1-client', async () => {
   const { mockAlbumList } = await import('../mock-data');
   return {
-    default: class {
-      findOne() {
-        return Promise.resolve(mockAlbumList[2]); // private album
+    D1Client: class {
+      constructor(table: string) {}
+      async getById(id: string) {
+        return mockAlbumList[2]; // private album
+      }
+      async update() {
+        return 'updated';
       }
     },
   };
@@ -26,20 +29,8 @@ vi.mock('../../src/services/s3-service', async () => {
 });
 
 vi.mock('../../src/controllers/helpers', async () => ({
-  updatePhotoAlbum: () => Promise.resolve(true),
+  // updatePhotoAlbum: () => Promise.resolve(true), // Removed
 }));
-
-const mocks = vi.hoisted(() => {
-  return {
-    updatePhotoAlbum: vi.fn().mockResolvedValue(true),
-  };
-});
-
-vi.mock('../../src/controllers/helpers', () => {
-  return {
-    updatePhotoAlbum: mocks.updatePhotoAlbum,
-  };
-});
 
 describe('private album route', () => {
   afterEach(() => {
@@ -54,8 +45,6 @@ describe('private album route', () => {
         Cookie: `jwt=${mockSignedCookies()}`,
       },
     });
-    expect(updatePhotoAlbum).toBe(mocks.updatePhotoAlbum);
-    expect(mocks.updatePhotoAlbum).toHaveBeenCalledOnce();
 
     expect(response.payload).toBe(
       JSON.stringify({

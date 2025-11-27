@@ -1,14 +1,9 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
+import { D1Client } from '../d1/d1-client.js';
 import { RequestWithUser } from '../types';
 import { Album } from '../types/album';
 import { BaseController } from './base-controller.js';
-import {
-  emptyS3Folder,
-  updateDatabaseAt,
-  uploadObject,
-  verifyIfIsAdmin,
-} from './helpers.js';
-import { D1Client } from '../d1/d1-client.js';
+import { emptyS3Folder, updateDatabaseAt, uploadObject, verifyIfIsAdmin } from './helpers.js';
 
 const albumClient = new D1Client('albums', ['place']);
 

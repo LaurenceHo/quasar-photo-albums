@@ -3,13 +3,13 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { get, isEmpty } from 'radash';
+import { D1Client } from '../d1/d1-client.js';
 import { cleanJwtCookie } from '../routes/auth-middleware.js';
 import S3Service from '../services/s3-service.js';
 import { PhotoResponse, PhotosRequest, RenamePhotoRequest } from '../types';
+import { Album } from '../types/album.js';
 import { BaseController } from './base-controller.js';
 import { deleteObjects } from './helpers.js';
-import { D1Client } from '../d1/d1-client.js';
-import { Album } from '../types/album.js';
 
 const albumClient = new D1Client('albums', ['place']);
 

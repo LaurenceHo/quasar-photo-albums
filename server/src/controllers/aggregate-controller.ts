@@ -1,8 +1,8 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
+import { D1Client } from '../d1/d1-client.js';
 import { Album, AlbumsByYear } from '../types/album.js';
 import { BaseController } from './base-controller.js';
 import { verifyIfIsAdmin } from './helpers.js';
-import { D1Client } from '../d1/d1-client.js';
 
 const aggregationClient = new D1Client('aggregations');
 

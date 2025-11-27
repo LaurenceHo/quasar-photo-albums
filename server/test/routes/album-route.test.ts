@@ -1,27 +1,33 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { app } from '../../src/app';
-import { Album } from '../../src/schemas/album';
+import { Album } from '../../src/types/album';
 import { mockAlbumList } from '../mock-data';
 
-vi.mock('../../src/services/album-service', async () => {
+vi.mock('../../src/d1/d1-client', async () => {
   const { mockAlbumList } = await import('../mock-data');
   return {
-    default: class {
-      findAll(method?: string) {
-        if (method === 'scan') {
-          return Promise.resolve([]);
-        } else {
-          return Promise.resolve(mockAlbumList);
+    D1Client: class {
+      constructor(table: string) { }
+      async find(query: any) {
+        if (query.year === '2024') {
+          return mockAlbumList;
         }
+        return [];
       }
-      create() {
-        return Promise.resolve(true);
+      async getById(id: string) {
+        if (id === 'test-album') {
+          return mockAlbumList[0];
+        }
+        throw new Error('D1 Worker error 404: Not Found');
       }
-      update() {
-        return Promise.resolve(true);
+      async create() {
+        return 'created';
       }
-      delete() {
-        return Promise.resolve(true);
+      async update() {
+        return 'updated';
+      }
+      async delete() {
+        return 'deleted';
       }
     },
   };
@@ -65,7 +71,7 @@ describe('album route', () => {
         url: '/api/albums',
         payload: {
           year: '2024',
-          id: 'test-album',
+          id: 'new-album',
           albumCover: '',
           albumName: 'Test album',
           description: '',

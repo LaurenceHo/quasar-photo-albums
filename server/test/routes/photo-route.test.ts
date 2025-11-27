@@ -1,5 +1,3 @@
-import formAutoContent from 'form-auto-content';
-import fs from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { app } from '../../src/app';
 import { mockAlbumList, mockPhotoList } from '../mock-data';
@@ -25,16 +23,22 @@ vi.mock('../../src/routes/auth-middleware', async () => ({
 
 vi.mock('../../src/controllers/helpers', async () => ({
   deleteObjects: () => Promise.resolve(true),
-  updatePhotoAlbum: () => Promise.resolve(true),
   uploadObject: () => Promise.resolve(true),
 }));
 
-vi.mock('../../src/services/album-service', async () => {
+vi.mock('../../src/d1/d1-client', async () => {
   const { mockAlbumList } = await import('../mock-data');
   return {
-    default: class {
-      findOne() {
-        return Promise.resolve(mockAlbumList[0]);
+    D1Client: class {
+      constructor(table: string) {}
+      async getById(id: string) {
+        if (id === 'test') {
+          return mockAlbumList[0];
+        }
+        throw new Error('D1 Worker error 404: Not Found');
+      }
+      async update() {
+        return 'updated';
       }
     },
   };
