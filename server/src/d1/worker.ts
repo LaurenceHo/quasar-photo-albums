@@ -4,6 +4,7 @@ import TravelRecordService from './travel-record-service';
 import UserService from './user-service';
 import AlbumService from './album-service';
 import AlbumTagService from './album-tag-service';
+import AggregationService from './aggregation-service';
 
 /**
  * Environment bindings for the Cloudflare Worker.
@@ -46,15 +47,19 @@ async function handleServiceRequest<T>(
     // CREATE a new item
     if (path === basePath && request.method === 'POST') {
       const body = (await request.json()) as any;
-      if (requiredFields.some((field) => !body[field])) {
-        return new Response(`Missing required fields: ${requiredFields.join(', ')}`, {
-          status: 400,
-        });
+      if (!Array.isArray(body)) {
+        if (requiredFields.some((field) => !body[field])) {
+          return new Response(`Missing required fields: ${requiredFields.join(', ')}`, {
+            status: 400,
+          });
+        }
       }
-      await service.create({
-        ...body,
-        createdAt: new Date().toISOString(),
-      });
+
+      await service.create(
+        Array.isArray(body)
+          ? body.map((item) => ({ ...item, createdAt: new Date().toISOString() }))
+          : { ...body, createdAt: new Date().toISOString() },
+      );
       return new Response(`${basePath.slice(1)} created`, { status: 201 });
     }
     // UPDATE an existing item
@@ -70,8 +75,10 @@ async function handleServiceRequest<T>(
     }
     // DELETE an item
     if (id && request.method === 'DELETE') {
-      const existingItem = await service.getById(id);
-      if (!existingItem) return new Response(`${basePath.slice(1)} not found`, { status: 404 });
+      // For album tags, we don't strictly check existence via getById because the ID is the tag string itself
+      // and we want to allow deletion even if getById might behave differently.
+      // However, for consistency, we can keep it or skip it.
+      // AlbumTagService.delete handles cascading deletes.
       await service.delete(id);
       return new Response(`${basePath.slice(1)} deleted`, { status: 200 });
     }
@@ -100,6 +107,7 @@ export default {
     const travelRecordService = new TravelRecordService(db);
     const userService = new UserService(db);
     const albumTagService = new AlbumTagService(db);
+    const aggregationService = new AggregationService(db);
 
     logger().info({ path, method: request.method }, 'Request received');
 
@@ -126,6 +134,45 @@ export default {
       return handleServiceRequest(albumTagService, request, path, '/album-tags', [
         'tag',
       ]);
+    }
+
+    if (path.startsWith('/aggregations')) {
+      if (request.method === 'GET') {
+        let type = path.split('/')[2];
+        if (!type) {
+          type = url.searchParams.get('type') || '';
+        }
+
+        if (type === 'albumsWithLocation') {
+          const includePrivate = url.searchParams.get('includePrivate') === 'true';
+          const data = await aggregationService.getAlbumsWithLocation(includePrivate);
+          return new Response(JSON.stringify(data), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+
+        if (type === 'featuredAlbums') {
+          const data = await aggregationService.getFeaturedAlbums();
+          return new Response(JSON.stringify(data), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+
+        if (type === 'countAlbumsByYear') {
+          const includePrivate = url.searchParams.get('includePrivate') === 'true';
+          const data = await aggregationService.getCountAlbumsByYear(includePrivate);
+          return new Response(JSON.stringify(data), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+
+        return new Response('Aggregation type not found', { status: 404 });
+      } else {
+        return new Response('Method Not Allowed', { status: 405 });
+      }
     }
 
     if (path.startsWith('/user_permissions') && request.method === 'GET') {

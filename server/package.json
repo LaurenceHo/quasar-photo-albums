@@ -17,6 +17,7 @@
     "lint": "eslint --fix",
     "prepare:server:deploy": "rimraf dist && bun esbuild.lambda.mjs",
     "start:server": "bun build:server && bun dist/app/index.js",
+    "start:wrangler": "wrangler dev --local",
     "test:server": "vitest run",
     "types:server": "tsc --noEmit"
   },

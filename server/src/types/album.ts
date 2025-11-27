@@ -31,3 +31,4 @@ export const AlbumTagsMapSchema = z.object({
 export type Album = z.infer<typeof AlbumSchema>;
 export type AlbumTag = z.infer<typeof AlbumTagSchema>;
 export type AlbumTagsMap = z.infer<typeof AlbumTagsMapSchema>;
+export type AlbumsByYear = { year: string; count: number }[];
