@@ -1,7 +1,7 @@
 import * as esbuild from 'esbuild';
 
 await esbuild.build({
-  entryPoints: ['src/app.ts', 'src/aggregations/albums.ts'],
+  entryPoints: ['src/app.ts'],
   bundle: true,
   minify: true,
   platform: 'node',
