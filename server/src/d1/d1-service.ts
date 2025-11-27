@@ -24,7 +24,7 @@ function flattenForD1(value: unknown): Primitive {
 }
 
 export class D1Service<T> {
-  private readonly db: D1Database;
+  protected readonly db: D1Database;
   private readonly tableName: string;
 
   constructor(db: D1Database, tableName: string) {
@@ -35,7 +35,10 @@ export class D1Service<T> {
   /* ------------------------------------------------------------------ */
   /* READ OPERATIONS                                                    */
   /* ------------------------------------------------------------------ */
-  async getAll(): Promise<T[]> {
+  async getAll(where?: Partial<T>): Promise<T[]> {
+    if (where && Object.keys(where).length > 0) {
+      return this.findAll(where);
+    }
     const { results } = await this.db.prepare(`SELECT * FROM ${this.tableName}`).all();
     return (results as T[]) || [];
   }

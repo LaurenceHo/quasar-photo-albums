@@ -98,6 +98,7 @@ export class D1Client {
     const search = new URLSearchParams(
       Object.entries(params).map(([k, v]) => [k, String(v)]) as [string, string][],
     ).toString();
-    return this.request<T[]>(`?${search}`);
+    const items = await this.request<T[]>(`?${search}`);
+    return items.map((item) => this.parseJsonFields<T>(item));
   }
 }

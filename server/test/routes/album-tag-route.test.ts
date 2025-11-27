@@ -16,37 +16,18 @@ vi.mock('../../src/routes/auth-middleware', async () => ({
   verifyUserPermission: () => authMock.verifyUserPermission(),
 }));
 
-vi.mock('../../src/services/album-service', async () => {
-  const { mockAlbumList } = await import('../mock-data');
+vi.mock('../../src/d1/d1-client', async () => {
   return {
-    default: class {
-      findAll() {
-        return Promise.resolve(mockAlbumList);
+    D1Client: class {
+      constructor(table: string) { }
+      async getAll() {
+        return [{ tag: 'sport' }, { tag: 'food' }, { tag: 'hiking' }];
       }
-      create() {
-        return Promise.resolve(true);
+      async create() {
+        return 'created';
       }
-      update() {
-        return Promise.resolve(true);
-      }
-      delete() {
-        return Promise.resolve(true);
-      }
-    },
-  };
-});
-
-vi.mock('../../src/services/album-tag-service', async () => {
-  return {
-    default: class {
-      findAll() {
-        return Promise.resolve([{ tag: 'sport' }, { tag: 'food' }, { tag: 'hiking' }]);
-      }
-      create() {
-        return Promise.resolve(true);
-      }
-      delete() {
-        return Promise.resolve(true);
+      async delete() {
+        return 'deleted';
       }
     },
   };

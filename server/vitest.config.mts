@@ -10,5 +10,9 @@ export default defineConfig({
       'src/**/*.vitest.{test,spec}.{ts,tsx}',
       'test/**/*.{test,spec}.{ts,tsx}',
     ],
+    env: {
+      WORKER_URL: 'http://localhost',
+      WORKER_SECRET: 'secret',
+    },
   },
 });

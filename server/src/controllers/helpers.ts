@@ -3,12 +3,9 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
 import logger from 'pino';
 import { get, isEmpty } from 'radash';
-import { Album } from '../schemas/album.js';
-import AlbumService from '../services/album-service.js';
 import S3Service from '../services/s3-service.js';
 
 const s3BucketName = process.env['AWS_S3_BUCKET_NAME'];
-const albumService = new AlbumService();
 const s3Service = new S3Service();
 
 export const updateDatabaseAt = async (type: 'album' | 'travel') => {
@@ -25,30 +22,6 @@ export const updateDatabaseAt = async (type: 'album' | 'travel') => {
       ...(type === 'travel' && { travel: new Date().toISOString() }),
     }),
   );
-};
-
-export const updatePhotoAlbum = async (album: Album, email = 'unknown') => {
-  try {
-    const cloneAlbum: any = { ...album };
-    cloneAlbum.updatedBy = email;
-    cloneAlbum.updatedAt = new Date().toISOString();
-
-    delete cloneAlbum.year;
-    delete cloneAlbum.id;
-    delete cloneAlbum.createdAt;
-    delete cloneAlbum.createdBy;
-
-    const result = await albumService.update({ id: album.id, year: album.year }, cloneAlbum);
-
-    if (result) {
-      logger().info(`##### Album updated: ${album.id}`);
-      await updateDatabaseAt('album');
-    }
-    return result;
-  } catch (err) {
-    logger().error(`Failed to update photo album: ${err}`);
-    throw Error('Error when updating photo album');
-  }
 };
 
 //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-photo-album-full.html

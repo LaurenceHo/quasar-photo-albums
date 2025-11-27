@@ -1,52 +1,37 @@
 import { describe, expect, it, vi } from 'vitest';
 import { app } from '../../src/app';
-import {
-  ALBUMS_WITH_LOCATION,
-  COUNT_ALBUMS_BY_YEAR,
-  COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
-} from '../../src/schemas/aggregation';
+
 import { mockAlbumList } from '../mock-data';
 
 const helperMock = vi.hoisted(() => ({
   verifyIfIsAdmin: vi.fn(() => true),
 }));
 
-vi.mock('../../src/services/data-aggregation-service', async () => {
-  const {
-    ALBUMS_WITH_LOCATION,
-    COUNT_ALBUMS_BY_YEAR,
-    COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
-  } = await import('../../src/schemas/aggregation');
+vi.mock('../../src/d1/d1-client', async () => {
   const { mockAlbumList } = await import('../mock-data');
 
   return {
-    default: class {
-      findOne({ key }: { key: string }) {
-        if (key === ALBUMS_WITH_LOCATION) {
-          return Promise.resolve({
-            key: ALBUMS_WITH_LOCATION,
-            value: mockAlbumList,
-          });
-        } else if (key === COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE) {
-          return Promise.resolve({
-            key: COUNT_ALBUMS_BY_YEAR,
-            value: [
-              { year: '2020', count: 10 },
-              { year: '2021', count: 20 },
-            ],
-          });
-        } else if (key === COUNT_ALBUMS_BY_YEAR) {
-          return Promise.resolve({
-            key: COUNT_ALBUMS_BY_YEAR,
-            value: [
+    D1Client: class {
+      constructor(table: string) { }
+      async find(params: any) {
+        if (params.type === 'albumsWithLocation') {
+          return mockAlbumList;
+        } else if (params.type === 'countAlbumsByYear') {
+          if (params.includePrivate) {
+            return [
               { year: '2018', count: 1 },
               { year: '2019', count: 11 },
               { year: '2020', count: 10 },
               { year: '2021', count: 20 },
-            ],
-          });
+            ];
+          } else {
+            return [
+              { year: '2020', count: 10 },
+              { year: '2021', count: 20 },
+            ];
+          }
         }
-        return Promise.reject('Invalid key');
+        return [];
       }
     },
   };

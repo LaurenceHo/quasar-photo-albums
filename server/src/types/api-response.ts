@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Album } from '../schemas/album';
+import { Album } from './album';
 import { PhotoSchema } from './photo';
 
 export const PhotoResponseSchema = z.object({

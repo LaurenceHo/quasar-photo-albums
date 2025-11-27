@@ -1,18 +1,10 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import {
-  ALBUMS_WITH_LOCATION,
-  AlbumsByYear,
-  COUNT_ALBUMS_BY_YEAR,
-  COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
-  DataAggregation,
-  FEATURED_ALBUMS,
-} from '../schemas/aggregation.js';
-import { Album } from '../schemas/album.js';
-import DataAggregationService from '../services/data-aggregation-service.js';
+import { D1Client } from '../d1/d1-client.js';
+import { Album, AlbumsByYear } from '../types/album.js';
 import { BaseController } from './base-controller.js';
 import { verifyIfIsAdmin } from './helpers.js';
 
-const dataAggregationService = new DataAggregationService();
+const aggregationClient = new D1Client('aggregations', ['place']);
 
 export default class AggregateController extends BaseController {
   findAll: RouteHandler = async () => {
@@ -38,13 +30,13 @@ export default class AggregateController extends BaseController {
       | 'featuredAlbums';
 
     if (aggregateType === 'albumsWithLocation') {
+      const isAdmin = verifyIfIsAdmin(request, reply);
       try {
-        const albumData: DataAggregation<typeof ALBUMS_WITH_LOCATION> =
-          await dataAggregationService.findOne({
-            key: ALBUMS_WITH_LOCATION,
-          });
-
-        return this.ok<Album[]>(reply, 'ok', albumData?.value ?? []);
+        const albumData = await aggregationClient.find<Album>({
+          type: 'albumsWithLocation',
+          includePrivate: isAdmin,
+        });
+        return this.ok<Album[]>(reply, 'ok', albumData);
       } catch (err: any) {
         request.log.error(`Failed to query aggregate data for photo album with location: ${err}`);
         return this.fail(reply, 'Failed to query aggregate data for photo album with location');
@@ -53,29 +45,19 @@ export default class AggregateController extends BaseController {
       const isAdmin = verifyIfIsAdmin(request, reply);
 
       try {
-        let countData: DataAggregation<typeof COUNT_ALBUMS_BY_YEAR>;
-        if (!isAdmin) {
-          countData = await dataAggregationService.findOne({
-            key: COUNT_ALBUMS_BY_YEAR_EXCLUDE_PRIVATE,
-          });
-        } else {
-          countData = await dataAggregationService.findOne({
-            key: COUNT_ALBUMS_BY_YEAR,
-          });
-        }
-        return this.ok<AlbumsByYear>(reply, 'ok', countData?.value ?? []);
+        const countData = await aggregationClient.find<AlbumsByYear[0]>({
+          type: 'countAlbumsByYear',
+          includePrivate: isAdmin,
+        });
+        return this.ok<AlbumsByYear>(reply, 'ok', countData);
       } catch (err: any) {
         request.log.error(`Failed to query aggregate data for count albums by year: ${err}`);
         return this.fail(reply, 'Failed to query aggregate data for count albums by year');
       }
     } else if (aggregateType === 'featuredAlbums') {
       try {
-        const featuredAlbums: DataAggregation<typeof FEATURED_ALBUMS> =
-          await dataAggregationService.findOne({
-            key: FEATURED_ALBUMS,
-          });
-
-        return this.ok<Album[]>(reply, 'ok', featuredAlbums?.value ?? []);
+        const featuredAlbums = await aggregationClient.find<Album>({ type: 'featuredAlbums' });
+        return this.ok<Album[]>(reply, 'ok', featuredAlbums);
       } catch (err: any) {
         request.log.error(`Failed to query aggregate data for featured albums: ${err}`);
         return this.fail(reply, 'Failed to query aggregate data for featured albums');
