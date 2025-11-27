@@ -1,10 +1,10 @@
 import logger from 'pino';
+import AggregationService from './aggregation-service';
+import AlbumService from './album-service';
+import AlbumTagService from './album-tag-service';
 import { D1Service } from './d1-service';
 import TravelRecordService from './travel-record-service';
 import UserService from './user-service';
-import AlbumService from './album-service';
-import AlbumTagService from './album-tag-service';
-import AggregationService from './aggregation-service';
 
 /**
  * Environment bindings for the Cloudflare Worker.
@@ -29,7 +29,13 @@ async function handleServiceRequest<T>(
   try {
     // LIST all items
     if (path === basePath && request.method === 'GET') {
-      const items = await service.getAll();
+      const url = new URL(request.url);
+      const params: Record<string, any> = {};
+      url.searchParams.forEach((value, key) => {
+        params[key] = value;
+      });
+
+      const items = await service.getAll(params as any);
       return new Response(JSON.stringify(items), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -57,8 +63,12 @@ async function handleServiceRequest<T>(
 
       await service.create(
         Array.isArray(body)
-          ? body.map((item) => ({ ...item, createdAt: new Date().toISOString() }))
-          : { ...body, createdAt: new Date().toISOString() },
+          ? body.map((item) => ({
+              ...item,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            }))
+          : { ...body, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
       );
       return new Response(`${basePath.slice(1)} created`, { status: 201 });
     }
@@ -131,9 +141,7 @@ export default {
     }
 
     if (path.startsWith('/album-tags')) {
-      return handleServiceRequest(albumTagService, request, path, '/album-tags', [
-        'tag',
-      ]);
+      return handleServiceRequest(albumTagService, request, path, '/album-tags', ['tag']);
     }
 
     if (path.startsWith('/aggregations')) {

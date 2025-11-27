@@ -16,7 +16,7 @@ export default class AlbumController extends BaseController {
 
       const query: any = { year };
       if (!isAdmin) {
-        query.isPrivate = false;
+        query.isPrivate = 0;
       }
 
       const albumList = await albumClient.find<Album>(query);
