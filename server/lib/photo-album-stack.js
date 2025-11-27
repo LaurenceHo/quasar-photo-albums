@@ -2,10 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
-import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as dotenv from 'dotenv';
 import path from 'path';
@@ -59,32 +56,10 @@ const createAppLambdaFunction = (scope, id, envType) => {
       ALBUM_URL: process.env.ALBUM_URL,
       VITE_IMAGEKIT_CDN_URL: process.env.VITE_IMAGEKIT_CDN_URL,
       AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME,
-      PHOTO_ALBUMS_TABLE_NAME: process.env.PHOTO_ALBUMS_TABLE_NAME,
-      PHOTO_ALBUM_TAGS_TABLE_NAME: process.env.PHOTO_ALBUM_TAGS_TABLE_NAME,
-      PHOTO_USER_PERMISSION_TABLE_NAME: process.env.PHOTO_USER_PERMISSION_TABLE_NAME,
-      DATA_AGGREGATIONS_TABLE_NAME: process.env.DATA_AGGREGATIONS_TABLE_NAME,
-      TRAVEL_RECORDS_TABLE_NAME: process.env.TRAVEL_RECORDS_TABLE_NAME,
       WORKER_URL: process.env.WORKER_URL,
       WORKER_SECRET: process.env.WORKER_SECRET,
       JWT_SECRET: process.env.JWT_SECRET,
       NODE_OPTIONS: '--experimental-vm-modules',
-      ENVIRONMENT: envType,
-    },
-  });
-};
-
-const createAggregationsLambdaFunction = (scope, id, envType) => {
-  return new lambda.Function(scope, id, {
-    functionName: `${envType}-photo-album-api-aggregations`,
-    runtime: lambda.Runtime.NODEJS_22_X,
-    handler: 'aggregations/albums.handler',
-    code: lambda.Code.fromAsset(path.join(rootDir, 'dist/lambda')),
-    timeout: cdk.Duration.seconds(15),
-    environment: {
-      NODE_OPTIONS: '--experimental-vm-modules',
-      AWS_REGION_NAME: process.env.AWS_REGION_NAME,
-      PHOTO_ALBUMS_TABLE_NAME: process.env.PHOTO_ALBUMS_TABLE_NAME,
-      DATA_AGGREGATIONS_TABLE_NAME: process.env.DATA_AGGREGATIONS_TABLE_NAME,
       ENVIRONMENT: envType,
     },
   });
@@ -117,114 +92,11 @@ class PhotoAlbumStack extends cdk.Stack {
       throw new Error('AWS_S3_BUCKET_NAME must be provided in environment variables.');
     }
 
-    // DynamoDB Tables - Reuse if exists, otherwise create
-    const albumTable = this.getOrCreateDynamoTable(
-      'AlbumTable',
-      process.env.PHOTO_ALBUMS_TABLE_NAME || 'photo-albums',
-      {
-        partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
-        sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
-        stream: dynamodb.StreamViewType.KEYS_ONLY,
-        removalPolicy: cdk.RemovalPolicy.RETAIN,
-        deletionProtection: true,
-        pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: true },
-        billingMode: dynamodb.BillingMode.PROVISIONED,
-        ProvisionedThroughput: { ReadCapacityUnits: 4, WriteCapacityUnits: 1 },
-      },
-      process.env.PHOTO_ALBUMS_STREAM_ARN,
-    );
-
-    const albumTagTable = this.getOrCreateDynamoTable(
-      'AlbumTagTable',
-      process.env.PHOTO_ALBUM_TAGS_TABLE_NAME || 'photo-album-tags',
-      {
-        partitionKey: { name: 'tag', type: dynamodb.AttributeType.STRING },
-        removalPolicy: cdk.RemovalPolicy.RETAIN,
-        deletionProtection: true,
-        pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: true },
-        billingMode: dynamodb.BillingMode.PROVISIONED,
-        ProvisionedThroughput: { ReadCapacityUnits: 4, WriteCapacityUnits: 1 },
-      },
-    );
-
-    const userPermissionTable = this.getOrCreateDynamoTable(
-      'UserPermissionTable',
-      process.env.PHOTO_USER_PERMISSION_TABLE_NAME || 'user-permission',
-      {
-        partitionKey: { name: 'uid', type: dynamodb.AttributeType.STRING },
-        sortKey: { name: 'email', type: dynamodb.AttributeType.STRING },
-        removalPolicy: cdk.RemovalPolicy.RETAIN,
-        deletionProtection: true,
-      },
-    );
-
-    const aggregationTable = this.getOrCreateDynamoTable(
-      'AggregationTable',
-      process.env.DATA_AGGREGATIONS_TABLE_NAME || 'data-aggregations',
-      {
-        partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
-        removalPolicy: cdk.RemovalPolicy.RETAIN,
-        deletionProtection: true,
-        pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: true },
-        billingMode: dynamodb.BillingMode.PROVISIONED,
-        ProvisionedThroughput: { ReadCapacityUnits: 4, WriteCapacityUnits: 1 },
-      },
-    );
-
-    const travelRecordTable = this.getOrCreateDynamoTable(
-      'TravelRecordsTable',
-      process.env.TRAVEL_RECORDS_TABLE_NAME || 'travel-records',
-      {
-        partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
-        removalPolicy: cdk.RemovalPolicy.RETAIN,
-        deletionProtection: true,
-        pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: true },
-        billingMode: dynamodb.BillingMode.PROVISIONED,
-        ProvisionedThroughput: { ReadCapacityUnits: 4, WriteCapacityUnits: 1 },
-        globalSecondaryIndexes: [
-          {
-            indexName: 'gsi1',
-            partitionKey: { name: 'gsi1pk', type: dynamodb.AttributeType.STRING },
-            sortKey: { name: 'gsi1sk', type: dynamodb.AttributeType.STRING },
-            projectionType: dynamodb.ProjectionType.ALL,
-          },
-        ],
-      },
-    );
-
     // Lambda Functions
     const appFunction = createAppLambdaFunction(this, `${envType}-app-function`, envType);
-    const aggregationsFunction = createAggregationsLambdaFunction(
-      this,
-      `${envType}-aggregations-function`,
-      envType,
-    );
 
     // Grant permissions
-    albumTable.grantReadWriteData(appFunction);
-    albumTagTable.grantReadWriteData(appFunction);
-    userPermissionTable.grantReadWriteData(appFunction);
-    aggregationTable.grantReadWriteData(appFunction);
-    travelRecordTable.grantReadWriteData(appFunction);
     photoBucket.grantReadWrite(appFunction);
-
-    appFunction.addToRolePolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: ['dynamodb:Query'],
-        resources: [travelRecordTable.tableArn, `${travelRecordTable.tableArn}/index/*`],
-      }),
-    );
-
-    albumTable.grantStreamRead(aggregationsFunction);
-    aggregationTable.grantReadWriteData(aggregationsFunction);
-
-    // DynamoDB Stream to Lambda
-    aggregationsFunction.addEventSource(
-      new lambdaEventSources.DynamoEventSource(albumTable, {
-        startingPosition: lambda.StartingPosition.LATEST,
-      }),
-    );
 
     // API Gateway
     const api = new apigateway.RestApi(this, `${envType}-photo-album-api`, {
@@ -284,27 +156,6 @@ class PhotoAlbumStack extends cdk.Stack {
         },
       ],
     });
-  }
-
-  getOrCreateDynamoTable(id, tableName, tableProps, streamArn = null) {
-    if (tableName) {
-      try {
-        console.log(`Attempting to retrieve DynamoDB table: ${tableName}`);
-        if (streamArn) {
-          return dynamodb.Table.fromTableAttributes(this, id, {
-            tableName,
-            tableStreamArn: streamArn,
-          });
-        }
-        return dynamodb.Table.fromTableName(this, id, tableName);
-      } catch (e) {
-        console.log('Error: ', e);
-        console.log(`DynamoDB table ${tableName} not found, creating new one...`);
-        return new dynamodb.Table(this, id, { tableName, ...tableProps });
-      }
-    } else {
-      throw new Error(`Table name for ${id} must be provided in environment variables.`);
-    }
   }
 }
 
