@@ -22,3 +22,15 @@ database_id = "${PROD_PHOTO_ALBUMS_DB_ID}"
 
 [env.production.vars]
 WORKER_SECRET = "${WORKER_SECRET}"
+
+[observability]
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+persist = true
+invocation_logs = true
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 1
+persist = true

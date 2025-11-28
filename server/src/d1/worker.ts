@@ -52,8 +52,10 @@ async function handleServiceRequest<T>(
     // CREATE a new item
     if (path === basePath && request.method === 'POST') {
       const body = (await request.json()) as any;
+      logger().debug({ body }, 'Creating new item');
+
       if (!Array.isArray(body)) {
-        if (requiredFields.some((field) => !body[field])) {
+        if (requiredFields.some((field) => body[field] === undefined || body[field] === null)) {
           return new Response(`Missing required fields: ${requiredFields.join(', ')}`, {
             status: 400,
           });

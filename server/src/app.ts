@@ -22,7 +22,7 @@ const ACCEPTED_MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 dotenv.config();
 
-export const app: FastifyInstance = Fastify();
+export const app: FastifyInstance = Fastify({logger: true});
 
 await app.register(cors, {
   allowedHeaders: ['Origin, Content-Type, Accept, Authorization, X-Requested-With'],
