@@ -1,24 +1,11 @@
-import { FastifyInstance, FastifyPluginCallback } from 'fastify';
-import fastifyPlugin from 'fastify-plugin';
+import { Hono } from 'hono';
 import AggregateController from '../controllers/aggregate-controller.js';
+import { HonoEnv } from '../env.js';
+import { optionalVerifyJwtClaim } from './auth-middleware.js';
 
 const controller = new AggregateController();
-const aggregateRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
-  instance.get('/api/aggregate/:type', {
-    handler: controller.findOne,
-    schema: {
-      params: {
-        type: 'object',
-        properties: {
-          year: {
-            type: 'string',
-          },
-        },
-      },
-    },
-  });
+const app = new Hono<HonoEnv>();
 
-  done();
-};
+app.get('/api/aggregate/:type', optionalVerifyJwtClaim, controller.findOne);
 
-export default fastifyPlugin(aggregateRoute);
+export default app;

@@ -1,6 +1,5 @@
 import { S3Client, waitUntilBucketExists } from '@aws-sdk/client-s3';
 import fs from 'node:fs';
-import logger from 'pino';
 import { uploadObject } from '../controllers/helpers.js';
 import { configuration } from './config.js';
 import S3Service from './s3-service.js';
@@ -14,13 +13,13 @@ export const initialiseS3Bucket = async () => {
   try {
     ifBucketExists = await s3Service.checkIfBucketExists({ Bucket: s3BucketName });
     if (ifBucketExists) {
-      logger().info(`Bucket ${s3BucketName} is ready.`);
+      console.log(`Bucket ${s3BucketName} is ready.`);
     } else {
       await waitUntilBucketExists({ client: s3Client, maxWaitTime: 20 }, { Bucket: s3BucketName });
-      logger().info(`Bucket ${s3BucketName} is finally ready.`);
+      console.log(`Bucket ${s3BucketName} is finally ready.`);
     }
   } catch (err) {
-    logger().error(err);
+    console.error(err);
     throw Error(`Bucket ${s3BucketName} does not exist. Please run 'bun run cdk:deploy' first.`);
   }
 
@@ -34,7 +33,7 @@ export const initialiseS3Bucket = async () => {
         throw err;
       }
       await uploadObject('test-album-1/example_photo1.webp', data);
-      logger().info(`Example photo 1 uploaded to ${s3BucketName} bucket.`);
+      console.log(`Example photo 1 uploaded to ${s3BucketName} bucket.`);
     });
 
     fs.readFile('./assets/example_photo2.webp', async (err, data) => {
@@ -42,13 +41,13 @@ export const initialiseS3Bucket = async () => {
         throw err;
       }
       await uploadObject('test-album-1/example_photo2.webp', data);
-      logger().info(`Example photo 2 uploaded to ${s3BucketName} bucket.`);
+      console.log(`Example photo 2 uploaded to ${s3BucketName} bucket.`);
     });
 
     await uploadObject(
       'updateDatabaseAt.json',
       JSON.stringify({ album: new Date().toISOString(), travel: new Date().toISOString() }),
     );
-    logger().info(`Uploaded updateDatabaseAt.json to ${s3BucketName} bucket.`);
+    console.log(`Uploaded updateDatabaseAt.json to ${s3BucketName} bucket.`);
   }
 };

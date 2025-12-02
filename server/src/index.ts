@@ -1,0 +1,77 @@
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { logger } from 'hono/logger';
+import { prettyJSON } from 'hono/pretty-json';
+import { HonoEnv } from './env.js';
+import aggregateRoute from './routes/aggregate-route.js';
+import albumRoute from './routes/album-route.js';
+import albumTagsRoute from './routes/album-tag-route.js';
+import authRoute from './routes/auth-route.js';
+import locationRoute from './routes/location-route.js';
+import photoRoute from './routes/photo-route.js';
+import travelRecordRoute from './routes/travel-record-route.js';
+
+const app = new Hono<HonoEnv>();
+
+// Middleware
+app.use('*', logger());
+app.use('*', prettyJSON());
+app.use('*', async (c, next) => {
+  const corsMiddleware = cors({
+    origin: (origin) => {
+      const allowedOrigins = [];
+      if (c.env.DEVELOPMENT === 'true') {
+        allowedOrigins.push('http://localhost:9000');
+      } else {
+        allowedOrigins.push(c.env.ALBUM_URL);
+      }
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        return origin;
+      }
+      return allowedOrigins[0]; // Fallback
+    },
+    allowHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization', 'X-Requested-With'],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  });
+  await corsMiddleware(c, next);
+});
+
+// Polyfill process.env for AWS SDK
+app.use('*', async (c, next) => {
+  if (c.env.AWS_S3_BUCKET_NAME) process.env['AWS_S3_BUCKET_NAME'] = c.env.AWS_S3_BUCKET_NAME;
+  if (c.env.AWS_REGION_NAME) process.env['AWS_REGION_NAME'] = c.env.AWS_REGION_NAME;
+  if (c.env.VITE_IMAGEKIT_CDN_URL)
+    process.env['VITE_IMAGEKIT_CDN_URL'] = c.env.VITE_IMAGEKIT_CDN_URL;
+  if (c.env.AWS_ACCESS_KEY_ID) process.env['AWS_ACCESS_KEY_ID'] = c.env.AWS_ACCESS_KEY_ID;
+  if (c.env.AWS_SECRET_ACCESS_KEY)
+    process.env['AWS_SECRET_ACCESS_KEY'] = c.env.AWS_SECRET_ACCESS_KEY;
+  if (c.env.JWT_SECRET) process.env['JWT_SECRET'] = c.env.JWT_SECRET;
+  if (c.env.GOOGLE_PLACES_API_KEY)
+    process.env['GOOGLE_PLACES_API_KEY'] = c.env.GOOGLE_PLACES_API_KEY;
+  if (c.env.VITE_GOOGLE_CLIENT_ID)
+    process.env['VITE_GOOGLE_CLIENT_ID'] = c.env.VITE_GOOGLE_CLIENT_ID;
+  if (c.env.ALBUM_URL) process.env['ALBUM_URL'] = c.env.ALBUM_URL;
+  if (c.env.ENVIRONMENT) process.env['ENVIRONMENT'] = c.env.ENVIRONMENT;
+  if (c.env.DEVELOPMENT) process.env['DEVELOPMENT'] = c.env.DEVELOPMENT;
+
+  await next();
+});
+
+// Routes
+app.route('/', aggregateRoute);
+app.route('/', albumRoute);
+app.route('/', albumTagsRoute);
+app.route('/', authRoute);
+app.route('/', locationRoute);
+app.route('/', photoRoute);
+app.route('/', travelRecordRoute);
+
+// Error handling
+app.onError((err, c) => {
+  console.error(`${err}`);
+  return c.json({ error: err.message }, 500);
+});
+
+export default app;

@@ -17,7 +17,6 @@ import {
   PutObjectCommandInput,
   S3Client,
 } from '@aws-sdk/client-s3';
-import logger from 'pino';
 import { get } from 'radash';
 import { BaseService, Photo } from '../types';
 
@@ -80,7 +79,7 @@ export default class S3Service implements BaseService<Photo> {
     const response = await this.s3Client.send(new DeleteObjectsCommand(params));
     if (response.$metadata.httpStatusCode === 200) {
       const deletedKeys = response.Deleted?.map((deleted) => deleted.Key).join(',');
-      logger().info(`##### Delete objects: ${deletedKeys}`);
+      console.log(`##### Delete objects: ${deletedKeys}`);
     }
     return response.$metadata.httpStatusCode === 200;
   }

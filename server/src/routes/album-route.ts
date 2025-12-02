@@ -1,124 +1,17 @@
-import { FastifyInstance, FastifyPluginCallback } from 'fastify';
-import fastifyPlugin from 'fastify-plugin';
+import { Hono } from 'hono';
 import AlbumController from '../controllers/album-controller.js';
+import { HonoEnv } from '../env.js';
 import { verifyJwtClaim, verifyUserPermission } from './auth-middleware.js';
 
 const controller = new AlbumController();
+const app = new Hono<HonoEnv>();
 
-const albumSchema = {
-  type: 'object',
-  required: ['year', 'id', 'albumName', 'isPrivate'],
-  properties: {
-    year: {
-      type: 'string',
-      minLength: 1,
-    },
-    id: {
-      type: 'string',
-      minLength: 1,
-    },
-    albumName: {
-      type: 'string',
-      minLength: 1,
-    },
-    description: {
-      type: 'string',
-    },
-    albumCover: {
-      type: 'string',
-    },
-    isPrivate: {
-      type: 'boolean',
-    },
-    isFeatured: {
-      type: 'boolean',
-    },
-    tags: {
-      type: 'array',
-      items: { type: 'string' },
-    },
-    place: {
-      type: ['object', 'null'],
-      properties: {
-        displayName: {
-          type: 'string',
-        },
-        formattedAddress: {
-          type: 'string',
-        },
-        location: {
-          type: 'object',
-          properties: {
-            latitude: {
-              type: 'number',
-            },
-            longitude: {
-              type: 'number',
-            },
-          },
-        },
-      },
-    },
-  },
-};
+app.get('/api/albums/:year', controller.findAll);
 
-const albumRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
-  instance.get('/api/albums/:year', {
-    handler: controller.findAll,
-    schema: {
-      params: {
-        type: 'object',
-        properties: {
-          year: {
-            type: 'string',
-          },
-        },
-      },
-    },
-  });
+app.post('/api/albums', verifyJwtClaim, verifyUserPermission, controller.create);
 
-  instance.post('/api/albums', {
-    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
-    }),
-    handler: controller.create,
-    schema: {
-      body: albumSchema,
-    },
-  });
+app.put('/api/albums', verifyJwtClaim, verifyUserPermission, controller.update);
 
-  instance.put('/api/albums', {
-    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
-    }),
-    handler: controller.update,
-    schema: {
-      body: albumSchema,
-    },
-  });
+app.delete('/api/albums', verifyJwtClaim, verifyUserPermission, controller.delete);
 
-  instance.delete('/api/albums', {
-    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
-    }),
-    handler: controller.delete,
-    schema: {
-      body: {
-        type: 'object',
-        required: ['year', 'id'],
-        properties: {
-          year: {
-            type: 'string',
-          },
-          id: {
-            type: 'string',
-          },
-        },
-      },
-    },
-  });
-
-  done();
-};
-
-export default fastifyPlugin(albumRoute);
+export default app;

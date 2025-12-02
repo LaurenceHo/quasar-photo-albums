@@ -1,27 +1,28 @@
-import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import logger from 'pino';
+import { Context } from 'hono';
 import TravelRecordService from '../d1/travel-record-service.js';
-import { RequestWithUser } from '../types';
+import { HonoEnv } from '../env.js';
 import { TravelRecord } from '../types/travel-record';
+import { UserPermission } from '../types/user-permission.js';
 import { BaseController } from './base-controller.js';
 import { haversineDistance, isValidCoordination, updateDatabaseAt } from './helpers.js';
 
 export default class TravelRecordController extends BaseController {
-  findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const travelRecordService = new TravelRecordService(request.env.DB);
+  findAll = async (c: Context<HonoEnv>) => {
+    const travelRecordService = new TravelRecordService(c.env.DB);
     try {
       const travelRecords: TravelRecord[] = await travelRecordService.getAll();
-      return this.ok<TravelRecord[]>(reply, 'ok', travelRecords);
+      return this.ok<TravelRecord[]>(c, 'ok', travelRecords);
     } catch (err: any) {
-      logger().error(`Failed to fetch travel records from D1: ${err.message}`);
-      return this.fail(reply, 'Failed to query travel records');
+      console.error(`Failed to fetch travel records from D1: ${err.message}`);
+      return this.fail(c, 'Failed to query travel records');
     }
   };
 
-  create: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const body = request.body as TravelRecord;
-    const userEmail = (request as RequestWithUser).user?.email ?? 'unknown';
-    const travelRecordService = new TravelRecordService(request.env.DB);
+  create = async (c: Context<HonoEnv>) => {
+    const body = await c.req.json<TravelRecord>();
+    const user = c.get('user') as UserPermission;
+    const userEmail = user?.email ?? 'unknown';
+    const travelRecordService = new TravelRecordService(c.env.DB);
 
     // TODO: If departure and destination are present, calculate the distance using latitude and longitude
     // If airline and flight number are present, calculate the distance using flight API
@@ -36,7 +37,7 @@ export default class TravelRecordController extends BaseController {
           body.destination.location.longitude,
         )
       ) {
-        return this.fail(reply, 'Invalid coordinates');
+        return this.fail(c, 'Invalid coordinates');
       }
 
       const rawDistance = haversineDistance(
@@ -59,18 +60,19 @@ export default class TravelRecordController extends BaseController {
     try {
       await travelRecordService.create(payload);
       await updateDatabaseAt('travel');
-      return this.ok(reply, 'Travel record created');
+      return this.ok(c, 'Travel record created');
     } catch (err: any) {
-      logger().error(`Failed to create travel record in D1: ${err.message}`);
-      return this.fail(reply, 'Failed to create travel record');
+      console.error(`Failed to create travel record in D1: ${err.message}`);
+      return this.fail(c, 'Failed to create travel record');
     }
   };
 
-  update: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const { id } = request.params as { id: string };
-    const body = request.body as TravelRecord;
-    const userEmail = (request as RequestWithUser).user?.email ?? 'unknown';
-    const travelRecordService = new TravelRecordService(request.env.DB);
+  update = async (c: Context<HonoEnv>) => {
+    const id = c.req.param('id');
+    const body = await c.req.json<TravelRecord>();
+    const user = c.get('user') as UserPermission;
+    const userEmail = user?.email ?? 'unknown';
+    const travelRecordService = new TravelRecordService(c.env.DB);
 
     const payload: any = { ...body };
     delete payload.id;
@@ -83,29 +85,29 @@ export default class TravelRecordController extends BaseController {
     try {
       await travelRecordService.update(id, payload);
       await updateDatabaseAt('travel');
-      return this.ok(reply, 'Travel record updated');
+      return this.ok(c, 'Travel record updated');
     } catch (err: any) {
-      logger().error(`Failed to update travel record in D1: ${err.message}`);
-      return this.fail(reply, 'Failed to update travel record');
+      console.error(`Failed to update travel record in D1: ${err.message}`);
+      return this.fail(c, 'Failed to update travel record');
     }
   };
 
-  delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const { recordId } = request.params as { recordId: string };
-    logger().info('##### Delete travel record: %s', recordId);
-    const travelRecordService = new TravelRecordService(request.env.DB);
+  delete = async (c: Context<HonoEnv>) => {
+    const recordId = c.req.param('recordId');
+    console.log('##### Delete travel record: %s', recordId);
+    const travelRecordService = new TravelRecordService(c.env.DB);
 
     try {
       await travelRecordService.delete(recordId);
       await updateDatabaseAt('travel');
-      return this.ok(reply, 'Travel record deleted');
+      return this.ok(c, 'Travel record deleted');
     } catch (err: any) {
-      logger().error(`Failed to delete travel record in D1: ${err.message}`);
-      return this.fail(reply, 'Failed to delete travel record');
+      console.error(`Failed to delete travel record in D1: ${err.message}`);
+      return this.fail(c, 'Failed to delete travel record');
     }
   };
 
-  findOne: RouteHandler = async () => {
+  findOne = async (_c: Context) => {
     throw new Error('Method not implemented.');
   };
 }

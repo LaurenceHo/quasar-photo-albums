@@ -1,26 +1,10 @@
-import { FastifyInstance, FastifyPluginCallback } from 'fastify';
-import fastifyPlugin from 'fastify-plugin';
+import { Hono } from 'hono';
 import LocationController from '../controllers/location-controller.js';
+import { HonoEnv } from '../env.js';
 
 const controller = new LocationController();
+const app = new Hono<HonoEnv>();
 
-const locationRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
-  instance.get('/api/location/search', {
-    handler: controller.findAll,
-    schema: {
-      querystring: {
-        type: 'object',
-        required: ['textQuery'],
-        properties: {
-          textQuery: {
-            type: 'string',
-          },
-        },
-      },
-    },
-  });
+app.get('/api/location/search', controller.findAll);
 
-  done();
-};
-
-export default fastifyPlugin(locationRoute);
+export default app;

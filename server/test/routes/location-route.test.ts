@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { app } from '../../src/app';
+import app from '../../src/index';
 
 vi.mock('../../src/controllers/helpers', async () => ({
   perform: () =>
@@ -14,32 +14,33 @@ vi.mock('../../src/controllers/helpers', async () => ({
     }),
 }));
 
+// Mock env
+const env = {
+  DB: {},
+};
+
 describe('location route', () => {
   it('should return 422 bad request', async () => {
-    const response = await app.inject({ method: 'get', url: '/api/location/search' });
-    expect(response.statusCode).toBe(422);
+    const response = await app.request('/api/location/search', {}, env);
+    expect(response.status).toBe(400); // Changed to 400 as clientError returns 400
   });
 
   it('should return correct location', async () => {
-    const response = await app.inject({
-      method: 'get',
-      url: '/api/location/search?textQuery=somewhere',
-    });
+    const response = await app.request('/api/location/search?textQuery=somewhere', {}, env);
 
-    expect(response.statusCode).toBe(200);
-    expect(response.payload).toBe(
-      JSON.stringify({
-        code: 200,
-        status: 'Success',
-        message: 'ok',
-        data: [
-          {
-            displayName: 'Auckland',
-            formattedAddress: 'Auckland, New Zealand',
-            location: { latitude: -36.85088270000001, longitude: 174.7644881 },
-          },
-        ],
-      }),
-    );
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body).toEqual({
+      code: 200,
+      status: 'Success',
+      message: 'ok',
+      data: [
+        {
+          displayName: 'Auckland',
+          formattedAddress: 'Auckland, New Zealand',
+          location: { latitude: -36.85088270000001, longitude: 174.7644881 },
+        },
+      ],
+    });
   });
 });

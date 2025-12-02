@@ -1,12 +1,13 @@
+import { createMiddleware } from 'hono/factory';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { app } from '../../src/app';
+import app from '../../src/index';
 import { mockAlbumList, mockPhotoList, mockSignedCookies } from '../mock-data';
 
-vi.mock('../../src/d1/d1-client', async () => {
+vi.mock('../../src/d1/album-service', async () => {
   const { mockAlbumList } = await import('../mock-data');
   return {
-    D1Client: class {
-      constructor(table: string) {}
+    default: class {
+      constructor(db: any) {}
       async getById(id: string) {
         return mockAlbumList[2]; // private album
       }
@@ -32,38 +33,69 @@ vi.mock('../../src/controllers/helpers', async () => ({
   // updatePhotoAlbum: () => Promise.resolve(true), // Removed
 }));
 
+// Mock auth middleware to simulate real behavior for testing 401
+vi.mock('../../src/routes/auth-middleware', async () => ({
+  verifyJwtClaim: createMiddleware(async (c, next) => {
+    const token = c.req.header('Cookie');
+    if (token && token.includes('jwt=')) {
+      c.set('user', { role: 'admin', email: 'test@test.com' });
+      await next();
+    } else {
+      return c.json({ message: 'Authentication failed. Please login.' }, 401);
+    }
+  }),
+  verifyUserPermission: createMiddleware(async (c, next) => await next()),
+  optionalVerifyJwtClaim: createMiddleware(async (c, next) => {
+    const token = c.req.header('Cookie');
+    if (token && token.includes('jwt=')) {
+      c.set('user', { role: 'admin', email: 'test@test.com' });
+    }
+    await next();
+  }),
+  cleanJwtCookie: (c: any, message: string, code = 401) => {
+    return c.json({ message }, code);
+  },
+}));
+
+// Mock env
+const env = {
+  DB: {},
+  JWT_SECRET: 'test-secret',
+};
+
 describe('private album route', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
   it('should return correct photos', async () => {
-    const response = await app.inject({
-      method: 'get',
-      url: '/api/photos/2024/test',
-      headers: {
-        Cookie: `jwt=${mockSignedCookies()}`,
+    process.env.JWT_SECRET = 'test-secret';
+    const token = mockSignedCookies();
+    const response = await app.request(
+      '/api/photos/2024/test',
+      {
+        headers: {
+          Cookie: `jwt=${token}`,
+        },
+      },
+      env,
+    );
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body).toEqual({
+      code: 200,
+      status: 'Success',
+      message: 'ok',
+      data: {
+        album: mockAlbumList[2],
+        photos: mockPhotoList,
       },
     });
-
-    expect(response.payload).toBe(
-      JSON.stringify({
-        code: 200,
-        status: 'Success',
-        message: 'ok',
-        data: {
-          album: mockAlbumList[2],
-          photos: mockPhotoList,
-        },
-      }),
-    );
   });
 
   it('should return 401', async () => {
-    const response = await app.inject({
-      method: 'get',
-      url: '/api/photos/2024/test',
-    });
-    expect(response.statusCode).toBe(401);
+    const response = await app.request('/api/photos/2024/test', {}, env);
+    expect(response.status).toBe(401);
   });
 });

@@ -1,62 +1,65 @@
-import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
+import { Context } from 'hono';
 import AggregationService from '../d1/aggregation-service.js';
+import { HonoEnv } from '../env.js';
 import { Album, AlbumsByYear } from '../types/album.js';
+import { UserPermission } from '../types/user-permission.js';
 import { BaseController } from './base-controller.js';
-import { verifyIfIsAdmin } from './helpers.js';
 
 export default class AggregateController extends BaseController {
-  findAll: RouteHandler = async () => {
+  findAll = async (_c: Context) => {
     throw new Error('Method not implemented.');
   };
 
-  create: RouteHandler = async () => {
+  create = async (_c: Context) => {
     throw new Error('Method not implemented.');
   };
 
-  update: RouteHandler = async () => {
+  update = async (_c: Context) => {
     throw new Error('Method not implemented.');
   };
 
-  delete: RouteHandler = async () => {
+  delete = async (_c: Context) => {
     throw new Error('Method not implemented.');
   };
 
-  findOne: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const aggregateType = (request.params as any)['type'] as
+  findOne = async (c: Context<HonoEnv>) => {
+    const aggregateType = c.req.param('type') as
       | 'albumsWithLocation'
       | 'countAlbumsByYear'
       | 'featuredAlbums';
 
-    const aggregationService = new AggregationService(request.env.DB);
+    const aggregationService = new AggregationService(c.env.DB);
 
     if (aggregateType === 'albumsWithLocation') {
-      const isAdmin = verifyIfIsAdmin(request, reply);
+      const user = c.get('user') as UserPermission;
+      const isAdmin = user?.role === 'admin';
       try {
         const albumData = await aggregationService.getAlbumsWithLocation(isAdmin);
-        return this.ok<Album[]>(reply, 'ok', albumData);
+        return this.ok<Album[]>(c, 'ok', albumData);
       } catch (err: any) {
-        request.log.error(`Failed to query aggregate data for photo album with location: ${err}`);
-        return this.fail(reply, 'Failed to query aggregate data for photo album with location');
+        console.error(`Failed to query aggregate data for photo album with location: ${err}`);
+        return this.fail(c, 'Failed to query aggregate data for photo album with location');
       }
     } else if (aggregateType === 'countAlbumsByYear') {
-      const isAdmin = verifyIfIsAdmin(request, reply);
+      const user = c.get('user') as UserPermission;
+      const isAdmin = user?.role === 'admin';
 
       try {
         const countData = await aggregationService.getCountAlbumsByYear(isAdmin);
-        return this.ok<AlbumsByYear>(reply, 'ok', countData);
+        return this.ok<AlbumsByYear>(c, 'ok', countData);
       } catch (err: any) {
-        request.log.error(`Failed to query aggregate data for count albums by year: ${err}`);
-        return this.fail(reply, 'Failed to query aggregate data for count albums by year');
+        console.error(`Failed to query aggregate data for count albums by year: ${err}`);
+        return this.fail(c, 'Failed to query aggregate data for count albums by year');
       }
     } else if (aggregateType === 'featuredAlbums') {
       try {
         const featuredAlbums = await aggregationService.getFeaturedAlbums();
-        return this.ok<Album[]>(reply, 'ok', featuredAlbums);
+        return this.ok<Album[]>(c, 'ok', featuredAlbums);
       } catch (err: any) {
-        request.log.error(`Failed to query aggregate data for featured albums: ${err}`);
-        return this.fail(reply, 'Failed to query aggregate data for featured albums');
+        console.error(`Failed to query aggregate data for featured albums: ${err}`);
+        return this.fail(c, 'Failed to query aggregate data for featured albums');
       }
     }
-    return this.clientError(reply, `Invalid aggregate type: ${aggregateType}`);
+    return this.clientError(c, `Invalid aggregate type: ${aggregateType}`);
   };
 }

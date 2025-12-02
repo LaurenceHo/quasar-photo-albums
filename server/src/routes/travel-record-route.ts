@@ -1,112 +1,17 @@
-import { FastifyInstance, FastifyPluginCallback } from 'fastify';
-import fastifyPlugin from 'fastify-plugin';
+import { Hono } from 'hono';
 import TravelRecordController from '../controllers/travel-record-controller.js';
+import { HonoEnv } from '../env.js';
 import { verifyJwtClaim, verifyUserPermission } from './auth-middleware.js';
 
 const controller = new TravelRecordController();
+const app = new Hono<HonoEnv>();
 
-const travelRecordSchema = {
-  type: 'object',
-  required: ['id', 'departure', 'destination', 'travelDate'],
-  properties: {
-    id: {
-      type: 'string',
-      minLength: 1,
-    },
-    travelDate: {
-      type: 'string',
-      minLength: 1,
-    },
-    departure: {
-      type: ['object', 'null'],
-      properties: {
-        displayName: {
-          type: 'string',
-        },
-        formattedAddress: {
-          type: 'string',
-        },
-        location: {
-          type: 'object',
-          properties: {
-            latitude: {
-              type: 'number',
-            },
-            longitude: {
-              type: 'number',
-            },
-          },
-        },
-      },
-    },
-    destination: {
-      type: ['object', 'null'],
-      properties: {
-        displayName: {
-          type: 'string',
-        },
-        formattedAddress: {
-          type: 'string',
-        },
-        location: {
-          type: 'object',
-          properties: {
-            latitude: {
-              type: 'number',
-            },
-            longitude: {
-              type: 'number',
-            },
-          },
-        },
-      },
-    },
-  },
-};
+app.get('/api/travelRecords', controller.findAll);
 
-const travelRecordRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
-  instance.get('/api/travelRecords', {
-    handler: controller.findAll,
-  });
+app.post('/api/travelRecords', verifyJwtClaim, verifyUserPermission, controller.create);
 
-  instance.post('/api/travelRecords', {
-    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
-    }),
-    handler: controller.create,
-    schema: {
-      body: travelRecordSchema,
-    },
-  });
+app.put('/api/travelRecords', verifyJwtClaim, verifyUserPermission, controller.update);
 
-  instance.put('/api/travelRecords', {
-    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
-    }),
-    handler: controller.update,
-    schema: {
-      body: travelRecordSchema,
-    },
-  });
+app.delete('/api/travelRecords/:recordId', verifyJwtClaim, verifyUserPermission, controller.delete);
 
-  instance.delete('/api/travelRecords/:recordId', {
-    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
-    }),
-    handler: controller.delete,
-    schema: {
-      params: {
-        type: 'object',
-        properties: {
-          recordId: {
-            type: 'string',
-          },
-        },
-      },
-    },
-  });
-
-  done();
-};
-
-export default fastifyPlugin(travelRecordRoute);
+export default app;
