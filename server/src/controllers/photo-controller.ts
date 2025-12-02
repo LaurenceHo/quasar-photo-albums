@@ -27,7 +27,7 @@ export default class PhotoController extends BaseController {
       const album = await albumService.getById(albumId);
 
       // Only fetch photos when album exists
-      if (!isEmpty(album)) {
+      if (!isEmpty(album) && album !== null) {
         // If album is private, check if user has the admin permission
         if (album.isPrivate) {
           const token = getCookie(c, 'jwt');
