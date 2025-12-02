@@ -7,7 +7,7 @@ import rateLimit from '@fastify/rate-limit';
 import throttle from '@fastify/throttle';
 import dotenv from 'dotenv';
 import Fastify, { FastifyError, FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import serverless from 'serverless-http';
+import { Env, envStorage } from './env.js';
 import aggregateRoute from './routes/aggregate-route.js';
 import albumRoute from './routes/album-route.js';
 import albumTagsRoute from './routes/album-tag-route.js';
@@ -22,7 +22,14 @@ const ACCEPTED_MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 dotenv.config();
 
-export const app: FastifyInstance = Fastify({logger: true});
+// Augment FastifyRequest to include env
+declare module 'fastify' {
+  interface FastifyRequest {
+    env: Env;
+  }
+}
+
+export const app: FastifyInstance = Fastify({ logger: true });
 
 await app.register(cors, {
   allowedHeaders: ['Origin, Content-Type, Accept, Authorization, X-Requested-With'],
@@ -67,6 +74,13 @@ await app.register(throttle, {
 // Route
 app.addHook('onRequest', (request, _reply, done) => {
   request.log.info('##### Request: %s %s', request.method, request.url);
+
+  // Attach env from AsyncLocalStorage
+  const env = envStorage.getStore();
+  if (env) {
+    request.env = env;
+  }
+
   done();
 });
 
@@ -95,5 +109,3 @@ app.register(authRoute);
 app.register(locationRoute);
 app.register(photoRoute);
 app.register(travelRecordRoute);
-
-export const handler = serverless(app as any);

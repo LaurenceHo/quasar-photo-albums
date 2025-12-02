@@ -12,7 +12,7 @@ vi.mock('../../src/d1/d1-client', async () => {
 
   return {
     D1Client: class {
-      constructor(table: string) { }
+      constructor(table: string) {}
       async find(params: any) {
         if (params.type === 'albumsWithLocation') {
           return mockAlbumList;

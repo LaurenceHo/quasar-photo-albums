@@ -3,12 +3,12 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
 import logger from 'pino';
 import { get, isEmpty } from 'radash';
-import S3Service from '../services/s3-service.js';
+import S3Service from '../services/s3-service';
 
 const s3BucketName = process.env['AWS_S3_BUCKET_NAME'];
-const s3Service = new S3Service();
 
 export const updateDatabaseAt = async (type: 'album' | 'travel') => {
+  const s3Service = new S3Service();
   const result: { album: string; travel: string } = await s3Service.read({
     Bucket: s3BucketName,
     Key: 'updateDatabaseAt.json',
@@ -27,6 +27,7 @@ export const updateDatabaseAt = async (type: 'album' | 'travel') => {
 //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-photo-album-full.html
 export const uploadObject = async (filePath: string, object: any) => {
   logger().info(`##### S3 destination file path: ${filePath}`);
+  const s3Service = new S3Service();
 
   try {
     const putObject: PutObjectCommandInput = {
@@ -53,6 +54,7 @@ export const deleteObjects = async (objectKeys: string[]) => {
   };
 
   objectKeys.forEach((objectKeys) => deleteParams.Delete?.Objects?.push({ Key: objectKeys }));
+  const s3Service = new S3Service();
 
   try {
     return await s3Service.delete(deleteParams);
@@ -63,6 +65,7 @@ export const deleteObjects = async (objectKeys: string[]) => {
 };
 
 export const emptyS3Folder = async (folderName: string) => {
+  const s3Service = new S3Service();
   const listedObjects = await s3Service.listObjects({
     Bucket: s3BucketName,
     Prefix: folderName,

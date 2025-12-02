@@ -20,11 +20,21 @@ import {
 import logger from 'pino';
 import { get } from 'radash';
 import { BaseService, Photo } from '../types';
-import { configuration } from './config.js';
 
 export default class S3Service implements BaseService<Photo> {
-  public readonly s3Client = new S3Client(configuration);
-  public readonly cdnURL = process.env['VITE_IMAGEKIT_CDN_URL'];
+  public readonly s3Client: S3Client;
+  public readonly cdnURL: string;
+
+  constructor() {
+    this.s3Client = new S3Client({
+      region: process.env['AWS_REGION_NAME'] || 'us-east-1',
+      credentials: {
+        accessKeyId: process.env['AWS_ACCESS_KEY_ID'] || '',
+        secretAccessKey: process.env['AWS_SECRET_ACCESS_KEY'] || '',
+      },
+    });
+    this.cdnURL = process.env['VITE_IMAGEKIT_CDN_URL'] || '';
+  }
 
   async findAll(params: ListObjectsV2CommandInput): Promise<Photo[]> {
     const response = await this.s3Client.send(new ListObjectsV2Command(params));

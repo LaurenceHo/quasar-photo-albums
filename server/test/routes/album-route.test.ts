@@ -7,7 +7,7 @@ vi.mock('../../src/d1/d1-client', async () => {
   const { mockAlbumList } = await import('../mock-data');
   return {
     D1Client: class {
-      constructor(table: string) { }
+      constructor(table: string) {}
       async find(query: any) {
         if (query.year === '2024') {
           return mockAlbumList;

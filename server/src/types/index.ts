@@ -10,14 +10,14 @@ import { Photo } from './photo';
 import { Place } from './place';
 
 export type {
-  BaseService,
-  BaseController,
-  RequestWithUser,
-  Photo,
-  Place,
   ApiResponse,
-  ResponseStatus,
+  BaseController,
+  BaseService,
+  Photo,
   PhotoResponse,
-  RenamePhotoRequest,
   PhotosRequest,
+  Place,
+  RenamePhotoRequest,
+  RequestWithUser,
+  ResponseStatus,
 };

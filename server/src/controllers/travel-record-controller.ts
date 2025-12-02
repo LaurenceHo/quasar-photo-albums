@@ -1,17 +1,16 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import logger from 'pino';
-import { D1Client } from '../d1/d1-client.js';
+import TravelRecordService from '../d1/travel-record-service.js';
 import { RequestWithUser } from '../types';
 import { TravelRecord } from '../types/travel-record';
 import { BaseController } from './base-controller.js';
-import { haversineDistance, isValidCoordination, updateDatabaseAt } from './helpers';
-
-const travelClient = new D1Client('travel_records', ['departure', 'destination']);
+import { haversineDistance, isValidCoordination, updateDatabaseAt } from './helpers.js';
 
 export default class TravelRecordController extends BaseController {
-  findAll: RouteHandler = async (_request: FastifyRequest, reply: FastifyReply) => {
+  findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+    const travelRecordService = new TravelRecordService(request.env.DB);
     try {
-      const travelRecords: TravelRecord[] = await travelClient.getAll<TravelRecord>();
+      const travelRecords: TravelRecord[] = await travelRecordService.getAll();
       return this.ok<TravelRecord[]>(reply, 'ok', travelRecords);
     } catch (err: any) {
       logger().error(`Failed to fetch travel records from D1: ${err.message}`);
@@ -22,6 +21,7 @@ export default class TravelRecordController extends BaseController {
   create: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const body = request.body as TravelRecord;
     const userEmail = (request as RequestWithUser).user?.email ?? 'unknown';
+    const travelRecordService = new TravelRecordService(request.env.DB);
 
     // TODO: If departure and destination are present, calculate the distance using latitude and longitude
     // If airline and flight number are present, calculate the distance using flight API
@@ -57,7 +57,7 @@ export default class TravelRecordController extends BaseController {
     };
 
     try {
-      await travelClient.create<TravelRecord>(payload);
+      await travelRecordService.create(payload);
       await updateDatabaseAt('travel');
       return this.ok(reply, 'Travel record created');
     } catch (err: any) {
@@ -70,6 +70,7 @@ export default class TravelRecordController extends BaseController {
     const { id } = request.params as { id: string };
     const body = request.body as TravelRecord;
     const userEmail = (request as RequestWithUser).user?.email ?? 'unknown';
+    const travelRecordService = new TravelRecordService(request.env.DB);
 
     const payload: any = { ...body };
     delete payload.id;
@@ -80,7 +81,7 @@ export default class TravelRecordController extends BaseController {
     payload.updatedBy = userEmail;
 
     try {
-      await travelClient.update<TravelRecord>(id, payload);
+      await travelRecordService.update(id, payload);
       await updateDatabaseAt('travel');
       return this.ok(reply, 'Travel record updated');
     } catch (err: any) {
@@ -92,9 +93,10 @@ export default class TravelRecordController extends BaseController {
   delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const { recordId } = request.params as { recordId: string };
     logger().info('##### Delete travel record: %s', recordId);
+    const travelRecordService = new TravelRecordService(request.env.DB);
 
     try {
-      await travelClient.delete(recordId);
+      await travelRecordService.delete(recordId);
       await updateDatabaseAt('travel');
       return this.ok(reply, 'Travel record deleted');
     } catch (err: any) {

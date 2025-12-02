@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { app } from '../../src/app';
-import { mockAlbumList } from '../mock-data';
 
 const authMock = vi.hoisted(() => ({
   verifyJwtClaim: vi.fn(() => Promise.resolve()),
@@ -19,7 +18,7 @@ vi.mock('../../src/routes/auth-middleware', async () => ({
 vi.mock('../../src/d1/d1-client', async () => {
   return {
     D1Client: class {
-      constructor(table: string) { }
+      constructor(table: string) {}
       async getAll() {
         return [{ tag: 'sport' }, { tag: 'food' }, { tag: 'hiking' }];
       }

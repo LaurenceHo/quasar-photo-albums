@@ -3,6 +3,7 @@ import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import logger from 'pino';
 import { get } from 'radash';
+import UserService from '../d1/user-service.js';
 import { setJwtCookies } from '../routes/auth-middleware.js';
 import { UserPermission } from '../types/user-permission';
 import { BaseController } from './base-controller.js';
@@ -11,33 +12,6 @@ import { BaseController } from './base-controller.js';
 // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
 // Google OAuth client
 const client = new OAuth2Client();
-
-const WORKER_SECRET = process.env['WORKER_SECRET'];
-
-// Helper: safe fetch with timeout and error parsing
-async function safeFetch(input: string, init?: RequestInit): Promise<Response> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
-
-  try {
-    const response = await fetch(input, {
-      ...init,
-      signal: controller.signal,
-      headers: {
-        'Content-Type': 'application/json',
-        ...init?.headers,
-      },
-    });
-    clearTimeout(timeout);
-    return response;
-  } catch (err: any) {
-    clearTimeout(timeout);
-    if (err.name === 'AbortError') {
-      throw new Error('Request to D1 worker timed out');
-    }
-    throw err;
-  }
-}
 
 export default class AuthController extends BaseController {
   // GET /api/auth/userInfo
@@ -94,28 +68,11 @@ export default class AuthController extends BaseController {
         return this.fail(reply, 'Login session expired');
       }
 
-      // 4. Call D1 Worker to get user permissions
-      const workerUrl = process.env['WORKER_URL'];
-      const environment = process.env['ENVIRONMENT'] || 'dev';
+      // 4. Call UserService to get user permissions
+      const userService = new UserService(request.env.DB);
+      const userPermission = await userService.findOne({ uid, email });
 
-      if (!workerUrl) {
-        logger().error('WORKER_URL not configured');
-        return this.fail(reply, 'Server configuration error');
-      }
-
-      const response = await safeFetch(`${workerUrl}/user_permissions`, {
-        method: 'GET',
-        headers: {
-          'X-Uid': uid,
-          'X-Email': email,
-          'X-Environment': environment,
-          'x-worker-secret': WORKER_SECRET || '',
-        },
-      });
-
-      if (response.status === 200) {
-        const userPermission = (await response.json()) as UserPermission;
-
+      if (userPermission) {
         // 5. Sign JWT and set cookies
         const jwtToken = jwt.sign(userPermission, process.env['JWT_SECRET']!, {
           expiresIn: '7d',
@@ -123,13 +80,9 @@ export default class AuthController extends BaseController {
 
         await setJwtCookies(reply, jwtToken);
         return this.ok<UserPermission>(reply, 'ok', userPermission);
-      } else if (response.status === 404) {
+      } else {
         logger().info(`User ${email} not found in permissions`);
         return this.unauthorized(reply, 'User not authorized');
-      } else {
-        const text = await response.text();
-        logger().error(`D1 worker error ${response.status}: ${text}`);
-        return this.fail(reply, 'Failed to verify permissions');
       }
     } catch (err: any) {
       logger().error('Error in verifyIdToken:', err);

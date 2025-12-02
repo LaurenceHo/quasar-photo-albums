@@ -1,16 +1,15 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import { D1Client } from '../d1/d1-client.js';
+import AlbumTagService from '../d1/album-tag-service.js';
 import { RequestWithUser } from '../types';
 import { AlbumTag } from '../types/album.js';
 import { BaseController } from './base-controller.js';
 import { updateDatabaseAt } from './helpers.js';
 
-const albumTagClient = new D1Client('album-tags');
-
 export default class AlbumTagController extends BaseController {
   findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+    const albumTagService = new AlbumTagService(request.env.DB);
     try {
-      const albumTags = await albumTagClient.getAll<AlbumTag>();
+      const albumTags = await albumTagService.getAll();
 
       return this.ok<AlbumTag[]>(reply, 'ok', albumTags);
     } catch (err: any) {
@@ -27,9 +26,10 @@ export default class AlbumTagController extends BaseController {
         createdBy: (request as RequestWithUser).user?.email ?? 'unknown',
       };
     });
+    const albumTagService = new AlbumTagService(request.env.DB);
 
     try {
-      await albumTagClient.create(tagsToCreate);
+      await albumTagService.create(tagsToCreate);
 
       await updateDatabaseAt('album');
       return this.ok(reply, 'Album tag created');
@@ -41,9 +41,10 @@ export default class AlbumTagController extends BaseController {
 
   delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const tag = (request.params as any)['tagId'] as string;
+    const albumTagService = new AlbumTagService(request.env.DB);
     try {
       request.log.info('##### Delete tag: %s', tag);
-      await albumTagClient.delete(tag);
+      await albumTagService.delete(tag);
 
       await updateDatabaseAt('album');
       return this.ok(reply, 'Album tag deleted');

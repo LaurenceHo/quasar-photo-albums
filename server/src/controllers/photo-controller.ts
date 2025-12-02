@@ -3,19 +3,12 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { get, isEmpty } from 'radash';
-import { D1Client } from '../d1/d1-client.js';
+import AlbumService from '../d1/album-service.js';
 import { cleanJwtCookie } from '../routes/auth-middleware.js';
 import S3Service from '../services/s3-service.js';
 import { PhotoResponse, PhotosRequest, RenamePhotoRequest } from '../types';
-import { Album } from '../types/album.js';
 import { BaseController } from './base-controller.js';
 import { deleteObjects } from './helpers.js';
-
-const albumClient = new D1Client('albums', ['place']);
-
-const s3Service = new S3Service();
-const bucketName = process.env['AWS_S3_BUCKET_NAME'];
-const s3Client = new S3Client({ region: 'us-east-1' });
 
 export default class PhotoController extends BaseController {
   /**
@@ -23,9 +16,12 @@ export default class PhotoController extends BaseController {
    */
   findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const albumId = (request.params as any)['albumId'] as string;
+    const albumService = new AlbumService(request.env.DB);
+    const s3Service = new S3Service();
+    const bucketName = process.env['AWS_S3_BUCKET_NAME'];
 
     try {
-      const album = await albumClient.getById<Album>(albumId);
+      const album = await albumService.getById(albumId);
 
       // Only fetch photos when album exists
       if (!isEmpty(album)) {
@@ -58,7 +54,7 @@ export default class PhotoController extends BaseController {
 
         // If photo list is not empty and doesn't have album cover, set album cover
         if (!isEmpty(photos) && isEmpty(album.albumCover)) {
-          await albumClient.update(album.id, {
+          await albumService.update(album.id, {
             ...album,
             albumCover: photos[0]?.key || '',
             updatedBy: 'System',
@@ -66,7 +62,7 @@ export default class PhotoController extends BaseController {
 
           // Remove album cover photo when photo list is empty
         } else if (isEmpty(photos) && !isEmpty(album.albumCover)) {
-          await albumClient.update(album.id, {
+          await albumService.update(album.id, {
             ...album,
             albumCover: '',
             updatedBy: 'System',
@@ -84,6 +80,14 @@ export default class PhotoController extends BaseController {
   create: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const albumId = (request.params as any)['albumId'] as string;
     const { filename, mimeType } = request.query as { filename: string; mimeType: string };
+    const bucketName = process.env['AWS_S3_BUCKET_NAME'];
+    const s3Client = new S3Client({
+      region: process.env['AWS_REGION_NAME'] || 'us-east-1',
+      credentials: {
+        accessKeyId: process.env['AWS_ACCESS_KEY_ID'] || '',
+        secretAccessKey: process.env['AWS_SECRET_ACCESS_KEY'] || '',
+      },
+    });
 
     if (!filename || !mimeType) {
       return this.fail(reply, 'Filename and mimeType are required in query parameters');
@@ -114,6 +118,8 @@ export default class PhotoController extends BaseController {
    */
   update: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const { destinationAlbumId, albumId, photoKeys } = request.body as PhotosRequest;
+    const s3Service = new S3Service();
+    const bucketName = process.env['AWS_S3_BUCKET_NAME'];
 
     const promises: Promise<any>[] = [];
     photoKeys.forEach((photoKey) => {
@@ -122,7 +128,7 @@ export default class PhotoController extends BaseController {
       const promise = new Promise((resolve, reject) => {
         s3Service
           .copy({
-            Bucket: process.env['AWS_S3_BUCKET_NAME'],
+            Bucket: bucketName,
             CopySource: `/${bucketName}/${sourcePhotoKey}`,
             Key: `${destinationAlbumId}/${photoKey}`,
           })
@@ -161,6 +167,8 @@ export default class PhotoController extends BaseController {
 
   rename: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const { albumId, newPhotoKey, currentPhotoKey } = request.body as RenamePhotoRequest;
+    const s3Service = new S3Service();
+    const bucketName = process.env['AWS_S3_BUCKET_NAME'];
 
     // Currently, the only way to rename an object using the SDK is to copy the object with a different name and
     // then delete the original object.

@@ -1,15 +1,14 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import { D1Client } from '../d1/d1-client.js';
+import AlbumService from '../d1/album-service.js';
 import { RequestWithUser } from '../types';
 import { Album } from '../types/album';
 import { BaseController } from './base-controller.js';
 import { emptyS3Folder, updateDatabaseAt, uploadObject, verifyIfIsAdmin } from './helpers.js';
 
-const albumClient = new D1Client('albums', ['place']);
-
 export default class AlbumController extends BaseController {
   findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const year = (request.params as any)['year'] as string;
+    const albumService = new AlbumService(request.env.DB);
 
     try {
       const isAdmin = verifyIfIsAdmin(request, reply);
@@ -19,7 +18,7 @@ export default class AlbumController extends BaseController {
         query.isPrivate = 0;
       }
 
-      const albumList = await albumClient.find<Album>(query);
+      const albumList = await albumService.getAll(query);
 
       return this.ok<Album[]>(reply, 'ok', albumList);
     } catch (err: any) {
@@ -32,21 +31,16 @@ export default class AlbumController extends BaseController {
     const album = request.body as Album;
     album.createdBy = (request as RequestWithUser).user?.email ?? 'unknown';
     album.updatedBy = (request as RequestWithUser).user?.email ?? 'unknown';
+    const albumService = new AlbumService(request.env.DB);
 
     try {
       // Check if album already exists
-      try {
-        await albumClient.getById(album.id);
+      const existing = await albumService.getById(album.id);
+      if (existing) {
         return this.clientError(reply, 'Album already exists');
-      } catch (e: any) {
-        // If 404, it means it doesn't exist, which is what we want.
-        // D1Client throws "D1 Worker error 404: ..."
-        if (!e.message.includes('404')) {
-          throw e;
-        }
       }
 
-      await albumClient.create(album);
+      await albumService.create(album);
 
       await updateDatabaseAt('album');
       // Create folder in S3
@@ -62,8 +56,9 @@ export default class AlbumController extends BaseController {
     try {
       const album = request.body as Album;
       album.updatedBy = (request as RequestWithUser).user?.email ?? 'unknown';
+      const albumService = new AlbumService(request.env.DB);
 
-      await albumClient.update(album.id, album);
+      await albumService.update(album.id, album);
       await updateDatabaseAt('album');
 
       return this.ok(reply, 'Album updated');
@@ -77,12 +72,14 @@ export default class AlbumController extends BaseController {
     try {
       const requestBody = request.body as { id: string; year: string };
       request.log.info('##### Delete album: %s', requestBody.id);
+      const albumService = new AlbumService(request.env.DB);
+
       // Empty S3 folder
       const result = await emptyS3Folder(requestBody.id);
 
       if (result) {
         // Delete album from database
-        await albumClient.delete(requestBody.id);
+        await albumService.delete(requestBody.id);
         await updateDatabaseAt('album');
         return this.ok(reply, 'Album deleted');
       } else {
@@ -96,14 +93,15 @@ export default class AlbumController extends BaseController {
 
   findOne: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const albumId = (request.params as any)['id'] as string;
+    const albumService = new AlbumService(request.env.DB);
 
     try {
-      const album = await albumClient.getById<Album>(albumId);
-      return this.ok<Album>(reply, 'ok', album);
-    } catch (err: any) {
-      if (err.message.includes('404')) {
+      const album = await albumService.getById(albumId);
+      if (!album) {
         return this.clientError(reply, 'Album not found');
       }
+      return this.ok<Album>(reply, 'ok', album);
+    } catch (err: any) {
       request.log.error(`Failed to query photo album: ${err}`);
       return this.fail(reply, 'Failed to query photo album');
     }

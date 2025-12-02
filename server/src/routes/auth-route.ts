@@ -1,7 +1,7 @@
+import { randomBytes } from 'crypto';
 import { FastifyInstance, FastifyPluginCallback } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import AuthController from '../controllers/auth-controller.js';
-import { randomBytes } from 'crypto';
 
 const controller = new AuthController();
 

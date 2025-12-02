@@ -1,10 +1,8 @@
 import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import { D1Client } from '../d1/d1-client.js';
+import AggregationService from '../d1/aggregation-service.js';
 import { Album, AlbumsByYear } from '../types/album.js';
 import { BaseController } from './base-controller.js';
 import { verifyIfIsAdmin } from './helpers.js';
-
-const aggregationClient = new D1Client('aggregations', ['place']);
 
 export default class AggregateController extends BaseController {
   findAll: RouteHandler = async () => {
@@ -29,13 +27,12 @@ export default class AggregateController extends BaseController {
       | 'countAlbumsByYear'
       | 'featuredAlbums';
 
+    const aggregationService = new AggregationService(request.env.DB);
+
     if (aggregateType === 'albumsWithLocation') {
       const isAdmin = verifyIfIsAdmin(request, reply);
       try {
-        const albumData = await aggregationClient.find<Album>({
-          type: 'albumsWithLocation',
-          includePrivate: isAdmin,
-        });
+        const albumData = await aggregationService.getAlbumsWithLocation(isAdmin);
         return this.ok<Album[]>(reply, 'ok', albumData);
       } catch (err: any) {
         request.log.error(`Failed to query aggregate data for photo album with location: ${err}`);
@@ -45,10 +42,7 @@ export default class AggregateController extends BaseController {
       const isAdmin = verifyIfIsAdmin(request, reply);
 
       try {
-        const countData = await aggregationClient.find<AlbumsByYear[0]>({
-          type: 'countAlbumsByYear',
-          includePrivate: isAdmin,
-        });
+        const countData = await aggregationService.getCountAlbumsByYear(isAdmin);
         return this.ok<AlbumsByYear>(reply, 'ok', countData);
       } catch (err: any) {
         request.log.error(`Failed to query aggregate data for count albums by year: ${err}`);
@@ -56,7 +50,7 @@ export default class AggregateController extends BaseController {
       }
     } else if (aggregateType === 'featuredAlbums') {
       try {
-        const featuredAlbums = await aggregationClient.find<Album>({ type: 'featuredAlbums' });
+        const featuredAlbums = await aggregationService.getFeaturedAlbums();
         return this.ok<Album[]>(reply, 'ok', featuredAlbums);
       } catch (err: any) {
         request.log.error(`Failed to query aggregate data for featured albums: ${err}`);
