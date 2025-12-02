@@ -13,6 +13,7 @@ export interface Env {
   VITE_GOOGLE_CLIENT_ID?: string;
   ALBUM_URL?: string;
   ENVIRONMENT?: string;
+  DEVELOPMENT?: string;
 }
 
 export const envStorage = new AsyncLocalStorage<Env>();

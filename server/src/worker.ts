@@ -1,5 +1,8 @@
-import { app } from './app.js';
+import { FastifyInstance } from 'fastify';
+import { getApp } from './app.js';
 import { Env, envStorage } from './env.js';
+
+let appInstance: FastifyInstance | undefined;
 
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
@@ -14,10 +17,16 @@ export default {
     if (env.VITE_GOOGLE_CLIENT_ID) process.env['VITE_GOOGLE_CLIENT_ID'] = env.VITE_GOOGLE_CLIENT_ID;
     if (env.ALBUM_URL) process.env['ALBUM_URL'] = env.ALBUM_URL;
     if (env.ENVIRONMENT) process.env['ENVIRONMENT'] = env.ENVIRONMENT;
+    if (env.DEVELOPMENT) process.env['DEVELOPMENT'] = env.DEVELOPMENT;
 
     // Run within AsyncLocalStorage context
     return envStorage.run(env, async () => {
-      await app.ready();
+      if (!appInstance) {
+        appInstance = await getApp();
+        await appInstance.ready();
+      }
+
+      const app = appInstance;
 
       const url = new URL(request.url);
       const injectHeaders: Record<string, string> = {};

@@ -1,7 +1,7 @@
 {
   "name": "fastify-server",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/worker.js",
   "files": [
     "dist/**/*.*",
     "package.json"

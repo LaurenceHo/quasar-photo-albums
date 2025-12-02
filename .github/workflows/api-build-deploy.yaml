@@ -6,9 +6,6 @@ on:
       - master
     paths:
       - "server/src/**"
-      - "server/lib/**"
-      - "server/bin/**"
-      - "server/cdk.json"
       - "server/package.json"
   workflow_dispatch:
 
@@ -40,17 +37,6 @@ jobs:
           bun install
           bun run types:server
           bun run test:server
-
-      - name: Build Server
-        run: |
-          cd ./server
-          bun run prepare:server:deploy
-
-      - name: CDK Deploy
-        run: |
-          cd ./server
-          bun cdk acknowledge 32775
-          bun cdk deploy PhotoAlbumProdStack --quiet --require-approval never | grep -E "✅|time"
 
       - name: Deploy Cloudflare Worker
         env:

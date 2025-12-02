@@ -1,5 +1,5 @@
 name = "${D1_PHOTO_ALBUMS_WORKER}"
-main = "src/d1/worker.ts"
+main = "src/worker.ts"
 compatibility_date = "2025-10-20"
 compatibility_flags = ["nodejs_compat"]
 
