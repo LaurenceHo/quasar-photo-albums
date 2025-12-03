@@ -57,7 +57,7 @@ export default class AuthController extends BaseController {
       const storedState = getCookie(c, 'csrf_state');
       if (state !== storedState) {
         console.log(`CSRF state mismatch: ${state} vs ${storedState}`);
-        // return this.unauthorized(c, 'CSRF token mismatch');
+        return this.unauthorized(c, 'CSRF token mismatch');
       }
 
       // 3. Fresh login (last 5 minutes)

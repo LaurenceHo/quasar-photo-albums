@@ -70,7 +70,6 @@ export default class TravelRecordController extends BaseController {
   };
 
   update = async (c: Context<HonoEnv>) => {
-    const id = c.req.param('id');
     const body = await c.req.json<TravelRecord>();
     const user = c.get('user') as UserPermission;
     const userEmail = user?.email ?? 'unknown';
@@ -85,7 +84,7 @@ export default class TravelRecordController extends BaseController {
     payload.updatedAt = new Date().toISOString();
 
     try {
-      await travelRecordService.update(id, payload);
+      await travelRecordService.update(payload.id, payload);
       await updateDatabaseAt('travel');
       return this.ok(c, 'Travel record updated');
     } catch (err: any) {

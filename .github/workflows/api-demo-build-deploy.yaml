@@ -7,6 +7,7 @@ on:
     paths:
       - 'server/src/**'
       - 'server/package.json'
+      - 'server/wrangler.ci.toml'
   workflow_dispatch:
 
 jobs:
@@ -19,7 +20,7 @@ jobs:
       AWS_REGION_NAME: ${{ secrets.AWS_REGION_NAME }}
       VITE_GOOGLE_CLIENT_ID: 'VITE_GOOGLE_CLIENT_ID'
       GOOGLE_PLACES_API_KEY: 'GOOGLE_PLACES_API_KEY'
-      JWT_SECRET: 'JWT_SECRET'
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
       ALBUM_URL: ${{ vars.ALBUM_URL }}
       VITE_IMAGEKIT_CDN_URL: ${{ vars.VITE_IMAGEKIT_CDN_URL }}
       AWS_S3_BUCKET_NAME: ${{ vars.AWS_S3_BUCKET_NAME }}
