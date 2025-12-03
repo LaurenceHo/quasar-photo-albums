@@ -17,7 +17,6 @@ declare namespace Cloudflare {
 		ALBUM_URL: string;
 		VITE_IMAGEKIT_CDN_URL: string;
 		AWS_S3_BUCKET_NAME: string;
-		WORKER_SECRET: string;
 		D1_PHOTO_ALBUMS_WORKER: string;
 		DEV_PHOTO_ALBUMS_DB_NAME: string;
 		DEV_PHOTO_ALBUMS_DB_ID: string;

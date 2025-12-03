@@ -28,7 +28,6 @@ jobs:
       D1_PHOTO_ALBUMS_WORKER: ${{ secrets.D1_PHOTO_ALBUMS_WORKER }}
       PROD_PHOTO_ALBUMS_DB_NAME: ${{ secrets.PROD_PHOTO_ALBUMS_DB_NAME }}
       PROD_PHOTO_ALBUMS_DB_ID: ${{ secrets.PROD_PHOTO_ALBUMS_DB_ID }}
-      WORKER_SECRET: ${{ secrets.PROD_WORKER_SECRET }}
       # Dummy values for Dev vars to satisfy wrangler.toml validation
       DEV_PHOTO_ALBUMS_DB_NAME: 'DEV_PHOTO_ALBUMS_DB_NAME'
       DEV_PHOTO_ALBUMS_DB_ID: 'DEV_PHOTO_ALBUMS_DB_ID'

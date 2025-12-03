@@ -2,7 +2,6 @@ import { UserPermission } from './types/user-permission';
 
 export interface Env {
   DB: D1Database;
-  WORKER_SECRET: string;
   AWS_S3_BUCKET_NAME: string;
   AWS_REGION_NAME: string;
   VITE_IMAGEKIT_CDN_URL: string;
@@ -18,7 +17,6 @@ export interface Env {
 
 export type Bindings = {
   DB: D1Database;
-  WORKER_SECRET: string;
   AWS_S3_BUCKET_NAME: string;
   AWS_REGION_NAME: string;
   VITE_IMAGEKIT_CDN_URL: string;
