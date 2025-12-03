@@ -71,7 +71,7 @@ export default class AlbumService extends D1Service<Album> {
     }
   }
 
-  override async update(id: string, item: any): Promise<any> {
+  override async update(id: string, item: Album): Promise<any> {
     const tags = item.tags;
     const album = { ...item };
     delete album.tags;
@@ -120,6 +120,7 @@ export default class AlbumService extends D1Service<Album> {
       try {
         item.place = JSON.parse(item.place);
       } catch (e) {
+        console.warn(`##### Failed to parse place JSON for album ${item.id}:`, e);
         item.place = undefined;
       }
     }
