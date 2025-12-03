@@ -3,4 +3,4 @@ export const ApiBaseUrl =
     ? '/api'
     : import.meta.env.DEV
       ? 'http://localhost:8787/api'
-      : import.meta.env.VITE_AWS_API_GATEWAY_URL;
+      : import.meta.env.VITE_WORKER_API_URL;

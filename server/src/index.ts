@@ -61,7 +61,6 @@ app.use('*', async (c, next) => {
   if (c.env.VITE_GOOGLE_CLIENT_ID)
     process.env['VITE_GOOGLE_CLIENT_ID'] = c.env.VITE_GOOGLE_CLIENT_ID;
   if (c.env.ALBUM_URL) process.env['ALBUM_URL'] = c.env.ALBUM_URL;
-  if (c.env.ENVIRONMENT) process.env['ENVIRONMENT'] = c.env.ENVIRONMENT;
   if (c.env.DEVELOPMENT) process.env['DEVELOPMENT'] = c.env.DEVELOPMENT;
 
   await next();

@@ -4,10 +4,9 @@ node_modules/
 *.log
 # Compiled JavaScript files
 dist/
-
 # TypeScript v1 declaration files
 typings/
 .build/
 coverage/
-cdk.out/*
 .wrangler
+wrangler.toml

@@ -10,7 +10,6 @@
   "scripts": {
     "format": "prettier --write src/ test/ --ignore-unknown --ignore-path .gitignore",
     "lint": "eslint --fix",
-    "init:s3": "bun src/init-s3.ts",
     "start:wrangler": "wrangler dev --local",
     "test:server": "vitest run",
     "types:server": "tsc --noEmit"
@@ -20,7 +19,6 @@
     "@aws-sdk/s3-request-presigner": "^3.937.0",
     "@hono/zod-validator": "^0.7.5",
     "@xmldom/xmldom": "^0.8.11",
-    "dotenv": "17.2.3",
     "google-auth-library": "10.5.0",
     "hono": "^4.6.12",
     "jsonwebtoken": "^9.0.2",

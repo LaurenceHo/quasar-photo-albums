@@ -5,8 +5,8 @@ on:
     branches:
       - master
     paths:
-      - "src/**"
-      - "package.json"
+      - 'src/**'
+      - 'package.json'
   workflow_dispatch:
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
       VITE_STATIC_FILES_URL: ${{ vars.VITE_STATIC_FILES_URL }}
       VITE_IMAGEKIT_CDN_URL: ${{ vars.VITE_IMAGEKIT_CDN_URL }}
       VITE_MAPBOX_API_KEY: ${{ secrets.VITE_MAPBOX_API_KEY }}
-      VITE_AWS_API_GATEWAY_URL: ${{ vars.VITE_AWS_API_GATEWAY_URL }}
+      VITE_WORKER_API_URL: ${{ secrets.VITE_WORKER_API_URL }}
       VITE_MAP_CENTRE_LNG: ${{ vars.VITE_MAP_CENTRE_LNG }}
       VITE_MAP_CENTRE_LAT: ${{ vars.VITE_MAP_CENTRE_LAT }}
 
