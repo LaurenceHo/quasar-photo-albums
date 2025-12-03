@@ -4,14 +4,14 @@ import { Context } from 'hono';
 import { getCookie } from 'hono/cookie';
 import jwt from 'jsonwebtoken';
 import { get, isEmpty } from 'radash';
-import AlbumService from '../d1/album-service.js';
 import { HonoEnv } from '../env.js';
 import { cleanJwtCookie } from '../routes/auth-middleware.js';
+import AlbumService from '../services/album-service.js';
 import S3Service from '../services/s3-service.js';
 import { PhotoResponse, PhotosRequest, RenamePhotoRequest } from '../types';
 import { UserPermission } from '../types/user-permission.js';
+import { deleteObjects } from '../utils/helpers.js';
 import { BaseController } from './base-controller.js';
-import { deleteObjects } from './helpers.js';
 
 export default class PhotoController extends BaseController {
   /**

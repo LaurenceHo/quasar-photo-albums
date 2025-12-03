@@ -1,6 +1,5 @@
 import { Context } from 'hono';
 import { BaseController as IBaseController } from '../types/models.js';
-
 import { ApiResponse } from '../types/api-response.js';
 
 export abstract class BaseController implements IBaseController {

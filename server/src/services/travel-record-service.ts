@@ -1,5 +1,5 @@
+import { D1Service } from '../services/d1-service';
 import { TravelRecord } from '../types/travel-record';
-import { D1Service } from './d1-service';
 
 const travelRecordTableName = 'travel_records';
 

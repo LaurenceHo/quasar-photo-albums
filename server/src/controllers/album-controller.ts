@@ -1,10 +1,15 @@
 import { Context } from 'hono';
-import AlbumService from '../d1/album-service.js';
 import { HonoEnv } from '../env.js';
+import AlbumService from '../services/album-service.js';
 import { Album } from '../types/album';
 import { UserPermission } from '../types/user-permission.js';
+import {
+  emptyS3Folder,
+  updateDatabaseAt,
+  uploadObject,
+  verifyIfIsAdmin,
+} from '../utils/helpers.js';
 import { BaseController } from './base-controller.js';
-import { emptyS3Folder, updateDatabaseAt, uploadObject, verifyIfIsAdmin } from './helpers.js';
 
 export default class AlbumController extends BaseController {
   findAll = async (c: Context<HonoEnv>) => {
@@ -62,7 +67,7 @@ export default class AlbumController extends BaseController {
       const user = c.get('user') as UserPermission;
       album.updatedBy = user?.email ?? 'unknown';
       album.updatedAt = new Date().toISOString();
-      
+
       const albumService = new AlbumService(c.env.DB);
 
       await albumService.update(album.id, album);

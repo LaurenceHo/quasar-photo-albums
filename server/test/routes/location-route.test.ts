@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import app from '../../src/index';
 
-vi.mock('../../src/controllers/helpers', async () => ({
+vi.mock('../../src/utils/helpers', async () => ({
   perform: () =>
     Promise.resolve({
       places: [

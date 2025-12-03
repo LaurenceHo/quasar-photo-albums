@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import app from '../../src/index';
 import { mockAlbumList, mockPhotoList, mockSignedCookies } from '../mock-data';
 
-vi.mock('../../src/d1/album-service', async () => {
+vi.mock('../../src/services/album-service', async () => {
   const { mockAlbumList } = await import('../mock-data');
   return {
     default: class {
@@ -28,10 +28,6 @@ vi.mock('../../src/services/s3-service', async () => {
     },
   };
 });
-
-vi.mock('../../src/controllers/helpers', async () => ({
-  // updatePhotoAlbum: () => Promise.resolve(true), // Removed
-}));
 
 // Mock auth middleware to simulate real behavior for testing 401
 vi.mock('../../src/routes/auth-middleware', async () => ({

@@ -44,14 +44,22 @@ jobs:
           bun run types:server
           bun run test:server
 
-      - name: Deploy Cloudflare Worker
+      - name: Configure Wrangler
         run: |
-          # Go to the exact folder that contains wrangler.toml
           cd "$GITHUB_WORKSPACE/server"
-
-          # Substitute variables in wrangler.toml
           envsubst < wrangler.ci.toml > wrangler.tmp.toml
           mv wrangler.tmp.toml wrangler.toml
 
-          # Deploy
+      - name: Upload Secrets
+        run: |
+          cd "$GITHUB_WORKSPACE/server"
+          echo $AWS_ACCESS_KEY_ID | npx wrangler secret put AWS_ACCESS_KEY_ID --name "$D1_PHOTO_ALBUMS_WORKER"
+          echo $AWS_SECRET_ACCESS_KEY | npx wrangler secret put AWS_SECRET_ACCESS_KEY --name "$D1_PHOTO_ALBUMS_WORKER"
+          echo "VITE_GOOGLE_CLIENT_ID" | npx wrangler secret put VITE_GOOGLE_CLIENT_ID --name "$D1_PHOTO_ALBUMS_WORKER"
+          echo "GOOGLE_PLACES_API_KEY" | npx wrangler secret put GOOGLE_PLACES_API_KEY --name "$D1_PHOTO_ALBUMS_WORKER"
+          echo "JWT_SECRET" | npx wrangler secret put JWT_SECRET --name "$D1_PHOTO_ALBUMS_WORKER"
+
+      - name: Deploy Cloudflare Worker
+        run: |
+          cd "$GITHUB_WORKSPACE/server"
           npx wrangler deploy --name "$D1_PHOTO_ALBUMS_WORKER"

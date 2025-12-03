@@ -4,7 +4,7 @@ import app from '../../src/index';
 
 let mockAuth = true;
 
-vi.mock('../../src/d1/album-tag-service', async () => {
+vi.mock('../../src/services/album-tag-service', async () => {
   return {
     default: class {
       constructor(db: any) {}
@@ -40,7 +40,7 @@ vi.mock('../../src/routes/auth-middleware', async () => ({
   optionalVerifyJwtClaim: createMiddleware(async (c, next) => await next()),
 }));
 
-vi.mock('../../src/controllers/helpers', async () => ({
+vi.mock('../../src/utils/helpers', async () => ({
   updateDatabaseAt: () => Promise.resolve(true),
 }));
 

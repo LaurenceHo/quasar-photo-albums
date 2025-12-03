@@ -2,7 +2,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { Context } from 'hono';
 import { getCookie, setCookie } from 'hono/cookie';
 import jwt from 'jsonwebtoken';
-import UserService from '../d1/user-service.js';
+import UserService from '../services/user-service.js';
 import { HonoEnv } from '../env.js';
 import { setJwtCookies } from '../routes/auth-middleware.js';
 import { UserPermission } from '../types/user-permission';

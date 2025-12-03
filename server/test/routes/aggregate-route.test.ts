@@ -6,7 +6,7 @@ const helperMock = vi.hoisted(() => ({
   verifyIfIsAdmin: vi.fn(() => true),
 }));
 
-vi.mock('../../src/d1/aggregation-service', async () => {
+vi.mock('../../src/services/aggregation-service', async () => {
   const { mockAlbumList } = await import('../mock-data');
 
   return {

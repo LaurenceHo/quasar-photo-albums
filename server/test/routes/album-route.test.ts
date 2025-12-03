@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import app from '../../src/index';
 import { Album } from '../../src/types/album';
 
-vi.mock('../../src/d1/album-service', async () => {
+vi.mock('../../src/services/album-service', async () => {
   const mockAlbumList = [
     {
       albumCover: 'demo-album2/batch_bird-8360220.jpg',
@@ -56,9 +56,8 @@ vi.mock('../../src/routes/auth-middleware', async () => ({
   optionalVerifyJwtClaim: createMiddleware(async (c, next) => await next()),
 }));
 
-vi.mock('../../src/controllers/helpers', async () => ({
+vi.mock('../../src/utils/helpers', async () => ({
   updateDatabaseAt: () => Promise.resolve(true),
-  updatePhotoAlbum: () => Promise.resolve(true),
   emptyS3Folder: () => Promise.resolve(true),
   uploadObject: () => Promise.resolve(true),
   verifyIfIsAdmin: () => true,

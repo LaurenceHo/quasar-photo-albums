@@ -30,12 +30,12 @@ vi.mock('@aws-sdk/s3-request-presigner', () => ({
   getSignedUrl: () => Promise.resolve('https://upload-url'),
 }));
 
-vi.mock('../../src/controllers/helpers', async () => ({
+vi.mock('../../src/utils/helpers', async () => ({
   deleteObjects: () => Promise.resolve(true),
   uploadObject: () => Promise.resolve(true),
 }));
 
-vi.mock('../../src/d1/album-service', async () => {
+vi.mock('../../src/services/album-service', async () => {
   const { mockAlbumList } = await import('../mock-data');
   return {
     default: class {

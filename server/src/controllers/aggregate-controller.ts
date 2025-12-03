@@ -1,6 +1,6 @@
 import { Context } from 'hono';
-import AggregationService from '../d1/aggregation-service.js';
 import { HonoEnv } from '../env.js';
+import AggregationService from '../services/aggregation-service.js';
 import { Album, AlbumsByYear } from '../types/album.js';
 import { UserPermission } from '../types/user-permission.js';
 import { BaseController } from './base-controller.js';

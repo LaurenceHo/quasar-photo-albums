@@ -29,17 +29,11 @@
 
 ## About The Project
 
-This is a fullstack photo album web app using Vue3, PrimeVue, Tailwind CSS, Tanstack Query, Fastify and AWS (including API Gateway, Lambda function, S3, CloudFront and dynamoDB). You can use this web app to display your photos in S3 bucket and manage your photos and albms. This app is supposed to be used by a small group of people (e.g. family members) so it doesn't have any user management feature.
-
-I've written the detailed tutorial on dev.to, you can check [here](https://dev.to/laurenceho/a-fullstack-vuejs-photo-album-app-part-1-2bgd).
+This is a fullstack photo album web app using Vue3, PrimeVue, Tailwind CSS, Tanstack Query, Hono, Cloudflare Workers, Cloudflare D1 and AWS S3. You can use this web app to display your photos in S3 bucket and manage your photos and albums. This app is supposed to be used by a small group of people (e.g. family members) so it doesn't have any user management feature.
 
 ### Built With
 
-[![Vite][vite]][vite-url][![Vue][Vue.js]][Vue-url][![Tailwind CSS][tailwindcss]][tailwindcss-url][![TypeScript][typescript]][type-url][![Vitest][vitest]][vitest-url][![Fastify][fastify]][fastify-url][![AWS][aws]][aws-url]
-
-### Architecture
-
-![Architecture](doc-images/AWS-Architecture.png)
+[![Vite][vite]][vite-url][![Vue][Vue.js]][Vue-url][![Tailwind CSS][tailwindcss]][tailwindcss-url][![TypeScript][typescript]][type-url][![Vitest][vitest]][vitest-url][![Hono][hono]][hono-url][![Cloudflare][cloudflare]][cloudflare-url][![AWS][aws]][aws-url]
 
 ## Getting started
 
@@ -49,23 +43,21 @@ You will need the follows:
 
 1. Google Place API key (For admin manage albums)
 2. Google OAuth 2.0 Client ID (For admin access)
-3. AWS user and role with admin permission for your local development and deployment
-4. AWS S3 bucket (For SPA website hosting and storing photos. **AWS CDK will create this for you once you run CDK deploy.** )
-5. AWS DynamoDB table (For managing album information. **AWS CDK will create 4 tables for you once you run CDK deploy**)
-6. AWS Lambda Function with API Gateway **(AWS CDK will create these for you once you run CDK deploy)**
-7. AWS CloudFront **(AWS CDK will create this for you once you run CDK deploy)**
-8. ImageKit account (It's optional)
-9. Mapbox API key (For displaying map)
+3. AWS user and role with S3 permission for your local development and deployment
+4. AWS S3 bucket (For storing photos. **You need to create this manually.** )
+5. Cloudflare account (For Workers and D1 database)
+6. ImageKit account (It's optional)
+7. Mapbox API key (For displaying map)
 
 ‼️ **️Important** ‼️
 
-Before you start local development, you will need to do CDK bootstrap and deployment first. Please check further
+Before you start local development, you will need to set up Cloudflare D1 and environment variables. Please check further
 information in the `server` folder [here](server/README.md).
 
-### After deploying app by AWS CDK
+### After deploying app to Cloudflare
 
-After deploying AWS CDK by running `bun run cdk:deploy`, replace properties `VITE_STATIC_FILES_URL` and
-`VITE_IMAGEKIT_CDN_URL` (There are 2 `VITE_IMAGEKIT_CDN_URL` env variables, one is in the root folder, another one is in the server folder) with the CloudFront Domain name URL in `.env.example` and modify file name to `.env`. (the URL is like https://d3r2s5zwkwj75c.cloudfront.net, you can find it from AWS console)
+After deploying the backend to Cloudflare, replace properties `VITE_STATIC_FILES_URL` and
+`VITE_IMAGEKIT_CDN_URL` (There are 2 `VITE_IMAGEKIT_CDN_URL` env variables, one is in the root folder, another one is in the server folder) with your configured URLs in `.env.example` and modify file name to `.env`.
 
 ### Integrate with ImageKit
 
@@ -86,11 +78,11 @@ Please check [here](https://developers.google.com/identity/protocols/oauth2) for
 
 #### Login UI
 
-This project uses Google OAuth 2.0 to authenticate users. If you don't want to use Google OAuth 2.0, you will need to implement login UI and authentication process by yourself. Once you set up Google OAuth 2.0 client ID and OAuth consent screen, you can access login UI by going to `http://localhost:9000/login`. You will also need to add your Google account information in the [DynamoDB table](server/README.md#aws-dynamodb) you created. If every thing is set up correctly, you should be able to login with your Google account and see the admin features including album and photo management. If you just want to have a quick glance of UI, you can simply run `bun run msw`, it will launch UI on http://localhost:5173.
+This project uses Google OAuth 2.0 to authenticate users. If you don't want to use Google OAuth 2.0, you will need to implement login UI and authentication process by yourself. Once you set up Google OAuth 2.0 client ID and OAuth consent screen, you can access login UI by going to `http://localhost:9000/login`. You will also need to add your Google account information in the D1 database you created. If every thing is set up correctly, you should be able to login with your Google account and see the admin features including album and photo management. If you just want to have a quick glance of UI, you can simply run `bun run msw`, it will launch UI on http://localhost:5173.
 
-### AWS Lambda Function
+### Cloudflare Workers
 
-This project uses AWS Lambda Function to handle all APIs (as BFF, backend for frontend) and authentication process once it's deployed to AWS. When you run serverless deploy, it will create necessary Lambda Functions, API Gateway and DynamoDB for you.
+This project uses Cloudflare Workers to handle all APIs (as BFF, backend for frontend) and authentication process.
 
 ## How to run locally
 
@@ -155,3 +147,7 @@ See [Configuring quasar.conf.js](https://v2.quasar.dev/quasar-cli/quasar-conf-js
 [fastify-url]: https://fastify.dev/
 [tailwindcss]: https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white
 [tailwindcss-url]: https://tailwindcss.com/
+[hono]: https://img.shields.io/badge/Hono-E36002?style=for-the-badge&logo=hono&logoColor=white
+[hono-url]: https://hono.dev/
+[cloudflare]: https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white
+[cloudflare-url]: https://www.cloudflare.com/

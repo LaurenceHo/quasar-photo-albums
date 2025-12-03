@@ -1,7 +1,7 @@
 import { Context } from 'hono';
 import { Place } from '../types';
+import { perform } from '../utils/helpers.js';
 import { BaseController } from './base-controller.js';
-import { perform } from './helpers.js';
 
 export default class LocationController extends BaseController {
   // Find places by keyword
