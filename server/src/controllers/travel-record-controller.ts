@@ -55,6 +55,8 @@ export default class TravelRecordController extends BaseController {
       distance,
       createdBy: userEmail,
       updatedBy: userEmail,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     try {
@@ -79,8 +81,8 @@ export default class TravelRecordController extends BaseController {
     delete payload.createdAt;
     delete payload.createdBy;
 
-    payload.updatedAt = new Date().toISOString();
     payload.updatedBy = userEmail;
+    payload.updatedAt = new Date().toISOString();
 
     try {
       await travelRecordService.update(id, payload);

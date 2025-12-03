@@ -1,4 +1,12 @@
+import { DOMParser } from '@xmldom/xmldom';
 import { Hono } from 'hono';
+
+// Polyfill DOMParser and Node for AWS SDK in Cloudflare Workers
+globalThis.DOMParser = DOMParser as any;
+// @ts-expect-error - Node is not exported from @xmldom/xmldom/lib/dom but is available at runtime
+import { Node } from '@xmldom/xmldom/lib/dom';
+globalThis.Node = Node as any;
+
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
@@ -35,7 +43,7 @@ app.use('*', async (c, next) => {
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
-  await corsMiddleware(c, next);
+  return corsMiddleware(c, next);
 });
 
 // Polyfill process.env for AWS SDK

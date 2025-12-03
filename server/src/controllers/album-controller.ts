@@ -33,6 +33,8 @@ export default class AlbumController extends BaseController {
     const user = c.get('user') as UserPermission;
     album.createdBy = user?.email ?? 'unknown';
     album.updatedBy = user?.email ?? 'unknown';
+    album.createdAt = new Date().toISOString();
+    album.updatedAt = new Date().toISOString();
     const albumService = new AlbumService(c.env.DB);
 
     try {
@@ -59,6 +61,8 @@ export default class AlbumController extends BaseController {
       const album = await c.req.json<Album>();
       const user = c.get('user') as UserPermission;
       album.updatedBy = user?.email ?? 'unknown';
+      album.updatedAt = new Date().toISOString();
+      
       const albumService = new AlbumService(c.env.DB);
 
       await albumService.update(album.id, album);
