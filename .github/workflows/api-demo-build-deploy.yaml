@@ -53,13 +53,13 @@ jobs:
       - name: Upload Secrets
         run: |
           cd "$GITHUB_WORKSPACE/server"
-          echo $AWS_ACCESS_KEY_ID | npx wrangler secret put AWS_ACCESS_KEY_ID --name "$D1_PHOTO_ALBUMS_WORKER"
-          echo $AWS_SECRET_ACCESS_KEY | npx wrangler secret put AWS_SECRET_ACCESS_KEY --name "$D1_PHOTO_ALBUMS_WORKER"
-          echo "VITE_GOOGLE_CLIENT_ID" | npx wrangler secret put VITE_GOOGLE_CLIENT_ID --name "$D1_PHOTO_ALBUMS_WORKER"
-          echo "GOOGLE_PLACES_API_KEY" | npx wrangler secret put GOOGLE_PLACES_API_KEY --name "$D1_PHOTO_ALBUMS_WORKER"
-          echo "JWT_SECRET" | npx wrangler secret put JWT_SECRET --name "$D1_PHOTO_ALBUMS_WORKER"
+          echo $AWS_ACCESS_KEY_ID | npx wrangler secret put AWS_ACCESS_KEY_ID --name "$D1_PHOTO_ALBUMS_WORKER" --env=""
+          echo $AWS_SECRET_ACCESS_KEY | npx wrangler secret put AWS_SECRET_ACCESS_KEY --name "$D1_PHOTO_ALBUMS_WORKER" --env=""
+          echo "VITE_GOOGLE_CLIENT_ID" | npx wrangler secret put VITE_GOOGLE_CLIENT_ID --name "$D1_PHOTO_ALBUMS_WORKER" --env=""
+          echo "GOOGLE_PLACES_API_KEY" | npx wrangler secret put GOOGLE_PLACES_API_KEY --name "$D1_PHOTO_ALBUMS_WORKER" --env=""
+          echo "JWT_SECRET" | npx wrangler secret put JWT_SECRET --name "$D1_PHOTO_ALBUMS_WORKER" --env=""
 
       - name: Deploy Cloudflare Worker
         run: |
           cd "$GITHUB_WORKSPACE/server"
-          npx wrangler deploy --name "$D1_PHOTO_ALBUMS_WORKER"
+          npx wrangler deploy --name "$D1_PHOTO_ALBUMS_WORKER" --env=""
