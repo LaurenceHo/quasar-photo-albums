@@ -45,7 +45,7 @@ export default class AlbumService extends D1Service<Album> {
     return result ? this.mapAlbum(result) : null;
   }
 
-  override async create(item: any): Promise<any> {
+  override async create(item: Album): Promise<any> {
     const tags = item.tags || [];
     const album = { ...item };
     delete album.tags;
