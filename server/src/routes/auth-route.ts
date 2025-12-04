@@ -12,8 +12,8 @@ app.get('/api/auth/csrf', async (c) => {
 
   setCookie(c, 'csrf_state', state, {
     httpOnly: true,
-    secure: c.env.DEVELOPMENT !== 'true',
-    sameSite: 'Strict',
+    secure: true,
+    sameSite: 'None', // FIXME: Change to 'Strict' when development is done
     path: '/',
     maxAge: 300,
   });

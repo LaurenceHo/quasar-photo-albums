@@ -11,6 +11,7 @@ export const setJwtCookies = async (c: Context, token: string) => {
     expires: new Date(Date.now() + expiresIn),
     httpOnly: true,
     secure: true,
+    sameSite: 'None', // FIXME: Change to 'Strict' when development is done
     path: '/',
   });
   c.header('Cache-Control', 'private');
