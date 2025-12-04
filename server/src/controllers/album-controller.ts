@@ -1,111 +1,121 @@
-import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import { D1Client } from '../d1/d1-client.js';
-import { RequestWithUser } from '../types';
+import { Context } from 'hono';
+import { HonoEnv } from '../env.js';
+import AlbumService from '../services/album-service.js';
 import { Album } from '../types/album';
+import { UserPermission } from '../types/user-permission.js';
+import {
+  emptyS3Folder,
+  updateDatabaseAt,
+  uploadObject,
+  verifyIfIsAdmin,
+} from '../utils/helpers.js';
 import { BaseController } from './base-controller.js';
-import { emptyS3Folder, updateDatabaseAt, uploadObject, verifyIfIsAdmin } from './helpers.js';
-
-const albumClient = new D1Client('albums', ['place']);
 
 export default class AlbumController extends BaseController {
-  findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const year = (request.params as any)['year'] as string;
+  findAll = async (c: Context<HonoEnv>) => {
+    const year = c.req.param('year');
+    const albumService = new AlbumService(c.env.DB);
 
     try {
-      const isAdmin = verifyIfIsAdmin(request, reply);
+      const isAdmin = verifyIfIsAdmin(c);
 
       const query: any = { year };
       if (!isAdmin) {
         query.isPrivate = 0;
       }
 
-      const albumList = await albumClient.find<Album>(query);
+      const albumList = await albumService.getAll(query);
 
-      return this.ok<Album[]>(reply, 'ok', albumList);
+      return this.ok<Album[]>(c, 'ok', albumList);
     } catch (err: any) {
-      request.log.error(`Failed to query photo album: ${err}`);
-      return this.fail(reply, 'Failed to query photo album');
+      console.error(`Failed to query photo album: ${err.stack}`);
+      return this.fail(c, 'Failed to query photo album');
     }
   };
 
-  create: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const album = request.body as Album;
-    album.createdBy = (request as RequestWithUser).user?.email ?? 'unknown';
-    album.updatedBy = (request as RequestWithUser).user?.email ?? 'unknown';
+  create = async (c: Context<HonoEnv>) => {
+    const album = await c.req.json<Album>();
+    const user = c.get('user') as UserPermission;
+    album.createdBy = user?.email ?? 'unknown';
+    album.updatedBy = user?.email ?? 'unknown';
+    album.createdAt = new Date().toISOString();
+    album.updatedAt = new Date().toISOString();
+    const albumService = new AlbumService(c.env.DB);
 
     try {
       // Check if album already exists
-      try {
-        await albumClient.getById(album.id);
-        return this.clientError(reply, 'Album already exists');
-      } catch (e: any) {
-        // If 404, it means it doesn't exist, which is what we want.
-        // D1Client throws "D1 Worker error 404: ..."
-        if (!e.message.includes('404')) {
-          throw e;
-        }
+      const existing = await albumService.getById(album.id);
+      if (existing) {
+        return this.clientError(c, 'Album already exists');
       }
 
-      await albumClient.create(album);
+      await albumService.create(album);
 
       await updateDatabaseAt('album');
       // Create folder in S3
       await uploadObject(album.id + '/', null);
-      return this.ok(reply, 'Album created');
+      return this.ok(c, 'Album created');
     } catch (err: any) {
-      request.log.error(`Failed to insert photo album: ${err}`);
-      return this.fail(reply, 'Failed to create photo album');
+      console.error(`Failed to insert photo album: ${err}`);
+      return this.fail(c, 'Failed to create photo album');
     }
   };
 
-  update: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+  update = async (c: Context<HonoEnv>) => {
     try {
-      const album = request.body as Album;
-      album.updatedBy = (request as RequestWithUser).user?.email ?? 'unknown';
+      const album = await c.req.json<Album>();
+      const user = c.get('user') as UserPermission;
+      album.updatedBy = user?.email ?? 'unknown';
+      album.updatedAt = new Date().toISOString();
 
-      await albumClient.update(album.id, album);
+      const albumService = new AlbumService(c.env.DB);
+
+      await albumService.update(album.id, album);
       await updateDatabaseAt('album');
 
-      return this.ok(reply, 'Album updated');
+      return this.ok(c, 'Album updated');
     } catch (err: any) {
-      request.log.error(`Failed to update photo album: ${err}`);
-      return this.fail(reply, 'Failed to update photo album');
+      console.error(`Failed to update photo album: ${err}`);
+      return this.fail(c, 'Failed to update photo album');
     }
   };
 
-  delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+  delete = async (c: Context<HonoEnv>) => {
     try {
-      const requestBody = request.body as { id: string; year: string };
-      request.log.info('##### Delete album: %s', requestBody.id);
+      const requestBody = await c.req.json<{ id: string; year: string }>();
+      console.log('##### Delete album: %s', requestBody.id);
+      const albumService = new AlbumService(c.env.DB);
+
       // Empty S3 folder
       const result = await emptyS3Folder(requestBody.id);
 
       if (result) {
         // Delete album from database
-        await albumClient.delete(requestBody.id);
+        await albumService.delete(requestBody.id);
         await updateDatabaseAt('album');
-        return this.ok(reply, 'Album deleted');
+        return this.ok(c, 'Album deleted');
       } else {
-        return this.fail(reply, 'Failed to delete photo album');
+        return this.fail(c, 'Failed to delete photo album');
       }
     } catch (err: any) {
-      request.log.error(`Failed to delete photo album: ${err}`);
-      return this.fail(reply, 'Failed to delete photo album');
+      console.error(`Failed to delete photo album: ${err}`);
+      return this.fail(c, 'Failed to delete photo album');
     }
   };
 
-  findOne: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const albumId = (request.params as any)['id'] as string;
+  findOne = async (c: Context<HonoEnv>) => {
+    const albumId = c.req.param('id');
+    const albumService = new AlbumService(c.env.DB);
 
     try {
-      const album = await albumClient.getById<Album>(albumId);
-      return this.ok<Album>(reply, 'ok', album);
-    } catch (err: any) {
-      if (err.message.includes('404')) {
-        return this.clientError(reply, 'Album not found');
+      const album = await albumService.getById(albumId);
+      if (!album) {
+        return this.clientError(c, 'Album not found');
       }
-      request.log.error(`Failed to query photo album: ${err}`);
-      return this.fail(reply, 'Failed to query photo album');
+      return this.ok<Album>(c, 'ok', album);
+    } catch (err: any) {
+      console.error(`Failed to query photo album: ${err}`);
+      return this.fail(c, 'Failed to query photo album');
     }
   };
 }

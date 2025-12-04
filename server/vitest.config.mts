@@ -12,7 +12,6 @@ export default defineConfig({
     ],
     env: {
       WORKER_URL: 'http://localhost',
-      WORKER_SECRET: 'secret',
     },
   },
 });

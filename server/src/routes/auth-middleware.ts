@@ -1,72 +1,67 @@
-import { FastifyAuthFunction } from '@fastify/auth';
-import { CookieSerializeOptions } from '@fastify/cookie';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { Context } from 'hono';
+import { getCookie, setCookie } from 'hono/cookie';
+import { createMiddleware } from 'hono/factory';
 import jwt from 'jsonwebtoken';
-import { get } from 'radash';
-import { RequestWithUser } from '../types';
+import { HonoEnv } from '../env.js';
 import { UserPermission } from '../types/user-permission';
-import JsonResponse from '../utils/json-response.js';
 
-export const setJwtCookies = async (reply: FastifyReply, token: string) => {
+export const setJwtCookies = async (c: Context, token: string) => {
   const expiresIn = 1000 * 60 * 60 * 24 * 7; // 7 days
-  const options: CookieSerializeOptions = {
+  setCookie(c, 'jwt', token, {
     expires: new Date(Date.now() + expiresIn),
     httpOnly: true,
     secure: true,
-    signed: true,
     path: '/',
-  };
-  reply.setCookie('jwt', token, options);
-  reply.header('Cache-Control', 'private');
+  });
+  c.header('Cache-Control', 'private');
 };
 
 /**
  * Clean cookie and return 401
- * @param reply FastifyReply
+ * @param c Context
  * @param message Message to return
  * @param code HTTP status code
  */
-export const cleanJwtCookie = (reply: FastifyReply, message: string, code = 401) => {
-  reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
-  return new JsonResponse(code).unauthorized(reply, message);
+export const cleanJwtCookie = (c: Context, message: string, code = 401) => {
+  setCookie(c, 'jwt', '', { maxAge: 0, path: '/' });
+  return c.json({ message }, code as any);
 };
 
 /**
  * Verify JWT claim
- * @param request
- * @param reply
- * @param done
  */
-export const verifyJwtClaim: FastifyAuthFunction = async (
-  request: FastifyRequest,
-  reply: FastifyReply,
-  done: any,
-) => {
-  const token = get(request, 'cookies.jwt', '');
-  const result = reply.unsignCookie(token);
-  if (result.valid && result.value != null) {
+export const verifyJwtClaim = createMiddleware<HonoEnv>(async (c, next) => {
+  const token = getCookie(c, 'jwt');
+  if (token) {
     try {
-      (request as RequestWithUser).user = jwt.verify(
-        result.value,
-        process.env['JWT_SECRET'] as string,
-      ) as UserPermission;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const user = jwt.verify(token, c.env.JWT_SECRET) as UserPermission;
+      c.set('user', user);
+      return await next();
     } catch (error) {
-      reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
-      done(new Error('Authentication failed. Please login.'));
+      return cleanJwtCookie(c, 'Authentication failed. Please login.');
     }
   } else {
-    reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
-    done(new Error('Authentication failed. Please login.'));
+    return cleanJwtCookie(c, 'Authentication failed. Please login.');
   }
-};
+});
 
-export const verifyUserPermission: FastifyAuthFunction = async (
-  request: FastifyRequest,
-  _reply: FastifyReply,
-  done: any,
-) => {
-  if ((request as RequestWithUser).user?.role !== 'admin') {
-    done(new Error('Unauthorized action'));
+export const optionalVerifyJwtClaim = createMiddleware<HonoEnv>(async (c, next) => {
+  const token = getCookie(c, 'jwt');
+  if (token) {
+    try {
+      const user = jwt.verify(token, c.env.JWT_SECRET) as UserPermission;
+      c.set('user', user);
+    } catch (error) {
+      // Ignore invalid token
+    }
   }
-};
+  return await next();
+});
+
+export const verifyUserPermission = createMiddleware<HonoEnv>(async (c, next) => {
+  const user = c.get('user') as UserPermission;
+  if (user?.role !== 'admin') {
+    return c.json({ message: 'Unauthorized action' }, 403);
+  }
+  return await next();
+});

@@ -1,4 +1,4 @@
-import { D1Service } from './d1-service';
+import { D1Service } from '../services/d1-service';
 import { UserPermission } from '../types/user-permission';
 
 export default class UserService extends D1Service<UserPermission> {

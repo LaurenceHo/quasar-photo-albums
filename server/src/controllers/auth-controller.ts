@@ -1,8 +1,9 @@
-import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
 import { OAuth2Client } from 'google-auth-library';
+import { Context } from 'hono';
+import { getCookie, setCookie } from 'hono/cookie';
 import jwt from 'jsonwebtoken';
-import logger from 'pino';
-import { get } from 'radash';
+import UserService from '../services/user-service.js';
+import { HonoEnv } from '../env.js';
 import { setJwtCookies } from '../routes/auth-middleware.js';
 import { UserPermission } from '../types/user-permission';
 import { BaseController } from './base-controller.js';
@@ -12,164 +13,112 @@ import { BaseController } from './base-controller.js';
 // Google OAuth client
 const client = new OAuth2Client();
 
-const WORKER_SECRET = process.env['WORKER_SECRET'];
-
-// Helper: safe fetch with timeout and error parsing
-async function safeFetch(input: string, init?: RequestInit): Promise<Response> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
-
-  try {
-    const response = await fetch(input, {
-      ...init,
-      signal: controller.signal,
-      headers: {
-        'Content-Type': 'application/json',
-        ...init?.headers,
-      },
-    });
-    clearTimeout(timeout);
-    return response;
-  } catch (err: any) {
-    clearTimeout(timeout);
-    if (err.name === 'AbortError') {
-      throw new Error('Request to D1 worker timed out');
-    }
-    throw err;
-  }
-}
-
 export default class AuthController extends BaseController {
   // GET /api/auth/userInfo
-  readUserInfoFromToken: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+  readUserInfoFromToken = async (c: Context<HonoEnv>) => {
     try {
-      const token = get(request, 'cookies.jwt', '');
-      const result = reply.unsignCookie(token);
+      const token = getCookie(c, 'jwt');
 
-      if (!token || !result.valid || !result.value) {
-        reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
-        return this.ok(reply, 'ok');
+      if (!token) {
+        return this.ok(c, 'ok');
       }
 
       try {
-        const decoded = jwt.verify(result.value, process.env['JWT_SECRET']!) as UserPermission;
-        return this.ok<UserPermission>(reply, 'ok', decoded);
+        const decoded = jwt.verify(token, c.env.JWT_SECRET) as UserPermission;
+        return this.ok<UserPermission>(c, 'ok', decoded);
       } catch (error: any) {
-        logger().info('Invalid JWT:', error);
-        reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
-        return this.ok(reply, 'ok');
+        console.log('Invalid JWT:', error);
+        setCookie(c, 'jwt', '', { maxAge: 0, path: '/' });
+        return this.ok(c, 'ok');
       }
     } catch (error: any) {
-      logger().info('Error reading JWT:', error);
-      reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
-      return this.ok(reply, 'ok');
+      console.log('Error reading JWT:', error);
+      setCookie(c, 'jwt', '', { maxAge: 0, path: '/' });
+      return this.ok(c, 'ok');
     }
   };
 
   // POST /api/auth/verifyIdToken
-  verifyIdToken: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const { token, state } = request.body as { token: string; state?: string };
+  verifyIdToken = async (c: Context<HonoEnv>) => {
+    const { token, state } = await c.req.json<{ token: string; state?: string }>();
 
     try {
       // 1. Verify Google ID token
-      const payload = await _verifyIdToken(token);
+      const payload = await _verifyIdToken(token, c.env.VITE_GOOGLE_CLIENT_ID);
       const uid = payload?.sub ?? '';
       const email = payload?.email ?? '';
       const auth_time = payload?.iat ?? 0;
 
       if (!uid || !email) {
-        return this.unauthorized(reply, 'Invalid Google token');
+        return this.unauthorized(c, 'Invalid Google token');
       }
 
       // 2. CSRF check
-      const storedState = (request.cookies as any).csrf_state;
+      const storedState = getCookie(c, 'csrf_state');
       if (state !== storedState) {
-        logger().info(`CSRF state mismatch: ${state} vs ${storedState}`);
-        return this.unauthorized(reply, 'CSRF token mismatch');
+        console.log(`CSRF state mismatch: ${state} vs ${storedState}`);
+        return this.unauthorized(c, 'CSRF token mismatch');
       }
 
       // 3. Fresh login (last 5 minutes)
       const now = Date.now() / 1000;
       if (now - auth_time >= 5 * 60) {
-        return this.fail(reply, 'Login session expired');
+        return this.fail(c, 'Login session expired');
       }
 
-      // 4. Call D1 Worker to get user permissions
-      const workerUrl = process.env['WORKER_URL'];
-      const environment = process.env['ENVIRONMENT'] || 'dev';
+      // 4. Call UserService to get user permissions
+      const userService = new UserService(c.env.DB);
+      const userPermission = await userService.findOne({ uid, email });
 
-      if (!workerUrl) {
-        logger().error('WORKER_URL not configured');
-        return this.fail(reply, 'Server configuration error');
-      }
-
-      const response = await safeFetch(`${workerUrl}/user_permissions`, {
-        method: 'GET',
-        headers: {
-          'X-Uid': uid,
-          'X-Email': email,
-          'X-Environment': environment,
-          'x-worker-secret': WORKER_SECRET || '',
-        },
-      });
-
-      if (response.status === 200) {
-        const userPermission = (await response.json()) as UserPermission;
-
+      if (userPermission) {
         // 5. Sign JWT and set cookies
-        const jwtToken = jwt.sign(userPermission, process.env['JWT_SECRET']!, {
+        const jwtToken = jwt.sign(userPermission, c.env.JWT_SECRET, {
           expiresIn: '7d',
         });
 
-        await setJwtCookies(reply, jwtToken);
-        return this.ok<UserPermission>(reply, 'ok', userPermission);
-      } else if (response.status === 404) {
-        logger().info(`User ${email} not found in permissions`);
-        return this.unauthorized(reply, 'User not authorized');
+        await setJwtCookies(c, jwtToken);
+        return this.ok<UserPermission>(c, 'ok', userPermission);
       } else {
-        const text = await response.text();
-        logger().error(`D1 worker error ${response.status}: ${text}`);
-        return this.fail(reply, 'Failed to verify permissions');
+        console.log(`User ${email} not found in permissions`);
+        return this.unauthorized(c, 'User not authorized');
       }
     } catch (err: any) {
-      logger().error('Error in verifyIdToken:', err);
-      return this.fail(reply, 'Authentication failed');
+      console.error('Error in verifyIdToken:', err);
+      return this.fail(c, 'Authentication failed');
     }
   };
 
   // POST /api/auth/logout
-  logout: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+  logout = async (c: Context) => {
     try {
-      reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
-      (request as any).user = null;
-      return this.ok(reply, 'Logged out');
+      setCookie(c, 'jwt', '', { maxAge: 0, path: '/' });
+      return this.ok(c, 'Logged out');
     } catch (err: any) {
-      logger().error('Logout error:', err);
-      return this.fail(reply, 'Logout failed');
+      console.error('Logout error:', err);
+      return this.fail(c, 'Logout failed');
     }
   };
 
   // Stub methods
-  findOne: RouteHandler = async () => {
+  findOne = async (_c: Context) => {
     throw new Error('Not implemented');
   };
-  findAll: RouteHandler = async () => {
+  findAll = async (_c: Context) => {
     throw new Error('Not implemented');
   };
-  create: RouteHandler = async () => {
+  create = async (_c: Context) => {
     throw new Error('Not implemented');
   };
-  update: RouteHandler = async () => {
+  update = async (_c: Context) => {
     throw new Error('Not implemented');
   };
-  delete: RouteHandler = async () => {
+  delete = async (_c: Context) => {
     throw new Error('Not implemented');
   };
 }
 
 // Verify Google ID token
-const _verifyIdToken = async (token: string) => {
-  const clientId = process.env['VITE_GOOGLE_CLIENT_ID'];
+const _verifyIdToken = async (token: string, clientId: string) => {
   if (!clientId) {
     throw new Error('VITE_GOOGLE_CLIENT_ID not configured');
   }

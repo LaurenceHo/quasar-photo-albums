@@ -254,8 +254,8 @@ const rules = computed(() => ({
     minLength: helpers.withMessage('It must be at least 2 characters long', minLength(2)),
     maxLength: helpers.withMessage('It cannot exceed 30 characters', maxLength(30)),
     validName: helpers.withMessage(
-      'Only lowercase alphanumeric, space, underscore and dash are allowed',
-      (value: string) => /^[a-z0-9\s-_]*$/.test(value),
+      'Only lowercase alphanumeric, underscore and dash are allowed',
+      (value: string) => /^[a-z0-9-_]*$/.test(value),
     ),
   },
   albumName: {

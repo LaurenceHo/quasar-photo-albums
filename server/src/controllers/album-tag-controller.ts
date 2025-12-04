@@ -1,63 +1,66 @@
-import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
-import { D1Client } from '../d1/d1-client.js';
-import { RequestWithUser } from '../types';
+import { Context } from 'hono';
+import { HonoEnv } from '../env.js';
+import AlbumTagService from '../services/album-tag-service.js';
 import { AlbumTag } from '../types/album.js';
+import { UserPermission } from '../types/user-permission.js';
+import { updateDatabaseAt } from '../utils/helpers.js';
 import { BaseController } from './base-controller.js';
-import { updateDatabaseAt } from './helpers.js';
-
-const albumTagClient = new D1Client('album-tags');
 
 export default class AlbumTagController extends BaseController {
-  findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+  findAll = async (c: Context<HonoEnv>) => {
+    const albumTagService = new AlbumTagService(c.env.DB);
     try {
-      const albumTags = await albumTagClient.getAll<AlbumTag>();
+      const albumTags = await albumTagService.getAll();
 
-      return this.ok<AlbumTag[]>(reply, 'ok', albumTags);
+      return this.ok<AlbumTag[]>(c, 'ok', albumTags);
     } catch (err: any) {
-      request.log.error(`Failed to query album tags: ${err}`);
-      return this.fail(reply, 'Failed to query album tags');
+      console.error(`Failed to query album tags: ${err}`);
+      return this.fail(c, 'Failed to query album tags');
     }
   };
 
-  create: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const tags: AlbumTag[] = request.body as AlbumTag[];
+  create = async (c: Context<HonoEnv>) => {
+    const tags = await c.req.json<AlbumTag[]>();
+    const user = c.get('user') as UserPermission;
     const tagsToCreate: AlbumTag[] = tags.map((tag) => {
       return {
         ...tag,
-        createdBy: (request as RequestWithUser).user?.email ?? 'unknown',
+        createdBy: user?.email ?? 'unknown',
       };
     });
+    const albumTagService = new AlbumTagService(c.env.DB);
 
     try {
-      await albumTagClient.create(tagsToCreate);
+      await albumTagService.create(tagsToCreate);
 
       await updateDatabaseAt('album');
-      return this.ok(reply, 'Album tag created');
+      return this.ok(c, 'Album tag created');
     } catch (err) {
-      request.log.error(`Failed to create album tag: ${err}`);
-      return this.fail(reply, 'Failed to create album tag');
+      console.error(`Failed to create album tag: ${err}`);
+      return this.fail(c, 'Failed to create album tag');
     }
   };
 
-  delete: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const tag = (request.params as any)['tagId'] as string;
+  delete = async (c: Context<HonoEnv>) => {
+    const tag = c.req.param('tagId');
+    const albumTagService = new AlbumTagService(c.env.DB);
     try {
-      request.log.info('##### Delete tag: %s', tag);
-      await albumTagClient.delete(tag);
+      console.log('##### Delete tag: %s', tag);
+      await albumTagService.delete(tag);
 
       await updateDatabaseAt('album');
-      return this.ok(reply, 'Album tag deleted');
+      return this.ok(c, 'Album tag deleted');
     } catch (err) {
-      request.log.error(`Failed to delete album tag: ${err}`);
-      return this.fail(reply, 'Failed to delete album tag');
+      console.error(`Failed to delete album tag: ${err}`);
+      return this.fail(c, 'Failed to delete album tag');
     }
   };
 
-  findOne: RouteHandler = async () => {
+  findOne = async (_c: Context) => {
     throw new Error('Method not implemented.');
   };
 
-  update: RouteHandler = async () => {
+  update = async (_c: Context) => {
     throw new Error('Method not implemented.');
   };
 }

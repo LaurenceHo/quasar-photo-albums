@@ -2,7 +2,7 @@ import CreateAlbum from '@/components/dialog/CreateAlbum.vue';
 import router from '@/router';
 import { AlbumService } from '@/services/album-service';
 import { LocationService } from '@/services/location-service';
-import { useDialogStore, useAlbumStore } from '@/stores';
+import { useAlbumStore, useDialogStore } from '@/stores';
 import { createTestingPinia } from '@pinia/testing';
 import { QueryClient, VueQueryPlugin, type VueQueryPluginOptions } from '@tanstack/vue-query';
 import { flushPromises, mount } from '@vue/test-utils';
@@ -124,7 +124,12 @@ describe('CreateAlbum', () => {
     // Test invalid characters
     await albumIdInput.setValue('Invalid@Album#ID');
     expect(wrapper.text()).toContain(
-      'Only lowercase alphanumeric, space, underscore and dash are allowed',
+      'Only lowercase alphanumeric, underscore and dash are allowed',
+    );
+
+    await albumIdInput.setValue('invalid space album id');
+    expect(wrapper.text()).toContain(
+      'Only lowercase alphanumeric, underscore and dash are allowed',
     );
 
     // Test valid input

@@ -1,11 +1,12 @@
+import { Album } from '../types/album';
 import { D1Service } from './d1-service';
 
-export default class AlbumService extends D1Service<any> {
+export default class AlbumService extends D1Service<Album> {
   constructor(db: D1Database) {
     super(db, 'albums');
   }
 
-  override async getAll(where?: Record<string, any>): Promise<any[]> {
+  override async getAll(where?: Record<string, any>): Promise<Album[]> {
     let sql = `
       SELECT a.*,
              (SELECT json_group_array(tag) FROM album_tags_map WHERE albumId = a.id) as tags
@@ -33,7 +34,7 @@ export default class AlbumService extends D1Service<any> {
     return results.map((item) => this.mapAlbum(item));
   }
 
-  override async getById(id: string): Promise<any | null> {
+  override async getById(id: string): Promise<Album | null> {
     const sql = `
       SELECT a.*,
              (SELECT json_group_array(tag) FROM album_tags_map WHERE albumId = a.id) as tags
@@ -44,7 +45,7 @@ export default class AlbumService extends D1Service<any> {
     return result ? this.mapAlbum(result) : null;
   }
 
-  override async create(item: any): Promise<any> {
+  override async create(item: Album): Promise<any> {
     const tags = item.tags || [];
     const album = { ...item };
     delete album.tags;
@@ -70,7 +71,7 @@ export default class AlbumService extends D1Service<any> {
     }
   }
 
-  override async update(id: string, item: any): Promise<any> {
+  override async update(id: string, item: Album): Promise<any> {
     const tags = item.tags;
     const album = { ...item };
     delete album.tags;
@@ -102,7 +103,7 @@ export default class AlbumService extends D1Service<any> {
     }
   }
 
-  private mapAlbum(item: any): any {
+  private mapAlbum(item: any): Album {
     // Parse tags
     if (item.tags && typeof item.tags === 'string') {
       try {
@@ -114,6 +115,16 @@ export default class AlbumService extends D1Service<any> {
       item.tags = [];
     }
 
+    // Parse place
+    if (item.place && typeof item.place === 'string') {
+      try {
+        item.place = JSON.parse(item.place);
+      } catch (e) {
+        console.warn(`##### Failed to parse place JSON for album ${item.id}:`, e);
+        item.place = undefined;
+      }
+    }
+
     // Convert booleans
     // D1/SQLite stores booleans as 0 or 1
     if (item.isPrivate !== undefined) {
@@ -123,6 +134,6 @@ export default class AlbumService extends D1Service<any> {
       item.isFeatured = !!item.isFeatured;
     }
 
-    return item;
+    return item as Album;
   }
 }

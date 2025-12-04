@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { haversineDistance } from '../../src/controllers/helpers';
+import { describe, expect, it } from 'vitest';
+import { haversineDistance } from '../../src/utils/helpers';
 
 describe('haversineDistance', () => {
   it('should calculate distance between two points correctly (km)', () => {

@@ -1,43 +1,72 @@
-import { FastifyReply, RouteHandler } from 'fastify';
+import { Context } from 'hono';
 import { BaseController as IBaseController } from '../types/models.js';
-import JsonResponse from '../utils/json-response.js';
+import { ApiResponse } from '../types/api-response.js';
 
 export abstract class BaseController implements IBaseController {
-  abstract findAll: RouteHandler;
+  abstract findAll(c: Context): Promise<Response>;
 
-  abstract findOne: RouteHandler;
+  abstract findOne(c: Context): Promise<Response>;
 
-  abstract create: RouteHandler;
+  abstract create(c: Context): Promise<Response>;
 
-  abstract update: RouteHandler;
+  abstract update(c: Context): Promise<Response>;
 
-  abstract delete: RouteHandler;
+  abstract delete(c: Context): Promise<Response>;
 
-  public ok<T>(reply: FastifyReply, message = '', data?: T) {
-    if (data) {
-      return new JsonResponse<T>(200).success(reply, message, data);
-    } else {
-      return new JsonResponse(200).success(reply, message);
+  public ok<T>(c: Context, message = 'ok', data?: T) {
+    const response: ApiResponse<T> = {
+      code: 200,
+      status: 'Success',
+      message,
+    };
+    if (data !== undefined) {
+      response.data = data;
     }
+    return c.json(response, 200);
   }
 
-  public clientError(reply: FastifyReply, message = '') {
-    return new JsonResponse(400).badRequest(reply, message);
+  public clientError(c: Context, message = 'Bad Request') {
+    const response: ApiResponse<null> = {
+      code: 400,
+      status: 'Bad Request',
+      message,
+    };
+    return c.json(response, 400);
   }
 
-  public notFoundError(reply: FastifyReply, message = '') {
-    return new JsonResponse(404).badRequest(reply, message);
+  public notFoundError(c: Context, message = 'Not Found') {
+    const response: ApiResponse<null> = {
+      code: 404,
+      status: 'Not Found',
+      message,
+    };
+    return c.json(response, 404);
   }
 
-  public unauthorized(reply: FastifyReply, message = '') {
-    return new JsonResponse(401).unauthorized(reply, message);
+  public unauthorized(c: Context, message = 'Unauthorized') {
+    const response: ApiResponse<null> = {
+      code: 401,
+      status: 'Unauthorized',
+      message,
+    };
+    return c.json(response, 401);
   }
 
-  public insufficientPermission(reply: FastifyReply, message = '') {
-    return new JsonResponse(403).unauthorized(reply, message);
+  public insufficientPermission(c: Context, message = 'Forbidden') {
+    const response: ApiResponse<null> = {
+      code: 403,
+      status: 'Forbidden',
+      message,
+    };
+    return c.json(response, 403);
   }
 
-  public fail(reply: FastifyReply, message: string) {
-    return new JsonResponse(500).error(reply, message);
+  public fail(c: Context, message: string) {
+    const response: ApiResponse<null> = {
+      code: 500,
+      status: 'Internal Server Error',
+      message,
+    };
+    return c.json(response, 500);
   }
 }

@@ -1,14 +1,15 @@
 import { DeleteObjectsCommandInput, PutObjectCommandInput } from '@aws-sdk/client-s3';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { Context } from 'hono';
+import { getCookie, setCookie } from 'hono/cookie';
 import jwt from 'jsonwebtoken';
-import logger from 'pino';
 import { get, isEmpty } from 'radash';
+import { HonoEnv } from '../env.js';
 import S3Service from '../services/s3-service.js';
 
 const s3BucketName = process.env['AWS_S3_BUCKET_NAME'];
-const s3Service = new S3Service();
 
 export const updateDatabaseAt = async (type: 'album' | 'travel') => {
+  const s3Service = new S3Service();
   const result: { album: string; travel: string } = await s3Service.read({
     Bucket: s3BucketName,
     Key: 'updateDatabaseAt.json',
@@ -26,7 +27,8 @@ export const updateDatabaseAt = async (type: 'album' | 'travel') => {
 
 //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-photo-album-full.html
 export const uploadObject = async (filePath: string, object: any) => {
-  logger().info(`##### S3 destination file path: ${filePath}`);
+  console.log(`##### S3 destination file path: ${filePath}`);
+  const s3Service = new S3Service();
 
   try {
     const putObject: PutObjectCommandInput = {
@@ -41,7 +43,7 @@ export const uploadObject = async (filePath: string, object: any) => {
 
     return await s3Service.create(putObject);
   } catch (err) {
-    logger().error(`Failed to upload photo: ${err}`);
+    console.error(`Failed to upload photo: ${err}`);
     throw Error('Error when uploading photo');
   }
 };
@@ -53,16 +55,18 @@ export const deleteObjects = async (objectKeys: string[]) => {
   };
 
   objectKeys.forEach((objectKeys) => deleteParams.Delete?.Objects?.push({ Key: objectKeys }));
+  const s3Service = new S3Service();
 
   try {
     return await s3Service.delete(deleteParams);
   } catch (err) {
-    logger().error(`Failed to delete photos: ${err}`);
+    console.error(`Failed to delete photos: ${err}`);
     throw Error('Error when deleting photos');
   }
 };
 
 export const emptyS3Folder = async (folderName: string) => {
+  const s3Service = new S3Service();
   const listedObjects = await s3Service.listObjects({
     Bucket: s3BucketName,
     Prefix: folderName,
@@ -79,7 +83,7 @@ export const emptyS3Folder = async (folderName: string) => {
   try {
     return await deleteObjects(listedObjectArray);
   } catch (err) {
-    logger().error(`Failed to empty S3 folder: ${err}`);
+    console.error(`Failed to empty S3 folder: ${err}`);
     throw Error('Error when emptying S3 folder');
   }
 };
@@ -110,18 +114,16 @@ export const perform = async (
   return await response.json();
 };
 
-export const verifyIfIsAdmin = (request: FastifyRequest, reply: FastifyReply) => {
+export const verifyIfIsAdmin = (c: Context<HonoEnv>) => {
   let isAdmin = false;
-  const token = get(request, 'cookies.jwt', '');
-  const result = reply.unsignCookie(token);
+  const token = getCookie(c, 'jwt');
 
-  if (result.valid && result.value != null) {
+  if (token) {
     try {
-      const decodedPayload = jwt.verify(result.value, process.env['JWT_SECRET'] as string);
+      const decodedPayload = jwt.verify(token, c.env.JWT_SECRET);
       isAdmin = get(decodedPayload, 'role') === 'admin';
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      reply.setCookie('jwt', '', { maxAge: 0, path: '/' });
+      setCookie(c, 'jwt', '', { maxAge: 0, path: '/' });
     }
   }
   return isAdmin;

@@ -1,121 +1,39 @@
-import { FastifyInstance, FastifyPluginCallback } from 'fastify';
-import fastifyPlugin from 'fastify-plugin';
+import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
 import PhotoController from '../controllers/photo-controller.js';
+import { HonoEnv } from '../env.js';
+import { PhotosRequestSchema, RenamePhotoRequestSchema } from '../types/api-response.js';
 import { verifyJwtClaim, verifyUserPermission } from './auth-middleware.js';
 
 const controller = new PhotoController();
+const app = new Hono<HonoEnv>();
 
-const photoRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
-  instance.get('/api/photos/:year/:albumId', {
-    handler: controller.findAll,
-    schema: {
-      params: {
-        type: 'object',
-        properties: {
-          year: {
-            type: 'string',
-          },
-          albumId: {
-            type: 'string',
-          },
-        },
-      },
-    },
-  });
+app.get('/api/photos/upload/:albumId', verifyJwtClaim, verifyUserPermission, controller.create);
 
-  instance.get('/api/photos/upload/:albumId', {
-    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
-    }),
-    handler: controller.create,
-    schema: {
-      params: {
-        type: 'object',
-        properties: {
-          albumId: {
-            type: 'string',
-          },
-        },
-      },
-    },
-  });
+app.get('/api/photos/:year/:albumId', controller.findAll);
 
-  instance.put('/api/photos', {
-    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
-    }),
-    handler: controller.update,
-    schema: {
-      body: {
-        type: 'object',
-        required: ['albumId', 'destinationAlbumId', 'photoKeys'],
-        properties: {
-          albumId: {
-            type: 'string',
-          },
-          destinationAlbumId: {
-            type: 'string',
-          },
-          photoKeys: {
-            type: 'array',
-            items: {
-              type: 'string',
-            },
-          },
-        },
-      },
-    },
-  });
+app.put(
+  '/api/photos',
+  verifyJwtClaim,
+  verifyUserPermission,
+  zValidator('json', PhotosRequestSchema),
+  controller.update,
+);
 
-  instance.put('/api/photos/rename', {
-    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
-    }),
-    handler: controller.rename,
-    schema: {
-      body: {
-        type: 'object',
-        required: ['albumId', 'newPhotoKey', 'currentPhotoKey'],
-        properties: {
-          albumId: {
-            type: 'string',
-          },
-          newPhotoKey: {
-            type: 'string',
-          },
-          currentPhotoKey: {
-            type: 'string',
-          },
-        },
-      },
-    },
-  });
+app.put(
+  '/api/photos/rename',
+  verifyJwtClaim,
+  verifyUserPermission,
+  zValidator('json', RenamePhotoRequestSchema),
+  controller.rename,
+);
 
-  instance.delete('/api/photos', {
-    onRequest: instance.auth([verifyJwtClaim, verifyUserPermission], {
-      relation: 'and',
-    }),
-    handler: controller.delete,
-    schema: {
-      body: {
-        type: 'object',
-        required: ['albumId', 'photoKeys'],
-        properties: {
-          albumId: {
-            type: 'string',
-          },
-          photoKeys: {
-            type: 'array',
-            items: {
-              type: 'string',
-            },
-          },
-        },
-      },
-    },
-  });
+app.delete(
+  '/api/photos',
+  verifyJwtClaim,
+  verifyUserPermission,
+  zValidator('json', PhotosRequestSchema),
+  controller.delete,
+);
 
-  done();
-};
-
-export default fastifyPlugin(photoRoute);
+export default app;

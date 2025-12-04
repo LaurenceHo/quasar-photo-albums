@@ -1,4 +1,3 @@
-import signerFactory from '@fastify/cookie/signer';
 import jwt from 'jsonwebtoken';
 
 export const mockAlbumList = [
@@ -88,6 +87,5 @@ export const mockSignedCookies = () => {
   const token = jwt.sign(mockUserPermission, process.env['JWT_SECRET'] as string, {
     expiresIn: '7d',
   });
-  const signer = signerFactory(process.env['JWT_SECRET']);
-  return signer.sign(token);
+  return token;
 };

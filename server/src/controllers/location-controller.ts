@@ -1,12 +1,12 @@
-import { FastifyReply, FastifyRequest, RouteHandler } from 'fastify';
+import { Context } from 'hono';
 import { Place } from '../types';
+import { perform } from '../utils/helpers.js';
 import { BaseController } from './base-controller.js';
-import { perform } from './helpers.js';
 
 export default class LocationController extends BaseController {
   // Find places by keyword
-  findAll: RouteHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const { textQuery } = request.query as { textQuery: string };
+  findAll = async (c: Context) => {
+    const textQuery = c.req.query('textQuery');
     const response: any = await perform(
       'POST',
       ':searchText',
@@ -25,25 +25,25 @@ export default class LocationController extends BaseController {
       });
     }
     if (!response.error) {
-      return this.ok<Place[]>(reply, 'ok', places);
+      return this.ok<Place[]>(c, 'ok', places);
     } else {
-      return this.fail(reply, response.error.message);
+      return this.fail(c, response.error.message);
     }
   };
 
-  findOne: RouteHandler = async () => {
+  findOne = async (_c: Context) => {
     throw new Error('Method not implemented.');
   };
 
-  create: RouteHandler = async () => {
+  create = async (_c: Context) => {
     throw new Error('Method not implemented.');
   };
 
-  delete: RouteHandler = async () => {
+  delete = async (_c: Context) => {
     throw new Error('Method not implemented.');
   };
 
-  update: RouteHandler = async () => {
+  update = async (_c: Context) => {
     throw new Error('Method not implemented.');
   };
 }

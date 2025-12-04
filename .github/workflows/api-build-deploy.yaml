@@ -5,11 +5,9 @@ on:
     branches:
       - master
     paths:
-      - "server/src/**"
-      - "server/lib/**"
-      - "server/bin/**"
-      - "server/cdk.json"
-      - "server/package.json"
+      - 'server/src/**'
+      - 'server/package.json'
+      - 'server/wrangler.ci.toml'
   workflow_dispatch:
 
 jobs:
@@ -26,9 +24,14 @@ jobs:
       ALBUM_URL: ${{ secrets.ALBUM_URL }}
       VITE_IMAGEKIT_CDN_URL: ${{ secrets.VITE_IMAGEKIT_CDN_URL }}
       AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
-      WORKER_URL: ${{ secrets.WORKER_URL }}
-      WORKER_SECRET: ${{ secrets.PROD_WORKER_SECRET }}
-      ENVIRONMENT: prod
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      D1_PHOTO_ALBUMS_WORKER: ${{ secrets.D1_PHOTO_ALBUMS_WORKER }}
+      PROD_PHOTO_ALBUMS_DB_NAME: ${{ secrets.PROD_PHOTO_ALBUMS_DB_NAME }}
+      PROD_PHOTO_ALBUMS_DB_ID: ${{ secrets.PROD_PHOTO_ALBUMS_DB_ID }}
+      # Dummy values for Dev vars to satisfy wrangler.toml validation
+      DEV_PHOTO_ALBUMS_DB_NAME: 'DEV_PHOTO_ALBUMS_DB_NAME'
+      DEV_PHOTO_ALBUMS_DB_ID: 'DEV_PHOTO_ALBUMS_DB_ID'
 
     steps:
       - uses: actions/checkout@v4
@@ -41,40 +44,22 @@ jobs:
           bun run types:server
           bun run test:server
 
-      - name: Build Server
+      - name: Configure Wrangler
         run: |
-          cd ./server
-          bun run prepare:server:deploy
-
-      - name: CDK Deploy
-        run: |
-          cd ./server
-          bun cdk acknowledge 32775
-          bun cdk deploy PhotoAlbumProdStack --quiet --require-approval never | grep -E "✅|time"
-
-      - name: Deploy Cloudflare Worker
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          D1_PHOTO_ALBUMS_WORKER: ${{ secrets.D1_PHOTO_ALBUMS_WORKER }}
-          PROD_PHOTO_ALBUMS_DB_NAME: ${{ secrets.PROD_PHOTO_ALBUMS_DB_NAME }}
-          PROD_PHOTO_ALBUMS_DB_ID: ${{ secrets.PROD_PHOTO_ALBUMS_DB_ID }}
-          WORKER_SECRET: ${{ secrets.PROD_WORKER_SECRET }}
-          # Dummy values for Dev vars to satisfy wrangler.toml validation
-          DEV_PHOTO_ALBUMS_DB_NAME: "placeholder-dev-db"
-          DEV_PHOTO_ALBUMS_DB_ID: "placeholder-dev-id"
-        run: |
-          # Go to the folder that contains wrangler.toml
           cd "$GITHUB_WORKSPACE/server"
-
-          # Export the prod DB vars so envsubst can replace them
-          export PROD_PHOTO_ALBUMS_DB_NAME
-          export PROD_PHOTO_ALBUMS_DB_ID
-          export WORKER_SECRET
-
-          # Substitute variables in wrangler.toml
-          envsubst < wrangler.toml > wrangler.tmp.toml
+          envsubst < wrangler.ci.toml > wrangler.tmp.toml
           mv wrangler.tmp.toml wrangler.toml
 
-          # Deploy to the **production** environment
+      - name: Upload Secrets
+        run: |
+          cd "$GITHUB_WORKSPACE/server"
+          echo $AWS_ACCESS_KEY_ID | npx wrangler secret put AWS_ACCESS_KEY_ID --name "$D1_PHOTO_ALBUMS_WORKER" --env production
+          echo $AWS_SECRET_ACCESS_KEY | npx wrangler secret put AWS_SECRET_ACCESS_KEY --name "$D1_PHOTO_ALBUMS_WORKER" --env production
+          echo $VITE_GOOGLE_CLIENT_ID | npx wrangler secret put VITE_GOOGLE_CLIENT_ID --name "$D1_PHOTO_ALBUMS_WORKER" --env production
+          echo $GOOGLE_PLACES_API_KEY | npx wrangler secret put GOOGLE_PLACES_API_KEY --name "$D1_PHOTO_ALBUMS_WORKER" --env production
+          echo $JWT_SECRET | npx wrangler secret put JWT_SECRET --name "$D1_PHOTO_ALBUMS_WORKER" --env production
+
+      - name: Deploy Cloudflare Worker
+        run: |
+          cd "$GITHUB_WORKSPACE/server"
           npx wrangler deploy --name "$D1_PHOTO_ALBUMS_WORKER" --env production

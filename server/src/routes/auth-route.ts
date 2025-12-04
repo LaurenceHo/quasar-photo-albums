@@ -1,44 +1,29 @@
-import { FastifyInstance, FastifyPluginCallback } from 'fastify';
-import fastifyPlugin from 'fastify-plugin';
+import { Hono } from 'hono';
+import { setCookie } from 'hono/cookie';
+import { randomBytes } from 'node:crypto';
 import AuthController from '../controllers/auth-controller.js';
-import { randomBytes } from 'crypto';
+import { HonoEnv } from '../env.js';
 
 const controller = new AuthController();
+const app = new Hono<HonoEnv>();
 
-const authRoute: FastifyPluginCallback = (instance: FastifyInstance, _opt, done) => {
-  instance.get('/api/auth/csrf', async (_request, reply) => {
-    const state = randomBytes(16).toString('hex');
+app.get('/api/auth/csrf', async (c) => {
+  const state = randomBytes(16).toString('hex');
 
-    reply.setCookie('csrf_state', state, {
-      httpOnly: true,
-      secure: process.env['DEVELOPMENT'] !== 'true',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 300,
-    });
-    return { state };
+  setCookie(c, 'csrf_state', state, {
+    httpOnly: true,
+    secure: c.env.DEVELOPMENT !== 'true',
+    sameSite: 'Strict',
+    path: '/',
+    maxAge: 300,
   });
+  return c.json({ state });
+});
 
-  instance.get('/api/auth/userInfo', controller.readUserInfoFromToken);
+app.get('/api/auth/userInfo', controller.readUserInfoFromToken);
 
-  instance.post('/api/auth/verifyIdToken', {
-    handler: controller.verifyIdToken,
-    schema: {
-      body: {
-        type: 'object',
-        required: ['token'],
-        properties: {
-          token: {
-            type: 'string',
-          },
-        },
-      },
-    },
-  });
+app.post('/api/auth/verifyIdToken', controller.verifyIdToken);
 
-  instance.post('/api/auth/logout', controller.logout);
+app.post('/api/auth/logout', controller.logout);
 
-  done();
-};
-
-export default fastifyPlugin(authRoute);
+export default app;

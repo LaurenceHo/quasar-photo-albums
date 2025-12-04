@@ -2,15 +2,17 @@ import { z } from 'zod';
 import { PlaceSchema } from './place';
 
 export const AlbumSchema = z.object({
-  id: z.string(),
+  id: z.string().regex(/^[a-z0-9-_]*$/, {
+    message: 'Only lowercase alphanumeric, underscore and dash are allowed',
+  }),
   year: z.string(),
   albumName: z.string(),
-  description: z.string().optional(),
   albumCover: z.string().optional(),
+  description: z.string().optional(),
   isPrivate: z.boolean(),
   isFeatured: z.boolean().optional(),
-  place: PlaceSchema.optional(),
   tags: z.array(z.string()).optional(),
+  place: PlaceSchema.optional().nullable(),
   createdAt: z.string(),
   createdBy: z.string(),
   updatedAt: z.string(),
